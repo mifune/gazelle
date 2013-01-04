@@ -176,7 +176,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                 }
                 
                 $UpdateSet[]="personal_freeleech='$personal_freeleech'";
-                update_tracker('set_personal_freeleech', array('passkey' => $LoggedUser['torrent_pass'], 'until_time' => $personal_freeleech));
+                update_tracker('set_personal_freeleech', array('passkey' => $LoggedUser['torrent_pass'], 'time' => strtotime($personal_freeleech)));
                 
                 $ResultMessage=$Summary;
                 break;
