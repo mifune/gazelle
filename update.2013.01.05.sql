@@ -1,0 +1,1 @@
+ALTER TABLE  `site_options` ADD  `FreeLeech` DATETIME NOT NULL DEFAULT  '0000-00-00 00:00:00';

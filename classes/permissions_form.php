@@ -120,19 +120,20 @@
     'users_view_language' => 'Can view user language(s) on user profile',
      
 	'torrents_edit' => 'Can edit any torrent.',
-              'torrents_review' => 'Can mark torrents for deletion.',
-              'torrents_review_override' => 'Can overide ongoing marked for deletion process.',
-              'torrents_review_manage' => 'Can set site options for marked for deletion list.',
-              'torrents_download_override' => 'Can download torrents that are marked for deletion.',
+        'torrents_review' => 'Can mark torrents for deletion.',
+        'torrents_review_override' => 'Can overide ongoing marked for deletion process.',
+        'torrents_review_manage' => 'Can set site options for marked for deletion list.',
+        'torrents_download_override' => 'Can download torrents that are marked for deletion.',
      
 	'torrents_delete' => 'Can delete torrents.',
 	'torrents_delete_fast' => 'Can delete more than 3 torrents at a time.',
 	'torrents_freeleech' => 'Can make torrents freeleech.',
 	'torrents_search_fast' => 'Rapid search (for scripts).',
 	'torrents_hide_dnu' => 'Hide the Do Not Upload list by default.',
-	  'torrents_hide_imagehosts' => 'Hide the Imagehost Whitelist list by default.',
+	'torrents_hide_imagehosts' => 'Hide the Imagehost Whitelist list by default.',
      
-     'admin_manage_languages' => 'Can manage the official site languages',
+        'admin_manage_site_options' => 'Can manage site options',
+        'admin_manage_languages' => 'Can manage the official site languages',
         'admin_email_blacklist' => 'Can manage the email blacklist',
         'admin_manage_cheats' => 'Can admin watchlist.',
         'admin_manage_categories' => 'Can manage categories.',
@@ -329,6 +330,7 @@ function permissions_form(){ ?>
 			</tr>
 			<tr>
 				<td>
+                                        <? display_perm('admin_manage_site_options', 'Can manage site options'); ?>
                                         <? display_perm('admin_manage_languages', 'Can manage the official site languages'); ?>
                                         <? display_perm('admin_email_blacklist', 'Can manage the email blacklist'); ?>
                                         <? display_perm('admin_manage_cheats', 'Can admin watchlist.', 'Can change site options for watchlist'); ?>
