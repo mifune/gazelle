@@ -346,7 +346,7 @@ if(check_perms('admin_reports')) {
 			<li id="nav_requests"><a href="requests.php">Requests</a></li>
                                 <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
 			<li id="nav_forums"><a href="forums.php">Forums</a></li>
-			<li id="nav_irc"><a href="chat.php">IRC</a></li>
+			<li id="nav_irc"><a href="chat.php">Chat</a></li>
 			<li id="nav_top10"><a href="top10.php">Top10</a></li>
 			<li id="nav_rules"><a href="articles.php?topic=rules">Rules</a></li>
                   <li id="nav_help"><a href="articles.php?topic=tutorials">Help</a></li>
@@ -606,6 +606,8 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
                             <li><a href="tools.php?action=speed_cheats">Speed Cheats</a></li> 
 <?                      } if (check_perms('users_manage_cheats')) { ?>
                             <li><a href="tools.php?action=speed_records">Speed Reports</a></li> 
+<?                      } if (check_perms('admin_manage_site_options')) { ?>
+                            <li><a href="tools.php?action=site_options">Site Options</a></li>
 <?                      } if (check_perms('admin_manage_permissions')) { ?>
                             <li><a href="tools.php?action=permissions">User Classes</a></li>
 <?                      } if (check_perms('users_groups')) { ?>
@@ -613,7 +615,7 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
 <?                      }  ?> 
                           </ul>
                       </li>
-                </ul>       
+                </ul>
 <? } ?> 
                 <!--
                 <ul id="userinfo_major">
