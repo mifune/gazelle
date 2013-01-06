@@ -346,7 +346,7 @@ if(check_perms('admin_reports')) {
 			<li id="nav_requests"><a href="requests.php">Requests</a></li>
                                 <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
 			<li id="nav_forums"><a href="forums.php">Forums</a></li>
-			<li id="nav_irc"><a href="chat.php">IRC</a></li>
+			<li id="nav_irc"><a href="chat.php">Chat</a></li>
 			<li id="nav_top10"><a href="top10.php">Top10</a></li>
 			<li id="nav_rules"><a href="articles.php?topic=rules">Rules</a></li>
                   <li id="nav_help"><a href="articles.php?topic=tutorials">Help</a></li>
@@ -539,23 +539,37 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
             </div>
         <?    
            
-$TimeStampNow = time();
-$PFLTimeStamp = strtotime($LoggedUser['personal_freeleech']);
 
-if($PFLTimeStamp >= $TimeStampNow) {
-     
-    if (($PFLTimeStamp - $TimeStampNow) < (28*24*3600)) { // more than 28 days freeleech and the time is only specififed in the tooltip
-        $TimeAgo = time_diff($LoggedUser['personal_freeleech'],2,false,false,0); 
-        $PFL = "PFL for $TimeAgo";
-    } else {
-        $PFL = "Personal Freeleech";
+if ($Sitewide_Freeleech_On) {
+    
+    $TimeNow = date('M d Y, H:i', strtotime($Sitewide_Freeleech) - (int) $LoggedUser['TimeOffset']);
+    $PFL = '<span class="time" title="Sitewide Freeleech for '. time_diff($Sitewide_Freeleech,2,false,false,0).' (until '.$TimeNow.')">Sitewide Freeleech</span>'; 
+    
+} else {
+    
+    $TimeStampNow = time();
+    $PFLTimeStamp = strtotime($LoggedUser['personal_freeleech']);
+
+    if($PFLTimeStamp >= $TimeStampNow) {
+
+        if (($PFLTimeStamp - $TimeStampNow) < (28*24*3600)) { // more than 28 days freeleech and the time is only specififed in the tooltip
+            $TimeAgo = time_diff($LoggedUser['personal_freeleech'],2,false,false,0); 
+            $PFL = "PFL for $TimeAgo";
+        } else {
+            $PFL = "Personal Freeleech";
+        }
+        $TimeNow = date('M d Y, H:i', $PFLTimeStamp - (int) $LoggedUser['TimeOffset']);
+        $PFL = '<span class="time" title="Personal Freeleech until '.$TimeNow.'">'.$PFL.'</span>';    
     }
-    $TimeNow = date('M d Y, H:i', $PFLTimeStamp - (int) $LoggedUser['TimeOffset']);
-    $PFL = '<span class="time" title="Personal Freeleech until '.$TimeNow.'">'.$PFL.'</span>';    
+    
 }
-            if ( !empty($PFL)) { ?> 
-                    <div class="nicebar" style="display:inline-block"><?=$PFL?></div>
-        <?  }  ?>
+
+
+    //$PFL = '<span class="time" title="Sitewide Freeleech until '.$Sitewide_Freeleech.'">Sitewide Freeleech '.$Sitewide_Freeleech_On.'</span>'; 
+            
+if ( !empty($PFL)) { ?> 
+            <div class="nicebar" style="display:inline-block"><?=$PFL?></div>
+<?  }  ?>
 
       
             <div id="major_stats">
@@ -606,6 +620,8 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
                             <li><a href="tools.php?action=speed_cheats">Speed Cheats</a></li> 
 <?                      } if (check_perms('users_manage_cheats')) { ?>
                             <li><a href="tools.php?action=speed_records">Speed Reports</a></li> 
+<?                      } if (check_perms('admin_manage_site_options')) { ?>
+                            <li><a href="tools.php?action=site_options">Site Options</a></li>
 <?                      } if (check_perms('admin_manage_permissions')) { ?>
                             <li><a href="tools.php?action=permissions">User Classes</a></li>
 <?                      } if (check_perms('users_groups')) { ?>
@@ -613,7 +629,7 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
 <?                      }  ?> 
                           </ul>
                       </li>
-                </ul>       
+                </ul>
 <? } ?> 
                 <!--
                 <ul id="userinfo_major">
