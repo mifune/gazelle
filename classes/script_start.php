@@ -292,6 +292,13 @@ if ($TorrentUserStatus === false) {
     $Cache->cache_value('torrent_user_status_'.$LoggedUser['ID'], $TorrentUserStatus, 600);
 }
 
+
+// -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
+$DB->query('SELECT FreeLeech FROM site_options');
+list($Sitewide_Freeleech) = $DB->next_record();
+$Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
+
+
 $Debug->set_flag('start function definitions');
 
 // Get cached user info, is used for the user loading the page and usernames all over the site
@@ -1018,7 +1025,7 @@ function authorize($Ajax = false) {
 // ex: 'somefile,somdire/somefile'
 
 function show_header($PageTitle='', $JSIncludes='') {
-    global $Document, $Cache, $DB, $LoggedUser, $Mobile, $Classes;
+    global $Document, $Cache, $DB, $LoggedUser, $Mobile, $Classes, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
 
     if ($PageTitle != '') {
         $PageTitle.=' :: ';
@@ -2222,7 +2229,7 @@ function get_tags($TagNames) {
 }
 
 function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $UserID,
-    global $DB, $Cache, $LoggedUser, $TorrentUserStatus;
+    global $DB, $Cache, $LoggedUser, $TorrentUserStatus, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
         //$AddExtra = '';
         $SeedTooltip='';
         $FreeTooltip='';
@@ -2230,12 +2237,14 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             $FreeTooltip = "Unlimited Freeleech";
         } elseif ($Data['FreeTorrent'] == '2') {
             $FreeTooltip = "Neutral Freeleech";
+        } elseif ($Sitewide_Freeleech_On) {
+            $FreeTooltip = "Sitewide Freeleech for ".time_diff($Sitewide_Freeleech, 2,false,false,0);
         }
 
         if ($Data['double_seed'] == '1') {
             $SeedTooltip = "Unlimited Doubleseed";
         }
-         
+        
         $UserID = $LoggedUser['ID'];
         $TokenTorrents = $Cache->get_value('users_tokens_' .$UserID );
         if ($TokenTorrents===false) {
@@ -2245,11 +2254,11 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
         }
         
         if (!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['FreeLeech'] > sqltime()) {
-            $FreeTooltip = "Personal Freeleech for ".time_diff($TokenTorrents[$TorrentID]['FreeLeech'], 2, false);;
+            $FreeTooltip = "Personal Freeleech for ".time_diff($TokenTorrents[$TorrentID]['FreeLeech'], 2,false,false,0);
         } 
         
         if (!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['DoubleSeed'] > sqltime()) {
-            $SeedTooltip = "Personal Doubleseed for ".time_diff($TokenTorrents[$TorrentID]['DoubleSeed'], 2, false);
+            $SeedTooltip = "Personal Doubleseed for ".time_diff($TokenTorrents[$TorrentID]['DoubleSeed'], 2,false,false,0);
         }
         
         $Icons = '';

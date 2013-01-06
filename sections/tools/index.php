@@ -67,12 +67,13 @@ switch ($_REQUEST['action']) {
         break;
     case 'take_site_options':
         $remove_freeleech = $_POST['remove_freeleech'];
-        $freeleech = $_POST['freeleech'];
+        //$freeleech = $_POST['freeleech'];
         if ($remove_freeleech == 'on') {
             $DB->query("UPDATE site_options SET FreeLeech='0000-00-00 00:00:00'");
             update_tracker('site_option', array('set' => 'freeleech', 'time' => strtotime("0000-00-00 00:00:00")));
         } else {
-            if ($freeleech != '0000-00-00 00:00:00') {
+            if ($_POST['freeleech'] != '0000-00-00 00:00:00') {
+                $freeleech = date('Y-m-d H:i:s', strtotime($_POST['freeleech']) + (int) $LoggedUser['TimeOffset']);
                 if (strtotime($freeleech)) {
                     $DB->query('SELECT FreeLeech FROM site_options');
                     list($f) = $DB->next_record();
@@ -80,10 +81,10 @@ switch ($_REQUEST['action']) {
                         $DB->query("UPDATE site_options SET FreeLeech='" . db_string($freeleech) . "'");
                         update_tracker('site_option', array('set' => 'freeleech', 'time' => strtotime($freeleech)));
                     } else {
-                        error('The freeleech time is set in the past.');
+                        error("The freeleech time is set in the past: $freeleech");
                     }
                 } else {
-                    error('The freeleech date is not a valid date.');
+                    error("The freeleech date is not a valid date: $freeleech");
                 }
             }
         }

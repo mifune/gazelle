@@ -539,23 +539,37 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
             </div>
         <?    
            
-$TimeStampNow = time();
-$PFLTimeStamp = strtotime($LoggedUser['personal_freeleech']);
 
-if($PFLTimeStamp >= $TimeStampNow) {
-     
-    if (($PFLTimeStamp - $TimeStampNow) < (28*24*3600)) { // more than 28 days freeleech and the time is only specififed in the tooltip
-        $TimeAgo = time_diff($LoggedUser['personal_freeleech'],2,false,false,0); 
-        $PFL = "PFL for $TimeAgo";
-    } else {
-        $PFL = "Personal Freeleech";
+if ($Sitewide_Freeleech_On) {
+    
+    $TimeNow = date('M d Y, H:i', strtotime($Sitewide_Freeleech) - (int) $LoggedUser['TimeOffset']);
+    $PFL = '<span class="time" title="Sitewide Freeleech for '. time_diff($Sitewide_Freeleech,2,false,false,0).' (until '.$TimeNow.')">Sitewide Freeleech</span>'; 
+    
+} else {
+    
+    $TimeStampNow = time();
+    $PFLTimeStamp = strtotime($LoggedUser['personal_freeleech']);
+
+    if($PFLTimeStamp >= $TimeStampNow) {
+
+        if (($PFLTimeStamp - $TimeStampNow) < (28*24*3600)) { // more than 28 days freeleech and the time is only specififed in the tooltip
+            $TimeAgo = time_diff($LoggedUser['personal_freeleech'],2,false,false,0); 
+            $PFL = "PFL for $TimeAgo";
+        } else {
+            $PFL = "Personal Freeleech";
+        }
+        $TimeNow = date('M d Y, H:i', $PFLTimeStamp - (int) $LoggedUser['TimeOffset']);
+        $PFL = '<span class="time" title="Personal Freeleech until '.$TimeNow.'">'.$PFL.'</span>';    
     }
-    $TimeNow = date('M d Y, H:i', $PFLTimeStamp - (int) $LoggedUser['TimeOffset']);
-    $PFL = '<span class="time" title="Personal Freeleech until '.$TimeNow.'">'.$PFL.'</span>';    
+    
 }
-            if ( !empty($PFL)) { ?> 
-                    <div class="nicebar" style="display:inline-block"><?=$PFL?></div>
-        <?  }  ?>
+
+
+    //$PFL = '<span class="time" title="Sitewide Freeleech until '.$Sitewide_Freeleech.'">Sitewide Freeleech '.$Sitewide_Freeleech_On.'</span>'; 
+            
+if ( !empty($PFL)) { ?> 
+            <div class="nicebar" style="display:inline-block"><?=$PFL?></div>
+<?  }  ?>
 
       
             <div id="major_stats">
