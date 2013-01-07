@@ -563,10 +563,7 @@ if ($Sitewide_Freeleech_On) {
     }
     
 }
-
-
-    //$PFL = '<span class="time" title="Sitewide Freeleech until '.$Sitewide_Freeleech.'">Sitewide Freeleech '.$Sitewide_Freeleech_On.'</span>'; 
-            
+      
 if ( !empty($PFL)) { ?> 
             <div class="nicebar" style="display:inline-block"><?=$PFL?></div>
 <?  }  ?>
