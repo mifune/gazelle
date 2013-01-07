@@ -79,36 +79,14 @@ function Toggle_view(elem_id) {
                         get_hidden_value('submit'),
                         get_hidden_value('loginwatch'), 
                         get_hidden_value('iplinked'), 
-                        get_hidden_value('elinked')]; 
+                        get_hidden_value('elinked'), 
+                        get_hidden_value('reports')]; 
             
     jQuery.cookie('userPageState', json.encode(t));
     return false;
 }
 
 
-/*
-function Get_Cookie() {
-    alert("g");
-    var t= [get_hidden_value('profilediv'), 
-                        get_hidden_value('bonusdiv'), 
-                        get_hidden_value('donatediv'), 
-                        get_hidden_value('snatchesdiv'), 
-                        get_hidden_value('recentuploadsdiv'), 
-                        get_hidden_value('linkeddiv'), 
-                        get_hidden_value('invitediv'), 
-                        get_hidden_value('requestsdiv'), 
-                        get_hidden_value('staffpmsdiv'), 
-                        get_hidden_value('notesdiv'), 
-                        get_hidden_value('historydiv'), 
-                        get_hidden_value('infodiv'), 
-                        get_hidden_value('badgesadmindiv'), 
-                        get_hidden_value('warndiv'), 
-                        get_hidden_value('privilegediv'), 
-                        get_hidden_value('sessiondiv'),
-                        get_hidden_value('submitdiv')]; 
-                    alert(t);
-    return json.encode(t);  
-} */
 
 function get_hidden_value(elem_id){
     
@@ -172,6 +150,7 @@ function Load_User_Cookie()  {
       set_hidden_value('loginwatch', state[17]);
       set_hidden_value('iplinked', state[18]);
       set_hidden_value('elinked', state[19]);
+      set_hidden_value('reports', state[20]);
 }
 
 

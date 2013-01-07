@@ -203,8 +203,10 @@ function user_dupes_table($UserID, $Username) {
             foreach($IPDupes AS $IPDupe) {
                 list($EUserID, $IP, $EType1, $EType2) = $IPDupe;
                 $DupeInfo = user_info($EUserID);
-?> 
-            <tr>
+
+            $Row = ($Row == 'a') ? 'b' : 'a';
+?>
+            <tr class="row<?=$Row?>">
                 <td align="left">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
                 </td>
@@ -262,8 +264,10 @@ function user_dupes_table($UserID, $Username) {
                 list($EUserID, $EEmail, $EType1, $EType2) = $EDupe;
                 $i++;
                 $DupeInfo = user_info($EUserID);
-?> 
-            <tr>
+
+            $Row = ($Row == 'a') ? 'b' : 'a';
+?>
+            <tr class="row<?=$Row?>">
                 <td align="left">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
                 </td>
@@ -318,7 +322,7 @@ function user_dupes_table($UserID, $Username) {
 	} */
 ?>
         <div class="head">
-            <span style="float:left;"><?=max($DupeCount - 1, 0)?> Linked Account<?=(($DupeCount == 2)?'':'s')?></span>
+            <span style="float:left;"><?=$DupeCount?max($DupeCount - 1, 0).' ':''?>Linked Account<?=(($DupeCount == 2)?'':'s')?></span>
             <span style="float:right;"><a href="#" id="linkedbutton" onclick="return Toggle_view('linked');">(Hide)</a></span>&nbsp;
         </div>
        <div class="box">
@@ -329,20 +333,21 @@ function user_dupes_table($UserID, $Username) {
 			<input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<input type="hidden" id="form_comment_hash" name="form_comment_hash" value="<?=$CommentHash?>" />
                  <table width="100%"  id="linkeddiv" class="linkedaccounts shadow">
-					<?=($DupeCount?'<tr>':'')?>
+					<?=($DupeCount?'<tr >':'')?>
 <?
 	$i = 0;
 	foreach ($Dupes as $Dupe) {
 		$i++;
 		list($DupeID) = $Dupe;
 		$DupeInfo = user_info($DupeID);
+        $Row = ($Row == 'b') ? 'a' : 'b';
 ?>
-					<td align="left"><?=format_username($DupeID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
+					<td class="row<?=$Row?>" align="left"><?=format_username($DupeID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
 						[<a href="user.php?action=dupes&dupeaction=remove&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&removeid=<?=$DupeID?>" onClick="return confirm('Are you sure you wish to remove <?=$DupeInfo['Username']?> from this group?');">x</a>]</td>
 <?
 		if ($i == 4) {
 			$i = 0;
-			echo "</tr><tr>";
+			echo '</tr><tr>';
 		}
 	}
 	if ($DupeCount) {
@@ -351,10 +356,10 @@ function user_dupes_table($UserID, $Username) {
 		}
 ?>
 					</tr>
-					<tr>
+					<tr class="rowa">
 						<td colspan="5" align="left"><strong>Comments:</strong></td>
 					</tr>
-					<tr>
+					<tr class="rowa">
 						<td colspan="5" align="left">
 							<div id="dupecomments" class="<?=($DupeCount?'':'hidden')?>"><?=$Text->full_format($Comments);?></div>
 							<div id="editdupecomments" class="<?=$DupeCount?'hidden':''?>">

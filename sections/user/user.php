@@ -1071,18 +1071,18 @@ if (check_paranoia_here('requestsvoted_list')) {
 			AND r.TorrentID = 0
 		GROUP BY r.ID
 		ORDER BY Votes DESC");
-	
-	if($DB->record_count() > 0) {
+	$NumRequests =  $DB->record_count() ;
+	if($NumRequests > 0) {
 		$Requests = $DB->to_array();
 ?>
             <div class="head">
-                    <span style="float:left;">Requests</span>
+                    <span style="float:left;"><?=$NumRequests?> Request<?=(($NumRequests == 1)?'':'s')?></span>
                     <span style="float:right;"><a id="requestsbutton" href="#" onclick="return Toggle_view('requests');">(Hide)</a></span>&nbsp;
             </div>                
             <div class="box">	
             <div id="requestsdiv" class="">
-				<table cellpadding="6" cellspacing="1" border="0" class="border shadow" width="100%">
-					<tr class="colhead_dark">
+				<table cellpadding="6" cellspacing="1" border="0" class="shadow" width="100%">
+					<tr class="colhead">
 						<td style="width:48%;">
 							<strong>Request Name</strong>
 						</td>
@@ -1161,7 +1161,7 @@ foreach($FLS as $F) {
 		break;
 	}
 }
-if (check_perms('users_mod', $Class) || $IsFLS) { 
+if (check_perms('users_mod') || $IsFLS) { 
 	$UserLevel = $LoggedUser['Class'];
 	$DB->query("SELECT 
 					SQL_CALC_FOUND_ROWS
@@ -1175,12 +1175,13 @@ if (check_perms('users_mod', $Class) || $IsFLS) {
 				FROM staff_pm_conversations 
 				WHERE UserID = $UserID AND (Level <= $UserLevel OR AssignedToUser='".$LoggedUser['ID']."')
 				ORDER BY Date DESC");
-	if ($DB->record_count()) {
+    $NumStaffPMs = $DB->record_count();
+	if ($NumStaffPMs) {
         $CookieItems[] = 'staffpms';
 		$StaffPMs = $DB->to_array();
 ?>
                 <div class="head">
-                        <span style="float:left;">Staff PMs</span>
+                        <span style="float:left;"><?=$NumStaffPMs?> Staff PM<?=(($NumStaffPMs == 1)?'':'s')?></span>
                         <span style="float:right;"><a id="staffpmsbutton" href="#" onclick="return Toggle_view('staffpms');">(Hide)</a></span>&nbsp;
                 </div>
                 <div class="box">
@@ -1213,8 +1214,9 @@ if (check_perms('users_mod', $Class) || $IsFLS) {
 				$Resolver = "(unresolved)";
 			}
 			
-			?>
-				<tr>
+            $Row = ($Row == 'a') ? 'b' : 'a';
+?>
+                <tr class="row<?=$Row?>">
 					<td><a href="staffpm.php?action=viewconv&amp;id=<?=$ID?>"><?=display_str($Subject)?></a></td>
 					<td><?=time_diff($Date, 2, true)?></td>
 					<td><?=$Assigned?></td>
@@ -1225,6 +1227,81 @@ if (check_perms('users_mod', $Class) || $IsFLS) {
 		</div>
 <?	}
 }
+
+
+if (check_perms('admin_reports') || $IsFLS) { 
+	//$UserLevel = $LoggedUser['Class'];
+	$DB->query("SELECT 
+					SQL_CALC_FOUND_ROWS
+					r.ID, 
+                    r.ReporterID,
+					r.TorrentID,
+                    tg.Name,
+                    r.Type,
+                    r.UserComment,
+                    r.Status,
+                    r.ReportedTime,
+                    r.LastChangeTime,
+                    r.ModComment,
+					r.ResolverID
+				FROM reportsv2 as r
+           LEFT JOIN torrents_group as tg ON tg.ID=r.TorrentID
+               WHERE ReporterID = $UserID 
+            ORDER BY ReportedTime DESC");
+    $NumReports = $DB->record_count();
+	if ($NumReports) {
+        $CookieItems[] = 'reports';
+		$Reports = $DB->to_array();
+?>
+                <div class="head">
+                        <span style="float:left;"><?=$NumReports?> Report<?=(($NumReports == 1)?'':'s')?></span>
+                        <span style="float:right;"><a id="reportsbutton" href="#" onclick="return Toggle_view('reports');">(Hide)</a></span>&nbsp;
+                </div>
+                <div class="box">
+                    <table width="100%" class="shadow" id="reportsdiv">
+				<tr class="colhead">
+					<td title="Report ID">ID</td>
+					<td width="80px">Torrent</td>
+					<td>Type</td>
+					<td>User Comment</td>
+					<td width="80px">Date</td>
+					<td>Resolved By</td>
+					<td width="100px">Mod Comment</td>
+				</tr>
+<?		foreach($Reports as $Report) {
+			list($ID, $ReporterID, $TorrentID, $Name, $Type, $UserComment, $Status, 
+                    $ReportedTime, $LastChangeTime, $ModComment, $ResolverID) = $Report;
+ 
+			if ($ResolverID) {
+				$UserInfo = user_info($ResolverID);
+				$Resolver = format_username($ResolverID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID']);
+			} else {
+				$Resolver = "(unresolved)";
+			}
+            
+			if ($Name) {
+				$Torrent = '<a href="torrents.php?id='.$TorrentID.'">'.cut_string( display_str($Name), 30, 1).'</a>';
+			} else {
+				$Torrent = '<a href="log.php?search=Torrent+'.$TorrentID.'">'.display_str($TorrentID).' (deleted)</a>';
+			}
+            
+            $Row = ($Row == 'a') ? 'b' : 'a';
+?>
+                <tr class="row<?=$Row?>">
+					<td><a href="reportsv2.php?view=report&id=<?=$ID?>">#<?=display_str($ID)?></a></td>
+					<td><?=$Torrent?></td>
+					<td><?=$Type?></td>
+					<td><?=$Text->full_format(cut_string($UserComment,120))?></td>
+					<td><?=time_diff($ReportedTime, 2, true)?></td>
+					<td><?=$Resolver?></td>
+					<td><?=$Text->full_format(cut_string($ModComment,120))?></td>
+				</tr>
+<?		} ?>			
+			</table>
+		</div>
+<?	}
+}
+
 
 if (check_perms('users_mod', $Class)) { 
         $CookieItems[] = 'notes';
