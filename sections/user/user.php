@@ -211,19 +211,19 @@ show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
     }
 
     if (check_perms('users_edit_profiles', $Class)) { 
-		$links2 .= '[<a href="user.php?action=edit&amp;userid='.$UserID.'">Settings</a>]';
+		$links2 .= '[<a href="user.php?action=edit&amp;userid='.$UserID.'">Settings</a>] ';
     }
     if (check_perms('users_view_invites', $Class)) {
-		$links2 .= '[<a href="user.php?action=invite&amp;userid='.$UserID.'">Invites</a>]';
+		$links2 .= '[<a href="user.php?action=invite&amp;userid='.$UserID.'">Invites</a>] ';
     }
     if (check_perms('admin_manage_permissions', $Class)) {
-		$links2 .= '[<a href="user.php?action=permissions&amp;userid='.$UserID.'">Permissions</a>]';
+		$links2 .= '[<a href="user.php?action=permissions&amp;userid='.$UserID.'">Permissions</a>] ';
     }
     if (check_perms('users_logout', $Class) && check_perms('users_view_ips', $Class)) {
-		$links2 .= '[<a href="user.php?action=sessions&amp;userid='.$UserID.'">Sessions</a>]';
+		$links2 .= '[<a href="user.php?action=sessions&amp;userid='.$UserID.'">Sessions</a>] ';
     }
     if (check_perms('admin_reports')) {
-		$links2 .= '[<a href="reportsv2.php?view=reporter&amp;id='.$UserID.'">Reports</a>]';
+		$links2 .= '[<a href="reportsv2.php?view=reporter&amp;id='.$UserID.'">Reports</a>] ';
     }
     if (check_perms('users_mod')) {
 		$links2 .= '[<a href="userhistory.php?action=token_history&amp;userid='.$UserID.'">Slots</a>]';
@@ -239,6 +239,7 @@ if (check_perms('users_manage_cheats', $Class)) {
 <?  } else {?>    
 		[<a onclick="watchlist_add('<?=$UserID?>');return false;" href="#" title="Add this user to the speed records user watchlist">Add to watchlist</a>]
 <?  } ?>
+        [<a href="/tools.php?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View speed records for this user">View speed records</a>]
     </span>
 <?
 } ?>

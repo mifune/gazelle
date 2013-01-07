@@ -2,10 +2,10 @@ function Subscribe(topicid) {
 	ajax.get("userhistory.php?action=thread_subscribe&topicid=" + topicid + "&auth=" + authkey, function() {
 		var subscribeLink = $("#subscribelink" + topicid).raw();
 		if(subscribeLink) {
-			if(subscribeLink.firstChild.nodeValue.substr(1,1) == 'U') {
-				subscribeLink.firstChild.nodeValue = "[Subscribe]";
+			if(subscribeLink.firstChild.nodeValue.substr(0,1) == 'U') {
+				subscribeLink.firstChild.nodeValue = "Subscribe";
 			} else {
-				subscribeLink.firstChild.nodeValue = "[Unsubscribe]";
+				subscribeLink.firstChild.nodeValue = "Unsubscribe";
 			}
 		}
 	});
