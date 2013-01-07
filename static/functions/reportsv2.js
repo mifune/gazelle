@@ -244,16 +244,18 @@ function UpdateResolve(reportid) {
 }
 
 
-function Switch(reportid, torrentid, otherid) {
+function Switch(reportid, reporterid, usercomment, torrentid, otherid) {
 	//We want to switch positions of the reported torrent
 	//This entails invalidating the current report and creating a new with the correct preset.
 	Dismiss(reportid);
 
 	var report = new Array();
 	report['auth'] = authkey;
-	report['torrentid'] = otherid
+	report['torrentid'] = otherid;
 	report['type'] = $('#type' + reportid).raw().value;
-	report['otherid'] = torrentid
+	report['otherid'] = torrentid;
+	report['reporterid'] = reporterid;
+	report['usercomment'] = usercomment;
 
 	ajax.post('reportsv2.php?action=ajax_create_report', report, function (response) {
 			//Returns new report ID.

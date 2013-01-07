@@ -43,10 +43,17 @@ if(!isset($_POST['type'])) {
 
 $ExtraID = $_POST['otherid'];
 
-if(!empty($_POST['extra'])) {
+if(!empty($_POST['usercomment'])) {  
+	$Extra = db_string($_POST['usercomment']);
+} elseif(!empty($_POST['extra'])) { 
 	$Extra = db_string($_POST['extra']);
-} else {
+} else { 
 	$Extra = "";
+}
+if(!empty($_POST['reporterid']) && is_number($_POST['reporterid'])) { 
+	$ReporterID = (int)$_POST['reporterid'];
+} else { 
+	$ReporterID = $LoggedUser['ID'];
 }
 
 if(!empty($Err)) {
@@ -54,7 +61,7 @@ if(!empty($Err)) {
 	die();
 }
 
-$DB->query("SELECT ID FROM reportsv2 WHERE TorrentID=".$TorrentID." AND ReporterID=".db_string($LoggedUser['ID'])." AND ReportedTime > '".time_minus(3)."'");
+$DB->query("SELECT ID FROM reportsv2 WHERE TorrentID=$TorrentID AND ReporterID=$ReporterID AND ReportedTime > '".time_minus(3)."'");
 if($DB->record_count() > 0) {
 	die();
 }
@@ -62,7 +69,7 @@ if($DB->record_count() > 0) {
 $DB->query("INSERT INTO reportsv2
 			(ReporterID, TorrentID, Type, UserComment, Status, ReportedTime, ExtraID)
 			VALUES
-			(".db_string($LoggedUser['ID']).", $TorrentID, '".$Type."', '$Extra', 'New', '".sqltime()."', '$ExtraID')");
+			($ReporterID, $TorrentID, '$Type', '$Extra', 'New', '".sqltime()."', '$ExtraID')");
 
 $ReportID = $DB->inserted_id();
 
