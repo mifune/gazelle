@@ -680,8 +680,9 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
             </div>
     </div>
 </div>
+<? if(!$LoggedUser['Donor']) { ?>
 <div id="adbar">
     <script type="text/javascript" language="javascript" charset="utf-8" src="http://adspaces.ero-advertising.com/adspace/198208.js"></script>
-   
 </div>
+<? } ?>
 <div id="content">
