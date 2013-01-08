@@ -82,7 +82,7 @@ foreach($Checkboxes as $C) {
 	}
 }
 
-$SimpleSelects = array('torrentcomments', 'collages', 'collagecontribs', 'uploads', 'seeding', 'leeching', 'snatched');
+$SimpleSelects = array('torrentcomments', 'collages', 'collagecontribs', 'uploads', 'seeding', 'leeching', 'snatched', 'grabbed');
 foreach ($SimpleSelects as $S) {
 	if(!isset($_POST['p_'.$S.'_c']) && !isset($_POST['p_'.$S.'_l'])) {
 		// Very paranoid - don't show count or list

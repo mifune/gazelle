@@ -5,7 +5,7 @@ if (!empty($_GET['userid']) && is_number($_GET['userid'])) {
 	error(0);
 }
 
-if(!check_perms('zip_downloader')) {
+if($UserID != $LoggedUser['ID'] && !check_perms('zip_downloader')) {
 	error(403);
 }
 
@@ -36,10 +36,16 @@ if (empty($_GET['type'])) {
 			$SQL = "JOIN xbt_files_users AS xfu ON t.ID = xfu.fid WHERE xfu.uid='$UserID' AND xfu.remaining = 0";
 			$Month = "FROM_UNIXTIME(xfu.mtime)";
 			break;
+		case 'grabbed':
+			if(!check_paranoia('grabbed', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
+			$SQL = "JOIN users_downloads AS ud ON t.ID = ud.TorrentID WHERE ud.UserID='$UserID'";
+			$Month = "t.Time";
+			break;
 		default:
 			error(0);
 	}
 }
+
 
 ZIP::unlimit();
 

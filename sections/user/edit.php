@@ -587,27 +587,33 @@ $RequestsVotedListChecked = checked(!in_array('requestsvoted_list', $Paranoia));
 				</td>
 			</tr>
 			<tr>
-				<td class="label">Uploaded</td>
+				<td class="label" title="uploaded torrents">Uploaded</td>
 				<td>
 <? display_paranoia('uploads'); ?>
 				</td>
 			</tr>
 			<tr>
-				<td class="label">Seeding</td>
+				<td class="label" title="torrents you are currently seeding">Seeding</td>
 				<td>
 <? display_paranoia('seeding'); ?>
 				</td>
 			</tr>
 			<tr>
-				<td class="label">Leeching</td>
+				<td class="label" title="torrents you are currently leeching">Leeching</td>
 				<td>
 <? display_paranoia('leeching'); ?>
 				</td>
 			</tr>
 			<tr>
-				<td class="label">Snatched</td>
+				<td class="label" title="torrents you have downloaded 100% of">Snatched</td>
 				<td>
 <? display_paranoia('snatched'); ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="label" title="torrent files you have downloaded">Grabbed</td>
+				<td>
+<? display_paranoia('grabbed'); ?>
 				</td>
 			</tr>
 			<tr>

@@ -111,7 +111,8 @@ switch($_GET['type']) {
 		$From = "torrents AS t";
 		break;
 	case 'downloaded':
-		if($UserID != $LoggedUser['ID'] && !check_perms('site_view_torrent_snatchlist')) { error("You do not have permission to view the snatchlist."); }
+		//if($UserID != $LoggedUser['ID'] && !check_perms('site_view_torrent_snatchlist')) { error("You do not have permission to view the snatchlist."); }
+		if(!check_paranoia('grabbed', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 		$Time = 'unix_timestamp(ud.Time)';
 		$UserField = 'ud.UserID';
 		$ExtraWhere = '';

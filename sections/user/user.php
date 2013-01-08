@@ -9,12 +9,8 @@ if (empty($_REQUEST['id']) || !is_numeric($_REQUEST['id'])) { error(0); }
 $UserID = $_REQUEST['id'];
 
 
+$OwnProfile = $UserID == $LoggedUser['ID'];
 
-if($UserID == $LoggedUser['ID']) { 
-	$OwnProfile = true;
-} else { 
-	$OwnProfile = false;
-}
 
 if(check_perms('users_mod')) { // Person viewing is a staff member
 	$DB->query("SELECT
@@ -629,7 +625,7 @@ list($UniqueGroups) = $DB->next_record();
 				<li>Requests voted: <?=get_size($TotalSpent)?> spent</li>
 <? } ?>
 <? if (check_paranoia_here('uploads')) { ?>
-				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View">View</a>]<? if(check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=uploads&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
+				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View">View</a>]<? if($OwnProfile || check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=uploads&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
 <? } elseif (check_paranoia_here('uploads+')) { ?>
 				<li>Uploaded: <?=number_format($Uploads)?></li>
 <? } ?>
@@ -643,7 +639,7 @@ if (check_paranoia_here('seeding+') || check_paranoia_here('leeching+')) {
 }
 ?>
 <? if (check_paranoia_here('seeding')) { ?>
-				<li>Seeding: <?=number_format($Seeding)?> <?=($Snatched && ($OwnProfile || check_paranoia_here(false)))?'(' . 100*min(1,round($Seeding/$UniqueSnatched,2)).'%) ':''?>[<a href="torrents.php?type=seeding&amp;userid=<?=$UserID?>" title="View">View</a>]<? if (check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=seeding&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
+				<li>Seeding: <?=number_format($Seeding)?> <?=($Snatched && ($OwnProfile || check_paranoia_here(false)))?'(' . 100*min(1,round($Seeding/$UniqueSnatched,2)).'%) ':''?>[<a href="torrents.php?type=seeding&amp;userid=<?=$UserID?>" title="View">View</a>]<? if ($OwnProfile || check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=seeding&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
 <? } elseif (check_paranoia_here('seeding+')) { ?>
 				<li>Seeding: <?=number_format($Seeding)?></li>
 <? } ?>
@@ -653,22 +649,37 @@ if (check_paranoia_here('seeding+') || check_paranoia_here('leeching+')) {
 				<li>Leeching: <?=number_format($Leeching)?></li>
 <? } 
 ?>
-<? if (check_paranoia_here('snatched+')) { ?>
-				<li>Snatched: <?=number_format($Snatched)?> 
-<? 	if($OwnProfile || check_perms('site_view_torrent_snatchlist', $Class)) { ?>
-					(<?=number_format($UniqueSnatched)?>)
-<?	} ?>
-<? } ?>
 <? if (check_paranoia_here('snatched')) { ?>
-				[<a href="torrents.php?type=snatched&amp;userid=<?=$UserID?>" title="View">View</a>]<? if($OwnProfile || check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=snatches&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?>
+				<li>Snatched: <?=number_format($Snatched)?> 
+				[<a href="torrents.php?type=snatched&amp;userid=<?=$UserID?>" title="View">View</a>]
+                <? if($OwnProfile || check_perms('zip_downloader')) { ?> 
+                    [<a href="torrents.php?action=redownload&amp;type=snatches&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
+                <? } ?>
  				</li>
-<? }
+<? } elseif (check_paranoia_here('snatched+')) { ?>
+				<li>Snatched: <?=number_format($Snatched)?> 
+<? 	//if($OwnProfile || check_perms('site_view_torrent_snatchlist', $Class)) { ?>
+					(<?=number_format($UniqueSnatched)?>) </li>
+<?	//} ?>
+<? }  
+    
 
-if($OwnProfile || check_perms('site_view_torrent_snatchlist', $Class)) {
+//if($OwnProfile || check_perms('site_view_torrent_snatchlist', $Class)) {
+    
+if (check_paranoia_here('grabbed+')) {
+                
 	$DB->query("SELECT COUNT(ud.UserID), COUNT(DISTINCT ud.TorrentID) FROM users_downloads AS ud INNER JOIN torrents AS t ON t.ID=ud.TorrentID WHERE ud.UserID='$UserID'");
 	list($NumDownloads, $UniqueDownloads) = $DB->next_record();
 ?>
-				<li>Downloaded: <?=number_format($NumDownloads)?> (<?=number_format($UniqueDownloads)?>) [<a href="torrents.php?type=downloaded&amp;userid=<?=$UserID?>" title="View">View</a>]</li>
+        <li>Grabbed: <?=number_format($NumDownloads)?> (<?=number_format($UniqueDownloads)?>) 
+                    
+<?      if (check_paranoia_here('grabbed')) { ?> 
+            [<a href="torrents.php?type=downloaded&amp;userid=<?=$UserID?>" title="View">View</a>]
+                <? if($OwnProfile || check_perms('zip_downloader')) { ?> 
+                    [<a href="torrents.php?action=redownload&amp;type=grabbed&amp;userid=<?=$UserID?>" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
+                <? } ?>
+<?      } ?>
+        </li>
 <?
 }
 
