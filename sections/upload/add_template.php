@@ -32,14 +32,14 @@ if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
             list($Name) = $DB->next_record();
             $DB->query("UPDATE upload_templates SET UserID='$UserID', 
                                                  TimeAdded='".sqltime()."', 
-                                                      Name='$Name', 
-                                                    Public='$Public', 
+                                                      Name='$Name',  
                                                      Title='$Title', 
                                                      Image='$Image',  
                                                       Body='$Body', 
                                                 CategoryID='$Category', 
                                                    Taglist='$TagList' 
-                                   WHERE ID='$TemplateID'");
+                                   WHERE ID='$TemplateID'"); 
+                                                   // Public='$Public',
 
             $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
             $Result = array(1, "Saved '$Name' template");
