@@ -1,7 +1,7 @@
 <?
 // error out on invalid requests (before caching)
 if(isset($_GET['details'])) {
-	if(in_array($_GET['details'],array('ul','dl','numul','uls','dls'))) {
+	if(in_array($_GET['details'],array('ul','dl','numul','uls','dls','rat'))) {
 		$Details = $_GET['details'];
 	} else {
 		error(404);
@@ -39,14 +39,17 @@ $BaseQuery = "SELECT
 	JOIN users_info AS ui ON ui.UserID = u.ID
 	LEFT JOIN torrents AS t ON t.UserID=u.ID
 	WHERE u.Enabled='1'
-	AND Uploaded>'". 1024*1024*1024 ."' 
-	AND Downloaded>'". 1024*1024*1024 ."' 
-	AND (Paranoia IS NULL OR (Paranoia NOT LIKE '%\"uploaded\"%' AND Paranoia NOT LIKE '%\"downloaded\"%'))
-	GROUP BY u.ID";
+	AND (Paranoia IS NULL OR (Paranoia NOT LIKE '%\"uploaded\"%' AND Paranoia NOT LIKE '%\"downloaded\"%')) ";
+	//AND Uploaded>'". 1024*1024*1024 ."' 
+	//AND Downloaded>'". 1024*1024*1024 ."' 
+	//GROUP BY u.ID";
 
 	if($Details=='all' || $Details=='ul') {
 		if (!$TopUserUploads = $Cache->get_value('topuser_ul_'.$Limit)) {
-			$DB->query("$BaseQuery ORDER BY u.Uploaded DESC LIMIT $Limit;");
+            $Query = $BaseQuery ."
+                AND Uploaded>'". 1024*1024*1024 ."' 
+                GROUP BY u.ID";
+			$DB->query("$Query ORDER BY u.Uploaded DESC LIMIT $Limit;");
 			$TopUserUploads = $DB->to_array();
 			$Cache->cache_value('topuser_ul_'.$Limit,$TopUserUploads,3600*12);
 		}
@@ -55,16 +58,29 @@ $BaseQuery = "SELECT
 
 	if($Details=='all' || $Details=='dl') {
 		if (!$TopUserDownloads = $Cache->get_value('topuser_dl_'.$Limit)) {
-			$DB->query("$BaseQuery ORDER BY u.Downloaded DESC LIMIT $Limit;");
+            $Query = $BaseQuery ."
+                AND Uploaded>'524288000' 
+                AND Downloaded>'". 1024*1024*1024 ."' 
+                GROUP BY u.ID";
+			$DB->query("$Query ORDER BY u.Downloaded DESC LIMIT $Limit;");
 			$TopUserDownloads = $DB->to_array();
 			$Cache->cache_value('topuser_dl_'.$Limit,$TopUserDownloads,3600*12);
 		}
 		generate_user_table('Downloaders', 'dl', $TopUserDownloads, $Limit);
 	}
 	
+         /*   $Query = $BaseQuery ."
+                AND Uploaded>'". 1024*1024*1024 ."' 
+                AND Downloaded>'". 1024*1024*1024 ."' 
+                GROUP BY u.ID"; */
+    
+    $Query = $BaseQuery ."
+                AND Uploaded>'524288000' 
+                GROUP BY u.ID";
+            
 	if($Details=='all' || $Details=='numul') {
 		if (!$TopUserNumUploads = $Cache->get_value('topuser_numul_'.$Limit)) {
-			$DB->query("$BaseQuery ORDER BY NumUploads DESC LIMIT $Limit;");
+			$DB->query("$Query ORDER BY NumUploads DESC LIMIT $Limit;");
 			$TopUserNumUploads = $DB->to_array();
 			$Cache->cache_value('topuser_numul_'.$Limit,$TopUserNumUploads,3600*12);
 		}
@@ -73,7 +89,7 @@ $BaseQuery = "SELECT
 
 	if($Details=='all' || $Details=='uls') {
 		if (!$TopUserUploadSpeed = $Cache->get_value('topuser_ulspeed_'.$Limit)) {
-			$DB->query("$BaseQuery ORDER BY UpSpeed DESC LIMIT $Limit;");
+			$DB->query("$Query ORDER BY UpSpeed DESC LIMIT $Limit;");
 			$TopUserUploadSpeed = $DB->to_array();
 			$Cache->cache_value('topuser_ulspeed_'.$Limit,$TopUserUploadSpeed,3600*12);
 		}
@@ -82,13 +98,26 @@ $BaseQuery = "SELECT
 
 	if($Details=='all' || $Details=='dls') {
 		if (!$TopUserDownloadSpeed = $Cache->get_value('topuser_dlspeed_'.$Limit)) {
-			$DB->query("$BaseQuery ORDER BY DownSpeed DESC LIMIT $Limit;");
+			$DB->query("$Query ORDER BY DownSpeed DESC LIMIT $Limit;");
 			$TopUserDownloadSpeed = $DB->to_array();
 			$Cache->cache_value('topuser_dlspeed_'.$Limit,$TopUserDownloadSpeed,3600*12);
 		}
 		generate_user_table('Fastest Downloaders', 'dls', $TopUserDownloadSpeed, $Limit);
 	}
-
+    
+    
+	if($Details=='all' || $Details=='rat') {
+		if (!$TopUserRatio = $Cache->get_value('topuser_ratio_'.$Limit)) {
+            $Query = $BaseQuery ."
+                AND Uploaded>'". 1024*1024*1024 ."' 
+                AND Downloaded>'". 1024*1024*1024 ."' 
+                GROUP BY u.ID"; 
+			$DB->query("$Query ORDER BY Uploaded/Downloaded DESC LIMIT $Limit;");
+			$TopUserRatio = $DB->to_array();
+			$Cache->cache_value('topuser_ratio_'.$Limit,$TopUserRatio,3600*12);
+		}
+		generate_user_table('Best Ratio', 'rat', $TopUserRatio, $Limit);
+	}
 
 
 echo '</div>';

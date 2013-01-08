@@ -35,7 +35,8 @@ if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']
                               WHERE t.ID='$TemplateID'");
         list($Properties) = $DB->to_array(false, MYSQLI_BOTH);
         if($Properties){
-            $Properties['GroupDescription'] .= "\n\n\n[br][bg=#0074b7][bg=#0074b7,90%][color=white][align=right][b][i][font=Courier New]$Properties[Name] template by $Properties[Authorname][/font][/i][/b][/align][/color][/bg][/bg]";
+            $Properties['TemplateFooter'] = "[bg=#0074b7][bg=#0074b7,90%][color=white][align=right][b][i][font=Courier New]$Properties[Name] template by $Properties[Authorname][/font][/i][/b][/align][/color][/bg][/bg]";
+            $Properties['TemplateID'] = $TemplateID;
             $Cache->cache_value('template_' .$TemplateID, $Properties, 96400 * 7);
         } else { // catch the case where a public template has been unexpectedly removed but left in a random users cache
             $Cache->delete_value('templates_ids_' .$LoggedUser['ID']); // remove from their template list
@@ -238,6 +239,7 @@ foreach ($Whitelist as $ImageHost) {
     </div>
 <?
     if (check_perms('use_templates')) {
+        $CanDelAny = check_perms('delete_any_template')?'1':'0';
 ?>
         <div class="box pad shadow">
             <form action="" enctype="multipart/form-data"  method="post" onsubmit="return ($('#template').raw().value!=0);">
@@ -260,31 +262,41 @@ foreach ($Whitelist as $ImageHost) {
                     }
                     ?>
                     <label for="template">select template: </label>
-                    <select id="template" name="template" onchange="SelectTemplate(<?=(check_perms('delete_any_template')?'1':'0')?>);" title="Select a template (*=public)">
+                    <div id="template_container" style="display: inline-block">
+                    <select id="template" name="template" onchange="SelectTemplate(<?=$CanDelAny?>);" title="Select a template (*=public)">
                         <option value="0">---</option>
     <? foreach ($Templates as $template) {
         list($tID, $tName,$tPublic,$tAuthorname) = $template; 
         if ($tPublic==1) $tName .= " (by $tAuthorname)*"
         ?>
-                            <option value="<?=$tID?>"><?=$tName?></option>
+                            <option value="<?=$tID?>"<? if($TemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
     <? } ?>
                     </select>
-                    <input type="submit" name="fill" id="fill" value="fill from" disabled="disabled" title="Fill the upload form from a template" />
-                    <input type="submit" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />
+                    </div>
+                    <input type="submit" name="fill" id="fill" value="fill from" disabled="disabled" title="Fill the upload form from selected template" />
+                    <!--<input type="submit" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />-->
+                    <input type="button" onclick="DeleteTemplate(<?=$CanDelAny?>);" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />
+                    <input type="button" onclick="OverwriteTemplate(<?=$CanDelAny?>,<?=$tPublic?>);" name="save" id="save" value="save over" disabled="disabled" title="Save current form as selected template (overwrites data in this template)" />
                 </div>
                 <div style="margin:10px 15% 10px 0;display:inline">
                     
 <?          if (check_perms('make_private_templates')) {   
                     $addsep=true; ?>
-                    <a href="#" onclick="AddTemplate(0);" title="Make a private template from the details currently in the form">Add Private Template</a>  
+                    <a href="#" onclick="AddTemplate(<?=$CanDelAny?>,0);" title="Make a private template from the details currently in the form">Add Private Template</a>  
 <?          } 
             if (check_perms('make_public_templates')) {   
                  if ($addsep) echo "&nbsp;&nbsp;&nbsp|&nbsp;&nbsp;&nbsp;";  ?>
-                    <a href="#" onclick="AddTemplate(1);" title="Make a public template from the details currently in the form">Add Public Template</a>
+                    <a href="#" onclick="AddTemplate(<?=$CanDelAny?>,1);" title="Make a public template from the details currently in the form">Add Public Template</a>
 <?          }   ?>
                 </div> 
             </form>
         </div>
+        <script type="text/javascript">//<![CDATA[
+        function SynchTemplates(){
+            SelectTemplate(<?=$CanDelAny?>);
+        }
+            addDOMLoadEvent(SynchTemplates);
+        //]]></script>
 <?
     }
 ?>

@@ -48,6 +48,9 @@ if(!empty($_POST['submit'])) {
           case 'add_template': // ajax call
                 include(SERVER_ROOT.'/sections/upload/add_template.php');
                 break;
+          case 'delete_template': // ajax call
+                include(SERVER_ROOT.'/sections/upload/delete_template.php');
+                break;
             
         default:
            // $Err ="default";

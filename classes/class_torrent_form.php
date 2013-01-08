@@ -71,6 +71,12 @@ class TORRENT_FORM {
 <?			} 
 			if($this->Torrent && $this->Torrent['RequestID']) { ?>
 			<input type="hidden" name="requestid" value="<?=display_str($this->Torrent['RequestID'])?>" />
+<?			} 
+			if($this->Torrent && $this->Torrent['TemplateID']) { ?>
+			<input type="hidden" name="templateid" value="<?=display_str($this->Torrent['TemplateID'])?>" />
+<?			}  
+			if($this->Torrent && $this->Torrent['TemplateFooter']) { ?>
+			<input type="hidden" name="templatefooter" value="<?=display_str($this->Torrent['TemplateFooter'])?>" />
 <?			}
 		} ?>
 		</div>

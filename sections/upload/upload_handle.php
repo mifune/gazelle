@@ -40,6 +40,7 @@ $Properties['Title'] = $_POST['title'];
 $Properties['TagList'] = $_POST['tags'];
 $Properties['Image'] = $_POST['image'];
 $Properties['GroupDescription'] = $_POST['desc'];
+$Properties['TemplateFooter'] = $_POST['templatefooter'];
       
 //$Properties['GroupID'] = $_POST['groupid'];
 $RequestID = $_POST['requestid'];
@@ -210,6 +211,10 @@ $SearchText = db_string(trim($Properties['Title']) . ' ' . $Text->db_clean_searc
 //--------------- Start database stuff -----------------------------------------//
 
 $Body = $Properties['GroupDescription'];
+
+if($Properties['TemplateFooter']!=''){
+    $Body .= "[br][br]$Properties[TemplateFooter]";
+}
 // Trickery
 /* image is already validated by better regex in validator so skip this 
 if (!preg_match("/^" . URL_REGEX . "$/i", $Properties['Image'])) {
