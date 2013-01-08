@@ -26,6 +26,7 @@ if ($Err){
 }  
     
     $Content = $_REQUEST['desc']; // Don't use URL decode.
+    $Content .= "[br][br]$_REQUEST[templatefooter]";
     $Imageurl = $_REQUEST['image']; // Don't use URL decode.
 
     if (!empty($Imageurl)) {
