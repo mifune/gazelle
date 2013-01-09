@@ -63,7 +63,7 @@ echo "\n";
 
 // Flush the last ones if any..
 if (count($passkey_rows) > 0) {
-    $sql = "INSERT INTO user_main
+    $sql = "INSERT INTO users_main
                 (id, torrent_pass) 
             VALUES " . implode(',', $passkey_rows) .
             " ON DUPLICATE KEY UPDATE torrent_pass=VALUES(torrent_pass)";
