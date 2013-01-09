@@ -1,6 +1,6 @@
 <?
  
-if ( !check_perms('use_templates') ) error(403);
+//if ( !check_perms('use_templates') ) error(403);
  
 include(SERVER_ROOT.'/sections/upload/functions.php'); 
 
@@ -25,11 +25,11 @@ if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
 } else {
     
     if(is_number($TemplateID)&& $TemplateID>0) {
-        $DB->query("SELECT Name FROM upload_templates WHERE ID='$TemplateID'");
+        $DB->query("SELECT Name, Public FROM upload_templates WHERE ID='$TemplateID'");
         if($DB->record_count()==0) {
             $Result = array(0, "Could not find template #$TemplateID to overwrite!");
         } else {
-            list($Name) = $DB->next_record();
+            list($Name, $Public) = $DB->next_record();
             $DB->query("UPDATE upload_templates SET UserID='$UserID', 
                                                  TimeAdded='".sqltime()."', 
                                                       Name='$Name',  
@@ -40,8 +40,10 @@ if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
                                                    Taglist='$TagList' 
                                    WHERE ID='$TemplateID'"); 
                                                    // Public='$Public',
-
-            $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
+            if ($Public) $Cache->delete_value('templates_public');
+            else $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
+            
+            $Cache->delete_value('template_' . $TemplateID);
             $Result = array(1, "Saved '$Name' template");
         }
         
@@ -57,7 +59,9 @@ if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
 
         $TemplateID = $DB->inserted_id();
 
-        $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
+        if ($Public) $Cache->delete_value('templates_public');
+        else $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
+        
         $Result = array(1, "Added '$Name' template");
         
     }

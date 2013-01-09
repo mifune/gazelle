@@ -42,7 +42,12 @@ if($candelete){
         //$Err = "Deleted '$Template[Name]' template";
         $DB->query("DELETE FROM upload_templates WHERE ID='$TemplateID'");
         $Cache->delete_value('template_' . $TemplateID);
-        $Cache->delete_value('templates_ids_' . $Template['UserID']);
+           
+        if ($Template['Public']) $Cache->delete_value('templates_public');
+        else $Cache->delete_value('templates_ids_' . $LoggedUser['ID']);
+        
+        //$Cache->delete_value('templates_ids_' . $Template['UserID']);
+        
         $Result = array(1, "Deleted '$Template[Name]' template");
 }
  

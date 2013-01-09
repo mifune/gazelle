@@ -245,21 +245,36 @@ foreach ($Whitelist as $ImageHost) {
             <form action="" enctype="multipart/form-data"  method="post" onsubmit="return ($('#template').raw().value!=0);">
                 <div style="margin:10px 10%;display:inline">
                     <?
-                    $Templates = $Cache->get_value('templates_ids_' . $LoggedUser['ID']);
-                    if ($Templates === FALSE) {
+                    $UserTemplates = $Cache->get_value('templates_ids_' . $LoggedUser['ID']);
+                    if ($UserTemplates === FALSE) {
                         $DB->query("SELECT 
                                     t.ID,
                                     t.Name,
                                     t.Public,
                                     u.Username
                                FROM upload_templates as t
-                                LEFT JOIN users_main AS u ON u.ID=t.UserID
+                          LEFT JOIN users_main AS u ON u.ID=t.UserID
                               WHERE t.UserID='$LoggedUser[ID]' 
-                                 OR Public='1'
+                                AND Public='0'
                            ORDER BY Name");
-                        $Templates = $DB->to_array();
-                        $Cache->cache_value('templates_ids_' . $LoggedUser['ID'], $Templates, 96400);
+                        $UserTemplates = $DB->to_array();
+                        $Cache->cache_value('templates_ids_' . $LoggedUser['ID'], $UserTemplates, 96400);
                     }
+                    $PublicTemplates = $Cache->get_value('templates_public');
+                    if ($PublicTemplates === FALSE) {
+                        $DB->query("SELECT 
+                                    t.ID,
+                                    t.Name,
+                                    t.Public,
+                                    u.Username
+                               FROM upload_templates as t
+                          LEFT JOIN users_main AS u ON u.ID=t.UserID
+                              WHERE Public='1'
+                           ORDER BY Name");
+                        $PublicTemplates = $DB->to_array();
+                        $Cache->cache_value('templates_public', $PublicTemplates, 96400);
+                    }
+                    $Templates = array_merge($UserTemplates, $PublicTemplates)
                     ?>
                     <label for="template">select template: </label>
                     <div id="template_container" style="display: inline-block">
