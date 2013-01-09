@@ -9,9 +9,11 @@ if(!empty($_POST['submit'])) {
            // $Err ="upload";
     include(SERVER_ROOT.'/sections/upload/upload_handle.php');   
     
+    /*
+     * following bit is done by ajax now
 } elseif(!empty($_POST['delete'])) {     
     // delete a template
-    /* -------  Get template ------- */
+     
     $TemplateID = (int)$_POST['template'];
     $candelete=true;
     $Template = $Cache->get_value('template_' . $TemplateID);
@@ -41,7 +43,7 @@ if(!empty($_POST['submit'])) {
     $HideDNU = true;
     $HideWL = true;
     include(SERVER_ROOT.'/sections/upload/upload.php');  
-      
+      */
 } else {
     
     switch ($_GET['action']){

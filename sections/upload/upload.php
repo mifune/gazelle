@@ -239,43 +239,14 @@ foreach ($Whitelist as $ImageHost) {
     </div>
 <?
     if (check_perms('use_templates')) {
+        include(SERVER_ROOT.'/sections/upload/functions.php'); 
+        $Templates = get_templates($LoggedUser['ID']);
+        
         $CanDelAny = check_perms('delete_any_template')?'1':'0';
 ?>
         <div class="box pad shadow">
             <form action="" enctype="multipart/form-data"  method="post" onsubmit="return ($('#template').raw().value!=0);">
                 <div style="margin:10px 10%;display:inline">
-                    <?
-                    $UserTemplates = $Cache->get_value('templates_ids_' . $LoggedUser['ID']);
-                    if ($UserTemplates === FALSE) {
-                        $DB->query("SELECT 
-                                    t.ID,
-                                    t.Name,
-                                    t.Public,
-                                    u.Username
-                               FROM upload_templates as t
-                          LEFT JOIN users_main AS u ON u.ID=t.UserID
-                              WHERE t.UserID='$LoggedUser[ID]' 
-                                AND Public='0'
-                           ORDER BY Name");
-                        $UserTemplates = $DB->to_array();
-                        $Cache->cache_value('templates_ids_' . $LoggedUser['ID'], $UserTemplates, 96400);
-                    }
-                    $PublicTemplates = $Cache->get_value('templates_public');
-                    if ($PublicTemplates === FALSE) {
-                        $DB->query("SELECT 
-                                    t.ID,
-                                    t.Name,
-                                    t.Public,
-                                    u.Username
-                               FROM upload_templates as t
-                          LEFT JOIN users_main AS u ON u.ID=t.UserID
-                              WHERE Public='1'
-                           ORDER BY Name");
-                        $PublicTemplates = $DB->to_array();
-                        $Cache->cache_value('templates_public', $PublicTemplates, 96400);
-                    }
-                    $Templates = array_merge($UserTemplates, $PublicTemplates)
-                    ?>
                     <label for="template">select template: </label>
                     <div id="template_container" style="display: inline-block">
                     <select id="template" name="template" onchange="SelectTemplate(<?=$CanDelAny?>);" title="Select a template (*=public)">
