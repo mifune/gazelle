@@ -95,7 +95,7 @@ show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbc
 <?	if($NewRequest || $CanEdit) { ?>
                 <tr class="pad">
                     <td colspan="2" class="center">
-                        <strong class="important_text">NOTE: Once you create a  request you can not get the bounty back, it is gone forever.</strong>
+                        <strong class="important_text">NOTE: Requests automatically expire after 90 days. At this time if the bounty has not been filled all outstanding bounties are returned to those who placed them</strong>
                     </td>
                 </tr>
 				<tr>

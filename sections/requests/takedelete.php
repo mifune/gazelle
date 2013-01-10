@@ -16,7 +16,12 @@ $DB->query("SELECT UserID,
 			WHERE ID = ".$RequestID);
 list($UserID, $Title, $GroupID) = $DB->next_record();
 
+/* now that requests expire maybe we shouldnt let users delete them
 if($LoggedUser['ID'] != $UserID && !check_perms('site_moderate_requests')) { 
+	error(403);
+} */
+
+if(!check_perms('site_moderate_requests')) { 
 	error(403);
 }
 

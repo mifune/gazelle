@@ -172,13 +172,17 @@ if($NewRequest) {
 	$Cache->delete_value('user_stats_'.$LoggedUser['ID']);
 
 	
-	
-        $Announce = "'".$Title."' - http://".NONSSL_SITE_URL."/requests.php?action=view&id=".$RequestID." - ".implode(" ", $Tags);
+    $Announce = "'".$Title."' - http://".NONSSL_SITE_URL."/requests.php?action=view&id=".$RequestID." - ".implode(" ", $Tags);
+        
 	send_irc('PRIVMSG #'.NONSSL_SITE_URL.'-requests :'.$Announce);
+    
+    write_log("Request $RequestID ($Title) created with " . get_size($Bytes). " bounty by ". $LoggedUser['Username']);
 	
 } else {
 	$Cache->delete_value('request_'.$RequestID);
 }
+
+        
 
 update_sphinx_requests($RequestID);
 

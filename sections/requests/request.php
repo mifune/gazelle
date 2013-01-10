@@ -55,7 +55,7 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 <? if($CanEdit) { ?> 
 		<a href="requests.php?action=edit&amp;id=<?=$RequestID?>">[Edit]</a>
 <? }
-if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
+if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
 		<a href="requests.php?action=delete&amp;id=<?=$RequestID?>">[Delete]</a>
 <? } ?>
 <?	if(has_bookmarked('request', $RequestID)) { ?>
@@ -178,6 +178,16 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 					<?=time_diff($TimeAdded)?>	by  <strong><?=format_username($RequestorID, $RequestorName)?></strong>
 				</td>
 			</tr>
+            <?
+                $TimeExpires = strtotime($TimeAdded) + (3600*24*90); // 90 days from start 
+                $NowTime = time();
+            ?>
+			<tr>
+				<td class="label">Expiry Date</td>
+				<td <? if( ( $TimeExpires - $NowTime ) <= (3600*24*7) ) echo ' class="redbar"'; ?> title="On the expiry date if this request is not filled all bounties will be returned to the requestors and the request removed automatically">
+					<?=time_diff($TimeExpires,2,false,false,1)." &nbsp; (in ".time_diff($TimeExpires,2,false,false,0).')'?> 
+				</td>
+			</tr>
 
 <?	if ($GroupID) { ?>
 			<tr>
@@ -233,14 +243,14 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 <? }?> 
 <?
 	if($IsFilled) {
-		$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 ?>
 			<tr>
 				<td class="label">Filled</td>
 				<td>
-					<strong><a href="torrents.php?<?=(strtotime($TimeFilled)<$TimeCompare?'id=':'torrentid=').$TorrentID?>">Yes</a></strong>, 
+					<strong><a href="torrents.php?torrentid=<?=$TorrentID?>">Yes</a></strong>, 
 					by user <?=format_username($FillerID, $FillerName)?>
-<?		if($LoggedUser['ID'] == $RequestorID || $LoggedUser['ID'] == $FillerID || check_perms('site_moderate_requests')) { ?>
+<?		if( ( $TimeExpires>$NowTime &&  ($LoggedUser['ID'] == $RequestorID || $LoggedUser['ID'] == $FillerID) )
+                || check_perms('site_moderate_requests')) { ?>
 						<strong><a href="requests.php?action=unfill&amp;id=<?=$RequestID?>">(Unfill)</a></strong> Unfilling a request without a valid, nontrivial reason will result in a warning. 
 <?		} ?>
 				</td>

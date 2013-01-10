@@ -2203,7 +2203,7 @@ function update_sphinx_requests($RequestID) {
 				GROUP BY r.ID");
 
 
-	$Cache->delete_value('requests_'.$RequestID);
+	$Cache->delete_value('request_'.$RequestID);
 }
 
 function get_tags($TagNames) {
