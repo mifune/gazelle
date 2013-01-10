@@ -7,8 +7,8 @@ if (isset($_REQUEST['topic'])) {
 }
 
 
-$DB->query("SELECT Category, Title, Body, Time, MinClass FROM articles WHERE TopicID='$CurrentTopicID'");
-if (!list($Category, $Title, $Body, $Time, $MinClass) = $DB->next_record()) {
+$DB->query("SELECT Category, Title, Body, Time, MinClass, SubCat FROM articles WHERE TopicID='$CurrentTopicID'");
+if (!list($Category, $Title, $Body, $Time, $MinClass, $SubCat) = $DB->next_record()) {
     error(404);
 }
 $Body = $Text->full_format($Body, true); // true so regardless of author permissions articles can use adv tags 
@@ -21,10 +21,10 @@ if($MinClass>0){ // check permissions
 
 $Articles = $Cache->get_value("articles_$Category");
 if($Articles===false){
-        $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass
+        $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass, IF(SubCat='$SubCat',0,1) AS Sort
                   FROM articles 
                  WHERE Category='$Category'
-              ORDER BY SubCat, Title");
+              ORDER BY Sort, SubCat, Title");
         $Articles = $DB->to_array();
         $Cache->cache_value("articles_$Category", $Articles);
 }
@@ -54,30 +54,39 @@ show_header( $PageTitle, 'browse,overlib,bbcode');
     </form>
     <br/>
     
+<?
+    $Row = 'a';
+    $LastSubCat=-1;
+    $OpenTable=false;
+    $i=0;
+    foreach($Articles as $Article) {
+        list($TopicID, $ATitle, $Description, $SubCat, $MinClass) = $Article;
+        
+        //if($CurrentTopicID==$TopicID) continue;
+        if($MinClass>$StaffClass) continue;
+        
+        $Row = ($Row == 'a') ? 'b' : 'a';
+
+        if($LastSubCat != $SubCat) {
+            $Row = 'b';
+            $LastSubCat = $SubCat;
+            if($OpenTable){  ?>
+        </table><br/>
+<?           }  ?>
+        
+ <?       
+        if($i==1) {    
+?>
+    
     <div class="head"><?=$Title?></div>
     <div class="box pad" style="padding:10px 10px 10px 20px;">
         <?=$Body?>
     </div>
 
 <?
-    $Row = 'a';
-    $LastSubCat=-1;
-    $OpenTable=false;
-
-    foreach($Articles as $Article) {
-        list($TopicID, $Title, $Description, $SubCat, $MinClass) = $Article;
-        
-        if($CurrentTopicID==$TopicID) continue;
-        if($MinClass>$StaffClass) continue;
-        
-        $Row = ($Row == 'a') ? 'b' : 'a';
-
-        if($LastSubCat != $SubCat) {
-		$Row = 'b';
-            $LastSubCat = $SubCat;
-            if($OpenTable){  ?>
-        </table><br/>
-<?           }  ?>
+        }
+        $i++;
+?>
         <div class="head"><?=($SubCat==1?"Other $ArticleCats[$Category] articles":$ArticleSubCats[$SubCat])?></div>
         <table width="100%" class="topic_list">
             <tr class="colhead">
@@ -91,7 +100,7 @@ show_header( $PageTitle, 'browse,overlib,bbcode');
             <tr class="row<?=$Row?>">
 
                     <td class="topic_link">
-                            <a href="articles.php?topic=<?=$TopicID?>"><?=display_str($Title)?></a>
+                            <a href="articles.php?topic=<?=$TopicID?>"><?=display_str($ATitle)?></a>
                     </td>
                     <td>
                             <?=display_str($Description)?>
