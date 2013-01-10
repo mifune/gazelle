@@ -174,7 +174,8 @@ show_header('Manage torrents marked for deletion');
         <div class="box pad">
                 
         <table>
-            <tr><td style="width: 50%;">
+        <tr>
+            <td style="width: 50%;">
 <? 
 
 $BaseSQL = "SELECT um.ID, 
@@ -200,61 +201,61 @@ $DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 24 HOUR', 
 $Results = $DB->to_array();
 
 ?>
-		<strong>Reports resolved in the last 24 hours</strong>
-		<table class="noborder">
-			<tr class="colhead">
-				<td>Username</td>
-				<td>Total</td>
-				<td>Okay</td>
-				<td>Warned</td>
-			</tr>
+            <strong>MFD actions in the last 24 hours</strong>
+            <table class="noborder">
+                <tr class="colhead">
+                    <td>Username</td>
+                    <td>Total</td>
+                    <td>Okay</td>
+                    <td>Warned</td>
+                </tr>
 <? foreach($Results as $Result) {
 	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
-			<tr>
-				<td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
-				<td><?=$Num?></td>
-				<td><?=$NumOkay?></td>
-				<td><?=$NumWarned?></td>
-			</tr>
+                <tr>
+                    <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
+                    <td><?=$Num?></td>
+                    <td><?=$NumOkay?></td>
+                    <td><?=$NumWarned?></td>
+                </tr>
 <? } ?>
-		</table>
-		<br /><br />
+            </table>
+            <br /><br />
 <?
 
 $DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 1 WEEK', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
-		<strong>Reports resolved in the last week</strong>
-		<table class="noborder">
-			<tr class="colhead">
-				<td>Username</td>
-				<td>Total</td>
-				<td>Okay</td>
-				<td>Warned</td>
-			</tr>
+            <strong>MFD actions in the last week</strong>
+            <table class="noborder">
+                <tr class="colhead">
+                    <td>Username</td>
+                    <td>Total</td>
+                    <td>Okay</td>
+                    <td>Warned</td>
+                </tr>
 <? foreach($Results as $Result) {
 	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
-			<tr>
-				<td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
-				<td><?=$Num?></td>
-				<td><?=$NumOkay?></td>
-				<td><?=$NumWarned?></td>
-			</tr>
+                <tr>
+                    <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
+                    <td><?=$Num?></td>
+                    <td><?=$NumOkay?></td>
+                    <td><?=$NumWarned?></td>
+                </tr>
 <? } ?>
-		</table>
+            </table>
 		
-                </td>
-                <td>
+        </td>
+        <td>
 <?
 
 $DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 1 MONTH', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
-		<strong>Reports resolved in the last month</strong>
+		<strong>MFD actions in the last month</strong>
 		<table class="noborder">
 			<tr class="colhead">
 				<td>Username</td>
@@ -280,82 +281,29 @@ $DB->query(str_replace('[TIMECLAUSE]', '', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
-		<strong>Reports resolved total</strong>
-		<table class="noborder">
-			<tr class="colhead">
-				<td>Username</td>
-				<td>Total</td>
-				<td>Okay</td>
-				<td>Warned</td>
-			</tr>
+            <strong>MFD actions total</strong>
+            <table class="noborder">
+                <tr class="colhead">
+                    <td>Username</td>
+                    <td>Total</td>
+                    <td>Okay</td>
+                    <td>Warned</td>
+                </tr>
 <? foreach($Results as $Result) {
 	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
-			<tr>
-				<td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
-				<td><?=$Num?></td>
-				<td><?=$NumOkay?></td>
-				<td><?=$NumWarned?></td>
-			</tr>
+                <tr>
+                    <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
+                    <td><?=$Num?></td>
+                    <td><?=$NumOkay?></td>
+                    <td><?=$NumWarned?></td>
+                </tr>
 <? } ?>
-		</table>
+            </table>
 		
-        </td></tr></table>
-<?
-
-
-
-/*
-$DB->query("SELECT um.ID, 
-                   um.Username, 
-                   COUNT(r.ID) AS Num , 
-                   (SELECT Count(torrents_reviews.ID) 
-                                         FROM torrents_reviews 
-                                         WHERE torrents_reviews.UserID=um.ID
-                                           AND torrents_reviews.Status='Okay'
-                                           AND r.Time > NOW() - INTERVAL 24 HOUR) AS NumOkay,
-                   (SELECT Count(torrents_reviews.ID) 
-                                         FROM torrents_reviews 
-                                         WHERE torrents_reviews.UserID=um.ID
-                                           AND torrents_reviews.Status='Warned'
-                                           AND r.Time > NOW() - INTERVAL 24 HOUR) AS NumWarned
-              FROM torrents_reviews AS r JOIN users_main AS um ON um.ID=r.UserID 
-             WHERE r.Status!='Pending'  AND r.Time > NOW() - INTERVAL 24 HOUR
-          GROUP BY r.UserID 
-          ORDER BY Num DESC");
-
-
-      
-      
-$DB->query("SELECT um.ID, 
-                   um.Username, 
-                   COUNT(r.ID) AS Num , 
-                   (SELECT Count(torrents_reviews.ID) 
-                                         FROM torrents_reviews 
-                                         WHERE torrents_reviews.UserID=um.ID
-                                           AND torrents_reviews.Status='Okay' ) AS NumOkay,
-                   (SELECT Count(torrents_reviews.ID) 
-                                         FROM torrents_reviews 
-                                         WHERE torrents_reviews.UserID=um.ID
-                                           AND torrents_reviews.Status='Warned' ) AS NumWarned
-              FROM torrents_reviews AS r JOIN users_main AS um ON um.ID=r.UserID 
-             WHERE r.Status!='Pending' 
-          GROUP BY r.UserID 
-          ORDER BY Num DESC");
-
-
-      
-      
-$DB->query("SELECT um.ID, um.Username, COUNT(r.ID) AS Num 
-              FROM torrents_reviews AS r JOIN users_main AS um ON um.ID=r.UserID 
-             WHERE r.Status!='Pending' AND r.Time > NOW() - INTERVAL 24 HOUR 
-          GROUP BY r.UserID 
-          ORDER BY Num DESC");
-*/
-
-?>
-            
-            
+        </td></tr>
+        </table>
+   
         </div>
  
         <br/>

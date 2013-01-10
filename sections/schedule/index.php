@@ -548,6 +548,7 @@ if($Day != next_day() || $_GET['runday']){
         // collect unique request ID's the old fashioned way
         if (!in_array($RequestID, $RemoveRequestIDs)) $RemoveRequestIDs[] = $RequestID;
         // return bounty and log in staff notes
+        $Title = db_string($Title);
 		$DB->query("UPDATE users_info AS ui JOIN users_main AS um ON um.ID = ui.UserID
                        SET um.Uploaded=um.Uploaded+$Bounty,
                            ui.AdminComment = CONCAT('".$sqltime." - Bounty of " . get_size($Bounty). " returned from expired Request $RequestID ($Title).\n', ui.AdminComment)
