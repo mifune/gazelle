@@ -36,6 +36,7 @@ switch($_REQUEST['action']) {
 
                 $Cache->delete_value("article_$TopicID");
                 $Cache->delete_value("articles_$_POST[category]");
+                $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);
 		}
 		header('Location: tools.php?action=articles');
 		break;

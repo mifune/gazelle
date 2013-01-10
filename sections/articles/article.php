@@ -21,13 +21,25 @@ if($MinClass>0){ // check permissions
 
 $Articles = $Cache->get_value("articles_$Category");
 if($Articles===false){
-        $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass, IF(SubCat='$SubCat',0,1) AS Sort
+        $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass
                   FROM articles 
                  WHERE Category='$Category'
-              ORDER BY Sort, SubCat, Title");
+              ORDER BY SubCat, Title");
         $Articles = $DB->to_array();
         $Cache->cache_value("articles_$Category", $Articles);
 }
+
+
+$TopArticles = $Cache->get_value("articles_sub_{$Category}_$SubCat");
+if($TopArticles===false){
+        $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass
+                  FROM articles 
+                 WHERE Category='$Category' AND SubCat='$SubCat'
+              ORDER BY SubCat, Title");
+        $TopArticles = $DB->to_array();
+        $Cache->cache_value("articles_sub_{$Category}_$SubCat", $TopArticles);
+}
+
 
 $PageTitle = empty($LoggedUser['ShortTitles'])?"{$ArticleCats[$Category]} > $Title":$Title ;
 $SubTitle = $ArticleCats[$Category] ." Articles";
@@ -52,67 +64,21 @@ show_header( $PageTitle, 'browse,overlib,bbcode');
             </tr>
         </table>
     </form>
-    <br/>
-    
-<?
-    $Row = 'a';
-    $LastSubCat=-1;
-    $OpenTable=false;
-    $i=0;
-    foreach($Articles as $Article) {
-        list($TopicID, $ATitle, $Description, $SubCat, $MinClass) = $Article;
-        
-        //if($CurrentTopicID==$TopicID) continue;
-        if($MinClass>$StaffClass) continue;
-        
-        $Row = ($Row == 'a') ? 'b' : 'a';
+    <br/> 
 
-        if($LastSubCat != $SubCat) {
-            $Row = 'b';
-            $LastSubCat = $SubCat;
-            if($OpenTable){  ?>
-        </table><br/>
-<?           }  ?>
-        
- <?       
-        if($i==1) {    
+<?
+    print_articles($TopArticles, $StaffClass);
 ?>
-    
+     
     <div class="head"><?=$Title?></div>
     <div class="box pad" style="padding:10px 10px 10px 20px;">
         <?=$Body?>
     </div>
 
 <?
-        }
-        $i++;
+    print_articles($Articles, $StaffClass, $SubCat);
 ?>
-        <div class="head"><?=($SubCat==1?"Other $ArticleCats[$Category] articles":$ArticleSubCats[$SubCat])?></div>
-        <table width="100%" class="topic_list">
-            <tr class="colhead">
-                    <td style="width:300px;">Title</td>
-                    <td>Additional Info</td>
-            </tr>
-<? 
-            $OpenTable=true;
-        }
-?>
-            <tr class="row<?=$Row?>">
-
-                    <td class="topic_link">
-                            <a href="articles.php?topic=<?=$TopicID?>"><?=display_str($ATitle)?></a>
-                    </td>
-                    <td>
-                            <?=display_str($Description)?>
-<?                  if($MinClass) { ?>
-                        <span style="float:right">
-                            <?="[{$ClassLevels[$MinClass][Name]}+]"?>
-                        </span>
-<?                  } ?>
-                    </td>
-            </tr>
-<?  } ?>
-    </table>
+    
 </div>
 
 

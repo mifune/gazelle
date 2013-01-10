@@ -2,6 +2,60 @@
 
 
 
+function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1) {
+    global $ArticleCats, $ArticleSubCats, $ClassLevels;
+    
+    $Row = 'a';
+    $LastSubCat=-1;
+    $OpenTable=false;
+     
+    foreach($Articles as $Article) {
+        list($TopicID, $ATitle, $Description, $SubCat, $MinClass) = $Article;
+        
+        //if($CurrentTopicID==$TopicID) continue;
+        if($MinClass>$StaffClass) continue;
+        if($SubCat==$SkipSubArticle) continue;
+        
+        $Row = ($Row == 'a') ? 'b' : 'a';
+
+        if($LastSubCat != $SubCat) {
+            $Row = 'b';
+            $LastSubCat = $SubCat;
+            if($OpenTable){  ?>
+        </table><br/>
+<?           }  ?>
+        
+
+        <div class="head"><?=($SubCat==1?"Other $ArticleCats[$Category] articles":$ArticleSubCats[$SubCat])?></div>
+        <table width="100%" class="topic_list">
+            <tr class="colhead">
+                    <td style="width:300px;">Title</td>
+                    <td>Additional Info</td>
+            </tr>
+<? 
+            $OpenTable=true;
+        }
+?>
+            <tr class="row<?=$Row?>">
+
+                    <td class="topic_link">
+                            <a href="articles.php?topic=<?=$TopicID?>"><?=display_str($ATitle)?></a>
+                    </td>
+                    <td>
+                            <?=display_str($Description)?>
+<?                  if($MinClass) { ?>
+                        <span style="float:right">
+                            <?="[{$ClassLevels[$MinClass][Name]}+]"?>
+                        </span>
+<?                  } ?>
+                    </td>
+            </tr>
+<?  } ?>
+        </table><br/>
+<?
+
+}
+
 
 function replace_special_tags($Body) {
     global $DB, $Cache, $LoggedUser, $Text;
