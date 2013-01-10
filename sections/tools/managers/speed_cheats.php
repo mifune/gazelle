@@ -146,10 +146,11 @@ show_header('Speed Cheats','watchlist');
         <tr class="rowb">
             <form id="speedrecords" action="tools.php" method="post" onsubmit="return prompt_before_multiban();">
                 <input type="hidden" name="action" value="ban_speed_cheat" />
+                <input type="hidden" name="returnto" value="cheats" />
                 <td class="center"> 
                     <label for="banspeed" title="Ban Speed">Ban users with upload speed over </label>
                     <select id="banspeed" name="banspeed" title="Ban users who have recorded speeds over this"  onchange="preview_users()">
-    <?                      for($i=10;$i<=20;$i+=2){ 
+    <?                      for($i=4;$i<=20;$i+=2){ 
                                 print_speed_option($i * 1048576 , $BanSpeed );
                             }
                             for($i=30;$i<=200;$i+=10){ 
@@ -211,14 +212,14 @@ $Pages=get_pages($Page,$NumResults,50,9);
     <div class="head"><?=$NumResults?> users with speed over <?=get_size($ViewSpeed).'/s'?></div>
         <table>
             <tr class="colhead">
-                <td style="width:66px"></td>
+                <td style="width:90px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
                 <td class="center"><a href="<?=header_link('count') ?>">count</a></td>
                 <td class="center"><span style="color:#777">-clientID-</span></td>
                 <td class="center">Client IP addresses</td>
                 <td class="center"><a href="<?=header_link('mtime') ?>">last seen</a></td>
-                <td class="center"></td>
+                <!--<td class="center"></td>-->
             </tr>
 <?
             $row = 'a';
@@ -273,7 +274,17 @@ $Pages=get_pages($Page,$NumResults,50,9);
                            <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>">[view]</a> 
 <?                         if (!array_key_exists($UserID, $Watchlist)) {   
 ?>                            <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a><?
-                           }  ?>
+                           }  
+                           
+                            if ($Enabled=='1'){
+?>
+                                <a href="tools.php?action=ban_speed_cheat&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat">
+                                    BAN
+                                </a>
+<?
+                            }
+                           
+                           ?>
                         </td>
                         <td class="center">
 <?                          echo format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false);  
@@ -303,21 +314,21 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         ?> 
                         </td>
                         <td class="center"><?=time_diff($LastTime, 2, true, false, 1)?></td>
-                        <td class="center">
+                        <!--<td class="center">-->
 <?
+/*
                             if ($Enabled=='1'){
 ?>
                             <form id="speedrecords" action="tools.php" method="post">
                                 <input type="hidden" name="action" value="ban_speed_cheat" />
                                 <input type="hidden" name="userid" value="<?=$UserID?>" />
-                                <input type="hidden" name="maxspeed" value="<?=$MaxUpSpeed?>" />
-                                <input type="hidden" name="banspeed" value="<?=$BanSpeed?>" />
+                                <input type="hidden" name="returnto" value="cheats" />
                                 <input type="submit" name="banuser" value="ban" title="ban this user for being a big fat cheat" />
                             </form>
 <?
-                            }
+                            } */
 ?>
-                        </td>
+                       <!-- </td>-->
                     </tr>
 <?
             if ($IPDupeCount>0) { 

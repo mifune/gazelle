@@ -1,5 +1,5 @@
 <?
-if (!check_perms('users_manage_cheats')) error(403);
+if (!check_perms('users_manage_cheats')) error(403,true);
 
 if ( isset($_GET['userid']) && is_number($_GET['userid']) && $_GET['userid']>0 ) {
     $UserID = (int)$_GET['userid'];

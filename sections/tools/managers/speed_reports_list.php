@@ -356,7 +356,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
     <div class="head"><?=" $NumResults / $TotalResults"?> records</div>
         <table>
             <tr class="colhead">
-                <td style="width:66px"></td>
+                <td style="width:100px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('remaining') ?>">Remaining</a></td>
                 <td class="center"><a href="<?=header_link('uploaded') ?>">Uploaded</a></td>
@@ -404,7 +404,16 @@ $Pages=get_pages($Page,$NumResults,50,9);
  ?>                           <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a><?
                             }  ?>
                               <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from watchlist"><img src="static/common/symbols/disabled.png" alt="del records" /></a>
-                         </td>
+<?
+                            if ($Enabled=='1'){
+?>
+                                <a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat">
+                                    BAN
+                                </a>
+<?
+                            }
+?>
+                        </td>
                         <td class="center">
 <?                          echo format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false);  ?>
                         </td>

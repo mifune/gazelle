@@ -107,28 +107,37 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/managers/speed_cheats.php');
         break;
     case 'ban_speed_cheat':
-        if (!check_perms('admin_manage_cheats'))
-            error(403);
+        if (!check_perms('admin_manage_cheats')) error(403);
 
-        if ($_POST['banuser'] && is_number($_POST['userid'])) {
-
-            $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_POST[userid]' ");
+        
+        if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
+            
+            $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
+            if ($DB->record_count()>0) error("This user is in the not a cheater list - you must remove them from the list if you want to ban them from this page");
+            
+            $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_REQUEST[userid]' ");
             list($Maxspeed) = $DB->next_record();
-            disable_users(array($_POST['userid']), "Disabled for speeding (maxspeed=" . get_size($Maxspeed) . "/s) by $LoggedUser[Username]", 2);
+            disable_users(array($_REQUEST['userid']), "Disabled for speeding (maxspeed=" . get_size($Maxspeed) . "/s) by $LoggedUser[Username]", 2);
+            
         } elseif ($_POST['banusers'] && is_number($_POST['banspeed']) && $_POST['banspeed'] > 0) {
 
             $DB->query("SELECT GROUP_CONCAT(DISTINCT xbt.uid SEPARATOR '|') 
                           FROM xbt_peers_history AS xbt JOIN users_main AS um ON um.ID=xbt.uid
-                         WHERE um.Enabled='1' AND xbt.upspeed >='$_POST[banspeed]' 
+                       LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
+                         WHERE um.Enabled='1' AND nc.UserID IS NULL AND xbt.upspeed >='$_POST[banspeed]' 
                        ");
             list($UserIDs) = $DB->next_record();
-            $UserIDs = explode('|', $UserIDs);
-            if ($UserIDs) {
-                //error(print_r($UserIDs, true));
-                disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 2);
+            if ($UserIDs ) {
+                $UserIDs = explode('|', $UserIDs);
+                if( count($UserIDs)>0 ) {
+                    //error(print_r($UserIDs, true));
+                    disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 2);
+                }
             }
         }
-        header("Location: tools.php?action=speed_cheats&viewspeed=$_POST[banspeed]&banspeed=$_POST[banspeed]");
+        if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
+        else $returnto = 'speed_records';
+        header("Location: tools.php?action=$returnto&viewspeed=$_POST[banspeed]&banspeed=$_POST[banspeed]");
         break;
 
     case 'edit_userwl':
@@ -396,6 +405,7 @@ switch ($_REQUEST['action']) {
                     VALUES ('" . (int) $_POST['category'] . "', '" . (int) $_POST['subcat'] . "', '" . db_string($_POST['topicid']) . "', '" . db_string($_POST['title']) . "', '" . db_string($_POST['description']) . "', '" . db_string($_POST['body']) . "', '" . sqltime() . "','" . db_string($_POST['level']) . "')");
         $NewID = $DB->inserted_id();
         $Cache->delete_value("articles_$_POST[category]");
+        $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);
         //header("Location: tools.php?action=editarticle&amp;id=$NewID");
         header('Location: tools.php?action=articles');
         break;
@@ -406,11 +416,12 @@ switch ($_REQUEST['action']) {
         }
         if (is_number($_GET['id'])) {
             authorize();
-            $DB->query("SELECT TopicID, Category FROM articles WHERE ID='" . db_string($_GET['id']) . "'");
-            list($TopicID, $CatID) = $DB->next_record();
+            $DB->query("SELECT TopicID, Category, SubCat FROM articles WHERE ID='" . db_string($_GET['id']) . "'");
+            list($TopicID, $CatID, $SubCat) = $DB->next_record();
             $DB->query("DELETE FROM articles WHERE ID='" . db_string($_GET['id']) . "'");
             $Cache->delete_value('article_' . $TopicID);
             $Cache->delete_value("articles_$CatID");
+            $Cache->delete_value("articles_sub_{$CatID}_$SubCat");
         }
 
         header('Location: tools.php?action=articles');
