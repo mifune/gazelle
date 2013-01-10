@@ -184,7 +184,10 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
             ?>
 			<tr>
 				<td class="label">Expiry Date</td>
-				<td <? if( ( $TimeExpires - $NowTime ) <= (3600*24*7) ) echo ' class="redbar"'; ?> title="On the expiry date if this request is not filled all bounties will be returned to the requestors and the request removed automatically">
+				<td <? 
+                if(  $TimeExpires < $NowTime ) echo ' class="greybar"'; 
+                elseif( ( $TimeExpires - $NowTime ) <= (3600*24*7) ) echo ' class="redbar"'; 
+                ?> title="On the expiry date if this request is not filled all bounties will be returned to the requestors and the request removed automatically">
 					<?=time_diff($TimeExpires,2,false,false,1)." &nbsp; (in ".time_diff($TimeExpires,2,false,false,0).')'?> 
 				</td>
 			</tr>

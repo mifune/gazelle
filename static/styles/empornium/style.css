@@ -843,6 +843,11 @@ table.boxstat td:first-child {
     padding: 4px 0px;
 }
 
+.greybar {
+    background: #aaa;
+    color: white;
+    font-weight: bolder;
+}
 .redbar {
     background: #f397a7;
     color: white;

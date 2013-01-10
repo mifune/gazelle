@@ -999,8 +999,14 @@ table.boxstat a, table.boxstat a:visited {
     padding: 4px 0px;
 }
 
+.greybar {
+    background: #aaa;
+    color: white;
+    font-weight: bolder;
+}
+
 .redbar {
-    background: #ff5644;    /*  #f397a7; */
+    background: #ff5644;
     color: white;
     font-weight: bolder;
 }
