@@ -191,6 +191,8 @@ class VALIDATE {
                                     if(isset($Field['MinLength'])) { $MinLength=$Field['MinLength']; } else { $MinLength=1; }
 
                                     if(isset($Field['MinImages'])) { $MinImages=$Field['MinImages']; } else { $MinImages=0; }
+                                    if(isset($Field['MaxWidth'])) { $MaxWidth=$Field['MaxWidth']; } else { $MaxWidth=-1; }
+                                    if(isset($Field['MaxHeight'])) { $MaxHeight=$Field['MaxHeight']; } else { $MaxHeight=-1; }
 
                                     if (!$Text){
                                         include(SERVER_ROOT . '/classes/class_text.php');
@@ -228,6 +230,16 @@ class VALIDATE {
                                              // probably be taken from some new option fields).
                                             $result = validate_imageurl($imageurls[1][$j], 12, 255, $WLRegex); 
                                             if ($result !== TRUE){ return $Field['ErrorMessage'].' field: ' .$result; } 
+                                            
+                                            // check image dimensions if max dimensions are specified
+                                            if($MaxWidth>=0 && $MaxHeight>=0){ 
+                                                $image_attribs = getimagesize($imageurls[1][$j]);
+                                                if($image_attribs!==FALSE){ // i guess we should ignore it if it fails .. hmmm...
+                                                    list($width, $height, $type, $attr) = $image_attribs;
+                                                    if ($width>$MaxWidth || $height > $MaxHeight)
+                                                        return "$Field[ErrorMessage] field:<br/>Image dimensions are too big; width: {$width}px  height: {$height}px<br/>Max Image dimensions; width: {$MaxWidth}px  height: {$MaxHeight}px<br/>File: {$imageurls[1][$j]}";
+                                                }
+                                            }
                                          }
                                     } elseif($MinImages> 0 && $num < $MinImages) {  // if there are no img tags then it validates unless required flag is set
                                         //if (!empty($Field['Required'])) {   
