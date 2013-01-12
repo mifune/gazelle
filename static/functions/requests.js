@@ -193,7 +193,7 @@ function Calculate() {
 		$('#new_uploaded').raw().innerHTML = get_size(($('#current_uploaded').raw().value) - amt);
 		$('#new_ratio').raw().innerHTML = ratio($('#current_uploaded').raw().value - amt, $('#current_downloaded').raw().value);
 		$('#new_bounty').raw().innerHTML = get_size(mul * $('#amount_box').raw().value);
-                $('#inform').raw().innerHTML = value + unit.toUpperCase() + ' will immediately be removed from your upload total.'
+             //   $('#inform').raw().innerHTML = value + unit.toUpperCase() + ' will immediately be removed from your upload total.';
 	}
 }
  

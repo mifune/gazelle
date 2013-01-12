@@ -134,48 +134,14 @@ $DB->query("INSERT INTO users_connectable_status ( UserID, IP, Time )
 $DB->query("DELETE FROM xbt_files_users WHERE active='0'");
 
 
-//------------ Remove unwatched and unwanted speed records
-
-// as we are deleting way way more than keeping, and to avoid exceeding lockrow size in innoDB we do it another way:
-$DB->query("DROP TABLE IF EXISTS temp_copy"); // jsut in case!
-$DB->query("CREATE TABLE `temp_copy` (  
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uid` int(11) NOT NULL,
-  `downloaded` bigint(20) NOT NULL,
-  `remaining` bigint(20) NOT NULL,
-  `uploaded` bigint(20) NOT NULL,
-  `upspeed` bigint(20) NOT NULL,
-  `downspeed` bigint(20) NOT NULL,
-  `timespent` bigint(20) NOT NULL,
-  `peer_id` binary(20) NOT NULL DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
-  `ip` varchar(15) NOT NULL DEFAULT '',
-  `fid` int(11) NOT NULL,
-  `mtime` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `uid` (`uid`),
-  KEY `fid` (`fid`),
-  KEY `upspeed` (`upspeed`),
-  KEY `mtime` (`mtime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8"); 
-
-// insert the records we want to keep into the temp table
-$DB->query("INSERT INTO temp_copy (uid, downloaded, remaining, uploaded, upspeed, downspeed, timespent, peer_id, ip, fid, mtime)
-                    SELECT x.uid, x.downloaded, x.remaining, x.uploaded, x.upspeed, x.downspeed, x.timespent, x.peer_id, x.ip, x.fid, x.mtime 
-                      FROM xbt_peers_history AS x
-                 LEFT JOIN users_watch_list AS uw ON uw.UserID=x.uid
-                 LEFT JOIN torrents_watch_list AS tw ON tw.TorrentID=x.fid
-                     WHERE uw.UserID IS NOT NULL
-                        OR tw.TorrentID IS NOT NULL
-                        OR x.upspeed >= '$KeepSpeed'
-                        OR x.mtime>'".($nowtime - ( $DeleteRecordsMins * 60))."'" );
-
-//Use RENAME TABLE to atomically move the original table out of the way and rename the copy to the original name:
-$DB->query("RENAME TABLE xbt_peers_history TO temp_old, temp_copy TO xbt_peers_history");
-//Drop the original table:
-$DB->query("DROP TABLE temp_old");
 
 
-//$DB->query("DELETE FROM xbt_peers_history WHERE ..."); 
+
+
+
+
+
+
 
 
 //------------- Remove torrents that have expired their warning period every 15 minutes ----------//
@@ -543,14 +509,14 @@ if($Day != next_day() || $_GET['runday']){
 	$RemoveBounties = $DB->to_array();
     $RemoveRequestIDs = array();
     
-    foreach($RemoveBounties as $Bounty) {
-        list($RequestID, $Title, $UserID, $Bounty) = $Bounty;
+    foreach($RemoveBounties as $BountyInfo) {
+        list($RequestID, $Title, $UserID, $Bounty) = $BountyInfo;
         // collect unique request ID's the old fashioned way
         if (!in_array($RequestID, $RemoveRequestIDs)) $RemoveRequestIDs[] = $RequestID;
         // return bounty and log in staff notes
         $Title = db_string($Title);
 		$DB->query("UPDATE users_info AS ui JOIN users_main AS um ON um.ID = ui.UserID
-                       SET um.Uploaded=um.Uploaded+$Bounty,
+                       SET um.Uploaded=(um.Uploaded+'$Bounty'),
                            ui.AdminComment = CONCAT('".$sqltime." - Bounty of " . get_size($Bounty). " returned from expired Request $RequestID ($Title).\n', ui.AdminComment)
 			         WHERE ui.UserID = '$UserID'");
         // send users who got bounty returned a PM
@@ -558,35 +524,38 @@ if($Day != next_day() || $_GET['runday']){
      
     }
     
-    // log and update sphinx for each request
-    $DB->query("SELECT r.ID, r.Title, Count(v.UserID), SUM( v.Bounty), r.GroupID 
-                  FROM requests as r JOIN requests_votes as v 
-                 WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")
-				 GROUP BY r.ID" );
-    
-	$RemoveRequests = $DB->to_array();
-    
-    // delete the requests
-    $DB->query("DELETE r, v, t, c
-                  FROM requests as r 
-             LEFT JOIN requests_votes as v ON r.ID=v.RequestID 
-             LEFT JOIN requests_tags AS t ON r.ID=t.RequestID 
-             LEFT JOIN requests_comments AS c ON r.ID=c.RequestID
-                 WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")"); 
-    
-    //log and update sphinx (sphinx call must be done after requests are deleted)    
-    foreach($RemoveRequests as $Request) {
-        list($RequestID, $Title, $NumUsers, $Bounty, $GroupID) = $Request;
-         
-        write_log("Request $RequestID ($Title) expired - returned total of ". get_size($Bounty)." to $NumUsers users");
+    if (count($RemoveRequestIDs)>0) {
+        // log and update sphinx for each request
+        $DB->query("SELECT r.ID, r.Title, Count(v.UserID), SUM( v.Bounty), r.GroupID 
+                      FROM requests as r JOIN requests_votes as v 
+                     WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")
+                     GROUP BY r.ID" );
 
-        $Cache->delete_value('request_votes_'.$RequestID);
-        if ($GroupID) {
-            $Cache->delete_value('requests_group_'.$GroupID);
+        $RemoveRequests = $DB->to_array();
+
+        // delete the requests
+        $DB->query("DELETE r, v, t, c
+                      FROM requests as r 
+                 LEFT JOIN requests_votes as v ON r.ID=v.RequestID 
+                 LEFT JOIN requests_tags AS t ON r.ID=t.RequestID 
+                 LEFT JOIN requests_comments AS c ON r.ID=c.RequestID
+                     WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")"); 
+
+        //log and update sphinx (sphinx call must be done after requests are deleted)    
+        foreach($RemoveRequests as $Request) {
+            list($RequestID, $Title, $NumUsers, $Bounty, $GroupID) = $Request;
+
+            write_log("Request $RequestID ($Title) expired - returned total of ". get_size($Bounty)." to $NumUsers users");
+
+            $Cache->delete_value('request_votes_'.$RequestID);
+            if ($GroupID) {
+                $Cache->delete_value('requests_group_'.$GroupID);
+            }
+            update_sphinx_requests($RequestID);
+
         }
-        update_sphinx_requests($RequestID);
-
     }
+    
     
     
     //----------------------------------------
@@ -1210,6 +1179,53 @@ if($BiWeek != next_biweek() || $_GET['runbiweek']) {
 	}
 }
 
+
+
+
+//---  moved this run every 15 mins section to the end as if xbt_peers_history gets too big (>~2.6 million? records on our server...) 
+//          it can screw the scheduler
+
+//------------ Remove unwatched and unwanted speed records
+
+// as we are deleting way way more than keeping, and to avoid exceeding lockrow size in innoDB we do it another way:
+$DB->query("DROP TABLE IF EXISTS temp_copy"); // jsut in case!
+$DB->query("CREATE TABLE `temp_copy` (  
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `downloaded` bigint(20) NOT NULL,
+  `remaining` bigint(20) NOT NULL,
+  `uploaded` bigint(20) NOT NULL,
+  `upspeed` bigint(20) NOT NULL,
+  `downspeed` bigint(20) NOT NULL,
+  `timespent` bigint(20) NOT NULL,
+  `peer_id` binary(20) NOT NULL DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  `fid` int(11) NOT NULL,
+  `mtime` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `fid` (`fid`),
+  KEY `upspeed` (`upspeed`),
+  KEY `mtime` (`mtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8"); 
+
+// insert the records we want to keep into the temp table
+$DB->query("INSERT INTO temp_copy (uid, downloaded, remaining, uploaded, upspeed, downspeed, timespent, peer_id, ip, fid, mtime)
+                    SELECT x.uid, x.downloaded, x.remaining, x.uploaded, x.upspeed, x.downspeed, x.timespent, x.peer_id, x.ip, x.fid, x.mtime 
+                      FROM xbt_peers_history AS x
+                 LEFT JOIN users_watch_list AS uw ON uw.UserID=x.uid
+                 LEFT JOIN torrents_watch_list AS tw ON tw.TorrentID=x.fid
+                     WHERE uw.UserID IS NOT NULL
+                        OR tw.TorrentID IS NOT NULL
+                        OR x.upspeed >= '$KeepSpeed'
+                        OR x.mtime>'".($nowtime - ( $DeleteRecordsMins * 60))."'" );
+
+//Use RENAME TABLE to atomically move the original table out of the way and rename the copy to the original name:
+$DB->query("RENAME TABLE xbt_peers_history TO temp_old, temp_copy TO xbt_peers_history");
+//Drop the original table:
+$DB->query("DROP TABLE temp_old");
+
+ 
 
 echo "-------------------------\n\n";
 if (check_perms('admin_schedule')) {	

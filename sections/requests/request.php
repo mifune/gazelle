@@ -214,9 +214,9 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
 				<td>
 					<input type="text" id="amount_box" size="8" onchange="Calculate();" />
 					<select id="unit" name="unit" onchange="Calculate();">
-						<option value='mb'>MB</option>
-						<option value='gb'>GB</option>
-                                                <option value='tb'>TB</option>
+						<option value="mb">MB</option>
+						<option value="gb">GB</option>
+                                                <option value="tb">TB</option>
 					</select>
 					<input type="button" value="Preview" onclick="Calculate();"/>
 				</td>
