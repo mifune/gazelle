@@ -26,6 +26,8 @@ list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryI
      $FillerID, $FillerName, $TorrentID, $TimeFilled, $GroupID) = $Request;
 
 //Convenience variables
+$NowTime = time();
+$TimeExpires = strtotime($TimeAdded) + (3600*24*90); // 90 days from start 
 $IsFilled = !empty($TorrentID);
 $CanVote = (empty($TorrentID) && check_perms('site_vote') && $TimeExpires < $NowTime);
 
@@ -166,10 +168,6 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 					<?=time_diff($TimeAdded)?>	by  <strong><?=format_username($RequestorID, $RequestorName)?></strong>
 				</td>
 			</tr>
-            <?
-                $TimeExpires = strtotime($TimeAdded) + (3600*24*90); // 90 days from start 
-                $NowTime = time();
-            ?>
 			<tr>
 				<td class="label">Expiry Date</td>
 				<td <? 
