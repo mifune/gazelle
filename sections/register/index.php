@@ -18,6 +18,10 @@ if(!empty($_REQUEST['confirm'])) {
 	if($UserID) {
 		$DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
 		$Cache->increment('stats_user_count');
+        
+        $Body = get_article("intro_pm");
+        if($Body) send_pm($UserID, 0, "Welcome to ". SITE_NAME , $Body);
+        
 		include('step2.php');
 	}
 	
