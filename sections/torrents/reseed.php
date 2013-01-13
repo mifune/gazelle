@@ -11,6 +11,8 @@ if(time()-strtotime($LastReseedRequest)<432000) { error("There was already a re-
 
 $DB->query("UPDATE torrents SET LastReseedRequest='" .sqltime(). "' WHERE ID='$TorrentID'");
 
+$Cache->delete_value('torrents_details_'.$GroupID);
+            
 $Group = get_groups(array($GroupID));
 $Group = array_pop($Group['matches']);
 list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
