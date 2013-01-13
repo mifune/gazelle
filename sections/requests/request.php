@@ -29,7 +29,7 @@ list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryI
 $NowTime = time();
 $TimeExpires = strtotime($TimeAdded) + (3600*24*90); // 90 days from start 
 $IsFilled = !empty($TorrentID);
-$CanVote = (empty($TorrentID) && check_perms('site_vote') && $TimeExpires < $NowTime);
+$CanVote = (empty($TorrentID) && check_perms('site_vote') && $TimeExpires > $NowTime);
 
 if($CategoryID == 0) {
     $CategoryName = 'unknown';
