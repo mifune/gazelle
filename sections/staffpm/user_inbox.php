@@ -37,7 +37,7 @@ $Msg = isset($_REQUEST['msg'])?$_REQUEST['msg']:'';
           </div>
 		<? print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
       </div>
-	<div class="box pad" id="inbox">
+	<div class="box pad shadow" id="inbox">
 <?
 
 if ($DB->record_count() == 0) {
