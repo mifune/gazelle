@@ -8,7 +8,7 @@ $sqltime= sqltime();
     
     // return bounties for each voter
     $DB->query("SELECT r.ID, r.Title, v.UserID, v.Bounty
-                  FROM requests as r JOIN requests_votes as v 
+                  FROM requests as r JOIN requests_votes as v ON v.RequestID=r.ID 
                  WHERE TorrentID='0' AND TimeAdded < '".time_minus(3600*24*90)."'" );
     
 	$RemoveBounties = $DB->to_array();
@@ -35,7 +35,7 @@ $sqltime= sqltime();
     if (count($RemoveRequestIDs)>0) {
         // log and update sphinx for each request
         $DB->query("SELECT r.ID, r.Title, Count(v.UserID), SUM( v.Bounty), r.GroupID 
-                      FROM requests as r JOIN requests_votes as v 
+                      FROM requests as r JOIN requests_votes as v ON v.RequestID=r.ID 
                      WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")
                      GROUP BY r.ID" );
 

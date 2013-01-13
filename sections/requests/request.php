@@ -27,7 +27,7 @@ list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryI
 
 //Convenience variables
 $IsFilled = !empty($TorrentID);
-$CanVote = (empty($TorrentID) && check_perms('site_vote'));
+$CanVote = (empty($TorrentID) && check_perms('site_vote') && $TimeExpires < $NowTime);
 
 if($CategoryID == 0) {
     $CategoryName = 'unknown';
@@ -52,13 +52,13 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 	<h2><a href="requests.php">Requests</a> &gt; <?=$CategoryName?> &gt; <?=$DisplayLink?></h2>
     <a id="messages" ></a>
 	<div class="linkbox">
-<? if($CanEdit) { ?> 
+<?  if($CanEdit) { ?> 
 		<a href="requests.php?action=edit&amp;id=<?=$RequestID?>">[Edit]</a>
-<? }
-if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
+<?  }
+    if($CanEdit) {     // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
 		<a href="requests.php?action=delete&amp;id=<?=$RequestID?>">[Delete]</a>
-<? } ?>
-<?	if(has_bookmarked('request', $RequestID)) { ?>
+<?  } 
+ 	if(has_bookmarked('request', $RequestID)) { ?>
 		<a href="#" id="bookmarklink_request_<?=$RequestID?>" onclick="Unbookmark('request', <?=$RequestID?>,'[Bookmark]');return false;">[Remove bookmark]</a>
 <?	} else { ?>
 		<a href="#" id="bookmarklink_request_<?=$RequestID?>" onclick="Bookmark('request', <?=$RequestID?>,'[Remove bookmark]');return false;">[Bookmark]</a>
@@ -144,18 +144,6 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
           
             <div class="head">Request</div>
 		<table>
-			<!--<tr>
-				<td class="label">Category</td>
-				<td style="font-size: 1.2em;vertical-align: middle;">
-                    <div class="center cats_col"  style="float:left;margin-right:30px;border-bottom:none;border-right:none;">
-                        <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
-                        <div title="<?= $NewCategories[$CategoryID]['tag'] ?>"><img src="<?= $CatImg ?>" /></div>
-                    </div>
-                    <div class="center cats_col"  style="float:left;margin-right:30px;padding-top:15px;">
-                        <?=$NewCategories[$CategoryID]['name']?>
-                    </div>
-                </td>
-			</tr>-->
 			<tr>
 				<td class="label">  Title </td>
 				<td style="font-size: 1.2em;">
@@ -188,7 +176,9 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
                 if(  $TimeExpires < $NowTime ) echo ' class="greybar"'; 
                 elseif( ( $TimeExpires - $NowTime ) <= (3600*24*7) ) echo ' class="redbar"'; 
                 ?> title="On the expiry date if this request is not filled all bounties will be returned to the requestors and the request removed automatically">
-					<?=time_diff($TimeExpires,2,false,false,1)." &nbsp; (in ".time_diff($TimeExpires,2,false,false,0).')'?> 
+					<?=time_diff($TimeExpires,2,false,false,1)." &nbsp; (".time_diff($TimeExpires,2,false,false,0).')';
+                    if (!$IsFilled && $TimeExpires < $NowTime) echo "<br/>this request will be deleted and the bounties returned within 24 hours";
+                ?>
 				</td>
 			</tr>
 
@@ -258,7 +248,7 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
 <?		} ?>
 				</td>
 			</tr>
-<?	} else { ?>
+<?	} elseif ($TimeExpires > $NowTime) { ?>
 			<tr>
 				<td class="label" valign="top">Fill request</td>
 				<td>
@@ -267,13 +257,14 @@ if(check_perms('site_moderate_requests')) {     // $UserCanEdit || check_perms('
 							<input type="hidden" name="action" value="takefill" />
 							<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 							<input type="hidden" name="requestid" value="<?=$RequestID?>" />
-							<input type="text" size="50" name="link" <?=(!empty($Link) ? "value='$Link' " : '')?>/>
+                            <strong class="warning">Please make sure the torrent you are filling this request with matches the required parameters.</strong>
+							<br/><input type="text" size="50" name="link" <?=(!empty($Link) ? "value='$Link' " : '')?>/>
 							<br/>Should be the permalink (PL) to the torrent
                             <br/>e.g. http://<?=NONSSL_SITE_URL?>/torrents.php?id=xxxx
 							<br/><br/>
 							<? if(check_perms('site_moderate_requests')) { ?> 
                             <span title="Fill this request on behalf of user:">
-                            Fill for user: <input type="text" size="50" name="user" <?=(!empty($FillerUsername) ? "value='$FillerUsername' " : '')?>/>
+                            Fill for user: <input type="text" size="50" name="user" title="the username of the user you are filling this for (they will be recorded as filling this request)" <?=(!empty($FillerUsername) ? "value='$FillerUsername' " : '')?>/>
 							</span><br/><br/>
 							<? } ?>
 							<input type="submit" value="Fill request" />
