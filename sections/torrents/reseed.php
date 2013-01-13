@@ -7,9 +7,9 @@ if(!is_number($GroupID) || !is_number($TorrentID)) { error(0); }
 $DB->query("SELECT LastReseedRequest, UserID, Time FROM torrents WHERE ID='$TorrentID'");
 list($LastReseedRequest, $UploaderID, $UploadedTime) = $DB->next_record();
 
-if(time()-strtotime($LastReseedRequest)<864000) { error("There was already a re-seed request for this torrent within the past 10 days."); }
+if(time()-strtotime($LastReseedRequest)<432000) { error("There was already a re-seed request for this torrent within the past 5 days."); }
 
-$DB->query("UPDATE torrents SET LastReseedRequest=NOW() WHERE ID='$TorrentID'");
+$DB->query("UPDATE torrents SET LastReseedRequest='" .sqltime(). "' WHERE ID='$TorrentID'");
 
 $Group = get_groups(array($GroupID));
 $Group = array_pop($Group['matches']);
