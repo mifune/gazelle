@@ -196,7 +196,11 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                       GROUP BY xbt.uid   
                       ORDER BY $SQLOrderBy $OrderWay 
                          LIMIT $Limit");
-
+/* for later - pattern matching: 
+SELECT uid, upspeed, uploaded, count(id) as cnt FROM xbt_peers_history
+WHERE upspeed!=0 
+GROUP BY  upspeed, uid, uploaded HAVING cnt > 1
+ */
 
 
 $Records = $DB->to_array();
