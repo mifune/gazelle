@@ -554,9 +554,8 @@ if(count($Tags) > 0) {
 		<table class="torrent_table">
 			<tr class="colhead">
 				<td></td>
-                        <td width="80%">
-                          Name
-                        </td>
+                <td width="80%">Name</td>
+				<td width="14%"><!--colspan="2"-->Files</td>
 				<td>Size</td>
 				<td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /></td>
 				<td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /></td>
@@ -594,6 +593,29 @@ $EditionID = 0;
 		$ReportInfo .= "</table>";
 	}
 	
+                         
+// count filetypes
+$num = preg_match_all('/\.([^\.]*)\{\{\{/ism', $FileList, $Extensions);
+//error(print_r($FileTypes[1],true)); // debug
+$TempFileTypes = array('video'=>0,'image'=>0,'compressed'=>0, 'other'=>0);
+foreach($Extensions[1] as $ext) { // filetypes arrays defined in config
+    if (in_array($ext, $Video_FileTypes))
+        $TempFileTypes['video']+=1;
+    elseif (in_array($ext, $Image_FileTypes))
+        $TempFileTypes['image']+=1;
+    elseif (in_array($ext, $Zip_FileTypes))
+        $TempFileTypes['compressed']+=1;
+    else 
+        $TempFileTypes['other']+=1;
+}
+$FileTypes=array();
+foreach($TempFileTypes as $image_ext=>$count) {
+    if ($count>0) $FileTypes[] = "$count <img src=\"static/common/symbols/$image_ext.gif\" alt=\"$image_ext\" title=\"$image_ext files\" /> ";
+    //$FileTypes .= "$count .{$ext}[br]";
+}
+$FileTypes = "<span class=\"grey\" style=\"float:left;\">" . implode(' ', $FileTypes)."</span>";
+//$FileTypes = "[spoiler=$FileCount]{$FileTypes}[/spoiler]";
+
 	$FileList = str_replace(array('_','-'), ' ', $FileList);
 	$FileList = str_replace('|||','<tr><td>',display_str($FileList));
 	$FileList = preg_replace_callback('/\{\{\{([^\{]*)\}\}\}/i','filelist',$FileList);
@@ -626,18 +648,20 @@ $EditionID = 0;
                 <td style="border-bottom:none;border-left:none;">
                     <strong><?=$ExtraInfo; ?></strong>
                 </td>
+				<!--<td class="nobr"><?=$FileCount?></td>-->
+				<td class="nobr"><?=$FileTypes;//$Text->full_format($FileTypes)?></td>
 				<td class="nobr"><?=get_size($Size)?></td>
 				<td><?=number_format($Snatched)?></td>
 				<td><?=number_format($Seeders)?></td>
 				<td><?=number_format($Leechers)?></td>
 			</tr>
             <tr>
-                <td colspan="5" class="right" style="border-top:none;border-bottom:none;border-left:none;">
+                <td colspan="6" class="right" style="border-top:none;border-bottom:none;border-left:none;">
                     <em>Uploaded by   <?=format_username($UserID, $TorrentUploader)?> <?=time_diff($TorrentTime);?> </em>
                 </td>
             </tr>
 			<tr class="groupid_<?=$GroupID?> edition_<?=$EditionID?> torrentdetails pad" id="torrent_<?=$TorrentID; ?>">
-				<td colspan="6" style="border-top:none;"> 
+				<td colspan="7" style="border-top:none;">
                             
 <? 
     $lasttimesinceactive =  time() - strtotime($LastActive);

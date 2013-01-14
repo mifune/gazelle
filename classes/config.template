@@ -126,7 +126,13 @@ $AutoAwardTypes  = array ('NumPosts', 'NumComments', 'NumUploaded', 'NumNewTags'
 
 $ShopActions = array('gb','givegb','givecredits','slot','title','badge','pfl','ufl');
 
+// for counting filetypes
+$Video_FileTypes = array('3gp','avi','flv','mpeg','mkv','mov','mp4','mpg','ogg','wmv');
+$Image_FileTypes = array('bmp','gif','jpeg','jpg','png');
+$Zip_FileTypes = array('rar','zip','7','7v','z','zip');
 
+define('SIG_MAX_WIDTH', 800);
+define('SIG_MAX_HEIGHT', 300);
 
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');
