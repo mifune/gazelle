@@ -190,6 +190,38 @@ if($DB->affected_rows() > 0 || !$Report) {
 		}
 		$DB->query("SELECT GroupID FROM torrents WHERE ID = ".$TorrentID);
 		list($GroupID) = $DB->next_record();
+        
+        if($ResolveType['title']=='Dupe' && isset($Escaped['extras_id'])) {
+            //------ if deleting a dupe pm peers with the duped torrents id
+			$ExtraIDs = explode(" ", $Escaped['extras_id']);
+            foreach($ExtraIDs as $ExtraID){
+                if(!is_number($ExtraID)) error(0);
+            }
+            $ExtraIDs = implode(',', $ExtraIDs);
+            
+            $DB->query("SELECT DISTINCT uid FROM xbt_snatched WHERE fid = '$TorrentID'
+                        UNION
+                        SELECT DISTINCT uid FROM xbt_files_users WHERE fid = '$TorrentID'");
+            
+            if ($DB->record_count()>0) {
+                $Peers = $DB->collect('uid');
+                $Message = "Torrent ".$TorrentID." (".$RawName.") was deleted for being a dupe.[br][br]";
+                $Message .= "The torrent it was duping was:";
+                //$DB->query("SELECT ID, Name FROM torrents_group WHERE ID IN ($ExtraIDs)");
+				$DB->query("SELECT tg.ID, tg.Name, t.Time, t.Size, t.UserID, um.Username
+							  FROM torrents AS t JOIN torrents_group AS tg ON tg.ID=t.GroupID
+							  LEFT JOIN users_main AS um ON um.ID=t.UserID
+							 WHERE tg.ID IN ($ExtraIDs) 
+							 ORDER BY t.Time DESC");
+                while(list($xID, $xName, $xTime, $xSize, $xUserID, $xUsername) = $DB->next_record()) {
+					$Message .= "[br][url=/torrents.php?id=$xID]{$xName}[/url] (". get_size($xSize).") uploaded by [url=/user.php?id=$xUserID]{$xUsername}[/url] " .time_diff($xTime,2,false,false);
+                }
+                $Message .= "[br][br]You should be able to join the torrent already here by grabbing its torrent file and doing a force recheck in your torrent client.";
+                send_pm($Peers, 0, db_string('A torrent you were a peer on was deleted'), db_string($Message)); 
+            }
+ 
+        }
+        
 		delete_torrent($TorrentID);
 		write_log($Log);
 		$Log = "deleted torrent for the reason: ".$ResolveType['title'].". ( ".$Escaped['log_message']." )";

@@ -362,6 +362,8 @@ if(count($Reports) == 0) {
 						<tr>
 							<td class="label">Relevant Other Torrents:</td>
 							<td colspan="3">
+                                <input class="hidden" name="extras_id" value="<?=$ExtraIDs?>" />
+                        
 			<?
 					$First = true;
 					$Extras = explode(" ", $ExtraIDs);
@@ -394,7 +396,7 @@ if(count($Reports) == 0) {
 				<?
 							$First = false;
 						}
-					}
+					} 
 			?>
 							</td>
 						</tr>
