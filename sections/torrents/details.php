@@ -599,6 +599,7 @@ $num = preg_match_all('/\.([^\.]*)\{\{\{/ism', $FileList, $Extensions);
 //error(print_r($FileTypes[1],true)); // debug
 $TempFileTypes = array('video'=>0,'image'=>0,'compressed'=>0, 'other'=>0);
 foreach($Extensions[1] as $ext) { // filetypes arrays defined in config
+    $ext = strtolower($ext);
     if (in_array($ext, $Video_FileTypes))
         $TempFileTypes['video']+=1;
     elseif (in_array($ext, $Image_FileTypes))
