@@ -1137,7 +1137,7 @@ class TEXT {
     }
 
     
-    function extract_attributes($Attrib) {
+    function extract_attributes($Attrib, $MaxNumber=-1) {
         $Elements=array();
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
@@ -1147,7 +1147,8 @@ class TEXT {
                     if ($this->is_color_attrib($att)) {
                         $Elements['color'][] = $att;
                         
-                    } elseif (preg_match('/^([0-9]{1,5})$/', $att, $matches)) {
+                    } elseif (preg_match('/^([0-9]*)$/', $att, $matches)) {
+                        if ($MaxNumber>-1 && $att>$MaxNumber) $att = $MaxNumber;
                         $Elements['number'][] = $att;
               
                     } elseif ( $this->valid_url($att) ) {
@@ -1296,7 +1297,7 @@ class TEXT {
                     // html5 video tag
                     // note: as a non attribute the link has been auto-formatted as [inlinelink]link.url 
                     $Block['Attr'] = str_replace('[inlineurl]', '', $Block['Attr']);
-                    $Attributes= $this->extract_attributes($Block['Attr']);
+                    $Attributes= $this->extract_attributes($Block['Attr'], 920);
                     
                     if ( ($Block['Attr'] != '' && count($Attributes)==0) || strpos($Block['Val'], '[inlineurl]') === FALSE ) {
                         //$Str.= print_r($Attributes,true).'[br]';
