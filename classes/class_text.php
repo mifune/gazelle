@@ -1306,9 +1306,15 @@ class TEXT {
                         if (isset($Attributes['number']) && count($Attributes['number']) >= 2) {
                             $dimensions = ' width="'.$Attributes['number'][0].'" height="'.$Attributes['number'][1].'" ';
                         }
-                        $Str .= '<video '.$dimensions.' controls src="'.str_replace('[inlineurl]', '', $Block['Val']).'">
-    Your browser does not support the html5 video tag. Please upgrade your browser.
-</video>';
+                        $Sources = explode(',', $Block['Val']);
+                        $Str .= '<video '.$dimensions.' controls>';     // src="'.str_replace('[inlineurl]', '', $Block['Val']).'">';
+                        foreach( $Sources as $Source) {
+                            $lastdot = strripos($Source, '.');
+                            $mime = substr($Source, $lastdot+1);
+                            if($mime=='ogv')$mime='ogg'; // all others are same as ext (webm=webm, mp4=mp4, ogg=ogg)
+                            $Str .= '<source src="'. str_replace('[inlineurl]', '', $Source).'" type="video/'.$mime.'">';
+                        }
+                        $Str .= 'Your browser does not support the html5 video tag. Please upgrade your browser.</video>';
                     }
                     break;
                 case 'flash':
