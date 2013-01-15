@@ -159,7 +159,7 @@ function replace_special_tags($Body) {
         $Body = preg_replace("/\[dnulist\]/i", $list, $Body);
     }
 
-
+/*
     if (preg_match("/\[ratiolist\]/i", $Body)) {
         $list = '<table>
                       <tr class="colhead">
@@ -220,8 +220,8 @@ function replace_special_tags($Body) {
                 </table>';
 
         $Body = preg_replace("/\[ratiolist\]/i", $list, $Body);
-
     }
+ */
     return $Body;
 }
 
