@@ -151,7 +151,7 @@ if (!isset($Properties['Title']) || $Properties['Title']=='') {
 }
 
 $Validate = new VALIDATE;
-$Validate->SetFields('Title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>64)); 
+$Validate->SetFields('Title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>42)); 
 $Err = $Validate->ValidateForm($Properties, $Text); // Validate the form
 if ($Err) { // Show the upload form, with the data the user entered
     include(SERVER_ROOT . '/sections/upload/upload.php');
