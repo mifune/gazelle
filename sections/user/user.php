@@ -227,7 +227,18 @@ show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
  
     if ($links2) echo $links2;
  
-if (check_perms('users_manage_cheats', $Class)) {
+if (check_perms('users_manage_cheats', $Class)) {  
+    /*
+    $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$UserID'"); ?>
+    <br/>
+    <span id="xcl">
+<?  if($DB->record_count() > 0)  {?>    
+		[<a onclick="excludelist_remove('<?=$UserID?>');return false;" title="Remove this user from the speed records user exclude list">Remove from exclude list</a>]
+<?  } else {?>    
+		[<a onclick="excludelist_add('<?=$UserID?>');return false;" title="Add this user to the exclude list">Add to exclude list</a>]
+<?  } ?>
+    </span>
+<? */
     $DB->query("SELECT UserID FROM users_watch_list WHERE UserID='$UserID'"); ?>
     <span id="wl">
 <?  if($DB->record_count() > 0)  {?>    

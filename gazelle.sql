@@ -1076,14 +1076,15 @@ CREATE TABLE IF NOT EXISTS `site_options` (
   `ReviewHours` int(4) NOT NULL,
   `AutoDelete` tinyint(1) NOT NULL,
   `DeleteRecordsMins` int(8) NOT NULL,
-  `KeepSpeed` bigint(11) NOT NULL
+  `KeepSpeed` bigint(11) NOT NULL,
+  `FreeLeech` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `site_options`
 --
  
-INSERT INTO `site_options` VALUES (24,0,720,524288);
+INSERT INTO `site_options` VALUES (24,0,720,524288,'0000-00-00 00:00:00');
 
 
 -- --------------------------------------------------------
@@ -1750,7 +1751,7 @@ CREATE TABLE IF NOT EXISTS `torrents_watch_list` (
 CREATE TABLE IF NOT EXISTS `upload_templates` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` int(10) unsigned NOT NULL,
-  `TimeAdded` date NOT NULL DEFAULT '0000-00-00',
+  `TimeAdded` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `Name` varchar(64) NOT NULL,
   `Public` enum('0','1') NOT NULL DEFAULT '0',
   `Title` varchar(255) NOT NULL,
@@ -2071,6 +2072,21 @@ CREATE TABLE IF NOT EXISTS `users_main` (
   KEY `RequiredRatio` (`RequiredRatio`),
   KEY `SeedHoursDaily` (`SeedHoursDaily`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_not_cheats`
+--
+
+DROP TABLE IF EXISTS `users_not_cheats`;
+CREATE TABLE IF NOT EXISTS `users_not_cheats` (
+  `UserID` int(10) NOT NULL,
+  `StaffID` int(10) NOT NULL,
+  `Time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `Comment` varchar(255) NOT NULL,
+  PRIMARY KEY (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

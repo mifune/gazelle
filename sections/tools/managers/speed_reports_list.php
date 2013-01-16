@@ -74,77 +74,12 @@ show_header('Speed Reports','watchlist');
 ?>
 <div class="thin">
     <h2>Speed Reports</h2>
-    
     <?
     
-    $Watchlist = print_user_watchlist();
+    $Watchlist = print_user_watchlist('records');
     
-    /*
-    <div class="head">User watch list &nbsp;<img src="static/common/symbols/watched.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#uwatchlist').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(view)</a></span>&nbsp;</div>
-        <table id="uwatchlist" class="hidden">
-            <tr class="rowa"> 
-                <td colspan="6" style="text-align: left;color:grey"> 
-                    Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
-                    note: use the list sparingly - this can quickly fill the database with a huge number of records.
-                </td>
-            </tr>
-            <tr class="colhead">
-                <td class="center"></td>
-                <td class="center">User</td>
-                <td class="center">Time added</td>
-                <td class="center">added by</td>
-                <td class="center">comment</td>
-                <!--<td class="center" width="100px" title="keep torrent records related to this user">keep torrents</td>-->
-                <td class="center" width="240px"></td>
-            </tr>
-<?
-            $row = 'a';
-            if(count($Watchlist)==0){
-?> 
-                    <tr class="rowb">
-                        <td class="center" colspan="7">no users on watch list</td>
-                    </tr>
-<?
-            } else {
-                foreach ($Watchlist as $Watched) {
-                    list($UserID, $Username, $StaffID, $Staffname, $Time, $Comment, $KeepTorrents,
-                                       $IsDonor, $Warned, $Enabled, $ClassID) = $Watched;
-                    $row = ($row === 'b' ? 'a' : 'b');
-?> 
-    
-                    <tr class="row<?=$row?>">
-                        <form action="tools.php" method="post">
-                            <input type="hidden" name="action" value="edit_userwl" />
-                            <input type="hidden" name="viewspeed" value="<?=$ViewSpeed?>" />
-                            <input type="hidden" name="userid" value="<?=$UserID?>" />
-                            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                            <td class="center">
-                                <a href="?action=cheats&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>">
-                                    [view]
-                                </a>
-                            </td>
-                            <td class="center"><?=format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false)?></td>
-                            <td class="center"><?=time_diff($Time, 2, true, false, 1)?></td>
-                            <td class="center"><?=format_username($StaffID, $Staffname)?></td>
-                            <td class="center" title="<?=$Comment?>"><?=cut_string($Comment, 40)?></td>
-                            <!--<td class="center">
-                                <input type="checkbox" name="keeptorrent" <?if($KeepTorrents)echo'checked="checked"'?> value="1" title="if checked keep all torrent records this user is on as well" />
-                            </td>-->
-                            <td class="center">
-                                <!--<input type="submit" name="submit" value="Save" title="Save edited value" />-->
-                                <input type="submit" name="submit" value="Delete records" title="Remove all of this users records from the watchlist" /> 
-                                <input type="submit" name="submit" value="Remove" title="Remove user from watchlist" /> 
-                            </td>
-                        </form>
-                    </tr>
-<?              }
-            }
-?>
-    </table>
-    <br/>      
-<?  
-     
-     */
+    $Excludelist = print_user_notcheatslist('records');
+
     //---------- torrrent watch
 
     $DB->query("SELECT TorrentID, tg.Name, StaffID, um.Username AS Staffname, tl.Time, tl.Comment
@@ -356,7 +291,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
     <div class="head"><?=" $NumResults / $TotalResults"?> records</div>
         <table>
             <tr class="colhead">
-                <td style="width:100px"></td>
+                <td style="min-width:70px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('remaining') ?>">Remaining</a></td>
                 <td class="center"><a href="<?=header_link('uploaded') ?>">Uploaded</a></td>
@@ -374,7 +309,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 <td class="center"><a href="<?=header_link('downloaded') ?>"><span style="color:#777">Downloaded</span></a></td>
                 <td class="center"><a href="<?=header_link('downspeed') ?>"><span style="color:#777">DownSpeed</span></a></td>
                 <td class="center"><span style="color:#777">host</span></td>
-                <td class="center"><a href="<?=header_link('timespent') ?>"><span style="color:#777">total time</span></a></td>
+                <td class="center" style="min-width:80px"><a href="<?=header_link('timespent') ?>"><span style="color:#777">total time</span></a></td>
             </tr>
     <form id="speedrecords" action="tools.php" method="post">
         <input type="hidden" name="action" value="delete_speed_records" />
@@ -398,21 +333,22 @@ $Pages=get_pages($Page,$NumResults,50,9);
 ?> 
                     <tr class="row<?=$row?>">
                         <td>
-<?                          if ($_GET['userid']!=$UserID) {   
- ?>                           <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>">[view]</a> <? 
- }                          if (!array_key_exists($UserID, $Watchlist)) {   
- ?>                           <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a><?
-                            }  ?>
-                              <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from watchlist"><img src="static/common/symbols/disabled.png" alt="del records" /></a>
-<?
-                            if ($Enabled=='1'){
-?>
-                                <a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat">
-                                    BAN
-                                </a>
-<?
+<?                          if ($_GET['userid']!=$UserID) {    ?>
+                            <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
+<?                          }   ?>
+                            <div style="display:inline-block">
+<?                          if (!array_key_exists($UserID, $Watchlist)) {   
+?>                           <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><br/><?
                             }
-?>
+                            if (!array_key_exists($UserID, $Excludelist)) {   
+?>                           <a onclick="excludelist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="view" /></a><?
+                            } 
+?>                          </div>
+                              <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from watchlist"><img src="static/common/symbols/trash.png" alt="del records" /></a>
+<?
+                            if ($Enabled=='1'){ ?>
+                                <a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+<?                          }  ?>
                         </td>
                         <td class="center">
 <?                          echo format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false);  ?>
@@ -429,7 +365,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     <tr class="row<?=$row?>">
                         <td><span style="color:#555">
 <?                          if ($_GET['torrentid']!=$TorrentID) {
-                        ?>  <a href="?action=speed_records&viewspeed=0&torrentid=<?=$TorrentID?>" title="View records for just this torrent">[view] </a> <? 
+                        ?>  <a href="?action=speed_records&viewspeed=0&torrentid=<?=$TorrentID?>" title="View records for just this torrent"><img src="static/common/symbols/view.png" alt="view" /></a> <? 
                             }
                             if ($GroupID && !array_key_exists($TorrentID, $TWatchlist)) {
                        ?>   <a onclick="twatchlist_add('<?=$GroupID?>','<?=$TorrentID?>',true);" href="#" title="Add torrent to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a> <? 

@@ -129,7 +129,7 @@ $ShopActions = array('gb','givegb','givecredits','slot','title','badge','pfl','u
 // for counting filetypes
 $Video_FileTypes = array('3gp','avi','flv','mpeg','mkv','mov','mp4','mpg','ogg','wmv');
 $Image_FileTypes = array('bmp','gif','jpeg','jpg','png');
-$Zip_FileTypes = array('rar','zip','7','7v','z','zip');
+$Zip_FileTypes = array('rar','zip','7','7z','z');
 
 define('SIG_MAX_WIDTH', 800);
 define('SIG_MAX_HEIGHT', 300);

@@ -70,6 +70,8 @@ switch ($_GET['action']){
 	
 	case 'watchlist_add':
 	case 'watchlist_remove':
+	case 'excludelist_add':
+	case 'excludelist_remove':
 	case 'remove_records':
 		include('do_watchlist.php');
 		break;

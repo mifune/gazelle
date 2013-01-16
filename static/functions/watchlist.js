@@ -36,6 +36,43 @@ function remove_records(user_id) {
 }
 
 
+
+
+function excludelist_add(user_id, reload) {
+    var comm = prompt('Enter a comment for adding this user to the exclude list');
+    if (!comm) return;
+	ajax.get('ajax.php?action=excludelist_add&userid=' + user_id + '&comm=' + comm, function (response) {
+        var x = json.decode(response); 
+        if ( is_array(x)){
+            if ( x[0] == true){
+               $('#xcl').html("[<a onclick=\"excludelist_remove('"+ user_id +"')\" href=\"#\">Remove from exclude list</a>]");
+            }
+            alert(x[1]);
+            if (x[0] == true && reload) location.reload();
+        } else {    // error from ajax
+            alert(x);
+        } 
+	}); 
+}
+
+function excludelist_remove(user_id, reload) {
+	ajax.get('ajax.php?action=excludelist_remove&userid=' + user_id, function (response) {
+        var x = json.decode(response); 
+        if ( is_array(x)){
+            if ( x[0] == true){
+               $('#xcl').html("[<a onclick=\"excludelist_add('"+ user_id +"')\" href=\"#\">Add to exclude list</a>]");
+            }
+            alert(x[1]);
+            if (x[0] == true && reload) location.reload();
+        } else {    // error from ajax
+            alert(x);
+        } 
+	}); 
+}
+
+
+
+
 function watchlist_add(user_id, reload) {
     var comm = prompt('Enter a comment for adding this user to the watchlist');
     if (!comm) return;
@@ -53,7 +90,7 @@ function watchlist_add(user_id, reload) {
 	}); 
 }
 
-function watchlist_remove(user_id) {
+function watchlist_remove(user_id, reload) {
 	ajax.get('ajax.php?action=watchlist_remove&userid=' + user_id, function (response) {
         var x = json.decode(response); 
         if ( is_array(x)){
@@ -61,6 +98,7 @@ function watchlist_remove(user_id) {
                $('#wl').html("[<a onclick=\"watchlist_add('"+ user_id +"')\" href=\"#\">Add to watchlist</a>]");
             }
             alert(x[1]);
+            if (x[0] == true && reload) location.reload();
         } else {    // error from ajax
             alert(x);
         } 

@@ -74,12 +74,12 @@ show_header('Speed Cheats','watchlist');
     <h2>(possible) cheaters</h2>
      
 <?
-    $Watchlist = print_user_watchlist();
+    $Watchlist = print_user_watchlist('cheats');
      
+    $Excludelist = print_user_notcheatslist('cheats');
 ?>
     <div class="head">options</div>
 <?
- 
 
     $CanManage = check_perms('admin_manage_cheats');
 ?>
@@ -192,10 +192,13 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                           FROM xbt_peers_history AS xbt
                      LEFT JOIN users_main AS um ON um.ID=xbt.uid
                      LEFT JOIN users_info AS ui ON ui.UserID=xbt.uid
-                         WHERE (xbt.upspeed)>='$ViewSpeed' $WHERE
+                     LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
+                         WHERE (xbt.upspeed)>='$ViewSpeed'
+                           AND nc.UserID IS NULL $WHERE
                       GROUP BY xbt.uid   
                       ORDER BY $SQLOrderBy $OrderWay 
                          LIMIT $Limit");
+
 /* for later - pattern matching: 
 SELECT uid, upspeed, uploaded, count(id) as cnt FROM xbt_peers_history
 WHERE upspeed!=0 
@@ -216,13 +219,13 @@ $Pages=get_pages($Page,$NumResults,50,9);
     <div class="head"><?=$NumResults?> users with speed over <?=get_size($ViewSpeed).'/s'?></div>
         <table>
             <tr class="colhead">
-                <td style="width:90px"></td>
+                <td style="width:70px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
                 <td class="center"><a href="<?=header_link('count') ?>">count</a></td>
                 <td class="center"><span style="color:#777">-clientID-</span></td>
                 <td class="center">Client IP addresses</td>
-                <td class="center"><a href="<?=header_link('mtime') ?>">last seen</a></td>
+                <td class="center" style="min-width:120px"><a href="<?=header_link('mtime') ?>">last seen</a></td>
                 <!--<td class="center"></td>-->
             </tr>
 <?
@@ -275,18 +278,20 @@ $Pages=get_pages($Page,$NumResults,50,9);
 ?> 
                     <tr class="row<?=$row?>">
                         <td>
-                           <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>">[view]</a> 
+                           <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
+                           <div style="display:inline-block">
 <?                         if (!array_key_exists($UserID, $Watchlist)) {   
-?>                            <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a><?
-                           }  
-                           
-                            if ($Enabled=='1'){
-?>
-                                <a href="tools.php?action=ban_speed_cheat&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat">
-                                    BAN
-                                </a>
+?>                            <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="wl add" /></a><br/><?
+                           }   
+                            if (!array_key_exists($UserID, $Excludelist)) {   
+ ?>                           <a onclick="excludelist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="excl add" /></a><?
+                            }  
+ ?>                        </div>
+                           <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?
-                            }
+                            if ($Enabled=='1'){  ?>
+                                <a href="tools.php?action=ban_speed_cheat&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+<?                          }
                            
                            ?>
                         </td>
@@ -349,10 +354,16 @@ $Pages=get_pages($Page,$NumResults,50,9);
 ?> 
             <tr>
                 <td>
-                    <a href="?action=speed_records&viewspeed=0&userid=<?=$EUserID?>" title="View records for just <?=$DupeInfo['Username']?>">[view]</a> 
-<?                  if (!array_key_exists($EUserID, $Watchlist)) {   
-?>                      <a onclick="watchlist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to watchlist"><img src="static/common/symbols/watched.png" alt="view" /></a><?
-                    }  ?>
+                    <a href="?action=speed_records&viewspeed=0&userid=<?=$EUserID?>" title="View records for just <?=$DupeInfo['Username']?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
+                    <div style="display:inline-block">
+                <?  if (!array_key_exists($EUserID, $Watchlist)) {   
+?>                      <a onclick="watchlist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><?
+                    }
+                    if (!array_key_exists($EUserID, $Excludelist)) {   
+?>                      <a onclick="excludelist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="view" /></a><?
+                    } ?>    
+                    </div>
+                    <a onclick="remove_records('<?=$EUserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$DupeInfo['Username']?> from speed records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
                 </td>
                 <td align="center">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>

@@ -113,7 +113,7 @@ switch ($_REQUEST['action']) {
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
             
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
-            if ($DB->record_count()>0) error("This user is in the not a cheater list - you must remove them from the list if you want to ban them from this page");
+            if ($DB->record_count()>0) error("This user is in the 'not a cheater' list - you must remove them from the list if you want to ban them from this page");
             
             $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_REQUEST[userid]' ");
             list($Maxspeed) = $DB->next_record();
@@ -124,8 +124,8 @@ switch ($_REQUEST['action']) {
             $DB->query("SELECT GROUP_CONCAT(DISTINCT xbt.uid SEPARATOR '|') 
                           FROM xbt_peers_history AS xbt JOIN users_main AS um ON um.ID=xbt.uid
                        LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
-                         WHERE um.Enabled='1' AND nc.UserID IS NULL AND xbt.upspeed >='$_POST[banspeed]' 
-                       ");
+                         WHERE um.Enabled='1' AND nc.UserID IS NULL AND xbt.upspeed >='$_POST[banspeed]' ");
+            
             list($UserIDs) = $DB->next_record();
             if ($UserIDs ) {
                 $UserIDs = explode('|', $UserIDs);
@@ -157,7 +157,9 @@ switch ($_REQUEST['action']) {
             $KeepTorrents = $_POST['keeptorrent'] == '1' ? '1' : '0';
             $DB->query("UPDATE users_watch_list SET KeepTorrents='$KeepTorrents' WHERE UserID='$UserID'");
         }
-        header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
+        if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
+        else $returnto = 'speed_records';
+        header("Location: tools.php?action=$returnto&viewspeed=$_POST[viewspeed]");
         break;
     case 'edit_torrentwl':
         if (!check_perms('users_manage_cheats'))
@@ -175,7 +177,9 @@ switch ($_REQUEST['action']) {
                 write_group_log($GroupID, $TorrentID, $LoggedUser['ID'], "Torrent removed from watchlist", '1');
             }
         }
-        header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
+        if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
+        else $returnto = 'speed_records';
+        header("Location: tools.php?action=$returnto&viewspeed=$_POST[viewspeed]");
         break;
     case 'save_records_options':
         if (!check_perms('admin_manage_cheats'))
@@ -185,7 +189,9 @@ switch ($_REQUEST['action']) {
         $KeepSpeed = (int) $_POST['keepspeed'];
 
         $DB->query("UPDATE site_options SET DeleteRecordsMins='$DelMins', KeepSpeed='$KeepSpeed'");
-        header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
+        if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
+        else $returnto = 'speed_records';
+        header("Location: tools.php?action=$returnto&viewspeed=$_POST[viewspeed]");
         break;
     case 'delete_speed_records':
         if (!check_perms('users_manage_cheats'))
@@ -201,8 +207,9 @@ switch ($_REQUEST['action']) {
         }
         $recordIDS = implode(',', $recordIDS);
         $DB->query("DELETE FROM xbt_peers_history WHERE ID IN ($recordIDS)");
-
-        header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
+        if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
+        else $returnto = 'speed_records';
+        header("Location: tools.php?action=$returnto&viewspeed=$_POST[viewspeed]");
         break;
 
     case 'test_delete_schedule':

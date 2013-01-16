@@ -477,7 +477,7 @@ echo $Val->GenerateJS('userform');
                         </td>
                   </tr>
 			<tr>
-				<td class="label"><strong>Signature<br/>(max <?=$MaxSigLength?> chars)<br/><span style="text-decoration: underline">max total size</span><br/>800 px * 300 px</strong></td>
+				<td class="label"><strong>Signature<br/>(max <?=$MaxSigLength?> chars)<br/><span style="text-decoration: underline">max total size</span><br/><?=SIG_MAX_WIDTH?> px * <?=SIG_MAX_HEIGHT?> px</strong></td>
 				<td>
 				<div class="box pad hidden" id="preview_sig" style="text-align:left;"></div>
 				<div  class="" id="editor_sig" >

@@ -960,6 +960,7 @@ class TEXT {
                             }
                             $CloseTag = $i;
                             $closetaglength = 0;
+
                         }
                         break;
                     } else {
@@ -1138,6 +1139,7 @@ class TEXT {
 
     
     function extract_attributes($Attrib, $MaxNumber=-1) {
+
         $Elements=array();
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
@@ -1296,7 +1298,6 @@ class TEXT {
                 case 'h5v':
                     // html5 video tag
                     // note: as a non attribute the link has been auto-formatted as [inlinelink]link.url 
-                    $Block['Attr'] = str_replace('[inlineurl]', '', $Block['Attr']);
                     $Attributes= $this->extract_attributes($Block['Attr'], 920);
                     
                     if ( ($Block['Attr'] != '' && count($Attributes)==0) || strpos($Block['Val'], '[inlineurl]') === FALSE ) {
@@ -1307,6 +1308,7 @@ class TEXT {
                         if (isset($Attributes['number']) && count($Attributes['number']) >= 2) {
                             $dimensions = ' width="'.$Attributes['number'][0].'" height="'.$Attributes['number'][1].'" ';
                         }
+
                         $Sources = explode(',', $Block['Val']);
                         $Str .= '<video '.$dimensions.' controls>';     // src="'.str_replace('[inlineurl]', '', $Block['Val']).'">';
                         foreach( $Sources as $Source) {
@@ -1959,4 +1961,6 @@ class TEXT {
   echo $Text->full_format($Str);
   echo "\n"
  */
+
 ?>
+
