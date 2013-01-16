@@ -323,21 +323,6 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         ?> 
                         </td>
                         <td class="center"><?=time_diff($LastTime, 2, true, false, 1)?></td>
-                        <!--<td class="center">-->
-<?
-/*
-                            if ($Enabled=='1'){
-?>
-                            <form id="speedrecords" action="tools.php" method="post">
-                                <input type="hidden" name="action" value="ban_speed_cheat" />
-                                <input type="hidden" name="userid" value="<?=$UserID?>" />
-                                <input type="hidden" name="returnto" value="cheats" />
-                                <input type="submit" name="banuser" value="ban" title="ban this user for being a big fat cheat" />
-                            </form>
-<?
-                            } */
-?>
-                       <!-- </td>-->
                     </tr>
 <?
             if ($IPDupeCount>0) { 
@@ -357,13 +342,13 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     <a href="?action=speed_records&viewspeed=0&userid=<?=$EUserID?>" title="View records for just <?=$DupeInfo['Username']?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
                     <div style="display:inline-block">
                 <?  if (!array_key_exists($EUserID, $Watchlist)) {   
-?>                      <a onclick="watchlist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><?
+?>                      <a onclick="watchlist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><br/><?
                     }
                     if (!array_key_exists($EUserID, $Excludelist)) {   
 ?>                      <a onclick="excludelist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="view" /></a><?
                     } ?>    
                     </div>
-                    <a onclick="remove_records('<?=$EUserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$DupeInfo['Username']?> from speed records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
+                    <a onclick="remove_records('<?=$EUserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$DupeInfo['Username']?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
                 </td>
                 <td align="center">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
@@ -378,7 +363,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 <?
                     if ( !array_key_exists($EUserID, $Dupes) ) {
 ?>
-						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>">link</a>]
+						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>" title="link this user to <?=$Username?>">link</a>]
 <?
                     }
 ?>

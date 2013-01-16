@@ -68,7 +68,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) 
             if(count($Userlist)==0){
 ?> 
                     <tr class="rowb">
-                        <td class="center" colspan="7">no users on watch list</td>
+                        <td class="center" colspan="7">no users on <?=$Title?></td>
                     </tr>
 <?
             } else {
@@ -87,6 +87,9 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) 
                             <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" /> -->
                             <td class="center">
                                 <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
+<?                          if ($ListType=='watchlist' && $Enabled=='1'){ ?>
+                                &nbsp;<a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+<?                          }  ?>
                             </td>
                             <td class="center"><?=format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false)?></td>
                             <td class="center"><?=time_diff($Time, 2, true, false, 1)?></td>

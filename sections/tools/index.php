@@ -113,7 +113,7 @@ switch ($_REQUEST['action']) {
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
             
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
-            if ($DB->record_count()>0) error("This user is in the 'not a cheater' list - you must remove them from the list if you want to ban them from this page");
+            if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
             
             $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_REQUEST[userid]' ");
             list($Maxspeed) = $DB->next_record();
