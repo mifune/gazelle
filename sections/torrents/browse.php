@@ -237,7 +237,8 @@ if (!$AdvancedSearch) {
         
     }
 }
-/*
+
+
 foreach (array('title'=>'groupname') as $Search) {
     if (!empty($_GET[$Search[0]])) {
         $_GET[$Search[0]] = str_replace(array('%'), '', $_GET[$Search[0]]);
@@ -260,25 +261,26 @@ foreach (array('title'=>'groupname') as $Search) {
             }
         //}
     }
-} */
+}
 
     
 if (!empty($_GET['filelist'])) {
     $FileList = ' ' . trim($_GET['filelist']);
     $FileList = str_replace(array('%'), '', $FileList);
-    $FileList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $FileList);
     $FileList = trim($FileList);
     
     $Queries[] = '@filelist "' . $SS->EscapeString($FileList) . '"~20';
 }
 
-    if (!empty($_GET['title'])) {
+
+/*
+if (!empty($_GET['title'])) {
         $SearchTitle = ' ' . trim($_GET['title']);
         $SearchTitle = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchTitle);
         $SearchTitle = trim($SearchTitle);
         
         $Queries[] = '@groupname ' . $SS->EscapeString($SearchTitle);
-    }
+} */
     
     
     
