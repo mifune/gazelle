@@ -239,13 +239,14 @@ if (!$AdvancedSearch) {
 }
 
 
-foreach (array('title'=>'groupname') as $Search) {
-    if (!empty($_GET[$Search[0]])) {
-        $_GET[$Search[0]] = str_replace(array('%'), '', $_GET[$Search[0]]);
+foreach (array('title'=>'groupname') as $Search=>$Queryname) {
+    
+    if (!empty($_GET[$Search])) {
+        $_GET[$Search] = str_replace(array('%'), '', $_GET[$Search]);
         //if ($Search[0] == 'filelist') {
         //    $Queries[] = '@filelist "' . $SS->EscapeString($_GET['filelist']) . '"~20';
         //} else {
-            $Words = explode(' ', $_GET[$Search[0]]);
+            $Words = explode(' ', $_GET[$Search]);
             foreach ($Words as $Key => &$Word) {
                 if ($Word[0] == '-' && strlen($Word) >= 3 && count($Words) >= 2) {
                     $Word = '!' . $SS->EscapeString(substr($Word, 1));
@@ -257,7 +258,7 @@ foreach (array('title'=>'groupname') as $Search) {
             }
             $Words = trim(implode(' ', $Words));
             if (!empty($Words)) {
-                $Queries[] = "@{$Search[1]} " . $Words;
+                $Queries[] = "@{$Queryname} " . $Words;
             }
         //}
     }
