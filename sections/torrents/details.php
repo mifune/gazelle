@@ -555,7 +555,6 @@ if(count($Tags) > 0) {
 			<tr class="colhead">
 				<td></td>
                 <td width="80%">Name</td>
-				<td width="14%"><!--colspan="2"-->Files</td>
 				<td>Size</td>
 				<td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /></td>
 				<td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /></td>
@@ -646,23 +645,26 @@ $FileTypes = "<span class=\"grey\" style=\"float:left;\">" . implode(' ', $FileT
                     <? $CatImg = 'static/common/caticons/' . $NewCategories[$GroupCategoryID]['image']; ?>
                     <div title="<?= $NewCategories[$GroupCategoryID]['tag'] ?>"><img src="<?= $CatImg ?>" /></div>
                 </td>
-                <td style="border-bottom:none;border-left:none;">
+                <td rowspan="2" style="border-bottom:none;border-left:none;">
                     <strong><?=$ExtraInfo; ?></strong>
                 </td>
 				<!--<td class="nobr"><?=$FileCount?></td>-->
-				<td class="nobr"><?=$FileTypes;//$Text->full_format($FileTypes)?></td>
 				<td class="nobr"><?=get_size($Size)?></td>
 				<td><?=number_format($Snatched)?></td>
 				<td><?=number_format($Seeders)?></td>
 				<td><?=number_format($Leechers)?></td>
 			</tr>
             <tr>
+                
+				<td class="nobr filetypes" colspan="4"><?=$FileTypes;//$Text->full_format($FileTypes)?></td>
+            </tr>
+            <tr>
                 <td colspan="6" class="right" style="border-top:none;border-bottom:none;border-left:none;">
                     <em>Uploaded by   <?=format_username($UserID, $TorrentUploader)?> <?=time_diff($TorrentTime);?> </em>
                 </td>
             </tr>
 			<tr class="groupid_<?=$GroupID?> edition_<?=$EditionID?> torrentdetails pad" id="torrent_<?=$TorrentID; ?>">
-				<td colspan="7" style="border-top:none;">
+				<td colspan="6" style="border-top:none;">
                             
 <? 
     $lasttimesinceactive =  time() - strtotime($LastActive);

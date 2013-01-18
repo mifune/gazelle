@@ -1027,6 +1027,9 @@ table.boxstat td:first-child {
 .details .tag_inner {
 
 }
+.details .filetypes {
+   /* background-color: #eff3f6; */
+}
 
 .details .tag_add {
     border-top: 1px solid #98AAB1;
