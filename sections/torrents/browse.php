@@ -263,7 +263,7 @@ foreach (array('filelist') as $Search) {
 }
 
     if (!empty($_GET['title'])) {
-        $SearchTitle = ' ' . trim($_GET['searchtext']);
+        $SearchTitle = ' ' . trim($_GET['title']);
         $SearchTitle = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchTitle);
         $SearchTitle = trim($SearchTitle);
         
