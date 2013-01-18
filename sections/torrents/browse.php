@@ -237,14 +237,14 @@ if (!$AdvancedSearch) {
         
     }
 }
-
-foreach (array('filelist') as $Search) {
-    if (!empty($_GET[$Search])) {
-        $_GET[$Search] = str_replace(array('%'), '', $_GET[$Search]);
-        if ($Search == 'filelist') {
-            $Queries[] = '@filelist "' . $SS->EscapeString($_GET['filelist']) . '"~20';
-        } else {
-            $Words = explode(' ', $_GET[$Search]);
+/*
+foreach (array('title'=>'groupname') as $Search) {
+    if (!empty($_GET[$Search[0]])) {
+        $_GET[$Search[0]] = str_replace(array('%'), '', $_GET[$Search[0]]);
+        //if ($Search[0] == 'filelist') {
+        //    $Queries[] = '@filelist "' . $SS->EscapeString($_GET['filelist']) . '"~20';
+        //} else {
+            $Words = explode(' ', $_GET[$Search[0]]);
             foreach ($Words as $Key => &$Word) {
                 if ($Word[0] == '-' && strlen($Word) >= 3 && count($Words) >= 2) {
                     $Word = '!' . $SS->EscapeString(substr($Word, 1));
@@ -256,10 +256,20 @@ foreach (array('filelist') as $Search) {
             }
             $Words = trim(implode(' ', $Words));
             if (!empty($Words)) {
-                $Queries[] = "@$Search " . $Words;
+                $Queries[] = "@{$Search[1]} " . $Words;
             }
-        }
+        //}
     }
+} */
+
+    
+if (!empty($_GET['filelist'])) {
+    $FileList = ' ' . trim($_GET['filelist']);
+    $FileList = str_replace(array('%'), '', $FileList);
+    $FileList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $FileList);
+    $FileList = trim($FileList);
+    
+    $Queries[] = '@filelist "' . $SS->EscapeString($FileList) . '"~20';
 }
 
     if (!empty($_GET['title'])) {
@@ -270,13 +280,6 @@ foreach (array('filelist') as $Search) {
         $Queries[] = '@groupname ' . $SS->EscapeString($SearchTitle);
     }
     
-    if (!empty($_GET['filesize'])) {
-        $SearchFileSize = ' ' . trim($_GET['filesize']);
-        $SearchFileSize = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchFileSize);
-        $SearchFileSize = trim($SearchFileSize);
-        
-        $Queries[] = '@size ' . $SS->EscapeString($SearchFileSize);
-    }
     
     
 if (!empty($_GET['filter_freeleech']) && $_GET['filter_freeleech'] == 1) {
