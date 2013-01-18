@@ -51,6 +51,9 @@ if (check_perms('users_mod'))
         <a style="margin-left:16px;vertical-align: top" href="feeds.php?feed=torrents_notify_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> : Torrent Notifications" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
         <a style="margin-left:3px;" href="feeds.php?feed=torrents_notify_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> : Torrent Notifications" >notifications</a>
      
+        <a style="margin-left:16px;vertical-align: top" href="articles.php?topic=rsshelp" title="<?=SITE_NAME?> : RSS Help" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
+        <a style="margin-left:3px;" href="articles.php?topic=rsshelp" title="<?=SITE_NAME?> : RSS Help" >help</a>
+     
     </p>
     <p><a href="log.php">Site Logs</a></p>
 </div>

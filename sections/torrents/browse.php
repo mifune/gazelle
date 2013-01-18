@@ -488,7 +488,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                     <tr>
                         <td class="label" style="width:140px" title="Search Titles">Title:</td>
                         <td colspan="3">
-                            <input type="text" spellcheck="false" size="40" name="title" class="inputtext" value="<? form('title') ?>" />
+                            <input type="text" spellcheck="false" size="40" name="title" class="inputtext" title="Supports full boolean search" value="<? form('title') ?>" />
                         </td>
                     </tr>
                     <tr>
