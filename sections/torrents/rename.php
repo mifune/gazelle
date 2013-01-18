@@ -25,7 +25,7 @@ $Text = new TEXT;
 $Validate = new VALIDATE;
 
 
-$Validate->SetFields('name', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>64));
+$Validate->SetFields('name', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>TITLE_MAXWORD_LENGTH));
 
 $Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
 

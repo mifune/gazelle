@@ -133,6 +133,7 @@ $Zip_FileTypes = array('rar','zip','7','7z','z');
 
 define('SIG_MAX_WIDTH', 800);
 define('SIG_MAX_HEIGHT', 300);
+define('TITLE_MAXWORD_LENGTH',42);
 
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');

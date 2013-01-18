@@ -5,9 +5,8 @@ show_header('Official Tags');
 <div class="thin">
     <h2>Official Tags</h2>
     <div class="tagtable center">
-        <div class=" box pad">
-		
-			<table class="tagtable">
+        <div>
+			<table class="tagtable shadow">
 				<tr class="colhead">
 					<td style="font-weight: bold">Tag</td>
 					<td style="font-weight: bold">Uses</td>
@@ -72,13 +71,13 @@ for ($i = 0; $i < $TagCount / 3; $i++) {
         if ($LastParentTagName != $ParentTagName) {
             if ($LastParentTagName != '') {  ?>
                 
-            </table>
+            </table></div>
 <?          
             }   ?>
-            
-            <table  class="tagtable" style="width:200px">
+            <div style="display:inline-block">
+            <table  class="syntable shadow">
                 <tr>
-                    <td class="colhead" colspan="2" style="width:200px"><a href="torrents.php?taglist=<?=$ParentTagName?>" ><?=$ParentTagName?></a>&nbsp;(<?=$Uses?>)</td>
+                    <td class="colhead" style="width:200px"><a href="torrents.php?taglist=<?=$ParentTagName?>" ><?=$ParentTagName?></a>&nbsp;(<?=$Uses?>)</td>
                 </tr>
 <?             
             $LastParentTagName = $ParentTagName;
@@ -90,7 +89,7 @@ for ($i = 0; $i < $TagCount / 3; $i++) {
                 </tr>
 <?  }   
     if($SnID){ // only finish if something was in list ?> 
-            </table>
+            </table></div>
 <?  }    ?> 
 	</form>
     </div>

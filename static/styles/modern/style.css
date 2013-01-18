@@ -1772,10 +1772,16 @@ div.tagtable {
     margin: 0px auto;
 }
 .tagtable {
-    display:inline;
-    width: 240px;
     border:none;
+    margin: 0px auto;
 }
+.syntable {
+    border:none;
+    width: 220px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
 .tagtable td {
     width: 80px;
     border: none;

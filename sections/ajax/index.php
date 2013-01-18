@@ -14,7 +14,11 @@ header('Content-Type: application/json; charset=utf-8');
 
 switch ($_GET['action']){
 	// things that (may be) used on the site
-      case 'get_badge_info':
+	case 'get_taglist':
+		require(SERVER_ROOT.'/sections/ajax/get_taglist.php');
+		break;
+    
+    case 'get_badge_info':
 		require(SERVER_ROOT.'/sections/ajax/get_badge_info.php');
 		break;
 	case 'upload_section':
