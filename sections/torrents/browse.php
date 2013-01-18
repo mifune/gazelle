@@ -206,8 +206,9 @@ if (!$AdvancedSearch) {
         $SearchText = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchText);
         $SearchText = trim($SearchText);
         
-        $Queries[] = '@searchtext ' . $SearchText;
+        $Queries[] = '@searchtext ' . $SS->EscapeString($SearchText); // *
     }
+    
     
     if (!empty($_GET['taglist'])) {
         // do synomyn replacement and skip <=2 length tags
@@ -232,7 +233,7 @@ if (!$AdvancedSearch) {
         $TagList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $TagList);
         $TagList = trim($TagList);
         
-        $Queries[] = '@taglist ' . $TagList;
+        $Queries[] = '@taglist ' . $SS->EscapeString($TagList); // *
         
     }
 }
@@ -261,6 +262,23 @@ foreach (array('filelist') as $Search) {
     }
 }
 
+    if (!empty($_GET['title'])) {
+        $SearchTitle = ' ' . trim($_GET['searchtext']);
+        $SearchTitle = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchTitle);
+        $SearchTitle = trim($SearchTitle);
+        
+        $Queries[] = '@groupname ' . $SS->EscapeString($SearchTitle);
+    }
+    
+    if (!empty($_GET['filesize'])) {
+        $SearchFileSize = ' ' . trim($_GET['filesize']);
+        $SearchFileSize = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchFileSize);
+        $SearchFileSize = trim($SearchFileSize);
+        
+        $Queries[] = '@size ' . $SS->EscapeString($SearchFileSize);
+    }
+    
+    
 if (!empty($_GET['filter_freeleech']) && $_GET['filter_freeleech'] == 1) {
     $SS->set_filter('FreeTorrent', array(1));
 }
