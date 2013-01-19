@@ -206,7 +206,7 @@ if (!$AdvancedSearch) {
         $SearchText = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchText);
         $SearchText = trim($SearchText);
         
-        $Queries[] = '@searchtext ' . $SS->EscapeString($SearchText); // *
+        $Queries[] = '@searchtext ' . $SearchText; // *
     }
     
     
@@ -219,9 +219,13 @@ if (!$AdvancedSearch) {
            
             if ( ($Tag[0] != '-' && strlen($Tag)>= 2) || strlen($Tag)>= 3 ) {
                 if ($Tag[0] == '-') {
-                    $Tag = '-'. get_tag_synonym( substr($Tag, 1), false);
+                    $Tag = get_tag_synonym( substr($Tag, 1), false);
+                    $Tag = str_replace('.', '_', $Tag);
+                    $Tag = '-'.$SS->EscapeString($Tag);
                 } else {
                     $Tag = get_tag_synonym($Tag, false);
+                    $Tag = str_replace('.', '_', $Tag);
+                    $Tag = $SS->EscapeString($Tag);
                 }
             } else {
                 unset($TagList[$Key]);
@@ -229,11 +233,11 @@ if (!$AdvancedSearch) {
         }
         unset($Tag);
         $TagList = implode(' ', $TagList);
-        $TagList = trim(str_replace('.', '_', $TagList));       
+        //$TagList = trim(str_replace('.', '_', $TagList));       
         $TagList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $TagList);
         $TagList = trim($TagList);
         
-        $Queries[] = '@taglist ' . $SS->EscapeString($TagList); // *
+        $Queries[] = '@taglist ' . $TagList; // *
         
     }
 }
