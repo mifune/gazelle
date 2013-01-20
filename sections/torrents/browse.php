@@ -127,78 +127,60 @@ $Queries = array();
 // Simple Search
 if (!$AdvancedSearch) {
     if (!empty($_GET['searchtext'])) {
-        $SearchList = explode(' ', $_GET['searchtext']);
-        $SearchListEx = array();
+        // Do not keep extended search signs.
+        $SearchList = preg_split("/([ \-!&|])/", $_GET['searchtext']); 
+        
         foreach ($SearchList as $Key => &$Word) {
             $Word = trim($Word);
-            $wlen = strlen($Word);
-            if ( $wlen >= 3 || ($Word[0] != '-'  && $wlen >= 2)) {
-                if ($Word[0] == '-') {
-                    $SearchListEx[] = '!' . $SS->EscapeString(substr($Word, 1));
-                    unset($SearchList[$Key]);
-                } else {
-                    $Word = $SS->EscapeString($Word);
-                }
+            if (strlen($Word) >= 2) {
+                $Word = $SS->EscapeString($Word);
             } else {
                 unset($SearchList[$Key]);
             }
         }
         unset($Word);
-    }
-    
-    if (empty($_GET['search_type']) && !empty($SearchList) && count($SearchList) > 1) {
-        $_GET['search_type'] = '0';
-        if (!empty($SearchListEx)) {
-            $Queries[] = '@searchtext ( ' . implode(' | ', $SearchList) . ' ) ' . implode(' ', $SearchListEx);
-        } else {
-            $Queries[] = '@searchtext ( ' . implode(' | ', $SearchList) . ' )';
+
+        if (!empty($SearchList)) {
+            $stype = 0 + $_GET['search_type'];
+            if ($stype == 0) {
+                $_GET['search_type'] = '0';
+                $Queries[] = '@searchtext ( ' . implode(' | ', $SearchList) . ' )';
+            } else {
+                $_GET['search_type'] = '1';
+                $Queries[] = '@searchtext ' . implode(' & ', $SearchList);
+            }
         }
-    } elseif (!empty($SearchList) || !empty($SearchListEx)) {
-        $Queries[] = '@searchtext ' . implode(' ', array_merge($SearchList, $SearchListEx));
-    } else {
-        $_GET['search_type'] = '1';
-    }
+    }    
     
     if (!empty($_GET['taglist'])) {
         $_GET['taglist'] = cleanup_tags($_GET['taglist']);
-        //$_GET['taglist'] = str_replace('.', '_', $_GET['taglist']);
-        $TagList = explode(' ', $_GET['taglist']);
-        $TagListEx = array();
+        // Do not keep extended search signs.
+        $TagList = preg_split("/([ \-!&|])/", $_GET['taglist']);
+
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
-            $tlen = strlen($Tag);
-            if ( $tlen >= 3 || ($Tag[0] != '-' && $tlen >= 2)) {
-                if ($Tag[0] == '-') {
-                    $Tag = get_tag_synonym( substr($Tag, 1), false);
-                    $Tag = str_replace('.', '_', $Tag);
-                    $TagListEx[] = '!' . $SS->EscapeString( $Tag );
-                    unset($TagList[$Key]);
-                } else {
+            if (strlen($Tag) >= 2) {
                     $Tag = get_tag_synonym($Tag, false);
                     $Tag = str_replace('.', '_', $Tag);
                     $Tag = $SS->EscapeString($Tag);
-                }
             } else {
                 unset($TagList[$Key]);
             }
         }
         unset($Tag);
-        // moved this to bottom so we can grab synomyns more easily
-        $_GET['taglist'] = str_replace('.', '_', $_GET['taglist']);
+    
+        if (!empty($TagList)) {
+            $ttype = 0 + $_GET['tags_type'];
+            if ($ttype == 0) {
+                $_GET['tags_type'] = '0';
+                $Queries[] = '@taglist ( ' . implode(' | ', $TagList) . ' )';
+            } else {
+                $_GET['tags_type'] = '1';
+                $Queries[] = '@taglist ( ' . implode(' & ', $TagList) . ' )';
+            }
+        }
     }
     
-    if (empty($_GET['tags_type']) && !empty($TagList) && count($TagList) > 1) {
-        $_GET['tags_type'] = '0';
-        if (!empty($TagListEx)) {
-            $Queries[] = '@taglist ( ' . implode(' | ', $TagList) . ' ) ' . implode(' ', $TagListEx);
-        } else {
-            $Queries[] = '@taglist ( ' . implode(' | ', $TagList) . ' )';
-        }
-    } elseif (!empty($TagList) || !empty($TagListEx)) {
-        $Queries[] = '@taglist ' . implode(' ', array_merge($TagList, $TagListEx));
-    } else {
-        $_GET['tags_type'] = '1';
-    }
 } else {
     // Advanced search, and yet so much simpler in code.
     if (!empty($_GET['searchtext'])) {
@@ -211,33 +193,30 @@ if (!$AdvancedSearch) {
     
     
     if (!empty($_GET['taglist'])) {
-        // do synomyn replacement and skip <=2 length tags
-        $TagList = explode(' ', $_GET['taglist']);
-        
+        // do synomyn replacement and skip <2 length tags
+        // Keep extended search signs.
+        $TagList = preg_split("/([ \-!&|])/", $_GET['taglist'], NULL, PREG_SPLIT_DELIM_CAPTURE);
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
            
-            if ( ($Tag[0] != '-' && strlen($Tag)>= 2) || strlen($Tag)>= 3 ) {
-                if ($Tag[0] == '-') {
-                    $Tag = get_tag_synonym( substr($Tag, 1), false);
-                    $Tag = str_replace('.', '_', $Tag);
-                    $Tag = '-'.$SS->EscapeString($Tag);
-                } else {
-                    $Tag = get_tag_synonym($Tag, false);
-                    $Tag = str_replace('.', '_', $Tag);
-                    $Tag = $SS->EscapeString($Tag);
-                }
+            if ($Tag == '-' || $Tag == '!' || $Tag == '|' || $Tag == '&' || $Tag == '(' || $Tag == ')') {
+                continue;
+            }
+            
+            if (strlen($Tag) >= 2) {
+                $Tag = get_tag_synonym($Tag, false);
+                $Tag = str_replace('.', '_', $Tag);
+                $Tag = $SS->EscapeString($Tag);
             } else {
                 unset($TagList[$Key]);
             }
         }
         unset($Tag);
-        $TagList = implode(' ', $TagList);
-        //$TagList = trim(str_replace('.', '_', $TagList));       
+        $TagList = implode(' ', $TagList);  
         $TagList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $TagList);
         $TagList = trim($TagList);
         
-        $Queries[] = '@taglist ' . $TagList; // *
+        $Queries[] = '@taglist ' . $TagList;
         
     }
 }
