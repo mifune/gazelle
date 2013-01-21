@@ -53,7 +53,7 @@ class FEED {
 		$Item .= "\t\t\t<pubDate>$Date</pubDate>\n";
 		$Item .= "\t\t\t<link>$Site/$DownLink</link>\n";
 		$Item .= "\t\t\t<download>$Site/$DownLink</download>\n";
-                $item .= "\t\t\t<enclosure url=\"$Site/$DownLink\" length=\"$Size\" type=\"application/x-bittorrent\"/>\n";
+                $item .= "\t\t\t<enclosure url=\"$Site/$DownLink\" length=\"$Size\" type=\"application/x-bittorrent\" />\n";
 		$Item .= "\t\t\t<guid isPermaLink=\"false\">$Site/$Page</guid>\n";
 		$Item .= "\t\t\t<comments><![CDATA[$Tags]]></comments>\n";
 		$Item .= "\t\t\t<category><![CDATA[$Category]]></category>\n";
