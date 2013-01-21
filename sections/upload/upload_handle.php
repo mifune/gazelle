@@ -169,6 +169,7 @@ $NumFiles = count($FileList);
 // The string that will make up the final torrent file
 $TorrentText = $Tor->enc();
 
+$TorrentSize = strlen($Tor->dump_data());
 
 // Infohash
 
@@ -403,7 +404,8 @@ send_irc('PRIVMSG #' . NONSSL_SITE_URL . '-announce-ssl :' . $AnnounceSSL);
 $Item = $Feed->torrent($Title, 
                        "Category: ".$NewCategories[(int)$_POST['category']]['name']." <br />Size: ". get_size($TotalSize) ."<br />Added: $sqltime<br />Description:<br />". $Text->strip_bbcode($Body), 
                         'torrents.php?id=' . $GroupID, 
-                        'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID, 
+                        'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID,
+                        $TorrentSize,
                         $LoggedUser['Username'], 
                         trim($Properties['TagList']), 
                         $NewCategories[(int)$_POST['category']]['name'] );

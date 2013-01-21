@@ -42,7 +42,7 @@ class FEED {
 		return $Item;
 	}
     //specialised creator function for torrent items
-	function torrent($Title, $Description, $Page, $DownLink, $Creator, $Tags='', $Category='') { //Escape with CDATA, otherwise the feed breaks.
+	function torrent($Title, $Description, $Page, $DownLink, $Size, $Creator, $Tags='', $Category='') { //Escape with CDATA, otherwise the feed breaks.
 		
         $Date = date("r");
 		
@@ -51,9 +51,10 @@ class FEED {
 		$Item .= "\t\t\t<title><![CDATA[$Title]]></title>\n";
 		$Item .= "\t\t\t<description><![CDATA[$Description]]></description>\n";
 		$Item .= "\t\t\t<pubDate>$Date</pubDate>\n";
-		$Item .= "\t\t\t<link>$Site/$Page</link>\n";
+		$Item .= "\t\t\t<link>$Site/$DownLink</link>\n";
 		$Item .= "\t\t\t<download>$Site/$DownLink</download>\n";
-		$Item .= "\t\t\t<guid>$Site/$Page</guid>\n";
+                $item .= "\t\t\t<enclosure url=\"$Site/$DownLink\" length=\"$Size\" type=\"application/x-bittorrent\"/>\n";
+		$Item .= "\t\t\t<guid isPermaLink=\"false\">$Site/$Page</guid>\n";
 		$Item .= "\t\t\t<comments><![CDATA[$Tags]]></comments>\n";
 		$Item .= "\t\t\t<category><![CDATA[$Category]]></category>\n";
 		 
