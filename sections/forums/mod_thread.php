@@ -10,10 +10,11 @@ threads will linger with the 'Moved' flag until they're knocked off
 the front page.
 
 \*********************************************************************/
-
+//error(print_r($_POST));
+//
 // Quick SQL injection check
 if(!is_number($_POST['threadid'])) { error(404); }
-if($_POST['title'] == ''){ error(0); }
+
 // End injection check
 // Make sure they are moderators
 if(!check_perms('site_moderate_forums')) { error(403); }
@@ -116,9 +117,30 @@ if (isset($_POST['split'])) {
         
         $DB->query("DELETE FROM forums_last_read_topics WHERE TopicID='$SplitTopicID'");
         
-    } else {
+    } elseif ($_POST['splitoption'] == 'trashsplit') {
+        
+        $ForumID = TRASH_FORUM_ID;
+        $Title = "Trashed Posts - from \"$OldTitle\"";
+        
+        $ExtraSystemPost = "[br][b]$LoggedUser[Username] trashed this thread ($sqltime) because:[/b][br][br]{$_POST[comment]}";
+
+        $DB->query("INSERT INTO forums_topics
+              (Title, AuthorID, ForumID, LastPostID, LastPostTime, LastPostAuthorID, NumPosts)
+              Values
+              ('".db_string($Title)."', '$FirstAuthorID', '$ForumID', '$lastpostID', '$sqltime', '$LastAuthorID','".($NumSplitPosts+1)."')");
+        $SplitTopicID = $DB->inserted_id();
+        $extra = "trashed to";
+        $numtopics = '+1';
+        
+        
+    } elseif ($_POST['splitoption'] == 'deletesplit') {
+        
+        if(!check_perms('site_admin_forums')) error(403);
+         
+        
+    } else {  //  $_POST['splitoption'] == 'mergesplit'
         // merge into a new thread
-        if ($Title!= $OldTitle)
+        if ($Title != '')
             $Title = "$Title (split from $OldTitle)";
         else
             $Title = "Split thread - from \"$OldTitle\"";
@@ -132,6 +154,7 @@ if (isset($_POST['split'])) {
         $numtopics = '+1';
     }
     
+    /*
     if (isset($_POST['trash'])) {
         $ForumID = TRASH_FORUM_ID;
         $Title = "Trashed Posts - from \"$OldTitle\"";
@@ -147,19 +170,30 @@ if (isset($_POST['split'])) {
         $PrePostID = $DB->inserted_id();
         
         $SET_NUMPOSTS = " , NumPosts=(NumPosts+1) " ;
+    } */
+    
+    if ($_POST['splitoption'] == 'deletesplit') {
+        
+        // post in original thread
+        $SystemPostOld = "[quote=the system]$NumSplitPosts posts were deleted from this thread[/quote]";
+     
+        
+    } else {
+        
+        $SystemPost = "[quote=the system]$NumSplitPosts posts $extra this thread from [url=/forums.php?action=viewthread&threadid=$TopicID]\"$OldTitle\"[/url][/quote]";
+        if ($ExtraSystemPost) $SystemPost .= $ExtraSystemPost;
+
+        $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
+                        VALUES ('$SplitTopicID', '$LoggedUser[ID]', '".sqltime(strtotime($FirstAddedTime)-10)."', '".db_string($SystemPost)."')"); 
+        $PrePostID = $DB->inserted_id();
+      
+        // post in original thread
+        $SystemPostOld = "[quote=the system]$NumSplitPosts posts $extra thread [url=/forums.php?action=viewthread&threadid=$SplitTopicID]\"$Title\"[/url][/quote]";
+     
     }
     
-    $SystemPost = "[quote=the system]$NumSplitPosts posts $extra this thread from [url=/forums.php?action=viewthread&threadid=$TopicID]\"$OldTitle\"[/url][/quote]";
-     
     $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
-                    VALUES ('$SplitTopicID', '$LoggedUser[ID]', '".sqltime(strtotime($FirstAddedTime)-10)."', '".db_string($SystemPost)."')"); 
-    $PrePostID = $DB->inserted_id();
-      
-    // post in original thread
-    $SystemPost = "[quote=the system]$NumSplitPosts posts moved to thread [url=/forums.php?action=viewthread&threadid=$SplitTopicID]\"$Title\"[/url][/quote]";
-     
-    $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
-                    VALUES ('$TopicID', '$LoggedUser[ID]', '$sqltime', '".db_string($SystemPost)."')"); 
+                    VALUES ('$TopicID', '$LoggedUser[ID]', '$sqltime', '".db_string($SystemPostOld)."')"); 
     $PostPostID = $DB->inserted_id();
    
     $DB->query("UPDATE forums_topics SET LastPostID='$PostPostID',
@@ -173,8 +207,20 @@ if (isset($_POST['split'])) {
     // move the selected posts
     $PostIDs = implode(',', $PostIDs);
      
-    $DB->query("UPDATE forums_posts SET TopicID='$SplitTopicID', Body=CONCAT_WS( '\n\n', Body, '[align=right][size=0][i]split from thread[/i][br]\'$OldTitle\'[/size][/align]') WHERE TopicID='$TopicID' AND ID IN ($PostIDs)");
+    
+    if ($_POST['splitoption'] == 'deletesplit') {
         
+        $DB->query("DELETE FROM forums_posts WHERE ID IN ($PostIDs)");
+  
+        //$DB->query("SELECT MAX(ID) FROM forums_posts WHERE TopicID='$TopicID'");
+        //list($LastID) = $DB->next_record();
+
+    } else {
+        
+        $DB->query("UPDATE forums_posts SET TopicID='$SplitTopicID', Body=CONCAT_WS( '\n\n', Body, '[align=right][size=0][i]split from thread[/i][br]\'$OldTitle\'[/size][/align]') WHERE TopicID='$TopicID' AND ID IN ($PostIDs)");
+        
+    }
+
     $Cache->begin_transaction('forums_list');
  
     update_forum_info($ForumID, $numtopics,false);
@@ -194,8 +240,13 @@ if (isset($_POST['split'])) {
         $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
     }
     
-    //header('Location: forums.php?action=viewforum&forumid='.$ForumID);
-    header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#post$PrePostID");
+    if ($SplitTopicID>0) {
+        //header('Location: forums.php?action=viewforum&forumid='.$ForumID);
+        header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#post$PrePostID");
+    } else {
+        
+        header("Location: forums.php?action=viewthread&threadid=$TopicID&postid=$PostPostID#post$PostPostID");
+    }
 	 
 
 // If we're merging a thread
@@ -277,6 +328,7 @@ if (isset($_POST['split'])) {
 
 // If we're just editing it/moving it/trashing it
 } else { 
+    if($_POST['title'] == ''){ error(0); }
     
     $SET_NUMPOSTS = '';
     

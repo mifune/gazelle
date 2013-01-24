@@ -529,7 +529,7 @@ $AllowTags= isset($PermissionValues['site_advanced_tags']) &&  $PermissionValues
 <? 
     if(check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?> 
           
-	<div class="head split hidden">Split thread (select posts to be split)</div>
+	<div class="head split hidden">Split thread (select posts to be split) <span style="float:right"><a href="#splittool" onclick="$('.split').toggle();">Show/Hide split tool</a></span></div>
 	<table cellpadding="6" cellspacing="1" border="0" width="100%" class="border split hidden">
                 
 		<input type="hidden" name="action" value="mod_thread" />
@@ -537,37 +537,45 @@ $AllowTags= isset($PermissionValues['site_advanced_tags']) &&  $PermissionValues
 		<input type="hidden" name="threadid" value="<?=$ThreadID?>" />
 		<input type="hidden" name="page" value="<?=$Page?>" />
 			<tr>
-				<td class="label">Split type</td>
+				<td class="label" title="Action to carry out on split">Split Type: </td>
 				<td> 
-                            <input type="hidden" name="split" value="1"/> 
-                            <a href="#" onclick="$('.split').toggle();">Show/Hide split tool</a>
-                            &nbsp;&nbsp;&nbsp;
-                            <input type="radio" name="splitoption" value="newsplit" checked="checked" />Split into new thread &nbsp;&nbsp;&nbsp;
-                            <input type="radio" name="splitoption" value="mergesplit" />
-                            <label for="splitintothreadid">id of thread to split <em>into</em></label>
-                            <input type="text" name="splitintothreadid" value="" />&nbsp;&nbsp;&nbsp;&nbsp; 
-				</td>
+                            <input type="hidden" name="split" value="1"/>
+                            <input type="radio" name="splitoption" id="split_new" value="newsplit" onchange="SetSplitInterface()" checked="checked" /> into <em>new</em> thread &nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="splitoption" id="split_merge" value="mergesplit"  onchange="SetSplitInterface()" />
+                            <label for="splitintothreadid">into <em>existing</em> thread with id:</label>
+                            <input type="text" name="splitintothreadid" id="split_threadid" value="" disabled="disabled"/>&nbsp;&nbsp;&nbsp;&nbsp; 
+                            <input type="radio" name="splitoption" id="split_trash" value="trashsplit"  onchange="SetSplitInterface()" /> Trash selected &nbsp;&nbsp;&nbsp;
+<?  if(check_perms('site_admin_forums') && $ThreadInfo['Posts'] > 1) { ?> 
+                            <input type="radio" name="splitoption" id="split_delete" value="deletesplit"  onchange="SetSplitInterface()" /> Delete selected &nbsp;&nbsp;&nbsp;
+<?  } ?> 
+                </td>
 			</tr>
 			<tr>
-				<td class="label">New Title*</td>
+				<td class="label">New Title* </td>
 				<td>
-					<input type="text" name="title" class="long" value="<?=display_str($ThreadInfo['Title'])?>" tabindex="2" />
+					<input type="text" name="title" id="split_title" class="long" value="<?=display_str($ThreadInfo['Title'])?>" />
 				</td>
 			</tr>
 			<tr>
-				<td class="label">New forum*</td>
+				<td class="label">New forum* </td>
 				<td> 
-                            <?= print_forums_select($Forums, $ForumCats, $ThreadInfo['ForumID']) ?>
+                            <?= print_forums_select($Forums, $ForumCats, $ThreadInfo['ForumID'], 'split_forum') ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Comment**</td>
+				<td>
+					<input type="text" name="comment" id="split_comment" class="long" value="" disabled="disabled" />
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2" class="center">
-                            <span style="float:left">*only used if splitting into new</span>
-					<input type="submit" value="Split thread" />
+                    <span style="float:left">*only used if splitting into new &nbsp;&nbsp; **only used if trashing</span>
+					<input type="submit" value="Split selected posts" />
 				</td>
 			</tr>
-      </table>    
-</form>      
+      </table>
+</form>
 <?  } ?>
     
 <?

@@ -90,6 +90,24 @@ function Save_Edit(postid) {
 }
 
 
+function SetSplitInterface() {
+    //$('#split_title').disable( !$('#split_new').raw().checked );
+    //$('#split_forum').disable( !$('#split_new').raw().checked );
+    $('#split_threadid').disable( !$('#split_merge').raw().checked );
+    $('#split_comment').disable( !$('#split_trash').raw().checked );
+    //$('#split_comment').disable( !$('#split_trash').raw().checked );
+    if ( $('#split_new').raw().checked ) {
+       jQuery('#split_forum').css("color", 'black');
+       jQuery('#split_forum').css("background", 'none');
+       $('#split_forum').disable(false);
+       $('#split_title').disable(false);
+    } else {
+       jQuery('#split_forum').css("color", '#bbb');
+       jQuery('#split_forum').css("background-color", '#eee');
+       $('#split_forum').disable(true);
+       $('#split_title').disable(true);
+    }
+}
 
 function Trash(threadid, postid) {
     var reason = prompt('Move this post to the Trash forum\n                                                             \nComment:');

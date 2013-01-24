@@ -133,10 +133,12 @@ function update_latest_topics() {
         }
 }
 
-function print_forums_select($Forums, $ForumCats, $SelectedForumID=false) {
+function print_forums_select($Forums, $ForumCats, $SelectedForumID=false, $ElementID = '') {
     global $Cache, $DB, $LoggedUser;
+    if ($ElementID) $ElementID = 'id="'.display_str($ElementID).'"';
+    else $ElementID ='';
 ?>
-					<select name="forumid" tabindex="2">
+                <select name="forumid" <?=$ElementID?>>
 <? 
 $OpenGroup = false;
 $LastCategoryID=-1;
@@ -158,7 +160,7 @@ foreach ($Forums as $Forum) {
 						<option value="<?=$Forum['ID']?>"<? if($SelectedForumID == $Forum['ID']) { echo ' selected="selected"';} ?>><?=$Forum['Name']?></option>
 <? } ?>
 					</optgroup>
-					</select>
+				</select>
 <?
 }
 
