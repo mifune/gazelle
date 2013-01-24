@@ -122,7 +122,7 @@ if (isset($_POST['split'])) {
         $ForumID = TRASH_FORUM_ID;
         $Title = "Trashed Posts - from \"$OldTitle\"";
         
-        $ExtraSystemPost = "[br][b]$LoggedUser[Username] trashed this thread ($sqltime) because:[/b][br][br]{$_POST[comment]}";
+        $ExtraSystemPost = "[br][b]$LoggedUser[Username] trashed $NumSplitPosts posts ($sqltime) because:[/b][br][br]{$_POST[comment]}";
 
         $DB->query("INSERT INTO forums_topics
               (Title, AuthorID, ForumID, LastPostID, LastPostTime, LastPostAuthorID, NumPosts)
@@ -224,23 +224,33 @@ if (isset($_POST['split'])) {
     $Cache->begin_transaction('forums_list');
  
     update_forum_info($ForumID, $numtopics,false);
+    
     if($OldForumID!=$ForumID) {    // If we're moving posts into a new forum, change the new forum stats
 	 
         update_forum_info($OldForumID, 0,false); 
-        $Cache->delete_value('forums_'.$OldForumID);
     }
       
     $Cache->commit_transaction(0);
+    
+    $Cache->delete_value('forums_'.$ForumID);
+    $Cache->delete_value('forums_'.$OldForumID);
+    
     $Cache->delete_value('thread_'.$TopicID.'_info');
     $Cache->delete_value('thread_'.$SplitTopicID.'_info');
     
     $CatalogueID = floor($Posts/THREAD_CATALOGUE);
     for($i=0;$i<=$CatalogueID;$i++) {
         $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
-        $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
     }
     
+    
     if ($SplitTopicID>0) {
+        
+        $CatalogueID = floor($NumSplitPosts/THREAD_CATALOGUE);
+        for($i=0;$i<=$CatalogueID;$i++) {
+            $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
+        }
+        
         //header('Location: forums.php?action=viewforum&forumid='.$ForumID);
         header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#post$PrePostID");
     } else {
