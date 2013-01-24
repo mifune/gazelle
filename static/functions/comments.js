@@ -89,6 +89,32 @@ function Save_Edit(postid) {
 	}
 }
 
+
+
+function Trash(threadid, postid) {
+    var reason = prompt('Move this post to the Trash forum\n                                                             \nComment:');
+	if (reason && reason != '') {
+		var ToPost = [];
+        ToPost['action']= 'trash_post';
+		ToPost['auth'] = authkey;
+        ToPost['threadid']= threadid;
+        ToPost['postid'] = postid;
+        ToPost['comment'] = reason;
+        //ToPost['']= '';
+		ajax.post("forums.php", ToPost, function (response) {
+            var x = json.decode(response);
+            if (is_array(x)) {
+				$('#post' + postid).hide();
+                //location.href=x[0];
+            } else {    // error from ajax
+                alert(x);
+            }
+		});
+	}
+}
+
+
+
 function Delete(post) {
 	postid = post;
 	if (confirm('Are you sure you wish to delete this post?') == true) {
@@ -144,7 +170,7 @@ function Newthread_Preview(mode) {
 			pollanswers = pollanswers.children;
 			$('#pollquestion').raw().innerHTML = $('#pollquestionfield').raw().value;
 			for(var i=0; i<pollanswers.length; i+=2) {
-				if(!pollanswers[i].value) { continue; }
+				if(!pollanswers[i].value) {continue;}
 				var el = document.createElement('input');
 				el.id = 'answer_'+(i+1);
 				el.type = 'radio';

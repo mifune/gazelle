@@ -38,14 +38,15 @@ $DB->query("SELECT
 	f.MinClassWrite,
 	COUNT(p.ID) AS Posts,
           Max(p.ID) AS LastPostID,
-            t.StickyPostID
+            t.StickyPostID, 
+        f.Name
 	FROM forums_topics AS t
 	LEFT JOIN forums_posts AS p ON p.TopicID=t.ID
 	LEFT JOIN forums AS f ON f.ID=.t.ForumID
 	WHERE t.ID='$TopicID'
 	GROUP BY p.TopicID");
 if ($DB->record_count()==0) error("Error: Could not find thread with id=$TopicID");
-list($OldForumID, $OldTitle, $MinClassWrite, $Posts, $OldLastPostID, $OldStickyPostID) = $DB->next_record();
+list($OldForumID, $OldTitle, $MinClassWrite, $Posts, $OldLastPostID, $OldStickyPostID, $OldForumName) = $DB->next_record();
 
 if( !check_forumperm($OldForumID, 'Write') ) { error(403); }
 
@@ -56,69 +57,10 @@ $Cache->delete_value('forums_'.$OldForumID);
  
 $sqltime = sqltime();
 
- 
-function update_forum_info($ForumID, $AdjustNumTopics = 0, $BeginEndTransaction = true) {
-    global $DB, $Cache;
-    
-    if ($BeginEndTransaction) $Cache->begin_transaction('forums_list');
-        
-    $DB->query("SELECT 
-			t.ID,
-			t.LastPostID,
-			t.Title,
-			p.AuthorID,
-			um.Username,
-			p.AddedTime, 
-			(SELECT COUNT(pp.ID) FROM forums_posts AS pp JOIN forums_topics AS tt ON pp.TopicID=tt.ID WHERE tt.ForumID='$ForumID'),
-			t.IsLocked,
-			t.IsSticky
-			FROM forums_topics AS t 
-			JOIN forums_posts AS p ON p.ID=t.LastPostID 
-			LEFT JOIN users_main AS um ON um.ID=p.AuthorID
-			WHERE t.ForumID='$ForumID'
-			GROUP BY t.ID
-			ORDER BY p.AddedTime DESC LIMIT 1");
-			//ORDER BY t.LastPostID DESC LIMIT 1");
-    list($NewLastTopic, $NewLastPostID, $NewLastTitle, $NewLastAuthorID, $NewLastAuthorName, $NewLastAddedTime, $NumPosts, $NewLocked, $NewSticky) = $DB->next_record(MYSQLI_BOTH, false);
-		
-    $UpdateArray = array(
-			'NumPosts'=>$NumPosts,
-			'LastPostID'=>$NewLastPostID,
-			'LastPostAuthorID'=>$NewLastAuthorID,
-			'Username'=>$NewLastAuthorName,
-			'LastPostTopicID'=>$NewLastTopic,
-			'LastPostTime'=>$NewLastAddedTime,
-			'Title'=>$NewLastTitle,
-			'IsLocked'=>$NewLocked,
-			'IsSticky'=>$NewSticky
-			);
-            
-    //$AdjustNumTopics=(int)$AdjustNumTopics;
-    if ($AdjustNumTopics !=0) { // '-1' or '+1' etc
-                //$AdjustNumTopics = $AdjustNumTopics>0?"+$AdjustNumTopics":$AdjustNumTopics;
-                $SetNumTopics = "NumTopics=NumTopics$AdjustNumTopics, ";
-                $UpdateArray['NumTopics']=$AdjustNumTopics;
-    }
-    else $SetNumTopics ='';
-            
-    $SQL = "UPDATE forums SET $SetNumTopics
-                    NumPosts='$NumPosts',
-                    LastPostTopicID='$NewLastTopic',
-                    LastPostID='$NewLastPostID',
-                    LastPostAuthorID='$NewLastAuthorID',
-                    LastPostTime='$NewLastAddedTime'
-                    WHERE ID='$ForumID'";
-            
-    $DB->query($SQL);
-		
-    $Cache->update_row($ForumID, $UpdateArray);
-    if ($BeginEndTransaction) $Cache->commit_transaction(0);
-}
-
 
 
 if (isset($_POST['split'])) {
-    if(!check_perms('site_admin_forums')) error(403);
+    if(!check_perms('site_moderate_forums')) error(403);
     
     $PostIDs = $_POST['splitids'];
     $NumSplitPosts =  count($PostIDs);
@@ -174,7 +116,7 @@ if (isset($_POST['split'])) {
         
         $DB->query("DELETE FROM forums_last_read_topics WHERE TopicID='$SplitTopicID'");
         
-    } else {   
+    } else {
         // merge into a new thread
         if ($Title!= $OldTitle)
             $Title = "$Title (split from $OldTitle)";
@@ -188,6 +130,23 @@ if (isset($_POST['split'])) {
         $SplitTopicID = $DB->inserted_id();
         $extra = "moved to";
         $numtopics = '+1';
+    }
+    
+    if (isset($_POST['trash'])) {
+        $ForumID = TRASH_FORUM_ID;
+        $Title = "Trashed Posts - from \"$OldTitle\"";
+        
+        $SystemPost = "[quote=the system]This thread moved from [b][url=/forums.php?action=viewforum&forumid=$OldForumID]{$OldForumName}[/url][/b] forum.[/quote]";
+        $SystemPost .= "[b]$LoggedUser[Username] trashed this thread ($sqltime) because:[/b][br][br]{$_POST[comment]}";
+
+        $DB->query("SELECT Min(AddedTime) FROM forums_posts WHERE TopicID='$TopicID'");
+        list($FirstAddedTime) = $DB->next_record();
+        
+        $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
+                        VALUES ('$TopicID', '$LoggedUser[ID]', '".sqltime(strtotime($FirstAddedTime)-10)."', '".db_string($SystemPost)."')"); 
+        $PrePostID = $DB->inserted_id();
+        
+        $SET_NUMPOSTS = " , NumPosts=(NumPosts+1) " ;
     }
     
     $SystemPost = "[quote=the system]$NumSplitPosts posts $extra this thread from [url=/forums.php?action=viewthread&threadid=$TopicID]\"$OldTitle\"[/url][/quote]";
@@ -236,12 +195,12 @@ if (isset($_POST['split'])) {
     }
     
     //header('Location: forums.php?action=viewforum&forumid='.$ForumID);
-    header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#$PrePostID");
+    header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#post$PrePostID");
 	 
 
 // If we're merging a thread
 } elseif (isset($_POST['merge'])) {
-    if(!check_perms('site_admin_forums')) error(403);
+    if(!check_perms('site_moderate_forums')) error(403);
        
     if(!is_number($_POST['mergethreadid'])) error("merge thread id is not a number!");
     $MergeTopicID = (int)$_POST['mergethreadid'];
@@ -310,15 +269,34 @@ if (isset($_POST['split'])) {
        
 		$Cache->delete_value('thread_'.$TopicID.'_info');
                 
-            update_latest_topics();
+        update_latest_topics();
 		header('Location: forums.php?action=viewforum&forumid='.$ForumID);
 	} else {
 		error(403);
 	}
 
-// If we're just editing it/moving it
+// If we're just editing it/moving it/trashing it
 } else { 
-      
+    
+    $SET_NUMPOSTS = '';
+    
+    if (isset($_POST['trash'])) {
+        $ForumID = TRASH_FORUM_ID;
+        $Title = "Trashed Thread - from \"$OldTitle\"";
+        
+        $SystemPost = "[quote=the system]This thread moved from [b][url=/forums.php?action=viewforum&forumid=$OldForumID]{$OldForumName}[/url][/b] forum.[/quote]";
+        $SystemPost .= "[b]$LoggedUser[Username] trashed this thread ($sqltime) because:[/b][br][br]{$_POST[comment]}";
+
+        $DB->query("SELECT Min(AddedTime) FROM forums_posts WHERE TopicID='$TopicID'");
+        list($FirstAddedTime) = $DB->next_record();
+        
+        $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
+                        VALUES ('$TopicID', '$LoggedUser[ID]', '".sqltime(strtotime($FirstAddedTime)-10)."', '".db_string($SystemPost)."')"); 
+        $PrePostID = $DB->inserted_id();
+        
+        $SET_NUMPOSTS = " , NumPosts=(NumPosts+1) " ;
+    }
+    
 	$Cache->begin_transaction('thread_'.$TopicID.'_info');
 	$UpdateArray = array(
 		'IsSticky'=>$Sticky,
@@ -326,6 +304,7 @@ if (isset($_POST['split'])) {
 		'Title'=>cut_string($Title, 150, 1, 0),
 		'ForumID'=>$ForumID
 		);
+    if ($SET_NUMPOSTS != '') $UpdateArray['NumPosts'] = '+1';
 	$Cache->update_row(false, $UpdateArray);
 	$Cache->commit_transaction(0);
 	
@@ -334,6 +313,7 @@ if (isset($_POST['split'])) {
 		IsLocked = '$Locked',
 		Title = '".db_string($Title)."',
 		ForumID ='$ForumID' 
+        $SET_NUMPOSTS
 		WHERE ID='$TopicID'");
 	
 	

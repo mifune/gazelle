@@ -1,4 +1,64 @@
 <?
+
+function update_forum_info($ForumID, $AdjustNumTopics = 0, $BeginEndTransaction = true) {
+    global $DB, $Cache;
+    
+    if ($BeginEndTransaction) $Cache->begin_transaction('forums_list');
+        
+    $DB->query("SELECT 
+			t.ID,
+			t.LastPostID,
+			t.Title,
+			p.AuthorID,
+			um.Username,
+			p.AddedTime, 
+			(SELECT COUNT(pp.ID) FROM forums_posts AS pp JOIN forums_topics AS tt ON pp.TopicID=tt.ID WHERE tt.ForumID='$ForumID'),
+			t.IsLocked,
+			t.IsSticky
+			FROM forums_topics AS t 
+			JOIN forums_posts AS p ON p.ID=t.LastPostID 
+			LEFT JOIN users_main AS um ON um.ID=p.AuthorID
+			WHERE t.ForumID='$ForumID'
+			GROUP BY t.ID
+			ORDER BY p.AddedTime DESC LIMIT 1");
+			//ORDER BY t.LastPostID DESC LIMIT 1");
+    list($NewLastTopic, $NewLastPostID, $NewLastTitle, $NewLastAuthorID, $NewLastAuthorName, $NewLastAddedTime, $NumPosts, $NewLocked, $NewSticky) = $DB->next_record(MYSQLI_BOTH, false);
+		
+    $UpdateArray = array(
+			'NumPosts'=>$NumPosts,
+			'LastPostID'=>$NewLastPostID,
+			'LastPostAuthorID'=>$NewLastAuthorID,
+			'Username'=>$NewLastAuthorName,
+			'LastPostTopicID'=>$NewLastTopic,
+			'LastPostTime'=>$NewLastAddedTime,
+			'Title'=>$NewLastTitle,
+			'IsLocked'=>$NewLocked,
+			'IsSticky'=>$NewSticky
+			);
+            
+    //$AdjustNumTopics=(int)$AdjustNumTopics;
+    if ($AdjustNumTopics !=0) { // '-1' or '+1' etc
+                //$AdjustNumTopics = $AdjustNumTopics>0?"+$AdjustNumTopics":$AdjustNumTopics;
+                $SetNumTopics = "NumTopics=NumTopics$AdjustNumTopics, ";
+                $UpdateArray['NumTopics']=$AdjustNumTopics;
+    }
+    else $SetNumTopics ='';
+            
+    $SQL = "UPDATE forums SET $SetNumTopics
+                    NumPosts='$NumPosts',
+                    LastPostTopicID='$NewLastTopic',
+                    LastPostID='$NewLastPostID',
+                    LastPostAuthorID='$NewLastAuthorID',
+                    LastPostTime='$NewLastAddedTime'
+                    WHERE ID='$ForumID'";
+            
+    $DB->query($SQL);
+		
+    $Cache->update_row($ForumID, $UpdateArray);
+    if ($BeginEndTransaction) $Cache->commit_transaction(0);
+}
+
+
 function get_thread_info($ThreadID, $Return = true, $SelectiveCache = false) {
 	global $DB, $Cache;
 	if(!$ThreadInfo = $Cache->get_value('thread_'.$ThreadID.'_info')) {

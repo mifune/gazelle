@@ -393,7 +393,7 @@ if ($ThreadInfo['NoPoll'] == 0) {
 } //End Polls
   
 // form for splitting posts... only include as appropriate
-if(check_perms('site_admin_forums') && $ThreadInfo['Posts'] > 1) { ?>
+if(check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?>
 <form action="forums.php" method="post">
 <?  } 
 
@@ -437,23 +437,26 @@ foreach($Thread as $Key => $Post){
 if (((!$ThreadInfo['IsLocked'] && check_forumperm($ForumID, 'Write')) && ($AuthorID == $LoggedUser['ID'] && (check_perms ('site_edit_own_posts') || time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME)) || check_perms('site_moderate_forums'))) { ?>
 				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a> 
 <? }
+if($ForumID != TRASH_FORUM_ID && check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?> 
+				- <a href="#post<?=$PostID?>" onclick="Trash('<?=$ThreadID?>','<?=$PostID?>');" title="moves this post to the trash forum">[Trash]</a> 
+<? }
 if(check_perms('site_admin_forums') && $ThreadInfo['Posts'] > 1) { ?> 
-				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> 
+				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');" title="permenantly delete this post">[Delete]</a> 
 <? }
 if($PostID == $ThreadInfo['StickyPostID']) { ?>
 				<strong><span class="sticky_post">[Sticky]</span></strong>
 <?	if(check_perms('site_moderate_forums')) { ?>
-				- <a href="forums.php?action=sticky_post&amp;threadid=<?=$ThreadID?>&amp;postid=<?=$PostID?>&amp;remove=true&amp;auth=<?=$LoggedUser['AuthKey']?>" >[X]</a>
+				- <a href="forums.php?action=sticky_post&amp;threadid=<?=$ThreadID?>&amp;postid=<?=$PostID?>&amp;remove=true&amp;auth=<?=$LoggedUser['AuthKey']?>" title="unsticky this post">[X]</a>
 <?	}
 } else {
 	if(check_perms('site_moderate_forums')) { ?>
-				- <a href="forums.php?action=sticky_post&amp;threadid=<?=$ThreadID?>&amp;postid=<?=$PostID?>&amp;auth=<?=$LoggedUser['AuthKey']?>" >[&#x21d5;]</a>
+				- <a href="forums.php?action=sticky_post&amp;threadid=<?=$ThreadID?>&amp;postid=<?=$PostID?>&amp;auth=<?=$LoggedUser['AuthKey']?>" title="make this post sticky (appears at the top of every page)">[&#x21d5;]</a>
 <? 	}
 }
 ?>
 			</span>
 			<span id="bar<?=$PostID?>" style="float:right;">
-<?      if(check_perms('site_admin_forums') && $ThreadInfo['Posts'] > 1) { ?>
+<?      if(check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?>
                         <label class="split hidden">split</label>
                         <input class="split hidden" type="checkbox" id="split_<?=$PostID?>" name="splitids[]" value="<?=$PostID?>" />
 				&nbsp;&nbsp;
@@ -524,7 +527,7 @@ $AllowTags= isset($PermissionValues['site_advanced_tags']) &&  $PermissionValues
 	<?=$Pages?>
 </div>
 <? 
-    if(check_perms('site_admin_forums') && $ThreadInfo['Posts'] > 1) { ?> 
+    if(check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?> 
           
 	<div class="head split hidden">Split thread (select posts to be split)</div>
 	<table cellpadding="6" cellspacing="1" border="0" width="100%" class="border split hidden">
@@ -563,8 +566,8 @@ $AllowTags= isset($PermissionValues['site_advanced_tags']) &&  $PermissionValues
 					<input type="submit" value="Split thread" />
 				</td>
 			</tr>
-      </table>            
-</form>         
+      </table>    
+</form>      
 <?  } ?>
     
 <?
@@ -653,13 +656,13 @@ if(check_perms('site_moderate_forums')) {
 			<tr>
 				<td class="label">Locked</td>
 				<td>
-					<input type="checkbox" name="locked"<? if($ThreadInfo['IsLocked']) { echo ' checked="checked"'; } ?> tabindex="2" />
+					<input type="checkbox" name="locked"<? if($ThreadInfo['IsLocked']) { echo ' checked="checked"'; } ?> />
 				</td>
 			</tr>
 			<tr>
 				<td class="label">Title</td>
 				<td>
-					<input type="text" name="title" class="long" value="<?=display_str($ThreadInfo['Title'])?>" tabindex="2" />
+					<input type="text" name="title" class="long" value="<?=display_str($ThreadInfo['Title'])?>" />
 				</td>
 			</tr>
 			<tr>
@@ -668,8 +671,6 @@ if(check_perms('site_moderate_forums')) {
                             <?= print_forums_select($Forums, $ForumCats, $ThreadInfo['ForumID']) ?>
 				</td>
 			</tr>
-<? if(check_perms('site_admin_forums')) { ?>
-                  
 			<tr>
 				<td class="label">Merge thread</td>
 				<td>
@@ -678,19 +679,31 @@ if(check_perms('site_moderate_forums')) {
                             <input type="text" name="mergethreadid" value="" />
 				</td>
 			</tr>
+<?  if($ThreadInfo['Posts'] > 1) { ?> 
 			<tr>
 				<td class="label">Split thread</td>
 				<td>
                             <a href="#splittool" onclick="$('.split').toggle();">Show/Hide split tool</a>
 				</td>
 			</tr>
+<?  }
+    if($ForumID != TRASH_FORUM_ID ) { ?>
+			<tr>
+				<td class="label">Trash thread</td>
+				<td>
+					<input type="checkbox" name="trash" /> &nbsp; Comment: <input type="text" name="comment" class="medium" value="" />
+				</td>
+			</tr>
+<?  }
+    if(check_perms('site_admin_forums')) { ?>
+                  
 			<tr>
 				<td class="label">Delete thread</td>
 				<td>
 					<input type="checkbox" name="delete" />
 				</td>
 			</tr>
-<? } ?>
+<?  } ?>
 			<tr>
 				<td colspan="2" class="center">
 					<input type="submit" value="Edit thread" />

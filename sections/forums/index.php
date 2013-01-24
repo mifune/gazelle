@@ -26,6 +26,9 @@ if(!empty($_POST['action'])){
 		case 'mod_thread':
 			require(SERVER_ROOT.'/sections/forums/mod_thread.php');
 			break;
+        case 'trash_post':
+			require(SERVER_ROOT.'/sections/forums/trash.php');
+			break;
 		case 'poll_mod':
 			require(SERVER_ROOT.'/sections/forums/poll_mod.php');
 			break;
