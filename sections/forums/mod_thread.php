@@ -188,8 +188,11 @@ if (isset($_POST['split'])) {
         $PrePostID = $DB->inserted_id();
       
         // post in original thread
-        $SystemPostOld = "[quote=the system]$NumSplitPosts posts $extra thread [url=/forums.php?action=viewthread&threadid=$SplitTopicID]\"$Title\"[/url][/quote]";
-     
+        if ($_POST['splitoption'] == 'trashsplit') {
+            $SystemPostOld = "[quote=the system]$NumSplitPosts posts were removed from this thread[/quote]";
+        } else {
+            $SystemPostOld = "[quote=the system]$NumSplitPosts posts $extra thread [url=/forums.php?action=viewthread&threadid=$SplitTopicID]\"$Title\"[/url][/quote]";
+        }
     }
     
     $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
@@ -243,14 +246,14 @@ if (isset($_POST['split'])) {
         $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
     }
     
-    
     if ($SplitTopicID>0) {
-        
         $CatalogueID = floor($NumSplitPosts/THREAD_CATALOGUE);
         for($i=0;$i<=$CatalogueID;$i++) {
             $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
         }
-        
+    }
+    
+    if ($SplitTopicID>0 && $_POST['splitoption'] != 'trashsplit') {
         //header('Location: forums.php?action=viewforum&forumid='.$ForumID);
         header("Location: forums.php?action=viewthread&threadid=$SplitTopicID&postid=$PrePostID#post$PrePostID");
     } else {
