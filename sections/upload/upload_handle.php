@@ -62,6 +62,7 @@ $Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
 
 $File = $_FILES['file_input']; // This is our torrent file
 $TorrentName = $File['tmp_name'];
+$FileName = $File['name'];
 
 if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)){
         $Err = "There are errors in your bbcode (unclosed tags)";
@@ -405,16 +406,15 @@ $Item = $Feed->torrent($Title,
                         $Text->strip_bbcode($Body), 
                         'torrents.php?id=' . $GroupID, 
                         'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID,
-                        $InfoHash,
-                        $File['name'],
+                        rawurlencode($InfoHash),
+                        $FileName,
                         $TorrentSize,
                         $TotalSize,
                         get_size($TotalSize),
                         $LoggedUser['Username'], 
-                        trim($Properties['TagList']),
                         "torrents.php?filter_cat[".$_POST['category']."]=1",
                         $NewCategories[(int)$_POST['category']]['name'],
-                        $Tags);
+                        implode($Tags, ' '));
 
 //Notifications
 $SQL = "SELECT unf.ID, unf.UserID, torrent_pass

@@ -62,13 +62,13 @@ class FEED {
                 
                 $Item .= "\t\t\t<torrent xmlns=\"http://xmlns.ezrss.it/0.1/\">\n";
                 $Item .= "\t\t\t\t<fileName><![CDATA[$TorrentName]]></fileName>\n";
-                $Item .= "\t\t\t\t<infoHash>![CDATA[$InfoHash]]></infoHash>\n";
+                $Item .= "\t\t\t\t<infoHash><![CDATA[$InfoHash]]></infoHash>\n";
                 $Item .= "\t\t\t\t<contentLength>$ContentSize</contentLength>\n";
-                $Item .= "\t\t\t\t<contentLengthHR>$ContentSizeHR</contentLength>\n";
+                $Item .= "\t\t\t\t<contentLengthHR>$ContentSizeHR</contentLengthHR>\n";
                 $Item .= "\t\t\t</torrent>\n";
                 
                 $Item .= "\t\t</item>\n";
-                
+
 		return $Item;
 	}
 
