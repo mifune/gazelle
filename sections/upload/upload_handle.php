@@ -402,14 +402,19 @@ send_irc('PRIVMSG #' . NONSSL_SITE_URL . '-announce-ssl :' . $AnnounceSSL);
 //$Item = $Feed->item($Title, $Text->strip_bbcode($Body), 'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID, $LoggedUser['Username'], 'torrents.php?id=' . $GroupID, trim($Properties['TagList']));
 
 $Item = $Feed->torrent($Title, 
-                       "Category: ".$NewCategories[(int)$_POST['category']]['name']." <br />Size: ". get_size($TotalSize) ."<br />Added: $sqltime<br />Description:<br />". $Text->strip_bbcode($Body), 
+                        $Text->strip_bbcode($Body), 
                         'torrents.php?id=' . $GroupID, 
                         'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID,
+                        $InfoHash,
+                        $TorrentName,
                         $TorrentSize,
+                        $TotalSize,
+                        get_size($TotalSize),
                         $LoggedUser['Username'], 
-                        trim($Properties['TagList']), 
-                        $NewCategories[(int)$_POST['category']]['name'] );
-
+                        trim($Properties['TagList']),
+                        "torrents.php?filter_cat[".$_POST['category']."]=1",
+                        $NewCategories[(int)$_POST['category']]['name'],
+                        $Tags);
 
 //Notifications
 $SQL = "SELECT unf.ID, unf.UserID, torrent_pass
