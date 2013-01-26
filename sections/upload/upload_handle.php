@@ -62,6 +62,7 @@ $Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
 
 $File = $_FILES['file_input']; // This is our torrent file
 $TorrentName = $File['tmp_name'];
+$FileName = $File['name'];
 
 if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)){
         $Err = "There are errors in your bbcode (unclosed tags)";
@@ -402,14 +403,18 @@ send_irc('PRIVMSG #' . NONSSL_SITE_URL . '-announce-ssl :' . $AnnounceSSL);
 //$Item = $Feed->item($Title, $Text->strip_bbcode($Body), 'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID, $LoggedUser['Username'], 'torrents.php?id=' . $GroupID, trim($Properties['TagList']));
 
 $Item = $Feed->torrent($Title, 
-                       "Category: ".$NewCategories[(int)$_POST['category']]['name']." <br />Size: ". get_size($TotalSize) ."<br />Added: $sqltime<br />Description:<br />". $Text->strip_bbcode($Body), 
+                        $Text->strip_bbcode($Body), 
                         'torrents.php?id=' . $GroupID, 
                         'torrents.php?action=download&amp;authkey=[[AUTHKEY]]&amp;torrent_pass=[[PASSKEY]]&amp;id=' . $TorrentID,
+                        rawurlencode($InfoHash),
+                        $FileName,
                         $TorrentSize,
+                        $TotalSize,
+                        get_size($TotalSize),
                         $LoggedUser['Username'], 
-                        trim($Properties['TagList']), 
-                        $NewCategories[(int)$_POST['category']]['name'] );
-
+                        "torrents.php?filter_cat[".$_POST['category']."]=1",
+                        $NewCategories[(int)$_POST['category']]['name'],
+                        implode($Tags, ' '));
 
 //Notifications
 $SQL = "SELECT unf.ID, unf.UserID, torrent_pass
