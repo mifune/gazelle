@@ -248,6 +248,7 @@ function AlterParanoia() {
 	$('input[name=p_leeching_l]').raw().disabled = !$('input[name=p_leeching_c]').raw().checked;
 	$('input[name=p_snatched_l]').raw().disabled = !$('input[name=p_snatched_c]').raw().checked;
 	$('input[name=p_grabbed_l]').raw().disabled = !$('input[name=p_grabbed_c]').raw().checked;
+	$('input[name=p_tags_l]').raw().disabled = !$('input[name=p_tags_c]').raw().checked;
 	UncheckIfDisabled($('input[name=p_torrentcomments_l]').raw());
 	UncheckIfDisabled($('input[name=p_collagecontribs_l]').raw());
 	UncheckIfDisabled($('input[name=p_requestsfilled_list]').raw());
@@ -257,6 +258,7 @@ function AlterParanoia() {
 	UncheckIfDisabled($('input[name=p_leeching_l]').raw());
 	UncheckIfDisabled($('input[name=p_snatched_l]').raw());
 	UncheckIfDisabled($('input[name=p_grabbed_l]').raw());
+	UncheckIfDisabled($('input[name=p_tags_l]').raw());
 	if ($('input[name=p_collagecontribs_l]').raw().checked) {
 		$('input[name=p_collages_c]').raw().disabled = true;
 		$('input[name=p_collages_l]').raw().disabled = true;

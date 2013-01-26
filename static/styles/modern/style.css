@@ -1324,7 +1324,7 @@ input.shopbutton.itembuy:hover {
 #articles tr.colhead a, #forums tr.colhead a, #top10 tr.colhead a, #torrents tr.colhead a, #staff tr.colhead a, #collage tr.colhead a, 
     #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a { 
     font-weight: bold; 
-    color: #555;
+    color: #888;
 }
 tr.colhead_dark td {
     background-color: #7393b3;

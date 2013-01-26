@@ -587,6 +587,12 @@ $RequestsVotedListChecked = checked(!in_array('requestsvoted_list', $Paranoia));
 				</td>
 			</tr>
 			<tr>
+				<td class="label" title="tags you have added/voted on">Tags</td>
+				<td>
+<? display_paranoia('tags'); ?>
+				</td>
+			</tr>
+			<tr>
 				<td class="label" title="uploaded torrents">Uploaded</td>
 				<td>
 <? display_paranoia('uploads'); ?>
