@@ -543,7 +543,7 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
 if ($Sitewide_Freeleech_On) {
     
     $TimeNow = date('M d Y, H:i', strtotime($Sitewide_Freeleech) - (int) $LoggedUser['TimeOffset']);
-    $PFL = '<span class="time" title="Sitewide Freeleech for '. time_diff($Sitewide_Freeleech,2,false,false,0).' (until '.$TimeNow.')">Sitewide Freeleech</span>'; 
+    $PFL = '<span class="time" title="Sitewide Freeleech for '. time_diff($Sitewide_Freeleech,2,false,false,0).' (until '.$TimeNow.')">Sitewide Freeleech for '.time_diff($Sitewide_Freeleech,2,false,false,0).'</span>'; 
     
 } else {
     
