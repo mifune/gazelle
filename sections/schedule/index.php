@@ -458,7 +458,10 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
 
 	//------------- Remove dead peers ---------------------------------------//
 	sleep(3);
-        $DB->query("DELETE FROM xbt_files_users WHERE mtime<unix_timestamp(now()-interval 2 HOUR)");
+        // Lanz: having this set to two hours will reap 158031 peers with the active flag set.
+        // Lets increase it to 4 hours which would delete 0 peers normally.. Perhaps this is
+        // the culprit. It's worth a shot anyway.
+        $DB->query("DELETE FROM xbt_files_users WHERE mtime<unix_timestamp(now()-interval 4 HOUR)");
 
 	//------------- Remove dead sessions ---------------------------------------//
 	sleep(3);
