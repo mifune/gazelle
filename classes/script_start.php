@@ -280,8 +280,7 @@ if (isset($LoginCookie)) {
 
 
 $Debug->set_flag('end user handling');
-// Lanz: disabled this for now.
-/*
+
 $TorrentUserStatus = $Cache->get_value('torrent_user_status_'.$LoggedUser['ID']);
 if ($TorrentUserStatus === false) {
     $DB->query("
@@ -292,7 +291,6 @@ if ($TorrentUserStatus === false) {
     $TorrentUserStatus = $DB->to_array('TorrentID');
     $Cache->cache_value('torrent_user_status_'.$LoggedUser['ID'], $TorrentUserStatus, 600);
 }
-*/
 
 // -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
 $DB->query('SELECT FreeLeech FROM site_options');
