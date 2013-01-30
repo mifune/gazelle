@@ -249,7 +249,7 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
       
 	//------------- Record daily seedhours  ----------------------------------------//
 
-	if ($Hour == 3) { // 3 am servertime... want it to be daily but not on the 0 hour  //SeedHours>0.00 
+	if ($Hour == 4) { // 3 am servertime... want it to be daily but not on the 0 hour  //SeedHours>0.00 
  
         /*
             $DB->query("UPDATE users_main AS u JOIN users_info AS i ON u.ID=i.UserID

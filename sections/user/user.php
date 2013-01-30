@@ -613,6 +613,12 @@ list($NumTagVotes) = $DB->next_record();
 			<ul class="stats nobullet">
                 
 <? 
+    /*
+     * Lets just skip the tag stats for the moment and see 
+     * (added a switch in case we want to check it)
+     */
+if (isset($_GET['tags']) ) {
+    
     if (check_paranoia_here('tags+')) { 
 
         $DB->query("SELECT COUNT(tt.TagID) FROM torrents_tags AS tt 
@@ -663,7 +669,10 @@ list($NumTagVotes) = $DB->next_record();
                 <li>Tags voted on: <span title="Tags on other uploaders torrents voted for"><?=$NumVotesOthers?></span> 
                                 <span title="Tags on own torrents voted for (<?=($NumVotesOwn+$NumVotesOthers)?> total)">(+<?=$NumVotesOwn?>)</span>
                 </li>
-<?  } ?>
+<?  }   
+ } // end if $_GET['tags'] hack
+
+?>
 				<li>Forum Posts: <?=number_format($ForumPosts)?> [<a href="userhistory.php?action=posts&amp;userid=<?=$UserID?>" title="View all forum posts by <?=$LoggedUser['Username']?>">View</a>]</li>
 <? if (check_paranoia_here('torrentcomments')) { ?>
 				<li>Torrent Comments: <?=number_format($NumComments)?> [<a href="comments.php?id=<?=$UserID?>" title="View all torrent comments by <?=$LoggedUser['Username']?>">View</a>]</li>
