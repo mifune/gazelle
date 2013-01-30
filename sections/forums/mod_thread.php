@@ -247,7 +247,7 @@ if (isset($_POST['split'])) {
     }
     
     if ($SplitTopicID>0) {
-        $CatalogueID = floor($NumSplitPosts/THREAD_CATALOGUE);
+        $CatalogueID = floor( ($NumSplitPosts+1) /THREAD_CATALOGUE);
         for($i=0;$i<=$CatalogueID;$i++) {
             $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
         }
@@ -352,14 +352,23 @@ if (isset($_POST['split'])) {
         $SystemPost = "[quote=the system]This thread moved from [b][url=/forums.php?action=viewforum&forumid=$OldForumID]{$OldForumName}[/url][/b] forum.[/quote]";
         $SystemPost .= "[b]$LoggedUser[Username] trashed this thread ($sqltime) because:[/b][br][br]{$_POST[comment]}";
 
-        $DB->query("SELECT Min(AddedTime) FROM forums_posts WHERE TopicID='$TopicID'");
-        list($FirstAddedTime) = $DB->next_record();
+        $DB->query("SELECT Count(ID), Min(AddedTime) FROM forums_posts WHERE TopicID='$TopicID'");
+        list($NumPosts, $FirstAddedTime) = $DB->next_record();
         
         $DB->query("INSERT INTO forums_posts (TopicID, AuthorID, AddedTime, Body)
                         VALUES ('$TopicID', '$LoggedUser[ID]', '".sqltime(strtotime($FirstAddedTime)-10)."', '".db_string($SystemPost)."')"); 
         $PrePostID = $DB->inserted_id();
         
         $SET_NUMPOSTS = " , NumPosts=(NumPosts+1) " ;
+        
+        $Cache->delete_value('forums_'.$ForumID);
+        //$Cache->delete_value('thread_'.$TopicID.'_info'); 
+
+        $CatalogueID = floor(($NumPosts+1)/THREAD_CATALOGUE);
+        for($i=0;$i<=$CatalogueID;$i++) {
+            $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
+        }
+     
     }
     
 	$Cache->begin_transaction('thread_'.$TopicID.'_info');
