@@ -128,7 +128,7 @@ $Queries = array();
 if (!$AdvancedSearch) {
     if (!empty($_GET['searchtext'])) {
         // Do not keep extended search signs
-        $SearchList = preg_split("/([!&|]| -)/", $_GET['searchtext']); 
+        $SearchList = preg_split("/([!&|]| -| )/", $_GET['searchtext']); 
         
         foreach ($SearchList as $Key => &$Word) {
             $Word = trim($Word);
@@ -147,7 +147,7 @@ if (!$AdvancedSearch) {
                 $Queries[] = '@searchtext ( ' . implode(' | ', $SearchList) . ' )';
             } else {
                 $_GET['search_type'] = '1';
-                $Queries[] = '@searchtext ' . implode(' & ', $SearchList);
+                $Queries[] = '@searchtext ( ' . implode(' & ', $SearchList) . ' )';
             }
         }
     }    
@@ -155,7 +155,7 @@ if (!$AdvancedSearch) {
     if (!empty($_GET['taglist'])) {
         $_GET['taglist'] = cleanup_tags($_GET['taglist']);
         // Do not keep extended search signs.
-        $TagList = preg_split("/([\!&|]| -)/", $_GET['taglist']);
+        $TagList = preg_split("/([!&|]| -| )/", $_GET['taglist']);
 
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
@@ -168,9 +168,9 @@ if (!$AdvancedSearch) {
             }
         }
         unset($Tag);
-
+        
         if (!empty($TagList)) {
-            $ttype = 0 + $_GET['tags_type'];
+            $ttype = 0 + $_GET['tags_type'];           
             if ($ttype == 0) {
                 $_GET['tags_type'] = '0';
                 $Queries[] = '@taglist ( ' . implode(' | ', $TagList) . ' )';
@@ -195,11 +195,11 @@ if (!$AdvancedSearch) {
     if (!empty($_GET['taglist'])) {
         // do synomyn replacement and skip <2 length tags
         // Keep extended search signs.
-        $TagList = preg_split("/([!&|]| -)/", $_GET['taglist'], NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $TagList = preg_split("/([!&|]| -| )/", $_GET['taglist'], NULL, PREG_SPLIT_DELIM_CAPTURE);
         
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
-           
+            echo "'".$Tag."'\n";
             if ($Tag == '-' || $Tag == '!' || $Tag == '|' || $Tag == '&' || $Tag == '(' || $Tag == ')') {
                 continue;
             }
