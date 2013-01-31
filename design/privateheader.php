@@ -136,6 +136,8 @@ $Infos = array(); // an info alert bar (nicer color)
 $Alerts = array(); // warning bar (red!)
 $ModBar = array();
 
+// This code really freaked out the mysql db something needs to be changed
+/*
 if ($LoggedUser['SuppressConnPrompt'] == '0'){
     
     $Connectable = $Cache->get_value('connectable_'.$LoggedUser['ID']);
@@ -178,9 +180,7 @@ if ($LoggedUser['SuppressConnPrompt'] == '0'){
         }
     }
 }
-
-
-
+*/
 
 // News
 $MyNews = $LoggedUser['LastReadNews']+0;
