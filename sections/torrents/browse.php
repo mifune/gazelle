@@ -127,8 +127,8 @@ $Queries = array();
 // Simple Search
 if (!$AdvancedSearch) {
     if (!empty($_GET['searchtext'])) {
-        // Do not keep extended search signs.
-        $SearchList = preg_split("/([ \-!&|])/", $_GET['searchtext']); 
+        // Do not keep extended search signs
+        $SearchList = preg_split("/([!&|]| -)/", $_GET['searchtext']); 
         
         foreach ($SearchList as $Key => &$Word) {
             $Word = trim($Word);
@@ -155,7 +155,7 @@ if (!$AdvancedSearch) {
     if (!empty($_GET['taglist'])) {
         $_GET['taglist'] = cleanup_tags($_GET['taglist']);
         // Do not keep extended search signs.
-        $TagList = preg_split("/([ \-!&|])/", $_GET['taglist']);
+        $TagList = preg_split("/([\!&|]| -)/", $_GET['taglist']);
 
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
@@ -168,7 +168,7 @@ if (!$AdvancedSearch) {
             }
         }
         unset($Tag);
-    
+
         if (!empty($TagList)) {
             $ttype = 0 + $_GET['tags_type'];
             if ($ttype == 0) {
@@ -185,9 +185,9 @@ if (!$AdvancedSearch) {
     // Advanced search, and yet so much simpler in code.
     if (!empty($_GET['searchtext'])) {
         $SearchText = ' ' . trim($_GET['searchtext']);
-        $SearchText = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $SearchText);
+        $SearchText = preg_replace(array('/ not /', '/ or /', '/ and /'), array(' -', ' | ', ' & '), $SearchText);
         $SearchText = trim($SearchText);
-        
+
         $Queries[] = '@searchtext ' . $SearchText; // *
     }
     
@@ -195,7 +195,8 @@ if (!$AdvancedSearch) {
     if (!empty($_GET['taglist'])) {
         // do synomyn replacement and skip <2 length tags
         // Keep extended search signs.
-        $TagList = preg_split("/([ \-!&|])/", $_GET['taglist'], NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $TagList = preg_split("/([!&|]| -)/", $_GET['taglist'], NULL, PREG_SPLIT_DELIM_CAPTURE);
+        
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
            
@@ -213,9 +214,9 @@ if (!$AdvancedSearch) {
         }
         unset($Tag);
         $TagList = implode(' ', $TagList);  
-        $TagList = preg_replace(array('/ -/','/ not /i', '/ or /i', '/ and /i'), array(' !', ' -', ' | ', ' & '), $TagList);
+        $TagList = preg_replace(array('/ not /', '/ or /', '/ and /'), array(' -', ' | ', ' & '), $TagList);
         $TagList = trim($TagList);
-        
+
         $Queries[] = '@taglist ' . $TagList;
         
     }
