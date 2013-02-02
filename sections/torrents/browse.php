@@ -199,7 +199,7 @@ if (!$AdvancedSearch) {
         
         foreach ($TagList as $Key => &$Tag) {
             $Tag = strtolower(trim($Tag)) ;
-            echo "'".$Tag."'\n";
+
             if ($Tag == '-' || $Tag == '!' || $Tag == '|' || $Tag == '&' || $Tag == '(' || $Tag == ')') {
                 continue;
             }
