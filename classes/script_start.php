@@ -646,18 +646,19 @@ function get_user_shop_badges_ids($UserID){
 
 function print_badges_array($UserBadges, $UserLinkID = false){ 
     $LastRow=0;
+    $html='';
     foreach ($UserBadges as $Badge) {
         list($ID,$BadgeID, $Tooltip, $Name, $Image, $Auto, $Type, $Row ) = $Badge;
-        if($LastRow!=$Row) {
-            echo "<br/>";
+        if($LastRow!=$Row && $html != '') {
+            $html .= "<br/>";
             $LastRow=$Row;
         }
         if($UserLinkID && is_number($UserLinkID))
-            echo '<div class="badge"><a href="user.php?id='.$UserLinkID.'#userbadges"><img src="'.STATIC_SERVER.'common/badges/'.$Image.'" title="The '.$Name.'. '.$Tooltip.'" alt="'.$Name.'" /></a></div>';
+            $html .= '<div class="badge"><a href="user.php?id='.$UserLinkID.'#userbadges"><img src="'.STATIC_SERVER.'common/badges/'.$Image.'" title="The '.$Name.'. '.$Tooltip.'" alt="'.$Name.'" /></a></div>';
         else
-            echo '<div class="badge"><img src="'.STATIC_SERVER.'common/badges/'.$Image.'" title="The '.$Name.'. '.$Tooltip.'" alt="'.$Name.'" /></div>';
+            $html .= '<div class="badge"><img src="'.STATIC_SERVER.'common/badges/'.$Image.'" title="The '.$Name.'. '.$Tooltip.'" alt="'.$Name.'" /></div>';
     }
-  
+    echo $html;
 }
 
 //----------------------------
