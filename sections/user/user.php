@@ -959,7 +959,7 @@ if (check_perms('users_view_bonuslog',$Class) || $OwnProfile) {
 <?
 }
 
-if (!$OwnProfile) {
+if ($Enabled == '1' && !$OwnProfile) {
         $CookieItems[] = 'donate';
     include(SERVER_ROOT.'/sections/bonus/functions.php'); 
     $ShopItems = get_shop_items_other();
