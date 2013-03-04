@@ -185,19 +185,19 @@ $BaseSQL = "SELECT um.ID,
                                          FROM torrents_reviews 
                                          WHERE torrents_reviews.UserID=um.ID
                                            AND torrents_reviews.Status='Okay'
-                                           [TIMECLAUSE] ) AS NumOkay,
+                                           AND torrents_reviews.Time > [TIMECLAUSE] ) AS NumOkay,
                    (SELECT Count(torrents_reviews.ID) 
                                          FROM torrents_reviews 
                                          WHERE torrents_reviews.UserID=um.ID
                                            AND torrents_reviews.Status='Warned'
-                                           [TIMECLAUSE] ) AS NumWarned
+                                           AND torrents_reviews.Time > [TIMECLAUSE] ) AS NumWarned
               FROM torrents_reviews AS r JOIN users_main AS um ON um.ID=r.UserID 
-             WHERE r.Status!='Pending'  [TIMECLAUSE]
+             WHERE r.Status!='Pending'  AND r.Time > [TIMECLAUSE]
           GROUP BY r.UserID 
           ORDER BY Num DESC";
 
 
-$DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 24 HOUR', $BaseSQL));
+$DB->query(str_replace('[TIMECLAUSE]', 'NOW() - INTERVAL 24 HOUR', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
@@ -223,7 +223,7 @@ $Results = $DB->to_array();
             <br /><br />
 <?
 
-$DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 1 WEEK', $BaseSQL));
+$DB->query(str_replace('[TIMECLAUSE]', 'NOW() - INTERVAL 1 WEEK', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
@@ -251,7 +251,7 @@ $Results = $DB->to_array();
         <td>
 <?
 
-$DB->query(str_replace('[TIMECLAUSE]', 'AND r.Time > NOW() - INTERVAL 1 MONTH', $BaseSQL));
+$DB->query(str_replace('[TIMECLAUSE]', 'NOW() - INTERVAL 1 MONTH', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
@@ -277,7 +277,7 @@ $Results = $DB->to_array();
 		<br /><br />
 <?
 
-$DB->query(str_replace('[TIMECLAUSE]', '', $BaseSQL));
+$DB->query(str_replace('[TIMECLAUSE]', "'0000-00-00 00:00:00'", $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
