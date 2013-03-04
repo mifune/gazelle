@@ -267,7 +267,7 @@ if($MaxGroupID>=$GroupID) $GroupID = $MaxGroupID+1;
     
  
 // Use this section to control freeleeches
-if ($TotalSize < (20*1024*1024*1024)){
+if ($TotalSize < AUTO_FREELEECH_SIZE ) {        // (20*1024*1024*1024)){
     $Properties['FreeTorrent']='0';
 } else {
     $Properties['FreeTorrent']='1';

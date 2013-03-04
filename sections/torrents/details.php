@@ -413,6 +413,9 @@ if ($FreeTorrent == '0' && $IsUploader) {
                      
 	foreach($ShopItems as $BonusItem) {
             list($ItemID, $Title, $Description, $Action, $Value, $Cost) = $BonusItem;
+            
+            if ( $Size < get_bytes($Value.'gb') ) continue; // skip over the items for smaller
+                    
             $CanBuy = is_float((float)$LoggedUser['Credits']) ? $LoggedUser['Credits'] >= $Cost: false;
             
             $Row = ($Row == 'a') ? 'b' : 'a';
@@ -433,6 +436,7 @@ if ($FreeTorrent == '0' && $IsUploader) {
                     </td>
                 </tr>
 <?
+            break; // only draw the first viable item
     }
 ?>
             </table>

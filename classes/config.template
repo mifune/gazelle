@@ -136,6 +136,9 @@ define('SIG_MAX_HEIGHT', 300);
 define('TITLE_MAXWORD_LENGTH',42);
 define('TRASH_FORUM_ID', 18);
 
+define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
+
+
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');
 //Captcha images should be located in /captcha

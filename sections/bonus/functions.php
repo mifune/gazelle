@@ -10,7 +10,7 @@ function get_shop_items_ufl(){
                            Cost
                       FROM bonus_shop_actions
                      WHERE Action = 'ufl'
-                  ORDER BY Sort");
+                  ORDER BY Value DESC");
 		$ShopItems = $DB->to_array(false, MYSQLI_BOTH);
 		$Cache->cache_value('shop_items_ufl', $ShopItems);
 	}
@@ -44,7 +44,7 @@ function get_shop_items($UserID){
                          Value,
                          Cost
 			FROM bonus_shop_actions
-                  WHERE Action != 'badge'
+                  WHERE Action != 'badge' AND Action != 'ufl'
 			ORDER BY Sort");
 		$ShopItems = $DB->to_array(false, MYSQLI_BOTH);
 		$Cache->cache_value('shop_items', $ShopItems);
