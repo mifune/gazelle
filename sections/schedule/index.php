@@ -101,7 +101,7 @@ $DB->query("UPDATE users_main SET Credits = Credits +
                     WHERE users_main.ID = xbt_files_users.uid
                     AND xbt_files_users.remaining =0
                     AND xbt_files_users.active =1 )"); 
-*/
+
         
 // method 3 : no cap, diminishing returns , rewritten as join and also records seedhours, ~2.1s with 650k seeders
 $DB->query("UPDATE users_main AS um
@@ -118,8 +118,25 @@ $DB->query("UPDATE users_main AS um
               CreditsDaily=CreditsDaily+SeedCount,
               um.SeedHours=um.SeedHours+s.SeedHours,
          um.SeedHoursDaily=um.SeedHoursDaily+s.SeedHours ");
- 
-                        
+ */
+
+// method 4 : cap, diminishing returns , rewritten as join and also records seedhours, ~2.1s with 650k seeders
+$CAP = 100;
+$DB->query("UPDATE users_main AS um
+              JOIN (
+                      SELECT xbt_files_users.uid AS UserID,
+                           (ROUND( ( SQRT( 8.0 * ( (if(COUNT(*) < $CAP, COUNT(*), $CAP))  /20 ) + 1.0 ) - 1.0 ) / 2.0 *20 ) * 0.25 ) AS SeedCount,
+                           (COUNT(*) * 0.25 ) AS SeedHours
+                        FROM xbt_files_users
+                       WHERE xbt_files_users.remaining =0
+                         AND xbt_files_users.active =1
+                    GROUP BY xbt_files_users.uid
+                   ) AS s ON s.UserID=um.ID
+               SET Credits=Credits+SeedCount,
+              CreditsDaily=CreditsDaily+SeedCount,
+              um.SeedHours=um.SeedHours+s.SeedHours,
+         um.SeedHoursDaily=um.SeedHoursDaily+s.SeedHours ");
+
 
 //------------ record ip's/ports for users and refresh time field for existing status records -------------------------//
 sleep(3);
