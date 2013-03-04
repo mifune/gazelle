@@ -228,7 +228,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                             
                         } else if ($Sizebytes < get_bytes($Value.'gb') ) {
                             
-                            $ResultMessage = "Torrent $TName (" . get_size($Sizebytes, 3). ") is too small for a > $Value gb freeleech!";
+                            $ResultMessage = "Torrent $TName (" . get_size($Sizebytes, 2). ") is too small for a > $Value gb freeleech!";
                             
                         } else {
                              

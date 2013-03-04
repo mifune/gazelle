@@ -37,7 +37,7 @@ function get_warning_message($FirstPart = true, $LastPart = false, $GroupID=0, $
 }
 
 // a reply to an existing conversation 
-function send_message_reply($ConvID, $ToID, $FromID, $Message, $SetStatus = false, $FromStaff = true){   //, $Unanswered = false){
+function send_message_reply($ConvID, $ToID, $FromID, $Message, $SetStatus = false, $FromStaff = true, $NewSubject = null){   //, $Unanswered = false){
     global $LoggedUser, $DB, $Cache;
     
     $DB->query("INSERT INTO staff_pm_messages (UserID, SentDate, Message, ConvID)
@@ -48,7 +48,7 @@ function send_message_reply($ConvID, $ToID, $FromID, $Message, $SetStatus = fals
         if ($SetStatus == 'Resolved') $SQL_insert = "Status='Resolved', ResolverID=$FromID"; 
         elseif ($SetStatus == 'Open') $SQL_insert = "Status='Open'"; 
         else $SQL_insert = "Status='Unanswered'"; 
-
+        if ($NewSubject) $SQL_insert .= ", Subject='".db_string($NewSubject)."' ";
         $DB->query("UPDATE staff_pm_conversations SET Date='".sqltime()."', Unread=true, $SQL_insert WHERE ID=$ConvID");
     }
     

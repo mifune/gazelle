@@ -504,19 +504,20 @@ if(!empty($_REQUEST['action'])) {
                                 // if there is an existing conversation
                                 //$ConvID = (int)$_POST['convid'];
                                 $PMSetStatus = 'Unanswered';
+                                $NewSubject =  "I have fixed my upload '$Name'";
                             } else {
                                 // New conversation
                                 $Subject = "I have fixed my upload '$Name'";
                                 $DB->query("INSERT INTO staff_pm_conversations 
                                                  (Subject, Status, Level, UserID, Date)
                                           VALUES ('".db_string($Subject)."', 'Unanswered', 500, ".$LoggedUser['ID'].", '".sqltime()."')");
-
+                                $NewSubject = null;
                                 $PMSetStatus = false;
                                 $ConvID = $DB->inserted_id();
                             }
                             if($ConvID>0) { // send message to staff
                                 $Message = get_user_okay_message($GroupID, $Name, $KillTime, $Description?$Description:$Reason);
-                                send_message_reply($ConvID, 0, $LoggedUser['ID'], $Message, $PMSetStatus, false);
+                                send_message_reply($ConvID, 0, $LoggedUser['ID'], $Message, $PMSetStatus, false, $NewSubject);
                                 /* $DB->query("INSERT INTO staff_pm_messages
                                                  (UserID, SentDate, Message, ConvID)
                                           VALUES (".$LoggedUser['ID'].", '".sqltime()."', '".db_string($Message)."', $ConvID)"); */
@@ -555,7 +556,7 @@ if(!empty($_REQUEST['action'])) {
                         else $Status = 'Okay'; // ($_POST['submit'] == "Mark as Okay")   
                        
                         
-                        $DB->query("SELECT Name, t.UserID, t.ID , tr.Status, tr.ConvID 
+                        $DB->query("SELECT Name, t.UserID, t.ID , tr.Status, tr.ConvID , tr.KillTime
                                     FROM torrents_group AS tg 
                                     JOIN torrents AS t ON t.GroupID=tg.ID
                                     LEFT JOIN (
@@ -566,7 +567,7 @@ if(!empty($_REQUEST['action'])) {
                                     LEFT JOIN torrents_reviews AS tr ON tr.GroupID=x.GroupID AND tr.Time=x.LastTime 
                                     WHERE tg.ID=$GroupID");
                          
-                        list($Name, $UserID, $TorrentID, $PreStatus, $ConvID) = $DB->next_record();
+                        list($Name, $UserID, $TorrentID, $PreStatus, $ConvID, $PreKillTime) = $DB->next_record();
                         
                         if (($PreStatus == 'Warned' && !check_perms('torrents_review_override')) ||
                             ($PreStatus == 'Pending' && ($Status == 'Okay' || $Status == 'Warned' ) && !check_perms('torrents_review_override'))) {
@@ -584,8 +585,36 @@ if(!empty($_REQUEST['action'])) {
                                     list($Description) = $DB->next_record();
                                     $LogDetails = "Reason: $Description";
                                 }
-                                $KillTime = get_warning_time(); // 12 hours...  ?
+                                if (!$PreKillTime || $PreStatus == 'Okay')
+                                    $KillTime = get_warning_time(); // 12 hours...  ?
+                                else
+                                    $KillTime = strtotime($PreKillTime);
+                                
                                 $LogDetails .= ", Delete at: ".  date('M d Y, H:i', $KillTime);
+                                
+                                $Message = get_warning_message(true, true, $GroupID, $Name, $Description?$Description:$Reason, $KillTime, false, display_str($_POST['msg_extra']) ); 
+            
+                                if (!$ConvID) {
+                                     
+                                    $DB->query("INSERT INTO staff_pm_conversations 
+                                             (Subject, Status, Level, UserID, Date, Unread)
+                                        VALUES ('".db_string("Important: Your upload has been marked for deletion!")."', 'Resolved', '500', '$UserID', '$Time', true)");
+
+                                    // New message
+                                    $ConvID = $DB->inserted_id();
+
+                                    $DB->query("INSERT INTO staff_pm_messages
+                                             (UserID, SentDate, Message, ConvID)
+                                        VALUES ('{$LoggedUser['ID']}', '$Time', '$Message', $ConvID)");
+             
+                                } else {
+                                             // send message 
+                                    send_message_reply($ConvID, $UserID, $LoggedUser['ID'], $Message, 'Open');
+                          
+                                    
+                                }
+                                
+                                /*
                                 if($ConvID){ // possible if a new mark for deletion is made on a warned/pending/Okay(fixed) torrent
                                     // send message 
                                     send_message_reply($ConvID, $UserID, $LoggedUser['ID'], 
@@ -594,6 +623,7 @@ if(!empty($_REQUEST['action'])) {
                                     send_pm($UserID, 0, db_string("Important: Your upload has been marked for deletion!"), 
                                                     get_warning_message(true, true, $GroupID, $Name, $Description?$Description:$Reason, $KillTime, false, display_str($_POST['msg_extra'])));
                                 }
+                                */
                                 break;
                             case 'Rejected':
                                 // get the review status from the record before the current (pending) one
