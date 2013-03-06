@@ -136,6 +136,9 @@ define('SIG_MAX_HEIGHT', 300);
 define('TITLE_MAXWORD_LENGTH',42);
 define('TRASH_FORUM_ID', 18);
 
+$ExcludeForums = array( 9 ); // exclude games forum from latest topics (user option) - array instead of define in case we end up with +1 games forums
+
+
 define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
 
 

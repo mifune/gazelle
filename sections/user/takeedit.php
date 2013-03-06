@@ -189,6 +189,7 @@ $Options['SplitByDays'] = (!empty($_POST['splitbydays']) ? 1 : 0);
 $Options['HideFloat'] = (!empty($_POST['hidefloatinfo']) ? 1 : 0);
 $Options['NotForceLinks'] = (!empty($_POST['forcelinks']) ? 0 : 1);
 $Options['MaxTags'] = (isset($_POST['maxtags']) ? (int)$_POST['maxtags'] : 16);
+$Options['ShowGames'] = (!empty($_POST['showgames']) ? 1 : 0);
 
 if(isset($LoggedUser['DisableFreeTorrentTop10'])) {
 	$Options['DisableFreeTorrentTop10'] = $LoggedUser['DisableFreeTorrentTop10'];

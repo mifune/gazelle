@@ -219,6 +219,19 @@ function CalculateAdjustUpload(name, radioObj, currentvalue){
 }
 
 
+function SetLatestTopicsInterface() {
+    
+    if ($('#disablelatesttopics').raw().checked) {
+        //UncheckIfDisabled()
+        $('#showgames').raw().disabled = true;
+        $('#showgames').raw().checked = false;
+    } else {
+        $('#showgames').raw().disabled = false;
+    }
+    
+}
+
+
 function UncheckIfDisabled(checkbox) {
 	if (checkbox.disabled) {
 		checkbox.checked = false;

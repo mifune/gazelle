@@ -317,8 +317,14 @@ echo $Val->GenerateJS('userform');
 			<tr>
 				<td class="label"><strong>Forum topics</strong></td>
 				<td>
-					<input type="checkbox" name="disablelatesttopics" id="disablelatesttopics" <? if (!empty($SiteOptions['DisableLatestTopics'])) { ?>checked="checked"<? } ?> />
+                    <input type="checkbox" name="disablelatesttopics" id="disablelatesttopics" onclick="SetLatestTopicsInterface();"
+                                <? if (!empty($SiteOptions['DisableLatestTopics'])) { ?>checked="checked"<? } ?> />
 					<label for="disablelatesttopics">Disable latest forum topics</label>
+                    <br/>
+					<input type="checkbox" name="showgames" id="showgames" <? 
+                        if (!empty($SiteOptions['ShowGames'])) { ?>checked="checked"<? };
+                        if (!empty($SiteOptions['DisableLatestTopics'])) { ?>disabled="disabled"<? }    ?> />
+					<label for="showgames">show forum games in latest forum topics</label>
 				</td>
 			</tr>
 			<tr>

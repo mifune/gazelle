@@ -663,20 +663,26 @@ function print_badges_array($UserBadges, $UserLinkID = false){
 
 //----------------------------
 
-function get_latest_forum_topics($PermissionID) {
-    global $Classes, $DB, $Cache;
-    $LatestTopics = $Cache->get_value('latest_topics_'.$PermissionID);
+function get_latest_forum_topics($PermissionID, $ExcludeGames = true) {
+    global $Classes, $DB, $Cache, $ExcludeForums;
+    if ($ExcludeGames && is_array($ExcludeForums)) { // check array from config exists
+        $ANDWHERE = " AND ft.ForumID NOT IN (" . implode(",", $ExcludeForums) .") ";
+        $cachekey = "nogames_$PermissionID";
+    } else {
+        $cachekey = "$PermissionID";
+    }
+    $LatestTopics = $Cache->get_value('latest_topics_'.$cachekey);
     if ($LatestTopics === false) {
         $Level = $Classes[$PermissionID]['Level'];
         $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
                     INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
                     INNER JOIN forums AS f ON f.ID=ft.ForumID
                     INNER JOIN users_main AS um ON um.ID=fp.AuthorID
-                    WHERE f.MinClassRead<='$Level'
+                    WHERE f.MinClassRead<='$Level' $ANDWHERE
                     ORDER BY AddedTime DESC
                     LIMIT 6");
         $LatestTopics = $DB->to_array();
-        $Cache->cache_value('latest_topics_'.$PermissionID, $LatestTopics);
+        $Cache->cache_value('latest_topics_'.$cachekey, $LatestTopics);
     }
     return $LatestTopics;
 }
@@ -684,7 +690,7 @@ function get_latest_forum_topics($PermissionID) {
 function print_latest_forum_topics() {
     global $LoggedUser;
     if (empty($LoggedUser['DisableLatestTopics'])) {    
-        $LatestTopics = get_latest_forum_topics($LoggedUser['PermissionID']);
+        $LatestTopics = get_latest_forum_topics($LoggedUser['PermissionID'], !$LoggedUser['ShowGames'] );
 
         echo '<div class="head latest_topics">Latest forum topics</div>';
         echo '<div class="box pad latest_topics">';
