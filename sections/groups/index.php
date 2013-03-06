@@ -103,11 +103,12 @@ if(empty($_POST['action'])) {
 
             if (!$GroupID) error(0);
             $DB->query("DELETE FROM groups WHERE ID='$GroupID'");
+            $DB->query("DELETE FROM users_groups WHERE GroupID='$GroupID'");
             header('Location: groups.php');
             break;
         
         case 'checkusers':
-            authorize();
+            authorize();    // ajax call
                 
             if (!$P[userlist]) error("No users in list", true);
             
@@ -164,7 +165,7 @@ if(empty($_POST['action'])) {
                 $id=(int)$id;
             }
             
-		$Values = "('".$GroupID."', '".implode("', '". sqltime()."', '".$LoggedUser['ID']."'), ('".$GroupID."', '", $IDs)."', '".sqltime()."', '".$LoggedUser['ID']."')";
+            $Values = "('".$GroupID."', '".implode("', '". sqltime()."', '".$LoggedUser['ID']."'), ('".$GroupID."', '", $IDs)."', '".sqltime()."', '".$LoggedUser['ID']."')";
             $DB->query("INSERT IGNORE INTO users_groups (GroupID, UserID, AddedTime, AddedBy) VALUES $Values");
             
             $IDs = implode(',', $IDs);

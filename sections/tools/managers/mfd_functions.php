@@ -30,7 +30,7 @@ function get_warning_message($FirstPart = true, $LastPart = false, $GroupID=0, $
     if ($LastPart){
         //$Message .= "[br][b]Time left: [/b]&nbsp; ". time_diff($KillTime, 2, false)." &nbsp;(".date('M d Y, H:i', strtotime($KillTime)).")";
         $Message .= '[br][br]Please make sure you read the [url=/articles.php?topic=upload]Upload Rules[/url]';
-        $Message .= '[br]You will find useful guides in the [url=/articles.php?topic=presentation]Upload Guides[/url] [url=/articles.php?topic=tutorials]Tutorials section[/url]';
+        $Message .= '[br]You will find useful guides in the [url=/articles.php?topic=presentation]Upload Guides[/url] and [url=/articles.php?topic=tutorials]Tutorials section[/url]';
         $Message .= '[br]If you need further help please post in the [url=/forums.php?action=viewforum&amp;forumid=6]Help & Support Forum[/url]';
     }
     return $Message;
