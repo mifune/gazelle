@@ -117,7 +117,7 @@ function check_forumperm($ForumID, $Perm = 'Read') {
 }
 
 function update_latest_topics() {
-        global $LoggedUser, $Classes, $Cache, $DB;
+        global $LoggedUser, $Classes, $Cache, $DB, $ExcludeForums;
 
         foreach($Classes as $Class) {
             $Level = $Class['Level'];
@@ -130,6 +130,22 @@ function update_latest_topics() {
                         LIMIT 6");
             $LatestTopics = $DB->to_array();
             $Cache->cache_value('latest_topics_'.$Class['ID'], $LatestTopics);
+        }
+        if (is_array($ExcludeForums)) { // check array from config exists
+            $ANDWHERE = " AND ft.ForumID NOT IN (" . implode(",", $ExcludeForums) .") ";
+
+            foreach($Classes as $Class) {
+                $Level = $Class['Level'];
+                $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
+                            INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
+                            INNER JOIN forums AS f ON f.ID=ft.ForumID
+                            INNER JOIN users_main AS um ON um.ID=fp.AuthorID
+                            WHERE f.MinClassRead<='$Level' $ANDWHERE
+                            ORDER BY AddedTime DESC
+                            LIMIT 6");
+                $LatestTopics = $DB->to_array();
+                $Cache->cache_value('latest_topics_nogames_'.$Class['ID'], $LatestTopics);
+            }
         }
 }
 
