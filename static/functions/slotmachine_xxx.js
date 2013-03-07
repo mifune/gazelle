@@ -123,7 +123,7 @@ function animate(){
                 if (winningreels[1]>=(i+1)) $('#reelc'+i).add_class('win');
                 if (winningreels[2]>=(i+1)) $('#reela'+i).add_class('win');
             }
-            $('#winnings').raw().innerHTML = addCommas( parseInt( $('#winnings').raw().innerHTML.replace(',', '') )+won-bet);
+            $('#winnings').raw().innerHTML = addCommas( parseInt( $('#winnings').raw().innerHTML.replace(/,/gi, '') )+won-bet);
             $('#result').raw().innerHTML = won>0?'*Win* ' +won:'';
             count=0;
             //setTimeout("Pull_Lever();", 400);
