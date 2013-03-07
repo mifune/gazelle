@@ -155,7 +155,15 @@ if ($ConvID = (int)$_GET['id']) {
 	// Replybox and buttons
 ?> 
 		<div class="head">
-                <strong>Reply</strong>
+                <strong>Reply</strong> <?
+                if (!$IsFLS) {
+                    if($Status != 'Resolved') { 
+                        if ($UserInitiated) echo " &nbsp; <em>(click resolve to close the conversation if you are happy with the answer given)</em>";
+                    }  else { 
+                        echo " &nbsp; <em>(click unresolve to reopen the conversation)</em>"; 
+                    }
+                }
+                ?>
 		</div>
 		<div class="box pad">
 			<div id="preview" class="box pad hidden"></div>
@@ -244,9 +252,9 @@ if ($ConvID = (int)$_GET['id']) {
 <?			} ?>
 					<input type="submit" value="Send message" />
 <?	} else { 
-                  if ($UserInitiated || $IsFLS) {  ?> 
+            // if ($UserInitiated || $IsFLS) {  ?> 
 					<input type="button" value="Unresolve" onClick="location.href='staffpm.php?action=unresolve&id=<?=$ConvID?>&return=1';" />
-<?			}  
+<?			// }  
  	}
 	if (check_perms('users_give_donor')) { ?>
 					<input type="button" value="Make Donor" onClick="location.href='staffpm.php?action=make_donor&id=<?=$ConvID?>';" />
