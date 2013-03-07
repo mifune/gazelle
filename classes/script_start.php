@@ -932,6 +932,26 @@ function get_host($IP) {
 
 function lookup_ip($IP) {
     //TODO: use the $Cache
+    global $Cache;
+    if (!$IP) return false;
+    
+    $LookUp = $Cache->get_value('gethost_'.$IP);
+    if ($LookUp===false) {
+        $Output = explode(' ', shell_exec('host -W 1 ' . escapeshellarg($IP)));
+        if (count($Output) == 1 && empty($Output[0])) {
+            //No output at all implies the command failed
+           $LookUp = ''; // pass back empty string for error reporting in ajax call
+        }
+        if (count($Output) != 5) {
+            $LookUp = false;
+        } else {
+            $LookUp = $Output[4];
+            $Cache->cache_value('gethost_'.$IP, $LookUp, 0);
+        }
+    }
+    return $LookUp;
+    
+    /*  non cached version
     $Output = explode(' ', shell_exec('host -W 1 ' . escapeshellarg($IP)));
     if (count($Output) == 1 && empty($Output[0])) {
         //No output at all implies the command failed
@@ -943,6 +963,7 @@ function lookup_ip($IP) {
     } else {
         return $Output[4];
     }
+     */
 }
 
 
