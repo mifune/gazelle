@@ -121,7 +121,7 @@ $DB->query("UPDATE users_main AS um
  */
 
 // method 4 : cap, diminishing returns , rewritten as join and also records seedhours, ~2.1s with 650k seeders
-$CAP = 100;
+$CAP = BONUS_TORRENTS_CAP;
 $DB->query("UPDATE users_main AS um
               JOIN (
                       SELECT xbt_files_users.uid AS UserID,
