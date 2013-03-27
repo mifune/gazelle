@@ -32,7 +32,7 @@ $Types = array(
             'warn' => '0',
             'delete' => '1',
             'pm' => 'Your torrent has been deleted for being a duplicate of another torrent.',
-            'bounty' => 1000
+            'bounty' => 2000
         ),
         'article' => array ('duperules', "Dupe Rules")
     ),
@@ -49,7 +49,7 @@ $Types = array(
             'warn' => '4',
             'delete' => '1',
             'pm' => 'The releases on the Do Not Upload list (on the upload page) are currently forbidden from being uploaded from the site. Do not upload them unless your torrent meets a condition specified in the comment.',
-            'bounty' => 1000
+            'bounty' => 2000
         ),
         'article' => array ('forbiddencontent', "Forbidden Content (Do Not Upload list)")
     ),

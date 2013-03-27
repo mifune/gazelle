@@ -140,7 +140,7 @@ $ExcludeForums = array( 9 ); // exclude games forum from latest topics (user opt
 
 
 define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
-define('BONUS_TORRENTS_CAP', 100);
+define('BONUS_TORRENTS_CAP', 300);
 
 
 //Captcha fonts should be located in /classes/fonts
