@@ -122,7 +122,7 @@ $ArticleSubCats = array(0=>'Intro', 1=>'Other', 2=>'Rules', 3=>'Torrents', 4=>'I
 // badge types
 $BadgeTypes = array ('Single', 'Multiple', 'Shop', 'Unique');
 $AutoAwardTypes  = array ('NumPosts', 'NumComments', 'NumUploaded', 'NumNewTags', 'NumTags', 'NumTagVotes',
-                  'RequestsFilled', 'UploadedTB', 'DownloadedTB', 'MaxSnatches');
+                  'RequestsFilled', 'UploadedTB', 'DownloadedTB', 'MaxSnatches','NumBounties');
 
 $ShopActions = array('gb','givegb','givecredits','slot','title','badge','pfl','ufl');
 

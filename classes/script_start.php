@@ -645,10 +645,11 @@ function get_user_shop_badges_ids($UserID){
 
 
 function print_badges_array($UserBadges, $UserLinkID = false){ 
-    $LastRow=0;
+    $LastRow='';
     $html='';
     foreach ($UserBadges as $Badge) {
         list($ID,$BadgeID, $Tooltip, $Name, $Image, $Auto, $Type, $Row ) = $Badge;
+        if($LastRow=='') $LastRow = $Row;
         if($LastRow!=$Row && $html != '') {
             $html .= "<br/>";
             $LastRow=$Row;

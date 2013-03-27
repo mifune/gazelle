@@ -216,7 +216,7 @@ if($DB->affected_rows() > 0 || !$Report) {
                 while(list($xID, $xName, $xTime, $xSize, $xUserID, $xUsername) = $DB->next_record()) {
 					$Message .= "[br][url=/torrents.php?id=$xID]{$xName}[/url] (". get_size($xSize).") uploaded by [url=/user.php?id=$xUserID]{$xUsername}[/url] " .time_diff($xTime,2,false,false);
                 }
-                $Message .= "[br][br]You should be able to join the torrent already here by grabbing its torrent file and doing a force recheck in your torrent client.";
+                $Message .= "[br][br]You should be able to join the torrent already here by grabbing its torrent file and doing a force recheck in your torrent client.[br][br]See the [url=/articles.php?topic=unseeded]Reseed a torrent[/url] article for details.";
                 send_pm($Peers, 0, db_string('A torrent you were a peer on was deleted'), db_string($Message)); 
             }
  
@@ -332,10 +332,14 @@ if($DB->affected_rows() > 0 || !$Report) {
         
 	//Now we've done everything, update the DB with values
 	if($Report) { 
+        if ($ResolveType['title']=='Dupe') {
+            $CreditSQL = ",Credit='1'";
+        }
 		$DB->query("UPDATE reportsv2 SET
 		Type = '".$Escaped['resolve_type']."',
 		LogMessage='".db_string($Log)."',
 		ModComment='".$Escaped['comment']."'
+        $CreditSQL
 		WHERE ID=".$ReportID);
 	}
 } else {

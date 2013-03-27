@@ -118,6 +118,15 @@ foreach($AutoActions as $AutoAction) {
                      GROUP BY u.ID 
                     HAVING Max(t.Snatched)>=$Value";
             break;
+        
+        case 'NumBounties': // num of dupes this user reported where they got the credit
+            // 
+            $SQL = "SELECT u.ID FROM users_main AS u LEFT JOIN reportsv2 AS r ON r.Type='dupe' AND r.Credit='1' AND r.ReporterID=u.ID
+                     WHERE u.Enabled='1'
+                       AND $NOTIN
+                     GROUP BY u.ID 
+                    HAVING Count(r.ID)>=$Value";
+            break;
     }
     
     
@@ -134,7 +143,7 @@ foreach($AutoActions as $AutoAction) {
             $logmsg = "Awarding $Name ($Badge/$Rank) to $CountUsers users...\n";
             echo $logmsg;   // for debug output
         
-            //FOR DEBUG ONLY TODO:REMOVE first log msg
+            //FOR DEBUG ONLY 
             //write_log($logmsg." (starting...)");
             
             $SQL_IN = implode(', ',$UserIDs);
@@ -150,13 +159,7 @@ foreach($AutoActions as $AutoAction) {
                           JOIN badges AS b ON b.ID=ub.BadgeID 
                          WHERE ub.UserID IN ($SQL_IN) 
                            AND b.Badge='$Badge' AND b.Rank<$Rank");
-            /*
-            "DELETE m, cu, c 
-               FROM pm_messages AS m 
-               JOIN pm_conversations AS c ON c.ID=m.ConvID
-               JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID
-              WHERE m.SenderID='0'";
-            */
+            
              
             if ($SendPM){
                 send_pm($UserIDs, 0, "Congratulations you have been awarded the $Name", 

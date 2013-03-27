@@ -32,7 +32,7 @@ $Types = array(
             'warn' => '0',
             'delete' => '1',
             'pm' => 'Your torrent has been deleted for being a duplicate of another torrent.',
-            'bounty' => 400
+            'bounty' => 1000
         ),
         'article' => array ('duperules', "Dupe Rules")
     ),
@@ -49,7 +49,7 @@ $Types = array(
             'warn' => '4',
             'delete' => '1',
             'pm' => 'The releases on the Do Not Upload list (on the upload page) are currently forbidden from being uploaded from the site. Do not upload them unless your torrent meets a condition specified in the comment.',
-            'bounty' => 400
+            'bounty' => 1000
         ),
         'article' => array ('forbiddencontent', "Forbidden Content (Do Not Upload list)")
     ),
@@ -119,7 +119,7 @@ $Types = array(
         ),
         'resolve_options' => array(
             'upload' => '0',
-            'warn' => '1',
+            'warn' => '0',
             'delete' => '0',
             'pm' => 'The torrent must have screenshots as per the rules.',
             'bounty' => 0
@@ -137,7 +137,7 @@ $Types = array(
         ),
         'resolve_options' => array(
             'upload' => '0',
-            'warn' => '1',
+            'warn' => '0',
             'delete' => '0',
             'pm' => 'Torrents must have a description that describes the content of the torrent.',
             'bounty' => 0
@@ -155,7 +155,7 @@ $Types = array(
         ),
         'resolve_options' => array(
             'upload' => '0',
-            'warn' => '1',
+            'warn' => '0',
             'delete' => '1',
             'pm' => 'Torrents can not contain compressed files such as .rar or .zip, unless it contains a large number of images.',
             'bounty' => 0
@@ -173,7 +173,7 @@ $Types = array(
         ),
         'resolve_options' => array(
             'upload' => '0',
-            'warn' => '1',
+            'warn' => '4',
             'delete' => '1',
             'pm' => 'The torrent was determined to be infected with a virus/trojan. In the future, please scan all potential uploads with an antivirus program such as AVG, Avast, or MS Security Essentials.',
             'bounty' => 0
