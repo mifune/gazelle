@@ -6,7 +6,7 @@ ALTER TABLE `badges_auto` CHANGE `Action` `Action` ENUM( 'NumPosts', 'NumComment
 INSERT INTO `badges` (`ID`, `Type`, `Display`, `Sort`, `Cost`, `Title`, `Description`, `Image`, `Badge`, `Rank`) VALUES
 (260, 'Single', 1, 80, 0, 'Bounty Hunter', 'awarded for finding 10 dupes', 'bounty-hunter1.png', 'bounty', 1),
 (261, 'Single', 1, 81, 0, 'Bounty Hunter 2', 'awarded for finding 50 dupes', 'bounty-hunter2.png', 'bounty', 2),
-(261, 'Single', 1, 82, 0, 'Bounty Hunter 3', 'awarded for finding 100 dupes', 'bounty-hunter3.png', 'bounty', 3);
+(262, 'Single', 1, 82, 0, 'Bounty Hunter 3', 'awarded for finding 100 dupes', 'bounty-hunter3.png', 'bounty', 3);
 
 
 
