@@ -256,7 +256,7 @@ if($DB->affected_rows() > 0 || !$Report) {
             
                 $Body = "Thank-you for your {$ResolveType['title']} report re: [url=http://".NONSSL_SITE_URL."/torrents.php?torrentid=$TorrentID]{$RawName}[/url]\n\nYou received a bounty payment of $Bounty credits.";
                
-                send_pm($ReporterID, 0, "Received Bounty Payment", $Body);
+                send_pm($ReporterID, 0, "Received Bounty Payment", db_string($Body));
           }
       }
       
