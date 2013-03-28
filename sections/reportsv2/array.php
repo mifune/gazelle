@@ -32,7 +32,7 @@ $Types = array(
             'warn' => '0',
             'delete' => '1',
             'pm' => 'Your torrent has been deleted for being a duplicate of another torrent.',
-            'bounty' => 2000
+            'bounty' => 1000
         ),
         'article' => array ('duperules', "Dupe Rules")
     ),
