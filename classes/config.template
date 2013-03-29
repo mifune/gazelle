@@ -136,6 +136,7 @@ define('SIG_MAX_HEIGHT', 300);
 define('TITLE_MAXWORD_LENGTH',42);
 define('ANNOUNCEMENT_FORUM_ID', 5);
 define('TRASH_FORUM_ID', 18);
+
 define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
 define('DEDUCT_GB_PER_EURO', 1.0);
 define('BTC_ADDRESS_REGEX', "/^[13]{1}[a-km-zA-HJ-NP-Z1-9]{26,34}$/");

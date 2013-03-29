@@ -31,29 +31,41 @@ show_header('My Donations','bitcoin');
     <div class="head">Your unique donation address</div>
     <div class="box pad">
     <?
+        $Err=false;
         //usually any user will only have one 'open' address - but list them all just in case
         $DB->query("SELECT ID, public, time FROM bitcoin_donations WHERE state='unused' AND userID='$UserID'");
         // existing 'open' (unused) addresses assigned to this user
         $user_addresses = $DB->to_array(false, MYSQL_NUM);
     
         if ($_REQUEST['new']=='1' && count($user_addresses)==0) { 
-            // only assign a new address if they dont already have one
-                
-            $new_address = "Failed to get an address - please reload the page, if this error persists please contact an admin";
-
+            // only assign a new address if they dont already have one 
             $DB->query("SELECT ID, public FROM bitcoin_addresses LIMIT 1");
-            list($addID, $public) = $DB->next_record();
-            $DB->query("DELETE FROM bitcoin_addresses WHERE ID=$addID");
-            if ($DB->affected_rows()==1) { // delete succeeded - we can issue this address
-                $time = sqltime();
-                $DB->query("INSERT INTO bitcoin_donations (public, time, userID)
-                                                VALUES ( '$public', '$time', '$UserID')");
-                $ID = $DB->inserted_id();
-                $user_addresses = array( array($ID, $public, $time) );
+            if ($DB->record_count() < 1) {
+                // no addresses!!
+                $Err = "Failed to get an address, if this error persists we probably need to add some addresses, please contact an admin"; 
+            } else {
+                // got an unused address 
+                list($addID, $public) = $DB->next_record();
+
+                $DB->query("DELETE FROM bitcoin_addresses WHERE ID=$addID");
+                if ($DB->affected_rows()==1) { // delete succeeded - we can issue this address
+                    $time = sqltime();
+                    $DB->query("INSERT INTO bitcoin_donations (public, time, userID)
+                                                    VALUES ( '$public', '$time', '$UserID')");
+                    $ID = $DB->inserted_id();
+                    $user_addresses = array( array($ID, $public, $time) );
+                } else {
+                    // maybe another user grabbed it at the same time? try again...
+                    $Err = "Address was already used! - please reload the page, if this error persists please contact an admin";
+                }
             }
         }
          
-        if (count($user_addresses)==0) {
+        if ($Err) {
+    ?>
+            <p><span class="warning"><?=$Err?></span></p>
+    <?
+        } else if (count($user_addresses)==0) {
             
     ?>
             <p><a style="font-weight: bold;" href="donate.php?action=donatebc&new=1">click here to get a personal donation address</a></p>
