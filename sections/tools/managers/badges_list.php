@@ -50,6 +50,10 @@ show_header('Badges','badges');
             $numAdds = isset($_REQUEST['numadd'])?(int)$_REQUEST['numadd']:5;
             if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
     
+            foreach ($BadgeTypes as $valtype) {   
+                $badge_select_html .= '<option value="'.$valtype.'">'.$valtype.'&nbsp;&nbsp;</option>';
+            }
+            
             for($i = 0; $i < $numAdds; $i++) { 
                 $ID = "new$i";
             ?>  
@@ -88,13 +92,11 @@ show_header('Badges','badges');
                     </td>
                     <td>
                         <select name="type[<?=$ID?>]" id="type<?=$ID?>" onchange="Set_Edit('<?=$ID?>')" title="Badge Type">
-<?                          foreach ($BadgeTypes as $valtype) {   ?>
-                                <option value="<?=$valtype?>"><?=$valtype?>&nbsp;&nbsp;</option>
-<?                          } ?>
+                            <?=$badge_select_html; ?>
                         </select>
                     </td>
                     <td>
-                        <input class="medium" type="text" name="cost[<?=$ID?>]" id="cost<?=$ID?>" value="" onchange="Set_Edit('<?=$ID?>')" title="Cost (Only used if item is a shop item)"/>
+                        <input class="medium" type="text" name="cost[<?=$ID?>]" id="cost<?=$ID?>" value="" onchange="Set_Edit('<?=$ID?>')" title="Cost (Only used if item is a shop or donor badge)"/>
                     </td>
                 </tr>
                 <tr class="rowa">
@@ -103,7 +105,7 @@ show_header('Badges','badges');
 <?          }       ?>
                 <tr class="rowb">
                     <td colspan="6" style="text-align: right;"> 
-        <input type="hidden" id="totalnum" value="<?=$numAdds?>" />
+                        <input type="hidden" id="totalnum" value="<?=$numAdds?>" />
                         <span style="float:left">
                             <a href="#" onclick="reload_num_forms('badges_list')">reload</a>
                             with <input style="width:30px;" type="text" name="numadd" id="numAdds" value="<?=$numAdds?>" title="Number of add forms to show (1 - 20)"/>
@@ -224,7 +226,7 @@ show_header('Badges','badges');
                         </select>
                     </td>
                     <td>
-                        <input class="medium" type="text" name="cost[<?=$ID?>]" value="<?=display_str($Cost)?>" onchange="Set_Edit(<?=$ID?>)" title="Cost (Only used if item is a shop item)"/>
+                        <input class="medium" type="text" name="cost[<?=$ID?>]" value="<?=display_str($Cost)?>" onchange="Set_Edit(<?=$ID?>)" title="Cost (Only used if item is a shop or donor badge)"/>
                     </td>
                 </tr>
                 <tr class="rowa">

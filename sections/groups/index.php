@@ -91,7 +91,7 @@ if(empty($_POST['action'])) {
             authorize();
 
             if (!$GroupID) error(0);
-            if (!$P[name] || $P[name] == '') error("Name of group cannot be empty");
+            if (!$P['name'] || $P['name'] == '') error("Name of group cannot be empty");
             $Log = sqltime() . " - Name [color=blue]changed[/color] to [color=green]$P[name][/color] by [user]{$LoggedUser['Username']}[/user]";
             $DB->query("UPDATE groups SET Name='$P[name]', Log=CONCAT_WS( '\n', '$Log', Log) WHERE ID='$GroupID'");
             header('Location: groups.php?groupid=' . $GroupID);
@@ -110,11 +110,11 @@ if(empty($_POST['action'])) {
         case 'checkusers':
             authorize();    // ajax call
                 
-            if (!$P[userlist]) error("No users in list", true);
+            if (!$P['userlist']) error("No users in list", true);
             
             $Items = array();
             // split on both whitespace and commas
-            $Preitems = str_replace('\n', ' ',$P[userlist]);
+            $Preitems = str_replace('\n', ' ',$P['userlist']);
             $Preitems = explode(",", $Preitems);
             foreach($Preitems as $pitem){
                 $Items = array_merge($Items, explode(" ", $pitem));
@@ -136,7 +136,7 @@ if(empty($_POST['action'])) {
                     }
                 } else {
                     $Username = $item;
-                    $DB->query("SELECT ID FROM users_main WHERE Username = '".$Username."'");
+                    $DB->query("SELECT ID FROM users_main WHERE Username = '$Username'");
                     if ($DB->record_count()==0) 
                         $result = '<img src="'. STATIC_SERVER .'common/symbols/warned.png" alt="No result" title="Could not find user '.$Username.'" /> Could not find user \''.$Username.'\'<br/>';
                     else  {
@@ -157,9 +157,9 @@ if(empty($_POST['action'])) {
             authorize();
         
             if (!$GroupID) error(0);
-            if (!$P[userids]) error("No users in list");
+            if (!$P['userids']) error("No users in list");
             
-            $IDs = explode(",", $P[userids]);
+            $IDs = explode(",", $P['userids']);
             foreach($IDs as &$id) {
                 if (!is_number($id)) error(0);
                 $id=(int)$id;

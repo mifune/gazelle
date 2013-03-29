@@ -1,24 +1,31 @@
 <?
-//Module mini-config
-//include(SERVER_ROOT.'/sections/donate/config.php');
 
-include(SERVER_ROOT.'/sections/donate/donate.php');
-      
-      /*   // we are using a manual method so dont need any of this
+include(SERVER_ROOT . '/sections/donate/functions.php');
+
+
 if (!isset($_REQUEST['action'])) {
-	include(SERVER_ROOT.'/sections/donate/donate.php');
+    include(SERVER_ROOT . '/sections/donate/donate.php');
 } else {
-	switch($_REQUEST['action']) {
-		case 'ipn': // Paypal hits this page when a donation is received
-			include(SERVER_ROOT.'/sections/donate/ipn.php');
-			break;
-		
-		case 'complete':
-			include(SERVER_ROOT.'/sections/donate/complete.php');
-			break;
-		case 'cancel':
-			include(SERVER_ROOT.'/sections/donate/cancel.php');
-			break;
-	}
-} */
+    switch ($_REQUEST['action']) {
+        case 'my_donations':
+            include(SERVER_ROOT . '/sections/donate/my_donations.php');
+            break;
+
+        case 'enter_addresses':
+            // admin submits new unused addresses
+            include(SERVER_ROOT . '/sections/donate/take_new_addresses.php');
+            break;
+
+        case 'submit_donate':
+            // user submits their donation
+            include(SERVER_ROOT . '/sections/donate/take_donation.php');
+            break;
+
+
+
+        default:
+            include(SERVER_ROOT . '/sections/donate/donate.php');
+            break;
+    }
+}
 ?>

@@ -771,13 +771,27 @@ if (check_paranoia_here('grabbed+')) {
 <?
 }
 
+if($OwnProfile || check_perms('users_mod')) {
+    
+        $DB->query("SELECT COUNT(ID) FROM bitcoin_donations WHERE received='0000-00-00 00:00:00' AND userID='$UserID'");
+        list($NumDonationsPending) = $DB->next_record();
+        $DB->query("SELECT COUNT(ID), Sum(amount_euro) FROM bitcoin_donations WHERE received !='0000-00-00 00:00:00' AND userID='$UserID'");
+        list($NumDonations, $SumDonations) = $DB->next_record();
+?>
+        <li>Donations: <strong>&euro;<?=number_format($SumDonations, 2) ?></strong>  <span title="number of donations made"><?=number_format($NumDonations)?></span> 
+                              <span title="donations pending">(<?=number_format($NumDonationsPending)?>)</span> 
+             [<a href="donate.php?action=my_donations&amp;userid=<?=$UserID?>" title="View donations">View</a>]</li>
+<?
+}
+
 if(check_paranoia_here('invitedcount')) {
 	$DB->query("SELECT COUNT(UserID) FROM users_info WHERE Inviter='$UserID'");
 	list($Invited) = $DB->next_record();
 ?>
 				<li>Invited: <?=number_format($Invited)?></li>
 <?
-}?>
+}
+?>
 			</ul>
 		</div>
 	</div>
@@ -1773,7 +1787,7 @@ if (check_perms('users_mod', $Class)) {
                     foreach($AvailableBadges as $ABadge){ // = $DB->next_record()
                         list($BadgeID, $Badge, $Rank, $Type, $Name, $Tooltip, $Image, $Available, $MaxRank) = $ABadge; 
 
-                        if (!in_array($Type, array('Single','Shop')) || !$MaxRank || $MaxRank < $Rank ) {
+                        if (!in_array($Type, array('Single','Shop','Donor')) || !$MaxRank || $MaxRank < $Rank ) {
                         ?>
                         <tr>
                             <td width="60px">

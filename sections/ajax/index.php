@@ -14,6 +14,13 @@ header('Content-Type: application/json; charset=utf-8');
 
 switch ($_GET['action']){
 	// things that (may be) used on the site
+	case 'change_donation':
+		require(SERVER_ROOT.'/sections/ajax/change_donation.php');
+		break;
+	case 'check_donation':
+		require(SERVER_ROOT.'/sections/ajax/check_donation.php');
+		break;
+    
 	case 'get_taglist':
 		require(SERVER_ROOT.'/sections/ajax/get_taglist.php');
 		break;

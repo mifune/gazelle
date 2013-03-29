@@ -146,6 +146,42 @@ CREATE TABLE IF NOT EXISTS `badges_auto` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `bitcoin_addresses`
+--
+
+CREATE TABLE IF NOT EXISTS `bitcoin_addresses` (
+  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `public` varchar(64) NOT NULL,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bitcoin_donations`
+--
+
+CREATE TABLE IF NOT EXISTS `bitcoin_donations` (
+  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `state` enum('unused','submitted','cleared') NOT NULL DEFAULT 'unused',
+  `public` varchar(64) NOT NULL,
+  `time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `userID` int(11) unsigned NOT NULL,
+  `received` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `bitcoin_rate` double NOT NULL DEFAULT '0',
+  `amount_bitcoin` double NOT NULL DEFAULT '0',
+  `amount_euro` double NOT NULL DEFAULT '0',
+  `comment` varchar(256) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `public` (`public`),
+  KEY `state` (`state`),
+  KEY `received` (`received`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+-- --------------------------------------------------------
+
+--
 -- Tabellstruktur `blog`
 --
 
@@ -344,6 +380,26 @@ CREATE TABLE IF NOT EXISTS `donations` (
   KEY `Time` (`Time`),
   KEY `Amount` (`Amount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `donation_drives`
+--
+
+CREATE TABLE IF NOT EXISTS `donation_drives` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `start_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `target_euros` int(11) NOT NULL DEFAULT '0',
+  `description` text NOT NULL,
+  `threadid` int(11) NOT NULL DEFAULT '0',
+  `end_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `raised_euros` int(11) NOT NULL DEFAULT '0',
+  `state` enum('active','notstarted','finished') NOT NULL DEFAULT 'notstarted',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 

@@ -102,9 +102,9 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) 
                               <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
                               &nbsp;&nbsp;
 <?                          if ($ListType=='watchlist') {  ?>
-                              <input type="button" onclick="watchlist_remove('<?=$UserID?>',true)" value="Remove" title="Remove user from watchlist" />
+                              <input type="button" onclick="watchlist_remove('<?=$UserID?>',true);return false;" value="Remove" title="Remove user from watchlist" />
 <?                          } else {?>
-                              <input type="button" onclick="excludelist_remove('<?=$UserID?>',true)" value="Remove" title="Remove user from exclude list" />
+                              <input type="button" onclick="excludelist_remove('<?=$UserID?>',true);return false;" value="Remove" title="Remove user from exclude list" />
 <?                          } ?>
                                 <!--<input type="submit" name="submit" value="Save" title="Save edited value" />
                                 <input type="submit" name="submit" value="Delete records" title="Remove all of this users records from the saved speed records" /> -->

@@ -5,7 +5,6 @@ if(!check_perms('users_mod')) {
 	error(403);
 }
 
-define('ANNOUNCEMENT_FORUM_ID', 19);
 show_header('Staff Blog','bbcode');
 require(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;

@@ -14,7 +14,8 @@ function get_fls() {
 			FROM users_info AS i
 			JOIN users_main AS m ON m.ID=i.UserID
 			JOIN permissions AS p ON p.ID=m.PermissionID
-			WHERE p.DisplayStaff!='1' AND i.SupportFor!=''");
+			WHERE p.DisplayStaff!='1' AND i.SupportFor!=''
+			ORDER BY m.LastAccess ASC");
         $FLS = $DB->to_array(false, MYSQLI_BOTH, array(4, 'Paranoia'));
         $Cache->cache_value('fls', $FLS, 180);
     }

@@ -628,8 +628,40 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/data/registration_log.php');
         break;
 
+    case 'btc_address_input':
+        include(SERVER_ROOT . '/sections/tools/data/donation_addresses.php');
+        break;
+    
+    case 'new_drive': 
+        authorize();
+            
+        if (!check_perms('admin_donor_drives'))  error(403);
+
+        $name = db_string($_REQUEST['drivename']);
+        $target_euros = (int) ($_REQUEST['target']);
+        $desc = db_string($_REQUEST['body']);
+        
+        //$start_time = db_string($_REQUEST['startdate']);
+        //$thread_id = (int) ($_REQUEST['threadid']);  `start_time`, `threadid`, 
+
+        $DB->query("INSERT INTO donation_drives ( `name`, `target_euros`, `description`) 
+                                VALUES ( '$name', '$target_euros', '$desc');");
+
+        header("Location: tools.php?action=donation_drives");
+
+        break;
+ 
+
+    case 'edit_drive':
+        include(SERVER_ROOT . '/sections/tools/data/edit_drive.php');
+        break;
+        
     case 'donation_log':
         include(SERVER_ROOT . '/sections/tools/data/donation_log.php');
+        break;
+    
+    case 'donation_drives':
+        include(SERVER_ROOT . '/sections/tools/data/donation_drives.php');
         break;
 
 

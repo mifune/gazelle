@@ -97,7 +97,8 @@
 	'users_promote_below' => 'Can promote users to below current level.',
 	'users_promote_to' => 'Can promote users up to current level.',
         'user_group_permissions'=> 'Can manage group permissions.',
-	'users_give_donor' => 'Can give donor access.',
+	'users_view_donor' => 'Can view users my donations page.',
+    'users_give_donor' => 'Can manually give donor status.',
 	'users_warn' => 'Can warn users.',
 	'users_disable_users' => 'Can disable users.',
 	'users_disable_posts' => 'Can disable users\' posting rights.',
@@ -146,7 +147,9 @@
 	'admin_reports' => 'Can access reports system.',
 	'admin_advanced_user_search' => 'Can access advanced user search.',
 	'admin_create_users' => 'Can create users through an administrative form.',
-	'admin_donor_log' => 'Can view the donor log.',
+	'admin_donor_drives' => 'Can view and manage donation drives.',
+	'admin_donor_log' => 'Can view and manage the donor log.',
+	'admin_donor_addresses' => 'Can manage and enter new bitcoin addresses.',
 	'admin_manage_ipbans' => 'Can manage IP bans.',
 	'admin_dnu' => 'Can manage do not upload list.',
 	  'admin_imagehosts' => 'Can manage Imagehost Whitelist.',
@@ -268,7 +271,8 @@ function permissions_form(){ ?>
 					<? display_perm('users_promote_below', 'Can promote users to below current level.'); ?>
 					<? display_perm('users_promote_to', 'Can promote users up to current level.'); ?>
                                         <? display_perm('user_group_permissions', 'Can manage group permissions.', 'Can change a users group permission setting.'); ?> 
-					<? display_perm('users_give_donor', 'Can give donor access.'); ?>
+					<? display_perm('users_view_donor', 'Can view users my donations page.','Can view detailed donation information for each user'); ?>
+					<? display_perm('users_give_donor', 'Can give donor status.','Can manually give donor status'); ?>
 					<? display_perm('users_warn', 'Can warn users.'); ?>
 					<? display_perm('users_disable_users', 'Can disable users.'); ?>
 					<? display_perm('users_disable_posts', 'Can disable users\' posting rights.'); ?>
@@ -351,7 +355,9 @@ function permissions_form(){ ?>
 					<? display_perm('admin_reports', 'Can access reports system'); ?>
 					<? display_perm('admin_advanced_user_search', 'Can access advanced user search'); ?>
 					<? display_perm('admin_create_users', 'Can create users through an administrative form'); ?>
-					<? display_perm('admin_donor_log', 'Can view the donor log'); ?>
+					<? display_perm('admin_donor_drives', 'Can view and manage donation drives'); ?>
+					<? display_perm('admin_donor_log', 'Can view and manage the donor log'); ?>
+                    <? display_perm('admin_donor_addresses', 'Can manage and enter new bitcoin addresses.'); ?>
 					<? display_perm('admin_manage_ipbans', 'Can manage IP bans'); ?>
 					<? display_perm('admin_dnu', 'Can manage do not upload list'); ?> 
 					    <? display_perm('admin_imagehosts', 'Can manage imagehosts whitelist'); ?> 

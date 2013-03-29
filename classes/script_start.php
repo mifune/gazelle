@@ -1198,21 +1198,21 @@ function get_url($Exclude = false) {
  * @return array(int,string) What page we are on, and what to use in the LIMIT section of a query
  * i.e. "SELECT [...] LIMIT $Limit;"
  */
-function page_limit($PerPage, $DefaultResult = 1) {
-    if (!isset($_GET['page'])) {
+function page_limit($PerPage, $DefaultResult = 1, $PageGetVar = 'page') {
+    if (!isset($_GET[$PageGetVar])) {
         $Page = ceil($DefaultResult / $PerPage);
         if ($Page == 0)
             $Page = 1;
         $Limit = $PerPage;
     } else {
-        if (!is_number($_GET['page'])) {
+        if (!is_number($_GET[$PageGetVar])) {
             error(0);
         }
-        $Page = $_GET['page'];
+        $Page = $_GET[$PageGetVar];
         if ($Page == 0) {
             $Page = 1;
         }
-        $Limit = $PerPage * $_GET['page'] - $PerPage . ', ' . $PerPage;
+        $Limit = $PerPage * $_GET[$PageGetVar] - $PerPage . ', ' . $PerPage;
     }
     return array($Page, $Limit);
 }
@@ -1289,7 +1289,9 @@ function get_pages($StartPage, $TotalRecords, $ItemsPerPage, $ShowPages=11, $Anc
 
         if ($StartPage > 1) {
             $Pages.='<a href="' . $Location . '?page=1' . $QueryString . $Anchor . '" class="pager pager_first">&lt;&lt; First</a> ';
-            $Pages.='<a href="' . $Location . '?page=' . ($StartPage - 1) . $QueryString . $Anchor . '" class="pager pager_prev">&lt; Prev</a> | ';
+            if ($StartPage > 2)
+                $Pages.='<a href="' . $Location . '?page=' . ($StartPage - 1) . $QueryString . $Anchor . '" class="pager pager_prev">&lt; Prev</a>';
+            $Pages.= ' | ';
         }
         //End change
 
@@ -1322,9 +1324,12 @@ function get_pages($StartPage, $TotalRecords, $ItemsPerPage, $ShowPages=11, $Anc
             $Pages .= $StartPage;
         }
 
+        if ($StartPage < $TotalPages) $Pages.=' | ';
+        if ($StartPage < $TotalPages-1) {
+            $Pages.='<a href="' . $Location . '?page=' . ($StartPage + 1) . $QueryString . $Anchor . '" class="pager pager_next">Next &gt;</a> ';
+        }
         if ($StartPage < $TotalPages) {
-            $Pages.=' | <a href="' . $Location . '?page=' . ($StartPage + 1) . $QueryString . $Anchor . '" class="pager pager_next">Next &gt;</a> ';
-            $Pages.='<a href="' . $Location . '?page=' . $TotalPages . $QueryString . $Anchor . '" class="pager pager_last"> Last &gt;&gt;</a>';
+                $Pages.='<a href="' . $Location . '?page=' . $TotalPages . $QueryString . $Anchor . '" class="pager pager_last"> Last &gt;&gt;</a>';
         }
     }
 

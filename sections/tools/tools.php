@@ -65,9 +65,13 @@ show_header('Staff Tools');
             <div class="head">Data</div>
 		<table>
 <?
-if (check_perms('admin_donor_log')) { ?>
-			<tr><td><a href="tools.php?action=donation_log">Donation Log</a></td></tr>
-			<tr><td><a href="tools.php?action=bitcoin_balance">Bitcoin donation balance</a></td></tr>
+if (check_perms('admin_donor_addresses')) { ?>
+			<tr><td><a href="tools.php?action=btc_address_input" title="Input freshly generated bitcoin addresses for users to donate to">Bitcoin addresses</a></td></tr>
+<? } if (check_perms('admin_donor_log')) { ?>
+			<tr><td><a href="tools.php?action=donation_log" title="View bitcoin donation log">Donation Log</a></td></tr>
+<? } if (check_perms('admin_donor_drives')) { ?>
+			<tr><td><a href="tools.php?action=donation_drives" title="Manage Donation Drives">Donation Drives</a></td></tr>
+            
 <? } if (check_perms('users_view_ips') && check_perms('users_view_email')) { ?>
 			<tr><td><a href="tools.php?action=registration_log">Registration Log</a></td></tr>
 <? } if (check_perms('users_view_invites')) { ?>

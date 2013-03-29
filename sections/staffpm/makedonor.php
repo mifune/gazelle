@@ -17,7 +17,7 @@
 		error(404);
 	}
 	
-	$Message = "Thank for for helping to support the site.  It's users like you who make all of this possible.";
+	$Message = "Thank you for helping to support the site.  It's users like you who make all of this possible.";
 	
 	if ((int)$Donor === 0) {
 		$Msg = db_string(sqltime() . ' - Donated: http://'.NONSSL_SITE_URL."/staffpm.php?action=viewconv&id=$ConvID\n");

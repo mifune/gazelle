@@ -1,7 +1,6 @@
 <?
 enforce_login();
 
-define('ANNOUNCEMENT_FORUM_ID', 5);
 show_header('Blog','bbcode');
 require(SERVER_ROOT.'/classes/class_text.php');
  

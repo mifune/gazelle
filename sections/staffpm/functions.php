@@ -49,6 +49,10 @@ function print_compose_staff_pm($Hidden = true, $Assign = 0, $Subject ='', $Msg 
             }
             $Assign='sysop';
             $AssignDirect = '1000';
+        } else if ($Msg=='nobtcrate'){
+            $Subject='Error: No exchange rate for bitcoin';
+            $Msg='';
+            $Assign='admin';
         }
        
         ?>

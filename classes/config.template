@@ -120,7 +120,7 @@ $ArticleCats = array(0=>'Rules', 1=>'Help', 2=>'Hidden');
 $ArticleSubCats = array(0=>'Intro', 1=>'Other', 2=>'Rules', 3=>'Torrents', 4=>'IRC', 5=>'Uploading', 6=>'Site', 7=>'Guides', 8=>'Staff');
 
 // badge types
-$BadgeTypes = array ('Single', 'Multiple', 'Shop', 'Unique');
+$BadgeTypes = array ('Single', 'Multiple', 'Shop', 'Unique','Donor');
 $AutoAwardTypes  = array ('NumPosts', 'NumComments', 'NumUploaded', 'NumNewTags', 'NumTags', 'NumTagVotes',
                   'RequestsFilled', 'UploadedTB', 'DownloadedTB', 'MaxSnatches','NumBounties');
 
@@ -134,14 +134,15 @@ $Zip_FileTypes = array('rar','zip','7','7z','z');
 define('SIG_MAX_WIDTH', 800);
 define('SIG_MAX_HEIGHT', 300);
 define('TITLE_MAXWORD_LENGTH',42);
+define('ANNOUNCEMENT_FORUM_ID', 5);
 define('TRASH_FORUM_ID', 18);
-
-$ExcludeForums = array( 9 ); // exclude games forum from latest topics (user option) - array instead of define in case we end up with +1 games forums
-
-
 define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
+define('DEDUCT_GB_PER_EURO', 1.0);
+define('BTC_ADDRESS_REGEX', "/^[13]{1}[a-km-zA-HJ-NP-Z1-9]{26,34}$/");
 define('BONUS_TORRENTS_CAP', 300);
 
+$ExcludeForums = array( 9 ); // exclude games forum from latest topics (user option) - array instead of define in case we end up with +1 games forums
+ 
 
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');

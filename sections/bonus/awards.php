@@ -56,7 +56,7 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
 ?> 
 		<div class="row<?=$Row?> pad">
                 <h3 class="pad" style="float:left;"><?=display_str($Name)?></h3>
-<?              if ($Cost) echo '<strong style="float:right;margin-top:2px;">Cost: '.number_format($Cost).'</strong>'; ?>
+<?              if ($Type=='Shop') echo '<strong style="float:right;margin-top:2px;">Cost: '.number_format($Cost).'</strong>'; ?>
                 <div class="badge" style="width:100%;height:40px;clear:both;">
                     <img style="text-align:center" src="<?=STATIC_SERVER.'common/badges/'.$Image?>" title="<?=$Desc?>" alt="<?=$Name?>" />
                 </div>
