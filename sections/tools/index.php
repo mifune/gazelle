@@ -632,6 +632,29 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/data/donation_addresses.php');
         break;
     
+   case 'enter_addresses':
+        // admin submits new unused addresses
+        include(SERVER_ROOT . '/sections/tools/data/take_btc_addresses.php');
+        break;
+        
+   case 'delete_addresses':
+        authorize();
+        if (!check_perms('admin_donor_addresses'))  error(403);
+        
+        $AddressIDs = $_POST['deleteids'];  
+        if (!is_array($AddressIDs)) error("Nothing selected to delete");
+
+        foreach ($AddressIDs as $addressID) {
+            if (!is_number($addressID))  error(0);  
+        }
+        $AddressIDs = implode(',', $AddressIDs);
+
+        $DB->query("DELETE FROM bitcoin_addresses WHERE ID IN ($AddressIDs)"); 
+       
+        
+        header("Location: tools.php?action=btc_address_input");
+        break;
+    
     case 'new_drive': 
         authorize();
             
@@ -647,8 +670,7 @@ switch ($_REQUEST['action']) {
         $DB->query("INSERT INTO donation_drives ( `name`, `target_euros`, `description`) 
                                 VALUES ( '$name', '$target_euros', '$desc');");
 
-        header("Location: tools.php?action=donation_drives");
-
+        header("Location: tools.php?action=donation_drives"); 
         break;
  
 

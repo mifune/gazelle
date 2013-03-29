@@ -26,9 +26,9 @@ show_header('Bitcoin addresses');
         <br/>
         Input addresses here: &nbsp; <em>separators can be newline, comma, or whitespace. addresses can be quoted (the quotes will be trimmed)</em><br/>
         <span style="color: red; font-weight:bold;">note: ONLY enter the public address. Keep the private key secret - you will need it to gain access to the donated BTC once users have transferred funds to these addresses.</span><br/><br/>
-        <form action="donate.php" method="post">
+        <form action="tools.php" method="post">
             <input type="hidden" name="action" value="enter_addresses" />
-            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']; // donate_details?>" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey'];?>" />
             <textarea id="input_addresses" name="input_addresses" class="medium" rows="15"></textarea>
             <br/>
             <input type="submit" value="Enter new addresses" />
@@ -59,7 +59,7 @@ show_header('Bitcoin addresses');
     <div class="head"><?=$Results?> Unused donation addresses</div>
     <div class="box pad">
         
-        <form id="addressform" action="donate.php" method="post" onsubmit="return anyChecks('addressform')">
+        <form id="addressform" action="tools.php" method="post" onsubmit="return anyChecks('addressform')">
             <div class="donate_details">
                 <input type="hidden" name="action" value="delete_addresses" />
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />

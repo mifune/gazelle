@@ -153,7 +153,8 @@ CREATE TABLE IF NOT EXISTS `bitcoin_addresses` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `public` varchar(64) NOT NULL,
   `userID` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `public` (`public`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 

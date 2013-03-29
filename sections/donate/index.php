@@ -11,11 +11,6 @@ if (!isset($_REQUEST['action'])) {
             include(SERVER_ROOT . '/sections/donate/my_donations.php');
             break;
 
-        case 'enter_addresses':
-            // admin submits new unused addresses
-            include(SERVER_ROOT . '/sections/donate/take_new_addresses.php');
-            break;
-
         case 'submit_donate':
             // user submits their donation
             include(SERVER_ROOT . '/sections/donate/take_donation.php');
