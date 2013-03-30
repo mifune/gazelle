@@ -39,7 +39,7 @@ show_header('My Donations','bitcoin');
     
         if ($_REQUEST['new']=='1' && count($user_addresses)==0) { 
             // only assign a new address if they dont already have one 
-            $DB->query("SELECT ID, public FROM bitcoin_addresses LIMIT 1");
+            $DB->query("SELECT ID, public FROM bitcoin_addresses ORDER BY ID LIMIT 1");
             if ($DB->record_count() < 1) {
                 // no addresses!!
                 $Err = "Failed to get an address, if this error persists we probably need to add some addresses, please contact an admin"; 
