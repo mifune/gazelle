@@ -68,7 +68,7 @@ show_header('My Donations','bitcoin');
         } else if (count($user_addresses)==0) {
             
     ?>
-            <p><a style="font-weight: bold;" href="donate.php?action=donatebc&new=1">click here to get a personal donation address</a></p>
+            <p><a style="font-weight: bold;" href="donate.php?action=my_donations&new=1">click here to get a personal donation address</a></p>
     <?
         } else {
     ?>
