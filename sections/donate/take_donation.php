@@ -109,6 +109,7 @@ if ($_REQUEST['donategb']) {
 }
 $Cache->delete_value('user_info_' . $UserID);
 $Cache->delete_value('user_info_heavy_' . $UserID);
+$Cache->delete_value('user_stats_'.$UserID);
 
 header("Location: donate.php?action=my_donations&userid=$UserID");
 ?>

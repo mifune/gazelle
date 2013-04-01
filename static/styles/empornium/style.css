@@ -2333,50 +2333,52 @@ img.win.flash {
 
 #active_drive {
     position: relative; 
+    /*
 	-moz-border-radius: 6px;
 	border-radius: 6px;
 	-webkit-border-radius: 6px;
     
     background-color:#fff;
+    */
+    background-color:#0261a3;
+    
     margin: 0px 0px 20px 0px;
     text-align: center;
 	text-decoration: none;
-	color: #000;	
-    font-weight: bold;
-    font-size: 16px;
+	color: #fff;
 	border: none;
 	vertical-align: top;
-	padding: 4px 0px;
+	padding: 0px 0px;
     
 }
 
 #active_drive a{ 
 	text-decoration: none;
-	color: #000;	
+	color: #fff;	
     font-weight: bold;
-    font-size: 16px;  
+    font-size: 14px;  
 }
 #active_drive a:hover { 
-	text-decoration: none;
-	color: #000;
+	text-decoration: underline;
+	color: #fff;
 }
 #active_drive a.link{ 
     margin-left: 16px;
 	text-decoration: none;
-	color: #000;	
-    font-weight: normal;
-    font-size: 14px;  
+	color: #fff;	
+    font-weight: bold;
+    font-size: 10px;  
     font-style: italic;
 }
 #active_drive a.link:hover { 
 	text-decoration: underline;
-	color: #000;
+	color: #fff;
 }
  
 #donorbargreen {
     display:inline-block;
-    font-size: 20px;  
-    height: 28px;
+    font-size: 14px;  
+    height: 20px;
     background-color:#4d4;
     color:white;
     font-weight: bold;
@@ -2384,8 +2386,8 @@ img.win.flash {
 }
 #donorbarred {
     display:inline-block;
-    font-size: 20px;  
-    height: 28px;
+    font-size: 14px;  
+    height: 20px;
     background-color:#b11;
     color:white;
     font-weight: bold;

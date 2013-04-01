@@ -2608,14 +2608,18 @@ img.win.flash {
 	background: #bbb;
 }
 
+/*
+// =============== standard
+
+
 #active_drive {
     position: relative; 
 	-moz-border-radius: 6px;
 	border-radius: 6px;
 	-webkit-border-radius: 6px;
     
-    background-color:#fff;
-    margin: 20px 0px 0px 0px;
+    background-color:#eff3f6;
+    margin: 10px 0px 0px 0px;
     text-align: center;
 	text-decoration: none;
 	color: #000;	
@@ -2630,6 +2634,7 @@ img.win.flash {
     box-shadow:inset 2px 1px 3px #6a9bb7;
 }
 
+ 
 #active_drive a{ 
 	text-decoration: none;
 	color: #000;	
@@ -2670,4 +2675,231 @@ img.win.flash {
     color:white;
     font-weight: bold;
     text-align: left;
+}  
+*/
+
+
+
+
+
+/*
+
+#active_drive {
+    position: relative; 
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	-webkit-border-radius: 6px;
+    
+    -moz-border-radius: 0px 0px 6px 6px;
+    -webkit-border-top-left-radius: 0px;
+    -webkit-border-top-right-radius: 0px;
+    -webkit-border-bottom-left-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    border-radius: 0px 0px 6px 6px;
+    
+    background-color:#fff;
+    margin: 0px 0px 0px 0px;
+    text-align: center;
+	text-decoration: none;
+	color: #000;	
+    font-weight: bold;
+    font-size: 14px;
+	border: none;
+	vertical-align: top;
+	padding: 4px 0px;
+     
+}
+#active_drive a{ 
+	text-decoration: none;
+	color: #000;	
+    font-weight: bold;
+    font-size: 14px;  
+}
+#active_drive a:hover { 
+	text-decoration: none;
+	color: #000;
+}
+#active_drive a.link{ 
+    margin-left: 16px;
+	text-decoration: none;
+	color: #000;	
+    font-weight: normal;
+    font-size: 12px;  
+    font-style: italic;
+}
+#active_drive a.link:hover { 
+	text-decoration: underline;
+	color: #000;
+}
+ 
+#donorbargreen {
+    display:inline-block;
+    font-size: 16px;  
+    height: 18px;
+    background-color:#4d4;
+    color:white;
+    font-weight: bold;
+    text-align: right;
+}
+#donorbarred {
+    display:inline-block;
+    font-size: 16px;  
+    height: 18px;
+    background-color:#b11;
+    color:white;
+    font-weight: bold;
+    text-align: left;
+}
+ */
+
+/*
+blue smaller
+#active_drive {
+    position: relative; 
+	
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	-webkit-border-radius: 6px;
+    
+    background-color:#0d245a;  
+    margin: 10px 0px 0px 0px;
+    text-align: center;
+	text-decoration: none;
+	color: white;	
+    font-weight: bold;
+    font-size: 14px;
+	border: none;
+	vertical-align: top;
+	padding: 4px 0px;
+     
+}
+
+ 
+#active_drive a{ 
+	text-decoration: none;
+	color: white;	
+    font-weight: bold;
+    font-size: 14px;  
+}
+#active_drive a:hover { 
+	text-decoration: none;
+	color: white;
+}
+#active_drive a.link{ 
+    margin-left: 16px;
+	text-decoration: none;
+	color: white;	
+    font-weight: normal;
+    font-size: 12px;  
+    font-style: italic;
+}
+#active_drive a.link:hover { 
+	text-decoration: underline;
+	color: white;
+}
+ 
+#donorbargreen {
+    display:inline-block;
+    font-size: 16px;  
+    height: 20px;
+    background-color:#4d4;
+    color:white;
+    font-weight: bold;
+    text-align: right;
+}
+#donorbarred {
+    display:inline-block;
+    font-size: 16px;  
+    height: 20px;
+    background-color:#b11;
+    color:white;
+    font-weight: bold;
+    text-align: left;
+} */
+
+
+#active_drive {
+    position: relative; 
+	
+    /*
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	-webkit-border-radius: 12px;
+    
+    centered
+    width: 90%;
+    min-width: 940px;
+    max-width: 1200px;
+    margin: 20px auto 0px auto; 
+    
+    trim
+    border: 1px solid #0054b0;
+    background-color: #003875;
+    */
+    border: none;
+    
+    background-color: #0d245a; 
+    
+    margin: 20px 0px 0px 0px;
+    
+    text-align: center;
+	text-decoration: none;
+	color: white;	
+    font-weight: bold;
+    font-size: 14px;
+ 
+	vertical-align: top;
+	padding: 0px;
+     
+}
+
+ 
+#active_drive a{ 
+	text-decoration: none;
+	color: white;	
+    font-weight: bold;
+    font-size: 14px;  
+}
+#active_drive a:hover { 
+	text-decoration: underline;
+	color: white;
+}
+#active_drive a.link{ 
+    margin-left: 16px;
+	text-decoration: none;
+	color: white;	
+    font-weight: normal;
+    font-size: 12px;  
+    font-style: italic;
+}
+#active_drive a.link:hover { 
+	text-decoration: underline;
+	color: white;
+}
+ 
+#donorbargreen {
+    display:inline-block;
+    font-size: 16px;  
+    height: 20px;
+    background-color:#4d4;
+    color:white;
+    font-weight: bold;
+    text-align: right;
+    
+    -moz-box-shadow:inset 2px 1px 3px #6a9bb7;
+    -webkit-box-shadow:inset 2px 1px 3px #6a9bb7;
+    box-shadow:inset 2px 1px 3px #6a9bb7;
+}
+#donorbarred {
+    display:inline-block;
+    font-size: 16px;  
+    height: 20px;
+    background-color:#b11;
+    color:white;
+    font-weight: bold;
+    text-align: left;
+    
+    -moz-box-shadow:inset 0px 1px 3px #6a9bb7;
+    -webkit-box-shadow:inset 0px 1px 3px #6a9bb7;
+    box-shadow:inset 0px 1px 3px #6a9bb7;
 }

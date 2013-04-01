@@ -76,6 +76,43 @@ if ($Mobile) { ?>
 <body id="<?=$Document == 'collages' ? 'collage' : $Document?>" <?= ((!$Mobile && $LoggedUser['Rippy'] == 'On') ? 'onload="say()"' : '') ?>>
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
 <div id="wrapper">
+<? /*
+$ActiveDrive = $Cache->get_value('active_drive');
+if ($ActiveDrive===false) { 
+    $DB->query("SELECT ID, name, start_time, target_euros, threadid 
+                      FROM donation_drives WHERE state='active' ORDER BY start_time DESC LIMIT 1");
+    if($DB->record_count()>0) {
+            $ActiveDrive = $DB->next_record();  // $DB->to_array(false, MYSQLI_NUM);
+    } else {
+            $ActiveDrive = array('false');
+    }
+    $Cache->cache_value('active_drive' , $ActiveDrive, 0);
+}
+
+if(isset($ActiveDrive['ID']) ) { 
+    list($ID, $name, $start_time, $target_euros, $threadid) = $ActiveDrive; 
+    $DB->query("SELECT SUM(amount_euro), Count(ID) FROM bitcoin_donations WHERE state!='unused' AND received > '$start_time'");
+    list($raised_euros, $count)=$DB->next_record();  
+    $percentdone = (int)($raised_euros * 100 / $target_euros); 
+    if ($percentdone>100) $percentdone=100;
+    ?>
+    <div id="active_drive">
+        <a href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details"><?=$name?></a>
+        <a class="link" href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details">click for details</a>
+        <div>
+            <a href="donate.php" title="click to donate">
+                <div id="donorbargreen" style="width:<?=$percentdone?>%;"> <?if($percentdone>94)echo "$percentdone%";?> &nbsp;</div><div id="donorbarred" style="width:<?=(100-$percentdone)?>%;"> &nbsp;<?if($percentdone<=94)echo "$percentdone%";?></div>
+            </a>
+        </div>
+        <a href="donate.php" title="click to donate">
+            so far we have raised &euro;<?=number_format($raised_euros,2)?> out of &euro;<?=number_format($target_euros,2)?>
+        </a>
+        <a class="link" title="click to donate" href="donate.php">please help support the site, click to donate</a>
+    </div>
+    <?
+} */
+    
+    ?>
 <h1 class="hidden"><?=SITE_NAME?></h1>
 
 <div id="header">
@@ -681,6 +718,7 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
     </div>
 </div>
 <?
+
 $ActiveDrive = $Cache->get_value('active_drive');
 if ($ActiveDrive===false) { 
     $DB->query("SELECT ID, name, start_time, target_euros, threadid 
@@ -714,7 +752,7 @@ if(isset($ActiveDrive['ID']) ) {
         <a class="link" title="click to donate" href="donate.php">please help support the site, click to donate</a>
     </div>
     <?
-}
+} 
 if(!$LoggedUser['Donor']) { ?>
 <div id="adbar">
     <script type="text/javascript" language="javascript" charset="utf-8" src="http://adspaces.ero-advertising.com/adspace/198208.js"></script>

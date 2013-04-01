@@ -2411,19 +2411,17 @@ img.win.flash {
 }
 
 #active_drive {
-    position: relative; 
-	-moz-border-radius: 6px;
-	border-radius: 6px;
-	-webkit-border-radius: 6px;
+    position: relative;
     
-    background-color:#fff;
+    background-color:#ebebeb;
     margin: 20px 0px 0px 0px;
     text-align: center;
 	text-decoration: none;
 	color: #000;	
     font-weight: bold;
-    font-size: 16px;
-	border: 1px solid #2c5687;  /*  #005689;  */
+    
+    border: none;
+	/* border: 1px solid #2c5687;    */
 	vertical-align: top;
 	padding: 4px 0px;
     
@@ -2433,10 +2431,10 @@ img.win.flash {
 	text-decoration: none;
 	color: #000;	
     font-weight: bold;
-    font-size: 16px;  
+    font-size: 14px;  
 }
 #active_drive a:hover { 
-	text-decoration: none;
+	text-decoration: underline;
 	color: #000;
 }
 #active_drive a.link{ 
@@ -2444,7 +2442,7 @@ img.win.flash {
 	text-decoration: none;
 	color: #000;	
     font-weight: normal;
-    font-size: 14px;  
+    font-size: 12px;  
     font-style: italic;
 }
 #active_drive a.link:hover { 
@@ -2454,8 +2452,8 @@ img.win.flash {
  
 #donorbargreen {
     display:inline-block;
-    font-size: 20px;  
-    height: 28px;
+    font-size: 14px;  
+    height: 20px;
     background-color:#4d4;
     color:white;
     font-weight: bold;
@@ -2463,8 +2461,8 @@ img.win.flash {
 }
 #donorbarred {
     display:inline-block;
-    font-size: 20px;  
-    height: 28px;
+    font-size: 14px;  
+    height: 20px;
     background-color:#b11;
     color:white;
     font-weight: bold;
