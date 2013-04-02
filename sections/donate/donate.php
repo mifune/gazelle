@@ -23,7 +23,8 @@ show_header('Donate','bitcoin');
         ?>
         <br/>
         <p style="font-size: 1.1em" title="rate is Mt.Gox weighted average: <?=$eur_rate?>">The current bitcoin exchange rate is 1 bitcoin = &euro;<?=number_format($eur_rate,2);?></p>
-        
+        <br/>
+        <a style="font-weight: bold;font-size: 1.2em;" href="donate.php?action=my_donations&new=1"><span style="color:red;"> >> </span>click here to get a personal donation address<span style="color:red;"> << </span></a>
     </div>
  
     <div class="head">Donate for <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" /></div>
@@ -59,8 +60,8 @@ show_header('Donate','bitcoin');
                 <?
             }
             ?>
-            <li><span  style="font-size: 1.1em;">If you want to donate for <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" title="love" /> 
-                    <a style="font-weight: bold;" href="donate.php?action=my_donations&new=1">click here to get a personal donation address</a></span></li> 
+            <li><span  style="font-size: 1.2em;">If you want to donate for <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" title="love" /> 
+                    <a style="font-weight: bold;" href="donate.php?action=my_donations&new=1"><span style="color:red;"> >> </span>click here to get a personal donation address<span style="color:red;"> << </span></a></span></li> 
         </ul>
     </div>
 
@@ -68,10 +69,23 @@ show_header('Donate','bitcoin');
     <div class="box pad">
         <p><span style="font-size:1.1em;font-weight: bold;">What you will receive for your donation:</span></p>
         <ul> 
+            <!--
             <li>You will get <?=DEDUCT_GB_PER_EURO?> GB removed from your <u>download</u> total per &euro; donated  <strong>(<?=DEDUCT_GB_PER_EURO?>gb per <?=number_format(1.0/$eur_rate,3)?> bitcoins, <?=number_format($eur_rate*DEDUCT_GB_PER_EURO,2)?>gb per bitcoin)</strong></li>  
             <li>For larger donations a more favourable rate may be available, please enquire.</li>  
-            <li><span  style="font-size: 1.1em;">If you want to donate for GB  
-                     <a style="font-weight: bold;" href="donate.php?action=my_donations&new=1">click here to get a personal donation address</a></span></li> 
+            -->
+            <?    
+            /// $DonateLevels = array ( 1 => 1.0, 10 => 1.5, 50 => 2.0, 100 => 10 );
+            
+            foreach ($DonateLevels as $level=>$rate) {
+                ?>
+                    <li>If you donate &euro;<?=$level?> you will get <?=number_format($level * $rate)?> GB removed from your <u>download</u>   <strong>(rate: <?=$rate?>gb per &euro;) &nbsp; ( <?=number_format($level/$eur_rate,3)?> bitcoins)</strong></li>  
+            
+                <?
+            }
+            
+            ?><br/>
+            <li><span style="font-size: 1.2em;">If you want to donate for GB  
+                    <a style="font-weight: bold;" href="donate.php?action=my_donations&new=1"><span style="color:red;"> >> </span>click here to get a personal donation address<span style="color:red;"> << </span></a></span></li> 
         </ul>
          
     </div>

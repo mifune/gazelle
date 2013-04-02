@@ -144,6 +144,8 @@ define('BONUS_TORRENTS_CAP', 300);
 
 $ExcludeForums = array( 9 ); // exclude games forum from latest topics (user option) - array instead of define in case we end up with +1 games forums
  
+$DonateLevels = array ( 1 => 1.0, 10 => 1.5, 50 => 2.0, 100 => 5 );
+
 
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');

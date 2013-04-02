@@ -32,8 +32,15 @@ $time = sqltime();
 $comment = "donated for ";
 
 if ($_REQUEST['donategb']) {
-    $deduct_bytes = floor($amount) * DEDUCT_GB_PER_EURO * 1024 * 1024 * 1024; // 1 euro per gb
-    $comment .= "- " . get_size($deduct_bytes);
+    //$deduct_bytes = floor($amount) * DEDUCT_GB_PER_EURO * 1024 * 1024 * 1024; // 1 euro per gb
+    $deduct_bytes = 0;
+    foreach ($DonateLevels as $level=>$rate) {
+        if ($amount >= $level ) {
+            $deduct_bytes = floor($amount) * $rate * 1024 * 1024 * 1024; // rate per gb
+            break;
+        }
+    }
+    $comment .= "ratio: - " . get_size($deduct_bytes);
 } else {
     $comment .= "love";
     $DB->query("SELECT ID, Title, Badge, Rank, Image, Description FROM badges WHERE Type='Donor' AND Cost<='" . (int) round($amount) . "' ORDER BY Cost DESC LIMIT 1");
@@ -74,6 +81,7 @@ if ($_REQUEST['donategb']) {
         $Summary .= " | NOTE: Could only remove " . get_size($downloaded_bytes);
 
     send_pm($UserID, 0, db_string("Thank-you for your donation"), db_string("[br]We have received your donation of &euro;$amount [br][br]:thankyou:[br][br]$Summary"));
+    
 } else {
 
     send_pm($UserID, 0, db_string("Thank-you for your donation"), db_string("[br]We have received your donation of &euro;$amount [br][br]:thankyou:[br][br]It's thanks to members like you that this site can carry on :gjob:"));
