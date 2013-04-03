@@ -71,7 +71,6 @@ show_header('Donation log','bitcoin');
         <div class="right">
             <span class="size3"><?=$totalnum?> donations</span><br/>
              (value when submitted) <span class="size3">&euro; <?=number_format($totalsum,2)?> total</span><br/>
-            <? //=print_r($Timeline,true); ?>
         </div>
     </div>
     

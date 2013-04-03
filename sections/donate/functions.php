@@ -68,9 +68,18 @@ function base58_decode($string) {
 
 */
 
-
-
-
+function get_donate_deduction($amount_euros) {
+    global $DonateLevels;
+    $deduct_bytes = 0;
+    $DonateLevelsR = array_reverse($DonateLevels, true);
+    foreach ($DonateLevelsR as $level=>$rate) {
+        if ($amount_euros >= $level ) {
+            $deduct_bytes = floor($amount_euros) * $rate * 1024 * 1024 * 1024; // rate per gb
+            break;
+        }
+    }
+    return $deduct_bytes;
+}
 
 
 
@@ -83,12 +92,7 @@ function print_btc_query_now($ID, $eur_rate, $address) {
             setTimeout("CheckAddress('<?=$ID?>','<?=$eur_rate?>','<?=$address?>','6')", <?=(int)($ID*800)?>);
         </script>
     </span>
-<?
-    //return $bID;
-    
-    /*   CheckAddress('<?=$bID?>','<?=$eur_rate?>','<?=$address?>','6'); */
-    //return '<span id="host_' . $ID . '">Resolving host ' . $IP . '...<script type="text/javascript">ajax.get(\'tools.php?action=get_host&ip=' . $IP . '\',function(host){$(\'#host_' . $ID . '\').raw().innerHTML=host;});</script></span>';
- 
+<? 
 }
 
 
@@ -182,54 +186,7 @@ function get_ticker_eur() {
             $mtgox_array = get_object_vars($output_mtgox_1['ticker']);
             return $mtgox_array;
         }
-        return false;
-        
-        /*
-        $returndata="";
-            
-        $last=round ( $mtgox_array['last'], 3);
-        $low =round ( $mtgox_array['low'], 3);
-        $high=round ( $mtgox_array['high'], 3);
-        $vol =round ( $mtgox_array['vol'], 3);
-        $avg = round ( $mtgox_array['avg'], 3 );
-        $ask = round ( $mtgox_array['sell'], 3 );
-        $bid = round ( $mtgox_array['buy'], 3 );
-     
-         Array
-(
-    [ticker] => stdClass Object
-        (
-            [high] => 34.8
-            [low] => 31.15337
-            [avg] => 33.109894651
-            [vwap] => 33.007414675
-            [vol] => 8539
-            [last_all] => 33.779
-            [last_local] => 33.779
-            [last] => 33.779
-            [buy] => 33.4901
-            [sell] => 33.75209
-        )
-
-)
-        // return "<pre>". print_r($output_mtgox_1, true)."</pre>";
-        
-        //echo $type;
-        if ( $type == "html" )
-        {
-        $returndata="<ul><li><strong>Last:</strong>&nbsp;&nbsp;".$last."</li><li><strong>High:</strong>&nbsp;".$high."</li><li><strong>Low:</strong>&nbsp;&nbsp;".$low."</li><li><strong>Avg:</strong>&nbsp;&nbsp;&nbsp;".$avg."</li><li><strong>Vol:</strong>&nbsp;&nbsp;&nbsp;&nbsp;".$vol."</li><li><strong>bid:</strong>&nbsp;&nbsp;&nbsp;".$bid."</li><li><strong>ask:</strong>&nbsp;&nbsp;&nbsp;".$ask."</li></ul>";
-        //$returndata="<ul><li><strong>Last:</strong>&nbsp;&nbsp;".$mtgox_array['last']."</li><li><strong>High:</strong>&nbsp;".$mtgox_array['high']."</li><li><strong>Low:</strong>&nbsp;&nbsp;".$mtgox_array['low']."</li><li><strong>Avg:</strong>&nbsp;&nbsp;&nbsp;".$mtgox_array['avg']."</li><li><strong>Vol:</strong>&nbsp;&nbsp;&nbsp;&nbsp;".$mtgox_array['vol']."</li></ul>";
-        }
-        else if ( $type == "text" )
-        {
-        //echo $geo;
-            if ( $geo == "line" )
-                $returndata="LAST: ".$last." HIGH: ".$high." LOW: ".$low." AVG: ".$avg." VOL: ".$vol." BID: ".$bid." ASK: ".$ask." ";
-            else if ( $geo == "vertical" )
-                $returndata="LAST: ".$last."\nHIGH: ".$high."\nLOW : ".$low."\nAVG : ".$avg."\nVOL : ".$vol."\nBID: ".$bid."\nASK: ".$ask;
-        }
-        return $returndata;
-         */
+        return false; 
  
  }
  

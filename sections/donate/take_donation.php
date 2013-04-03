@@ -33,13 +33,7 @@ $comment = "donated for ";
 
 if ($_REQUEST['donategb']) {
     //$deduct_bytes = floor($amount) * DEDUCT_GB_PER_EURO * 1024 * 1024 * 1024; // 1 euro per gb
-    $deduct_bytes = 0;
-    foreach ($DonateLevels as $level=>$rate) {
-        if ($amount >= $level ) {
-            $deduct_bytes = floor($amount) * $rate * 1024 * 1024 * 1024; // rate per gb
-            break;
-        }
-    }
+    $deduct_bytes = get_donate_deduction($amount);
     $comment .= "ratio: - " . get_size($deduct_bytes);
 } else {
     $comment .= "love";

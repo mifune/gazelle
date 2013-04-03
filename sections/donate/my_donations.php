@@ -113,7 +113,7 @@ show_header('My Donations','bitcoin');
                     ?>
                     <tr>
                         <td colspan="3" style="text-align:right;">
-                        <?      echo "&euro;$amount_euro => -". get_size(floor($amount_euro) * DEDUCT_GB_PER_EURO * 1024*1024*1024 ,2); ?>
+                        <?      echo "&euro;$amount_euro => -". get_size(get_donate_deduction($amount_euro) ,2); ?>
                         </td>
                         <td style="width:100px" rowspan="2">
                             <?
