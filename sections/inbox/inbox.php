@@ -102,6 +102,7 @@ if ($Section == 'sentbox'){
           LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
     
 } else {
+ 
     
     $sql = "SELECT
           SQL_CALC_FOUND_ROWS
@@ -118,10 +119,9 @@ if ($Section == 'sentbox'){
           um.PermissionID
           FROM pm_conversations AS c
           LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
-          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID 
+          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID AND pms.SenderID!='$UserID' 
           LEFT JOIN users_main AS um ON um.ID=pms.SenderID
           LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
-
 } 
 
 if(!empty($_GET['search']) && $_GET['searchtype'] == "message") {

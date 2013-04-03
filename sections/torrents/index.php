@@ -254,17 +254,17 @@ if(!empty($_REQUEST['action'])) {
 			$Cache->commit_transaction(0);
 			$Cache->increment('torrent_comments_'.$GroupID);
 			
-                  $DB->query("SELECT tg.Name, t.UserID, CommentsNotify 
+            $DB->query("SELECT tg.Name, t.UserID, CommentsNotify 
                                 FROM users_info AS u 
                            LEFT JOIN torrents AS t ON t.UserID=u.UserID
                            LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID 
                                WHERE t.GroupID='$GroupID'");
-                  list($TName, $UploaderID, $Notify)=$DB->next_record();
-                  // check whether system should pm uploader there is a new comment
-                  if( $Notify == 1 && $UploaderID!=$LoggedUser['ID'] )
-                      send_pm($UploaderID, 0, "Comment received on your upload", 
-                              "[br]You have received a comment from [url=/user.php?id={$LoggedUser['ID']}]{$LoggedUser['Username']}[/url] on your upload [url=/torrents.php?id=$GroupID&page=$Pages#post$PostID]{$TName}[/url]");
-                    
+            list($TName, $UploaderID, $Notify)=$DB->next_record();
+            // check whether system should pm uploader there is a new comment
+            if( $Notify == 1 && $UploaderID!=$LoggedUser['ID'] )
+                send_pm($UploaderID, 0, db_string("Comment received on your upload by {$LoggedUser['Username']}"), 
+                        db_string("[br]You have received a comment from [url=/user.php?id={$LoggedUser['ID']}]{$LoggedUser['Username']}[/url] on your upload [url=/torrents.php?id=$GroupID&page=$Pages#post$PostID]{$TName}[/url]"));
+            
 			header('Location: torrents.php?id='.$GroupID.'&page='.$Pages."#post$PostID");
 			break;
 		
