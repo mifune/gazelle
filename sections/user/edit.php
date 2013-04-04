@@ -22,14 +22,15 @@ $DB->query("SELECT
 			i.SiteOptions,
 			i.UnseededAlerts,
                   i.TimeZone,
-            m.Flag
+            m.Flag,
+            i.DownloadAlt
 			FROM users_main AS m
 			JOIN users_info AS i ON i.UserID = m.ID
 			LEFT JOIN permissions AS p ON p.ID=m.PermissionID
 			WHERE m.ID = '".db_string($UserID)."'");
 
 list($Username,$Email,$IRCKey,$Paranoia,$Signature,$PermissionID,$CustomPermissions,$Info,$Avatar,$Country,
-        $StyleID,$StyleURL,$SiteOptions,$UnseededAlerts,$TimeZone,$flag)=$DB->next_record(MYSQLI_NUM, array(3,6,12));
+        $StyleID,$StyleURL,$SiteOptions,$UnseededAlerts,$TimeZone,$flag, $DownloadAlt)=$DB->next_record(MYSQLI_NUM, array(3,6,12));
 
 $Permissions = get_permissions($PermissionID);
 list($Class,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($Permissions);
