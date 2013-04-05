@@ -22,8 +22,7 @@ if ( !isset($_GET['page']) && !$DonationTimeline = $Cache->get_value('donation_t
 	$Timeline = $DB->to_array(false,MYSQLI_NUM);
 	//$Timeline[] = array('', '0');
 	$Timeline = array_reverse($Timeline);
-    //$Timeline = array( array('one',5) , array('two',15) , array('three',25) , array('four',35) , array('six',45) , array('eight',48) , array('seven',50) );
-	$Area = new AREA_GRAPH(880,160); // ,array('Break'=>1)
+    $Area = new AREA_GRAPH(880,160); // ,array('Break'=>1)
 	foreach($Timeline as $Entry) {
 		list($Label,$Amount) = $Entry;
 		$Area->add($Label,$Amount);
@@ -44,11 +43,9 @@ if (!$view || !in_array($view, array('issued','submitted','cleared'))) $view='su
 
 if ($view == 'issued') {
     $statesql= 'unused';
-    //$statesql= "!='unused'";
     $unused = true;
 } else {
     $statesql= $view;
-    //$statesql= "='unused'";
     $unused = false;
 }
 
@@ -178,7 +175,7 @@ show_header('Donation log','bitcoin');
                             <td>&euro; (now)</td>
     <?                  }                   ?>
                 </tr>
-    <? 
+    <?
             $i=0;
             foreach($Donations as $Donation) {
                 list($ID, $state, $public, $activetime, $UserID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment,
@@ -201,12 +198,12 @@ show_header('Donation log','bitcoin');
                             <td><?=$amount_euro?></td>
     <?                  }                   ?>
                         
-                    <td><? //print_btc_query_now($i, $eur_rate, $public);?>
-                            <span style="font-style: italic;" id="btc_button_<?=$i?>">
-                                <a href="#" onclick="CheckAddress('<?=$i?>','<?=$eur_rate?>','<?=$public?>','6','<?=($unused?'0':'1')?>');return false;">
-                                    <img src="<?= STATIC_SERVER ?>common/symbols/reload1.gif" title="query btc balance" alt="query" /></a>
-                            </span>&nbsp;
-                            <span id="btc_balance_<?=$i?>"></span>
+                    <td>
+                        <span style="font-style: italic;" id="btc_button_<?=$i?>">
+                            <a href="#" onclick="CheckAddress('<?=$i?>','<?=$eur_rate?>','<?=$public?>','6','<?=($unused?'0':'1')?>');return false;">
+                                <img src="<?= STATIC_SERVER ?>common/symbols/reload1.gif" title="query btc balance" alt="query" /></a>
+                        </span>&nbsp;
+                        <span id="btc_balance_<?=$i?>"></span>
                     </td>
                     <td><span style="font-style: italic;" id="euros_<?=$i?>"></span></td>
                 </tr>

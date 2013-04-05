@@ -38,9 +38,12 @@ if(!empty($ShopItem) && is_array($ShopItem)){
             //$ResultMessage = "User cancelled operation";
         }
     }
+            
+    $DB->query("SELECT Credits From users_main WHERE ID='$UserID'"); 
+    list($Credits) = $DB->next_record(); 
     
     // again lets not trust the check on the previous page as to whether they can afford it
-    if ($OtherID && ($Cost <= $LoggedUser['TotalCredits'])) {
+    if ($OtherID && ($Cost <= $Credits)) {      // $LoggedUser['TotalCredits'])) {
         
         $UpdateSet = array();
         $UpdateSetOther = array();
@@ -137,10 +140,9 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                 $UpdateSet[]="i.BonusLog=CONCAT_WS( '\n', '$Summary', i.BonusLog)";
                 $UpdateSet[]="m.Credits=(m.Credits-'$Cost')";
                 
-                send_pm($OtherID, 0, "Bonus Shop - You received a gift of -gb", 
-                            "[br]You received a gift of -$Value gb from [user={$LoggedUser['Username']}]{$LoggedUser['Username']}[/user]");
+                send_pm($OtherID, 0, db_string("Bonus Shop - You received a gift of -gb"), 
+                     db_string("[br]You received a gift of -$Value gb from [user={$LoggedUser['Username']}]{$LoggedUser['Username']}[/user]"));
                 
-                            
                 $Value = get_bytes($Value.'gb');
                 $UpdateSetOther[]="m.Downloaded=(m.Downloaded-'$Value')";
                 $ResultMessage=$Summary;
@@ -260,7 +262,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
             $DB->query($sql);
             $Cache->delete_value('user_stats_'.$OtherID);
             $Cache->delete_value('user_info_heavy_'.$OtherID);
-            $Cache->delete_value('user_info_' . $UserID);
+            $Cache->delete_value('user_info_' . $OtherID);
         }
         
         if($UpdateSet){
