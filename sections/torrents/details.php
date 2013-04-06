@@ -129,7 +129,7 @@ $Icons .= '&nbsp;';
  
 ?>
 <div class="details thin">
-	<h2><?="$Icons$DisplayName"?></h2>
+    <h2><span class="arrow" style="float:left"><a href="torrents.php?id=<?=$GroupID?>&action=prev" title="goto previous torrent"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/arrow_left.png" alt="prev" title="goto previous torrent" /></a></span><?="$Icons$DisplayName"?><span class="arrow" style="float:right"><a href="torrents.php?id=<?=$GroupID?>&action=next" title="goto next torrent"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/arrow_right.png" alt="next" title="goto next torrent" /></a></span></h2>
       
 <?
 if(check_perms('torrents_review')){

@@ -16,7 +16,32 @@ function js_pages($Action, $TorrentID, $NumResults, $CurrentPage) {
 
 if(!empty($_REQUEST['action'])) {
 	switch($_REQUEST['action']){
-            case 'thank': // ajax
+        
+        case 'next':
+			enforce_login();
+            
+            if(empty($_GET['id']) || !is_number($_GET['id'])) error(0);
+         
+            $DB->query("SELECT ID FROM torrents WHERE ID>'".$_GET['id']."' ORDER BY ID ASC LIMIT 1" );
+            list($GroupID) = $DB->next_record();
+            if(!$GroupID) error('Cannot find a next record after <a href="/torrents.php?id='.$_GET['id'].'">the torrent you came from</a>');
+            
+            header("Location: torrents.php?id=".$GroupID );
+            break;
+        
+        case 'prev':
+			enforce_login();
+            
+            if(empty($_GET['id']) || !is_number($_GET['id'])) error(0);
+         
+            $DB->query("SELECT ID FROM torrents WHERE ID<'".$_GET['id']."' ORDER BY ID DESC LIMIT 1" );
+            list($GroupID) = $DB->next_record();
+            if(!$GroupID) error('Cannot find a previous record to <a href="/torrents.php?id='.$_GET['id'].'">the torrent you came from</a>');
+            
+            header("Location: torrents.php?id=".$GroupID );
+            break;
+        
+        case 'thank': // ajax
 			enforce_login();
 			authorize();
                   
@@ -36,7 +61,7 @@ if(!empty($_REQUEST['action'])) {
 			//header("Location: torrents.php?id=$GroupID#thanks");
 			break;
                     
-            case 'grouplog':
+        case 'grouplog':
 			enforce_login();
 			include(SERVER_ROOT.'/sections/torrents/grouplog.php');
 			break;

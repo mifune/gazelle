@@ -2468,3 +2468,8 @@ img.win.flash {
     font-weight: bold;
     text-align: left;
 }
+
+
+h2 span.arrow img {
+    margin-top:4px;
+}
