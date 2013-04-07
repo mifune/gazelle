@@ -617,43 +617,56 @@ list($NumTagVotes) = $DB->next_record();
      * Lets just skip the tag stats for the moment and see 
      * (added a switch in case we want to check it)
      */
-if (isset($_GET['tags']) ) {
+// if (isset($_GET['tags']) ) {
     
     if (check_paranoia_here('tags+')) { 
 
-        $DB->query("SELECT COUNT(tt.TagID) FROM torrents_tags AS tt 
-                      JOIN torrents AS t ON t.GroupID=tt.GroupID JOIN torrents_group AS tg ON tg.ID=tt.GroupID 
-                      JOIN tags ON tt.TagID=tags.ID 
-                     WHERE tt.UserID = '$UserID' 
-                       AND t.UserID = '$UserID'");
-        list($NumOwnTags) = $DB->next_record();
+        $UserTagCount = $Cache->get_value('user_tag_count_'.$UserID);
+    
+        if (is_array($UserTagCount)) {
 
-        $DB->query("SELECT COUNT(tt.TagID) FROM torrents_tags AS tt 
-                      JOIN torrents AS t ON t.GroupID=tt.GroupID JOIN torrents_group AS tg ON tg.ID=tt.GroupID
-                      JOIN tags ON tt.TagID=tags.ID 
-                     WHERE tt.UserID = '$UserID' 
-                       AND t.UserID != '$UserID'");
-        list($NumOthersTags) = $DB->next_record();
+            list($NumOwnTags, $NumOthersTags, $NumVotesOwn, $NumVotesOthers) = $UserTagCount;
 
-        $DB->query("SELECT COUNT(ttv.TagID) FROM torrents_tags_votes AS ttv 
-                      JOIN torrents AS t ON t.GroupID=ttv.GroupID JOIN torrents_group AS tg ON tg.ID=ttv.GroupID 
-                      JOIN tags ON ttv.TagID=tags.ID  
-                      JOIN torrents_tags AS tt ON tt.TagID=ttv.TagID AND tt.GroupID=ttv.GroupID
-                     WHERE ttv.UserID = '$UserID' 
-                       AND t.UserID = '$UserID'");
-        list($NumVotesOwn) = $DB->next_record();
+        } else {
 
-        $DB->query("SELECT COUNT(ttv.TagID) FROM torrents_tags_votes AS ttv 
-                     JOIN torrents AS t ON t.GroupID=ttv.GroupID JOIN torrents_group AS tg ON tg.ID=ttv.GroupID  
-                      JOIN tags ON ttv.TagID=tags.ID  
-                      JOIN torrents_tags AS tt ON tt.TagID=ttv.TagID AND tt.GroupID=ttv.GroupID
-                     WHERE ttv.UserID = '$UserID' 
-                       AND t.UserID != '$UserID'");
-        list($NumVotesOthers) = $DB->next_record();
+            $DB->query("SELECT COUNT(tt.TagID) FROM torrents_tags AS tt 
+                          JOIN torrents AS t ON t.GroupID=tt.GroupID JOIN torrents_group AS tg ON tg.ID=tt.GroupID 
+                          JOIN tags ON tt.TagID=tags.ID 
+                         WHERE tt.UserID = '$UserID' 
+                           AND t.UserID = '$UserID'");
+            list($NumOwnTags) = $DB->next_record(MYSQL_NUM);
+
+            $DB->query("SELECT COUNT(tt.TagID) FROM torrents_tags AS tt 
+                          JOIN torrents AS t ON t.GroupID=tt.GroupID JOIN torrents_group AS tg ON tg.ID=tt.GroupID
+                          JOIN tags ON tt.TagID=tags.ID 
+                         WHERE tt.UserID = '$UserID' 
+                           AND t.UserID != '$UserID'");
+            list($NumOthersTags) = $DB->next_record(MYSQL_NUM);
+
+            $DB->query("SELECT COUNT(ttv.TagID) FROM torrents_tags_votes AS ttv 
+                          JOIN torrents AS t ON t.GroupID=ttv.GroupID JOIN torrents_group AS tg ON tg.ID=ttv.GroupID 
+                          JOIN tags ON ttv.TagID=tags.ID  
+                          JOIN torrents_tags AS tt ON tt.TagID=ttv.TagID AND tt.GroupID=ttv.GroupID
+                         WHERE ttv.UserID = '$UserID' 
+                           AND t.UserID = '$UserID'");
+            list($NumVotesOwn) = $DB->next_record(MYSQL_NUM);
+
+            $DB->query("SELECT COUNT(ttv.TagID) FROM torrents_tags_votes AS ttv 
+                         JOIN torrents AS t ON t.GroupID=ttv.GroupID JOIN torrents_group AS tg ON tg.ID=ttv.GroupID  
+                          JOIN tags ON ttv.TagID=tags.ID  
+                          JOIN torrents_tags AS tt ON tt.TagID=ttv.TagID AND tt.GroupID=ttv.GroupID
+                         WHERE ttv.UserID = '$UserID' 
+                           AND t.UserID != '$UserID'");
+            list($NumVotesOthers) = $DB->next_record(MYSQL_NUM);
+
+            $UserTagCount = array($NumOwnTags, $NumOthersTags, $NumVotesOwn, $NumVotesOthers);
+            $Cache->cache_value('user_tag_count_'.$UserID , $UserTagCount, 3600 );
+        }
     
     }  
                 
-    if (check_paranoia_here('tags')) { ?>
+    
+   if (check_paranoia_here('tags')) { ?>
 				<li>Tags added: <span title="Tags on other uploaders torrents added"><?=$NumOthersTags?></span> 
                                 <span title="Tags on own torrents added (<?=($NumOthersTags+$NumOwnTags)?> total)">(+<?=$NumOwnTags?>) </span> 
                                 [<a href="userhistory.php?action=tag_history&amp;type=added&amp;userid=<?=$UserID?>" title="View all tags added by <?=$LoggedUser['Username']?>">View</a>]
@@ -670,7 +683,7 @@ if (isset($_GET['tags']) ) {
                                 <span title="Tags on own torrents voted for (<?=($NumVotesOwn+$NumVotesOthers)?> total)">(+<?=$NumVotesOwn?>)</span>
                 </li>
 <?  }   
- } // end if $_GET['tags'] hack
+ //} // end if $_GET['tags'] hack
 
 ?>
 				<li>Forum Posts: <?=number_format($ForumPosts)?> [<a href="userhistory.php?action=posts&amp;userid=<?=$UserID?>" title="View all forum posts by <?=$LoggedUser['Username']?>">View</a>]</li>
@@ -771,15 +784,16 @@ if (check_paranoia_here('grabbed+')) {
 <?
 }
 
-if($OwnProfile || check_perms('users_mod')) {
+if($OwnProfile || check_perms('users_view_donor')) {
     
-        $DB->query("SELECT COUNT(ID) FROM bitcoin_donations WHERE received='0000-00-00 00:00:00' AND userID='$UserID'");
-        list($NumDonationsPending) = $DB->next_record();
-        $DB->query("SELECT COUNT(ID), Sum(amount_euro) FROM bitcoin_donations WHERE received !='0000-00-00 00:00:00' AND userID='$UserID'");
+        $DB->query("SELECT COUNT(ID) FROM bitcoin_donations WHERE state='unused' AND userID='$UserID'");
+        list($NumDonationsIssued) = $DB->next_record();
+        $DB->query("SELECT COUNT(ID), Sum(amount_euro) FROM bitcoin_donations WHERE state!='unused' AND userID='$UserID'");
         list($NumDonations, $SumDonations) = $DB->next_record();
 ?>
-        <li>Donations: <strong>&euro;<?=number_format($SumDonations, 2) ?></strong>  <span title="number of donations made"><?=number_format($NumDonations)?></span> 
-                              <span title="donations pending">(<?=number_format($NumDonationsPending)?>)</span> 
+        <li>Donated: <strong>&euro;<?=number_format($SumDonations, 2) ?></strong>  
+            &nbsp; <span title="number of donations made"><?=number_format($NumDonations)?></span> 
+            <span title="donation addresses unused">(<?=number_format($NumDonationsIssued)?>)</span> 
              [<a href="donate.php?action=my_donations&amp;userid=<?=$UserID?>" title="View donations">View</a>]</li>
 <?
 }
@@ -1142,7 +1156,7 @@ foreach ($Collages as $CollageInfo) {
 
 
 // Linked accounts
-if(check_perms('users_mod')) {
+if(check_perms('users_mod', $Class)) {
         $CookieItems[] = 'linked';
         $CookieItems[] = 'iplinked';
         $CookieItems[] = 'elinked';
@@ -1451,7 +1465,7 @@ if (check_perms('users_mod', $Class)) {
             <div class="head">
                 <span style="float:left;">Tracker History</span>
                 <span style="float:right;"><a id="historybutton" href="#" onclick="return Toggle_view('history');">(Hide)</a></span>&nbsp;
-            </div>               
+            </div>            
 		<div class="box">		
                   <div class="pad" id="historydiv">
                       This is a record of up/down from the tracker, plus credits awarded 

@@ -17,7 +17,7 @@ $Title = "My Donations";
 
 if(!$OwnProfile) {
     $UserInfo = user_info($UserID);
-    $Title .= " " . format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], $UserInfo['Title'], true);
+    $Title .= " " . format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, true);
 }
     
     

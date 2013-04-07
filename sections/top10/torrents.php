@@ -42,6 +42,7 @@ show_header('Top '.$Limit.' Torrents');
 		<a href="top10.php?type=torrents"><strong>[Torrents]</strong></a>
 		<a href="top10.php?type=users">[Users]</a>
 		<a href="top10.php?type=tags">[Tags]</a>
+		<a href="top10.php?type=taggers">[Taggers]</a>
 	</div>
 <?
 
