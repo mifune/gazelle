@@ -738,7 +738,7 @@ if(isset($ActiveDrive['ID']) ) {
     list($raised_euros, $count)=$DB->next_record();  
     $percentdone = (int)($raised_euros * 100 / $target_euros); 
     if ($percentdone>100) $percentdone=100;
-    ?>
+    /* ?>
     <div id="active_drive">
         <a href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details"><?=$name?></a>
         <a class="link" href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details">click for details</a>
@@ -752,6 +752,23 @@ if(isset($ActiveDrive['ID']) ) {
         </a>
         <a class="link" title="click to donate" href="donate.php">please help support the site, click to donate</a>
     </div>
+    <? */
+    ?>
+<div id="active_drive">
+    <div id="donorbar">
+        <div>
+            <a href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details"><?=$name?></a>
+            <a class="link" href="donate.php" title="click to donate">
+                so far we have raised <strong>&euro;<?=number_format($raised_euros,2)?></strong> out of <strong>&euro;<?=number_format($target_euros,2)?></strong> - to help support the site click to donate
+            </a>
+            <div>
+                <a href="donate.php" title="click to donate">
+                    <div id="donorbargreen" style="width:<?=$percentdone?>%;"> <?if($percentdone>94)echo "$percentdone%";?> &nbsp;</div><div id="donorbarred" style="width:<?=(100-$percentdone)?>%;"> &nbsp;<?if($percentdone<=94)echo "$percentdone%";?></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
     <?
 } 
 if(!$LoggedUser['Donor']) { ?>

@@ -2332,53 +2332,50 @@ img.win.flash {
 }
 
 #active_drive {
-    position: relative; 
-    /*
-	-moz-border-radius: 6px;
-	border-radius: 6px;
-	-webkit-border-radius: 6px;
+    position: relative;  
+    text-align: left;
+	text-decoration: none; 
+	vertical-align: top; 
     
-    background-color:#fff;
-    */
-    background-color:#0261a3;
+    width: 90%;
+    min-width: 980px;
+    max-width: 1200px;
+    background-color: #e0e8eb;
+    margin: 10px auto 30px auto;
+    padding: 5px 0.6em ;
+    border: 1px solid #98AAB1;
     
-    margin: 0px 0px 20px 0px;
-    text-align: center;
-	text-decoration: none;
-	color: #fff;
-	border: none;
-	vertical-align: top;
-	padding: 0px 0px;
-    
+    color: #0261a3;
+}
+#donorbar {
+    width: 90%;
+    min-width: 960px;
+    margin: 0px auto; 
+    padding: 5px;
 }
 
 #active_drive a{ 
-	text-decoration: none;
-	color: #fff;	
+	text-decoration: none;	
     font-weight: bold;
     font-size: 14px;  
 }
 #active_drive a:hover { 
 	text-decoration: underline;
-	color: #fff;
 }
 #active_drive a.link{ 
-    margin-left: 16px;
+    float:right;
 	text-decoration: none;
-	color: #fff;	
-    font-weight: bold;
+    font-weight: normal;
     font-size: 10px;  
-    font-style: italic;
 }
 #active_drive a.link:hover { 
 	text-decoration: underline;
-	color: #fff;
 }
  
 #donorbargreen {
     display:inline-block;
-    font-size: 14px;  
-    height: 20px;
+    font-size: 12px;  
+    height: 15px;
     background-color:#4d4;
     color:white;
     font-weight: bold;
@@ -2386,10 +2383,12 @@ img.win.flash {
 }
 #donorbarred {
     display:inline-block;
-    font-size: 14px;  
-    height: 20px;
+    font-size: 12px;  
+    height: 15px;
     background-color:#b11;
-    color:white;
+    background-color:#0261a3;
+    background-color:white;
+    color:#0261a3;
     font-weight: bold;
     text-align: left;
 }

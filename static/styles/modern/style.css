@@ -2817,10 +2817,6 @@ blue smaller
     text-align: left;
 } */
 
-
-#active_drive {
-    position: relative; 
-	
     /*
 	-moz-border-radius: 12px;
 	border-radius: 12px;
@@ -2836,23 +2832,42 @@ blue smaller
     border: 1px solid #0054b0;
     background-color: #003875;
     */
-    border: none;
     
-    background-color: #0d245a; 
     
-    margin: 20px 0px 0px 0px;
+
+#active_drive {
+    position: relative; 
+	 
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	-webkit-border-radius: 12px;
+     
+    width: 90%;
+    min-width: 940px;
+    max-width: 1200px;
+    margin: 20px auto 0px auto; 
+     
+    border: 1px solid #0054b0;
+    background-color: #003875; 
+     
+    padding: 0px;
     
-    text-align: center;
+    text-align: left;
 	text-decoration: none;
 	color: white;	
     font-weight: bold;
     font-size: 14px;
  
-	vertical-align: top;
-	padding: 0px;
+	vertical-align: top; 
      
 }
 
+#donorbar {
+    width: 96%;
+    min-width: 920px;
+    margin: 0px auto; 
+    padding: 5px;
+}
  
 #active_drive a{ 
 	text-decoration: none;
@@ -2865,18 +2880,51 @@ blue smaller
 	color: white;
 }
 #active_drive a.link{ 
-    margin-left: 16px;
+    float:right;
 	text-decoration: none;
 	color: white;	
     font-weight: normal;
     font-size: 12px;  
-    font-style: italic;
 }
 #active_drive a.link:hover { 
 	text-decoration: underline;
 	color: white;
 }
  
+#donorbargreen {
+    display:inline-block;
+    font-size: 12px;  
+    height: 14px;
+    background-color:#4d4;
+    color:white;
+    font-weight: bold;
+    text-align: right;
+    
+    -moz-box-shadow:inset 2px 1px 3px #6a9bb7;
+    -webkit-box-shadow:inset 2px 1px 3px #6a9bb7;
+    box-shadow:inset 2px 1px 3px #6a9bb7;
+/*
+    background-color:#4d649a;
+    -moz-box-shadow:inset 2px 1px 3px #0d245a;
+    -webkit-box-shadow:inset 2px 1px 3px #0d245a;
+    box-shadow:inset 2px 1px 3px #0d245a;
+*/
+}
+#donorbarred {
+    display:inline-block;
+    font-size: 12px;  
+    height: 14px;
+    background-color:#0d245a;  
+    color:white;
+    font-weight: bold;
+    text-align: left;
+    
+    -moz-box-shadow:inset 0px 1px 3px #081a4a;
+    -webkit-box-shadow:inset 0px 1px 3px #081a4a;
+    box-shadow:inset 0px 1px 3px #081a4a;
+}
+
+/*
 #donorbargreen {
     display:inline-block;
     font-size: 16px;  
@@ -2903,3 +2951,4 @@ blue smaller
     -webkit-box-shadow:inset 0px 1px 3px #6a9bb7;
     box-shadow:inset 0px 1px 3px #6a9bb7;
 }
+*/
