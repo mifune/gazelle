@@ -1926,13 +1926,36 @@ if (check_perms('users_mod', $Class)) {
 ?>
 						<option value="<?=display_str($Address)?>"><?=display_str($Address)?> - <?=display_str($IP)?></option>
 <?			} ?>
-					</select>
+					</select> (disables the account)
 				</td>
 			</tr>
 
 <?		} ?>
 <?
 	}
+    
+	if ($Enabled == '0' && check_perms('users_mod')) {
+        if (!is_array($Emails)) {
+            $DB->query("SELECT DISTINCT Email, IP FROM users_history_emails WHERE UserID = ".$UserID." ORDER BY Time ASC");
+            $Emails = $DB->to_array();
+        }
+?>
+			<tr>
+				<td class="label">Confirm Account:</td>
+				<td>
+					<input type="checkbox" name="SendConfirmMail" id="SendConfirmMail" /> <label for="SendConfirmMail">Resend confirmation email</label> to 
+					<select name="ConfirmEmail">
+<?
+			foreach($Emails as $Email) {
+				list($Address, $IP) = $Email;
+?>
+						<option value="<?=display_str($Address)?>"><?=display_str($Address)?> - <?=display_str($IP)?></option>
+<?			} ?>
+					</select> 
+				</td>
+			</tr>
+<?
+    }
 
 	if (check_perms('users_disable_any')) {
 ?>

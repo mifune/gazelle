@@ -93,6 +93,12 @@ if($SendHackedMail && !empty($_POST['HackedEmail'])) {
 } else {
 	$SendHackedMail = false;
 }
+$SendConfirmMail = (isset($_POST['SendConfirmMail']))? 1 : 0;
+if($SendConfirmMail && !empty($_POST['ConfirmEmail'])) {
+	$ConfirmEmail = $_POST['ConfirmEmail'];
+} else {
+	$SendConfirmMail = false;
+}
 $MergeStatsFrom = db_string($_POST['MergeStatsFrom']);
 $Reason = db_string($_POST['Reason']);
 
@@ -706,6 +712,22 @@ Once you are connected to our server you'll need to join our disabled channel.
 Type: /join ".BOT_DISABLED_CHAN."
 
 Please visit us soon so we can help you resolve this matter.");
+}
+
+if($SendConfirmMail) {
+	$EditSummary[]="confirmation email resent to ".$ConfirmEmail;
+    
+    include(SERVER_ROOT.'/classes/class_templates.php');
+			
+    $TPL=NEW TEMPLATE;
+	$TPL->open(SERVER_ROOT.'/templates/new_registration.tpl');
+			
+    $TPL->set('Username',$_POST['Username']);
+    $TPL->set('TorrentKey',$Cur['torrent_pass']);
+    $TPL->set('SITE_NAME',SITE_NAME);
+    $TPL->set('SITE_URL',SITE_URL);
+
+    send_email($ConfirmEmail,'New account confirmation at '.SITE_NAME,$TPL->get(),'noreply');
 }
 
 if ($MergeStatsFrom && check_perms('users_edit_ratio')) {

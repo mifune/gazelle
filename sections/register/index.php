@@ -12,16 +12,19 @@ $Val=NEW VALIDATE;
 
 if(!empty($_REQUEST['confirm'])) {
 	// Confirm registration
-	$DB->query("SELECT ID FROM users_main WHERE torrent_pass='".db_string($_REQUEST['confirm'])."' AND Enabled='0'");
-	list($UserID)=$DB->next_record();
+	$DB->query("SELECT ID, Enabled FROM users_main WHERE torrent_pass='".db_string($_REQUEST['confirm'])."'"); //  AND Enabled='0'
+	list($UserID, $Enabled)=$DB->next_record();
 	
 	if($UserID) {
-		$DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
-		$Cache->increment('stats_user_count');
-        
         $Body = get_article("intro_pm");
         if($Body) send_pm($UserID, 0, "Welcome to ". SITE_NAME , $Body);
-        
+
+        if ($Enabled=='0') {
+            $DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
+            $Cache->increment('stats_user_count');
+
+            update_tracker('add_user', array('id' => $UserID, 'passkey' => $_REQUEST['confirm']));
+        }
 		include('step2.php');
 	}
 	
@@ -198,7 +201,7 @@ if(!empty($_REQUEST['confirm'])) {
 			$TPL->set('SITE_URL',SITE_URL);
 
 			send_email($_REQUEST['email'],'New account confirmation at '.SITE_NAME,$TPL->get(),'noreply');
-			update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
+			//update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
 			$Sent=1;
 			
 			
