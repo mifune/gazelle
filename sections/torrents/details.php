@@ -502,7 +502,8 @@ if(count($Tags) > 0) {
                                 <li id="tlist<?=$Tag['id']?>">
                                       <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;"><?=display_str($Tag['name'])?></a>
                                       <div style="float:right; display:block; letter-spacing: -1px;">
-        <?		if(check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid'])){  ?>
+        <?		if(empty($LoggedUser['DisableTagging']) && 
+                                    (check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid']))) {  ?>
                                       <a title="Vote down tag '<?=$Tag['name']?>'" href="#tags"  onclick="return Vote_Tag(<?="'{$Tag['name']}',{$Tag['id']},$GroupID,'down'"?>)" style="font-family: monospace;" >[-]</a>
                                       <span id="tagscore<?=$Tag['id']?>" style="width:10px;text-align:center;display:inline-block;"><?=$Tag['score']?></span>
                                       <a title="Vote up tag '<?=$Tag['name']?>'" href="#tags"  onclick="return Vote_Tag(<?="'{$Tag['name']}',{$Tag['id']},$GroupID,'up'"?>)" style="font-family: monospace;">[+]</a>
@@ -538,7 +539,7 @@ if(count($Tags) > 0) {
 } // action="torrents.php" 
 ?>
                 </div>
-<?      if(check_perms('site_add_tag') || $IsUploader){ ?>
+<?      if(empty($LoggedUser['DisableTagging']) && (check_perms('site_add_tag') || $IsUploader)) { ?>
 			<div class="tag_add">
 	<div id="messagebar" class="messagebar hidden"></div>
 				<form id="form_addtag" action="" method="post" onsubmit="return false;">
@@ -553,6 +554,9 @@ if(count($Tags) > 0) {
 <?      }       ?>
             </div>
 	</div>
+     
+     
+     
 	<div class="middle_column">
             <div class="head">Torrent Info</div>
 		<table class="torrent_table">

@@ -2,6 +2,10 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
+if(!empty($LoggedUser['DisableTagging'])) {
+	error(403,true);
+}
+
 include(SERVER_ROOT . '/sections/torrents/functions.php');
 
 
