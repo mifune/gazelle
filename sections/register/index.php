@@ -124,11 +124,15 @@ if(!empty($_REQUEST['confirm'])) {
 				(UserID, Email, Time, IP, ChangedbyID) VALUES 
 				('$UserID', '".db_string($_REQUEST['email'])."', '0000-00-00 00:00:00', '".db_string($_SERVER['REMOTE_ADDR'])."','$UserID')");
 				
-			if ($_REQUEST['email'] != $InviteEmail) {
+            /*
+             * not sure what the purpose of this is... it records the inviters email in the new users email history... why??
+             * // blanking this for the moment seems wrong
+			if ($InviteEmail && $_REQUEST['email'] != $InviteEmail) {
 				$DB->query("INSERT INTO users_history_emails
 					(UserID, Email, Time, IP, ChangedbyID) VALUES 
 					('$UserID', '$InviteEmail', '".sqltime()."', '".db_string($_SERVER['REMOTE_ADDR'])."','$UserID')");
 			}
+             */
 			
 			
 			
