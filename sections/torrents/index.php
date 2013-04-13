@@ -712,6 +712,7 @@ if(!empty($_REQUEST['action'])) {
                         $Cache->delete_value('torrent_group_' . $GroupID);
                         $Cache->delete_value('torrent_group_light_' . $GroupID);
                         $Cache->delete_value('torrents_details_' . $GroupID);
+                        $Cache->delete_value('staff_pm_new_' . $UserID);
                         
                         // logging - 
                         write_log("Torrent $TorrentID ($Name) status set to $Status by ".$LoggedUser['Username']." ($LogDetails)"); // TODO: this is probably broken
