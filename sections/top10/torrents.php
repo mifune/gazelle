@@ -106,6 +106,7 @@ $FreeleechToggleQuery .= 'freeleech=' . $FreeleechToggleName;
 $Where = implode(' AND ', $Where);
 
 $WhereSum = (empty($Where)) ? '' : md5($Where);
+      
 $BaseQuery = "SELECT
 	t.ID,
 	g.ID,
@@ -120,18 +121,12 @@ $BaseQuery = "SELECT
       t.UserID,
       u.Username, 
       t.FreeTorrent, 
-      t.double_seed,
-      tr.Status
+      t.double_seed 
 	FROM torrents AS t
 	LEFT JOIN torrents_group AS g ON g.ID = t.GroupID
-      LEFT JOIN torrents_reviews AS tr ON tr.GroupID=t.GroupID
-      LEFT JOIN users_main AS u ON u.ID = t.UserID ";
+    LEFT JOIN users_main AS u ON u.ID = t.UserID ";
       
-if (!empty($Where)) $Where .= ' AND';
-$Where .= ' (tr.Time IS NULL OR tr.Time=(SELECT MAX(torrents_reviews.Time) 
-                                                              FROM torrents_reviews 
-                                                              WHERE torrents_reviews.GroupID=t.GroupID)) ';
-
+ 
 if($Details=='all' || $Details=='day') {
 	if (!$TopTorrentsActiveLastDay = $Cache->get_value('top10tor_day_'.$Limit.$WhereSum)) {
 		$DayAgo = time_minus(86400);
