@@ -1907,11 +1907,11 @@ if (check_perms('users_mod', $Class)) {
 					
 					<input type="checkbox" title="Disable user from being able to access the forums (no read permission)" name="DisableForums" id="DisableForums"<? if ($DisableForums==1) { ?>checked="checked"<? } ?> /> <label title="Disable user from being able to access the forums (no read permission)" for="DisableForums">Forums</label> |
 					<input type="checkbox" title="Disable user from being able to add tags" name="DisableTagging" id="DisableTagging"<? if ($DisableTagging==1) { ?>checked="checked"<? } ?> /> <label title="Disable user from being able to add tags" for="DisableTagging">Tagging</label> |
-					<input type="checkbox" title="Disable user from being able to access the requests section" name="DisableRequests" id="DisableRequests"<? if ($DisableRequests==1) { ?>checked="checked"<? } ?> /> <label for="DisableRequests">Requests</label>
+					<input type="checkbox" title="Disable user from being able to access the requests section" name="DisableRequests" id="DisableRequests"<? if ($DisableRequests==1) { ?>checked="checked"<? } ?> /> <label title="Disable user from being able to access the requests section" for="DisableRequests">Requests</label>
 					<br />
-					<input type="checkbox" title="Disable user ability to upload torrents" name="DisableUpload" id="DisableUpload"<? if ($DisableUpload==1) { ?>checked="checked"<? } ?> /> <label for="DisableUpload">Upload</label> |
-					<input type="checkbox" title="Disable user ability to leech on the tracker" name="DisableLeech" id="DisableLeech"<? if ($DisableLeech==0) { ?>checked="checked"<? } ?> /> <label for="DisableLeech">Leech</label> |
-					<input type="checkbox" title="Disable user ability to send private messages" name="DisablePM" id="DisablePM"<? if ($DisablePM==1) { ?>checked="checked"<? } ?> /> <label for="DisablePM">PM</label> <!-- | -->
+					<input type="checkbox" title="Disable user ability to upload torrents" name="DisableUpload" id="DisableUpload"<? if ($DisableUpload==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to upload torrents" for="DisableUpload">Upload</label> |
+					<input type="checkbox" title="Disable user ability to leech on the tracker" name="DisableLeech" id="DisableLeech"<? if ($DisableLeech==0) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to leech on the tracker" for="DisableLeech">Leech</label> |
+					<input type="checkbox" title="Disable user ability to send private messages" name="DisablePM" id="DisablePM"<? if ($DisablePM==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to send private messages" for="DisablePM">PM</label> <!-- | -->
 					<!-- <input type="checkbox" name="DisableIRC" id="DisableIRC"<? if ($DisableIRC==1) { ?>checked="checked"<? } ?> /> <label for="DisableIRC">IRC</label> -->
 				</td>
 			</tr>

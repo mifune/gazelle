@@ -1,5 +1,7 @@
 <?php
 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
    
 if (!empty($_REQUEST['userid']) && is_numeric($_REQUEST['userid']))  
     $UserID = $_REQUEST['userid'];
@@ -21,7 +23,7 @@ if(!$OwnProfile) {
 }
     
     
-show_header('My Donations','bitcoin');
+show_header('My Donations','bitcoin,bbcode');
 
 ?>
 <!-- Donate -->
@@ -105,7 +107,7 @@ show_header('My Donations','bitcoin');
                         <td>bc amount deposited</td><td>&euro; <em>(estimated)</em></td>
                     </tr>
                     <tr>
-                        <td><?=$public?></td><td><?=($activetime?time_diff($activetime):'')?></td>
+                        <td><?=$Text->full_format("[font=Courier New][b]{$public}[/b][/font]", true)?></td><td><?=($activetime?time_diff($activetime):'')?></td>
                         <td><?=$balance1; if ($balance1>0) echo ($balance2==0?' (pending)':' (verified)')?></td><td><?=$amount_euro?></td>
                     </tr>
                     <?
@@ -176,6 +178,15 @@ show_header('My Donations','bitcoin');
             
             foreach($donation_records as $record) {
                 list($ID, $state, $public, $time, $userID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment) = $record;
+                /* $hidden_addy = $public;
+                $len = strlen($hidden_addy);
+                for ($i=6;$i<$len;$i++) {
+                   // $hidden_addy[$i] 
+                } */
+                //$hidden_addy = substr_replace($public, "__Do_Not_Use_This_Again", -23);
+                //$hidden_addy = substr_replace($public, "#######################", -23);
+                $addybbcode = "[font=Courier New]" .substr_replace($public, "#######################", -23)."[/font]" .
+                        "[spoiler= ]Do not use this address again, if you want to make another donation please request a new address above[br]your old address: [font=Courier New]{$public}[/font][/spoiler]"; 
     ?>
             <div class="donate_details green">
                 <table class="noborder">
@@ -183,7 +194,7 @@ show_header('My Donations','bitcoin');
                         <td>address</td><td>bc rate</td><td>date</td><td>bc amount</td><td></td>
                     </tr>
                     <tr>
-                        <td><?=$public?></td><td><?=$bitcoin_rate?></td><td><?=time_diff($received)?></td><td><?=$amount_bitcoin?></td><td>&euro;<?=$amount_euro?></td>
+                        <td title="Do not reuse old donation addresses. If you want to make a new donation please use a new address (issued above)"><?=$Text->full_format($addybbcode, true)?></td><td><?=$bitcoin_rate?></td><td><?=time_diff($received)?></td><td><?=$amount_bitcoin?></td><td>&euro;<?=$amount_euro?></td>
                     </tr>
                     <tr>
                         <td colspan="4"><?=$comment?></td><td colspan="1"><? if (check_perms('admin_donor_log'))echo "<em>$state</em>";?></td> 
