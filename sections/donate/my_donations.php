@@ -41,19 +41,19 @@ show_header('My Donations','bitcoin,bbcode');
     
         if ($_REQUEST['new']=='1' && count($user_addresses)==0) { 
             // only assign a new address if they dont already have one 
-            $DB->query("SELECT ID, public FROM bitcoin_addresses ORDER BY ID LIMIT 1");
+            $DB->query("SELECT ID, public, userID FROM bitcoin_addresses ORDER BY ID LIMIT 1");
             if ($DB->record_count() < 1) {
                 // no addresses!!
                 $Err = "Failed to get an address, if this error persists we probably need to add some addresses, please contact an admin"; 
             } else {
                 // got an unused address 
-                list($addID, $public) = $DB->next_record();
+                list($addID, $public, $staffID) = $DB->next_record();
 
                 $DB->query("DELETE FROM bitcoin_addresses WHERE ID=$addID");
                 if ($DB->affected_rows()==1) { // delete succeeded - we can issue this address
                     $time = sqltime();
-                    $DB->query("INSERT INTO bitcoin_donations (public, time, userID)
-                                                    VALUES ( '$public', '$time', '$UserID')");
+                    $DB->query("INSERT INTO bitcoin_donations (public, time, userID, staffID)
+                                                    VALUES ( '$public', '$time', '$UserID', '$staffID')");
                     $ID = $DB->inserted_id();
                     $user_addresses = array( array($ID, $public, $time) );
                 } else {

@@ -76,11 +76,12 @@ show_header('Donation log','bitcoin');
     list($Page,$Limit) = page_limit(DONATIONS_PER_PAGE);
  
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
-                        bc.ID, state, public, bc.time, bc.userID, bitcoin_rate, received, amount_bitcoin, amount_euro, comment,
+                        bc.ID, state, public, bc.time, bc.userID, bitcoin_rate, received, amount_bitcoin, amount_euro, comment, bc.staffID, staff.Username,
                         m.Username, m.PermissionID, m.Enabled, i.Donor, i.Warned  
                      FROM bitcoin_donations AS bc
-                     LEFT JOIN users_main AS m ON m.ID=bc.UserID
-                     LEFT JOIN users_info AS i ON i.UserID=bc.UserID 
+                     LEFT JOIN users_main AS m ON m.ID=bc.userID
+                     LEFT JOIN users_info AS i ON i.UserID=bc.userID 
+                     LEFT JOIN users_main AS staff ON staff.ID=bc.staffID
                      WHERE state ='$statesql' 
                      ORDER BY received DESC, bc.time DESC LIMIT $Limit ");
 
@@ -167,19 +168,24 @@ show_header('Donation log','bitcoin');
                 <tr class="colhead">
                     <td>user</td>
                     <td>address</td>
+    <?              
+                    $admin_addresses = check_perms('admin_donor_addresses');
+                    if ($admin_addresses){      ?>
+                        <td>issued by</td>
+    <?              }                   ?>
                     <td><?=$timeheader?></td>
                     <td>btc <?=($unused?'balance':'(submitted)')?></td>
                     <td>&euro; <?=($unused?' (estimated)':' (submitted)')?></td>
-    <?                  if (!$unused){      ?>
-                            <td>btc (now)</td>
-                            <td>&euro; (now)</td>
-    <?                  }                   ?>
+    <?              if (!$unused){      ?>
+                        <td>btc (now)</td>
+                        <td>&euro; (now)</td>
+    <?              }                   ?>
                 </tr>
     <?
             $i=0;
             foreach($Donations as $Donation) {
-                list($ID, $state, $public, $activetime, $UserID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment,
-                        $Username, $PermissionID, $Enabled, $Donor, $Warned) = $Donation;
+                list($ID, $state, $public, $activetime, $UserID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment, 
+                        $staffID, $staffname, $Username, $PermissionID, $Enabled, $Donor, $Warned) = $Donation;
                 $i++;
                 if ($state == 'unused') {
                     $time = time_diff($activetime);
@@ -187,11 +193,16 @@ show_header('Donation log','bitcoin');
                     $time = time_diff($received);
                 }
                 $row = $row=='b'?'a':'b';
+                //if ($add_title) $add_title = " title=\"address issued by $staffname\" ";
     ?>
                 <tr class="row<?=$row?>">
                     <td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?> 
                             <a style="font-style: italic;font-size:0.8em;" href="donate.php?action=my_donations&userid=<?=$UserID?>" target="_blank" title="view users my donations page">[view log]</a></td>
-                    <td><span class="address" id="address_<?=$i?>"><?=$public?></span></td><td><?=$time?></td>
+                    <td><span class="address" id="address_<?=$i?>" <?=$add_title?>><?=$public?></span></td>
+    <?              if ($admin_addresses){      ?>
+                        <td><?=$staffname?></td>
+    <?              }                   ?>
+                    <td><?=$time?></td>
                         
     <?                  if (!$unused){       ?>
                             <td><?=$amount_bitcoin?></td>
@@ -210,7 +221,7 @@ show_header('Donation log','bitcoin');
                 <? if ($state!='unused') {  ?>
                     <tr class="row<?=$row?>">
                         <td><strong>status: <span id="status_<?=$i?>"><?=$state?></span></strong></td>
-                        <td colspan="4"><?=$comment?></td>
+                        <td colspan="<?=($admin_addresses?'5':'4')?>"><?=$comment?></td>
                         <td colspan="2"><span id="state_button_<?=$i?>"></span></td>
                     </tr>
                 <? }                        ?>
