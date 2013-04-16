@@ -17,7 +17,8 @@ if(!empty($_REQUEST['confirm'])) {
 	
 	if($UserID) {
         $Body = get_article("intro_pm");
-        if($Body) send_pm($UserID, 0, "Welcome to ". SITE_NAME , $Body);
+ 
+        if($Body) send_pm($UserID, 0, db_string("Welcome to ". SITE_NAME) , db_string($Body));
 
         if ($Enabled=='0') {
             $DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
@@ -25,6 +26,7 @@ if(!empty($_REQUEST['confirm'])) {
 
             update_tracker('add_user', array('id' => $UserID, 'passkey' => $_REQUEST['confirm']));
         }
+
 		include('step2.php');
 	}
 	
@@ -61,7 +63,7 @@ if(!empty($_REQUEST['confirm'])) {
 			if($UserCount) {
 				$Err = 'There is already someone registered with that email address.'; //<br/><br/>
                     //<a href="login.php?act=recover">If it is your account you can use email recovery to reset the password</a>
-				$_POST['email']='';
+				$_REQUEST['email']='';
 			}
             
 			if($_POST['invite']) {
@@ -111,7 +113,8 @@ if(!empty($_REQUEST['confirm'])) {
 			list($StyleID) = $DB->next_record();
 			$AuthKey = make_secret();
 			
-			$DB->query("INSERT INTO users_info (UserID,StyleID,AuthKey, Inviter, JoinDate) VALUES ('$UserID','$StyleID','".db_string($AuthKey)."', '$InviterID', '".sqltime()."')");
+			$DB->query("INSERT INTO users_info (UserID,StyleID,AuthKey, Inviter, JoinDate, RunHour) VALUES 
+                            ('$UserID','$StyleID','".db_string($AuthKey)."', '$InviterID', '".sqltime()."', FLOOR( RAND() * 24 ))");
 			
 			$DB->query("INSERT INTO users_history_ips
 					(UserID, IP, StartTime) VALUES

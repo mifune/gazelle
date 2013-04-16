@@ -2042,6 +2042,7 @@ CREATE TABLE IF NOT EXISTS `users_info` (
   `PermittedForums` varchar(150) NOT NULL DEFAULT '',
   `UnseededAlerts` enum('0','1') NOT NULL DEFAULT '0',
   `BonusLog` text NOT NULL,
+  `RunHour` tinyint(2) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `UserID` (`UserID`),
   KEY `SupportFor` (`SupportFor`),
   KEY `DisableInvites` (`DisableInvites`),
@@ -2050,7 +2051,8 @@ CREATE TABLE IF NOT EXISTS `users_info` (
   KEY `JoinDate` (`JoinDate`),
   KEY `Inviter` (`Inviter`),
   KEY `RatioWatchEnds` (`RatioWatchEnds`),
-  KEY `RatioWatchDownload` (`RatioWatchDownload`)
+  KEY `RatioWatchDownload` (`RatioWatchDownload`),
+  KEY `RunHour` (`RunHour`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

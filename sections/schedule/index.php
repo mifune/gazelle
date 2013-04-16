@@ -249,26 +249,17 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
         }
     }
     
-    
-    
-    //----------------------------------------
-	
-    
-      
-	//if ($Hour%3 == 0) { // every 3 hrs
-      //}
+     
 	//------------- Award Badges ----------------------------------------//
-       
-      
-      include(SERVER_ROOT.'/sections/schedule/award_badges.php');
+    include(SERVER_ROOT.'/sections/schedule/award_badges.php');
       
       
       
 	//------------- Record daily seedhours  ----------------------------------------//
 
+    /*
 	if ($Hour == 4) { // 3 am servertime... want it to be daily but not on the 0 hour  //SeedHours>0.00 
  
-        /*
             $DB->query("UPDATE users_main AS u JOIN users_info AS i ON u.ID=i.UserID
                            SET BonusLog = CONCAT('$sqltime | +', CreditsDaily, ' credits | seeded ', SeedHoursDaily, ' hrs\n', BonusLog),
                                SeedHistory = CONCAT('$sqltime | ', SeedHoursDaily, ' hrs | up: ', 
@@ -278,9 +269,11 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
                                CreditsDaily=0.00 , 
                                UploadedLast=Uploaded , 
                                DownloadedLast=Downloaded 
-                         WHERE SeedHoursDaily>0.00");   */
+                         WHERE SeedHoursDaily>0.00");    
+    }
+    */
             
-            $DB->query("UPDATE users_main AS u JOIN users_info AS i ON u.ID=i.UserID
+    $DB->query("UPDATE users_main AS u JOIN users_info AS i ON u.ID=i.UserID
                            SET BonusLog = CONCAT('$sqltime | +', CreditsDaily, ' credits | seeded ', SeedHoursDaily, ' hrs\n', BonusLog),
                                SeedHistory = CONCAT('$sqltime | ', SeedHoursDaily, ' hrs | up: ', 
                                                 FORMAT(UploadedDaily/1073741824, 2) , ' GB | down: ', 
@@ -289,12 +282,10 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
                                CreditsDaily=0.00 , 
                                UploadedDaily=0.00 , 
                                DownloadedDaily=0.00 
-                         WHERE SeedHoursDaily>0.00");
-            
-            
-      }
+                         WHERE RunHour='$Hour' AND SeedHoursDaily>0.00"); 
       
-      
+    
+    
 	//------------- Front page stats ----------------------------------------//
  
 	//Love or hate, this makes things a hell of a lot faster
