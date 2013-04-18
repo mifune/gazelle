@@ -66,8 +66,28 @@ if($NewRequest && !empty($_GET['groupid']) && is_number($_GET['groupid'])) {
 	}
 }
 
-show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbcode');
+show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbcode,jquery,jquery.cookie');
 ?>
+<script type="text/javascript">//<![CDATA[
+    function change_tagtext() {
+        var tags = new Array();
+<?
+foreach ($NewCategories as $cat) {
+    echo 'tags[' . $cat['id'] . ']="' . $cat['tag'] . '"' . ";\n";
+}
+?>
+        if ($('#category').raw().value == 0) {
+            $('#tagtext').html("");
+        } else {
+            $('#tagtext').html("<strong>The tag "+tags[$('#category').raw().value]+" will be added automatically.</strong>");
+        }
+    }
+<?
+if (!empty($Properties))
+    echo "addDOMLoadEvent(SynchInterface);";
+?>
+//]]></script>
+
 <div class="thin">
 	<h2><?=($NewRequest ? "Create a request" : "Edit a request")?></h2>
 	
@@ -103,10 +123,21 @@ show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbc
 						Category
 					</td>
 					<td>
-						<select id="categories" name="category">
-<? foreach($NewCategories as $Cat){ $Cat = display_array($Cat); ?>
+						<select id="category" name="category" onchange="change_tagtext();">
+                                        <option value="0">---</option>
+                                    <? foreach($NewCategories as $category) { ?>
+                                        <option value="<?=$category['id']?>"<? 
+                                            if (isset($CategoryID) && $CategoryID==$category['id']) {
+                                                echo ' selected="selected"';
+                                            }   ?>><?=$category['name']?></option>
+                                    <? } ?>
+<? /*
+        foreach($NewCategories as $Cat){ $Cat = display_array($Cat); ?>
 							<option value='<?=$Cat['id']?>' <?=(!empty($CategoryName) && ($CategoryName ==  $Cat['name']) ? 'selected="selected"' : '')?>><?=$Cat['name']?></option>
-<?		} ?>
+<?		} */
+
+
+?>
 						</select>
 					</td>
 				</tr>
@@ -129,6 +160,7 @@ show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbc
 				<tr>
 					<td class="label">Tags</td>
 					<td>
+                    <div id="tagtext"></div>
 <?
 	$GenreTags = $Cache->get_value('genre_tags');
 	if(!$GenreTags) {
@@ -143,7 +175,9 @@ show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbc
 							<option value="<?=$Genre ?>"><?=$Genre ?></option>
 <?	} ?>
 						</select>
-						<input type="text" id="tags" name="tags" class="medium"  value="<?=(!empty($Tags) ? display_str($Tags) : '')?>" />
+                    <textarea id="tags" name="tags" class="medium" style="height:1.4em;" ><?=(!empty($Tags) ? display_str($Tags) : '')?></textarea>
+                     
+	 <!--	<input type="text" id="tags" name="tags" class="medium"  value="<?=(!empty($Tags) ? display_str($Tags) : '')?>" /> -->
 						<br />
 					<? 
                                       $taginfo = get_article('tagrulesinline');

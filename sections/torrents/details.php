@@ -8,6 +8,7 @@ function compare($X, $Y){ // if this is used anywhere else...
 define(MAX_PERS_COLLAGES, 3); // How many personal collages should be shown by default
 
 include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
+include(SERVER_ROOT.'/sections/requests/functions.php');
 include(SERVER_ROOT.'/sections/bookmarks/functions.php'); // has_bookmarked()
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
@@ -396,7 +397,6 @@ if(check_perms('torrents_review')){
 
 
 
-
 if ($FreeTorrent == '0' && $IsUploader) {
     include(SERVER_ROOT.'/sections/bonus/functions.php'); 
     $ShopItems = get_shop_items_ufl();
@@ -558,7 +558,7 @@ if(count($Tags) > 0) {
      
      
 	<div class="middle_column">
-            <div class="head">Torrent Info</div>
+        <div class="head">Torrent Info</div>
 		<table class="torrent_table">
 			<tr class="colhead">
 				<td></td>
@@ -671,6 +671,34 @@ $FileTypes = "<span class=\"grey\" style=\"float:left;\">" . implode(' ', $FileT
                     <em>Uploaded by   <?=format_username($UserID, $TorrentUploader)?> <?=time_diff($TorrentTime);?> </em>
                 </td>
             </tr>
+<?
+            
+
+$FilledRequests = get_group_requests_filled($GroupID);
+if (count($FilledRequests) > 0) {
+        $row = $row =='a'?'b':'a';
+?>
+        <tr class="row<?=$row?>">
+            <td colspan="6" >
+                <em>filled request<?=count($FilledRequests)>1?'s':''?></em>
+            </td>
+        </tr>
+<?
+    foreach($FilledRequests as $Request) {
+		$RequestVotes = get_votes_array($Request['ID']);
+        $row = $row =='a'?'b':'a';
+?>
+			<tr class="requestrows row<?=$row?>">
+				<td colspan="2" >
+                    <a href="requests.php?action=view&id=<?=$Request['ID']?>"><?=$Request['Title']?></a>
+                </td>
+				<td colspan="4" >
+                    <span style="float:right"><em>for <?=get_size($RequestVotes['TotalBounty'])?></em></span>
+                </td>
+			</tr>
+<?	}
+}
+?>
 			<tr class="groupid_<?=$GroupID?> edition_<?=$EditionID?> torrentdetails pad" id="torrent_<?=$TorrentID; ?>">
 				<td colspan="6" style="border-top:none;">
                             
@@ -724,8 +752,11 @@ $Requests = get_group_requests($GroupID);
 if (count($Requests) > 0) {
 	$i = 0;
 ?>
+        <div class="head">
+            <span style="font-weight: bold;">Requests (<?=count($Requests)?>)</span> 
+            <span style="float:right;"><a href="#" onClick="$('#requests').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(Show)':'(Hide)'); return false;">(Show)</a></span>
+        </div>
 		<div class="box">
-			<div class="head"><span style="font-weight: bold;">Requests (<?=count($Requests)?>)</span> <span style="float:right;"><a href="#" onClick="$('#requests').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(Show)':'(Hide)'); return false;">(Show)</a></span></div>
 			<table id="requests" class="hidden">
 				<tr class="head">
 					<td>Format / Bitrate / Media</td>
@@ -736,7 +767,7 @@ if (count($Requests) > 0) {
 		$RequestVotes = get_votes_array($Request['ID']);
 ?>
 				<tr class="requestrows <?=(++$i%2?'rowa':'rowb')?>">
-					<td><a href="requests.php?action=view&id=<?=$Request['ID']?>"></a></td>
+					<td><a href="requests.php?action=view&id=<?=$Request['ID']?>"><?=$Request['Title']?></a></td>
 					<td>
 						<form id="form_<?=$Request['ID']?>">
 							<span id="vote_count_<?=$Request['ID']?>"><?=count($RequestVotes['Voters'])?></span>

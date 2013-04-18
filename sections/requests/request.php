@@ -145,17 +145,20 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
           
           
             <div class="head">Request</div>
-		<table>
+		<table> 
 			<tr>
-				<td class="label">  Title </td>
-				<td style="font-size: 1.2em;">
-                    <div class=""  style="float:left;padding-top:0.8em;">
+				<td class="label"> 
+                        <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
+                            <img style="float:right" src="<?= $CatImg ?>" />  </td>
+				<td style="font-size: 1.2em;text-align:center;font-weight:bold;">
                         <?=$DisplayLink?>
-                    </div>
+                    <!--<div class=""  style="float:left;padding-top:0.8em;">
+                        <?=$DisplayLink?>
+                    </div> 
                     <div class="center cats_col"  style="float:right;margin-right:10px;border-bottom:none;border-right:none;">
                         <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
                         <div title="<?= $NewCategories[$CategoryID]['tag'] ?>"><img src="<?= $CatImg ?>" /></div>
-                    </div>
+                    </div> -->
                 </td>
 			</tr>
 			<tr id="bounty">

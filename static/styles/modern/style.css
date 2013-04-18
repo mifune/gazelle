@@ -1317,7 +1317,7 @@ input.shopbutton.itembuy:hover {
 }
 
 #articles tr.colhead, #forums tr.colhead, #top10 tr.colhead, #torrents tr.colhead , #staff tr.colhead, #collage tr.colhead, 
-    #staffpm tr.colhead, #staffpms tr.colhead, #tools tr.colhead , #userhistory tr.colhead, #user tr.colhead, #reports tr.colhead  { 
+    #staffpm tr.colhead, #staffpms tr.colhead, #tools tr.colhead , #userhistory tr.colhead, #user tr.colhead, #reports tr.colhead, #requests tr.colhead  { 
     background-image: none;
     background-color: #d3e3f3;
     font-weight: bold; 
@@ -1327,7 +1327,7 @@ input.shopbutton.itembuy:hover {
     box-shadow:none;
 }
 #articles tr.colhead a, #forums tr.colhead a, #top10 tr.colhead a, #torrents tr.colhead a, #staff tr.colhead a, #collage tr.colhead a, 
-    #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a { 
+    #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a, #requests tr.colhead a { 
     font-weight: bold; 
     color: #888;
 }

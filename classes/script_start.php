@@ -2159,6 +2159,27 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 	}
 }
 
+
+
+// moved this here from requests/functions.php as get_requests() is dependent
+function get_request_tags($RequestID) {
+	global $DB;
+	$DB->query("SELECT rt.TagID, 
+					t.Name 
+				FROM requests_tags AS rt 
+					JOIN tags AS t ON rt.TagID=t.ID 
+				WHERE rt.RequestID = ".$RequestID."
+				ORDER BY rt.TagID ASC");
+	$Tags = $DB->to_array();
+	$Results = array();
+	foreach($Tags as $TagsRow) {
+		list($TagID, $TagName) = $TagsRow;
+		$Results[$TagID]= $TagName;
+	}
+	return $Results;
+}
+
+
 //Function to get data from an array of $RequestIDs.
 //In places where the output from this is merged with sphinx filters, it will be in a different order.
 function get_requests($RequestIDs, $Return = true) {

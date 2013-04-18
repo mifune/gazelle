@@ -122,6 +122,7 @@ $DB->query("UPDATE users_main
 
 $Cache->delete_value('user_stats_'.$FillerID);
 $Cache->delete_value('request_'.$RequestID);
+$Cache->delete_value('requests_torrent_'.$TorrentID);
 if ($GroupID) {
 	$Cache->delete_value('requests_group_'.$GroupID);
 }

@@ -11,6 +11,10 @@ if($_POST['action'] != "takenew" &&  $_POST['action'] != "takeedit") {
 	error(0);
 }
 
+include(SERVER_ROOT . '/sections/torrents/functions.php');
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+
 $NewRequest = ($_POST['action'] == "takenew");
 
 if(!$NewRequest) {
@@ -107,8 +111,7 @@ if(empty($_POST['description'])) {
 	$Description = trim($_POST['description']);
 }
 
-include(SERVER_ROOT.'/classes/class_text.php');
-$Text = new TEXT;
+
 $Text->validate_bbcode($_POST['description'],  get_permissions_advtags($LoggedUser['ID']));
       
 
@@ -141,6 +144,34 @@ if(!$NewRequest) {
 	$DB->query("DELETE FROM requests_tags WHERE RequestID = ".$RequestID);
 }
 
+
+$Tags = explode(' ', strtolower($NewCategories[$CategoryID]['tag']." ".$Tags));
+
+$TagsAdded=array();
+foreach ($Tags as $Tag) {
+        $Tag = strtolower(trim($Tag,'.')); // trim dots from the beginning and end
+        if (!is_valid_tag($Tag) || !check_tag_input($Tag)) continue;
+        $Tag = get_tag_synonym($Tag);
+        if (!empty($Tag)) {
+            if (!in_array($Tag, $TagsAdded)){ // and to create new tags as Uses=1 which seems more correct
+                $TagsAdded[] = $Tag;
+                $DB->query("INSERT INTO tags
+                            (Name, UserID, Uses) VALUES
+                            ('$Tag', $LoggedUser[ID], 1)
+                            ON DUPLICATE KEY UPDATE Uses=Uses+1;");
+                $TagID = $DB->inserted_id();
+	
+                $DB->query("INSERT IGNORE INTO requests_tags
+					(TagID, RequestID) VALUES 
+					($TagID, $RequestID)");
+            }
+        }
+}
+// replace the original tag array with corrected tags
+$Tags = $TagsAdded;
+
+
+/*
 $Tags = cleanup_tags($Tags);
 $Tags = array_unique(explode(' ', $Tags));
 foreach($Tags as $Index => $Tag) {
@@ -159,7 +190,7 @@ foreach($Tags as $Index => $Tag) {
 					(TagID, RequestID)
 				VALUES 
 					(".$TagID.", ".$RequestID.")");
-}
+}  */
 
 if($NewRequest) {
 	//Remove the bounty and create the vote

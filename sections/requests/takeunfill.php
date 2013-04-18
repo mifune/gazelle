@@ -14,11 +14,12 @@ $DB->query("SELECT
 		r.FillerID, 
 		r.Title,
 		u.Uploaded,
+		r.TorrentID,
 		r.GroupID
 	FROM requests AS r 
 		LEFT JOIN users_main AS u ON u.ID=FillerID
 	WHERE r.ID= ".$RequestID);
-list($UserID, $FillerID, $Title, $Uploaded, $GroupID) = $DB->next_record();
+list($UserID, $FillerID, $Title, $Uploaded, $TorrentID, $GroupID) = $DB->next_record();
 
 if((($LoggedUser['ID'] != $UserID && $LoggedUser['ID'] != $FillerID) && !check_perms('site_moderate_requests')) || $FillerID == 0) {
 		error(403);
@@ -54,6 +55,7 @@ if($UserID != $LoggedUser['ID']) {
 write_log("Request $RequestID ($FullName), with a ".get_size($RequestVotes['TotalBounty'])." bounty, was un-filled by user ".$LoggedUser['ID']." (".$LoggedUser['Username'].") for the reason: ".$_POST['reason']);
 
 $Cache->delete_value('request_'.$RequestID);
+$Cache->delete_value('requests_torrent_'.$TorrentID);
 if ($GroupID) {
 	$Cache->delete_value('requests_group_'.$GroupID);
 }

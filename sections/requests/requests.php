@@ -199,6 +199,7 @@ if(!empty($SphinxResults['notfound'])) {
 		//$Requests['matches'][$ID] = array_merge($Requests['matches'][$ID], $SQLResult);
 		//We ksort because depending on the filter modes, we're given our data in an unpredictable order
 		//ksort($Requests['matches'][$ID]);
+        
 	}
 }
 
@@ -206,9 +207,10 @@ $PageLinks = get_pages($Page, $NumResults, REQUESTS_PER_PAGE);
 
 $Requests = $SphinxResults['matches'];
 
+    
 $CurrentURL = get_url(array('order', 'sort'));
 
-show_header($Title, 'requests');
+show_header($Title, 'requests,jquery,jquery.cookie');
 
 ?>
 <div class="thin">
@@ -323,9 +325,11 @@ foreach($NewCategories as $Cat) {
 	<div class="linkbox">
 		<?=$PageLinks?>
 	</div>
-	<table id="request_table" cellpadding="6" cellspacing="1" border="0" class="" width="100%">
+	<div class="head">Requests</div>
+	<table id="request_table" cellpadding="6" cellspacing="1" border="0" class="shadow" width="100%">
 		<tr class="colhead">
-			<td style="width: 38%;" class="nobr">
+            <td class="small cats_col"></td>
+            <td width="40%" class="nobr">
 				Request Name
 			</td>
 			<td class="nobr">
@@ -351,14 +355,14 @@ foreach($NewCategories as $Cat) {
 			</td>
 		</tr>
 <?	if($NumResults == 0) { ?>
-		<tr class="rowb shadow">
-			<td colspan="8">
-				Nothing found!
+		<tr class="rowb">
+			<td colspan="9" style="text-align:center">
+				No requests!
 			</td>
 		</tr>
 <?	} else {
 		$Row = 'a';
-		$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
+		//$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 		foreach ($Requests as $RequestID => $Request) {
 			
 			list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
@@ -368,21 +372,27 @@ foreach($NewCategories as $Cat) {
 			
 			$VoteCount = count($RequestVotes['Voters']);
 			
-			if($CategoryID == 0) {
+			/* if($CategoryID == 0) {
 				$CategoryName = "Unknown";
 			} else {
 				$CategoryName = $NewCategories[$CategoryID]['name'];
-			}
+			} */
 			
 			$IsFilled = ($TorrentID != 0);
 			
-                        $FullName ="<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title."</a>";
+            $FullName ="<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title."</a>";
 			
 			$Row = ($Row == 'a') ? 'b' : 'a';
 			
 			$Tags = $Request['Tags'];
 ?>
-		<tr class="row<?=$Row?> shadow">
+		<tr class="row<?=$Row?>">
+            <td class="center ">
+                <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
+                <div title="<?= $NewCategories[$CategoryID]['tag'] ?>">
+                    <a href="requests.php?filter_cat[<?=$CategoryID?>]=1"><img src="<?= $CatImg ?>" /></a>
+                </div>
+            </td>
 			<td>
 				<?=$FullName?>
                                 <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
@@ -413,7 +423,7 @@ foreach($NewCategories as $Cat) {
 			</td>
 			<td>
 <?   		if($IsFilled){ ?>
-				<a href="torrents.php?<?=(strtotime($TimeFilled)<$TimeCompare?'id=':'torrentid=').$TorrentID?>"><strong><?=time_diff($TimeFilled)?></strong></a>
+				<a href="torrents.php?id=<?=$TorrentID?>"><strong><?=time_diff($TimeFilled)?></strong></a>
 <?   		} else { ?>
 				<strong>No</strong>
 <?   		} ?>

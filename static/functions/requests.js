@@ -1,4 +1,9 @@
- 
+
+
+function SynchInterface(){
+    change_tagtext();
+    resize('tags');
+}
 
 function Cover_Toggle() {
 

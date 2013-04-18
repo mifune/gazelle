@@ -1,5 +1,5 @@
 <?
-include(SERVER_ROOT.'/sections/requests/functions.php'); // get_request_tags()
+// include(SERVER_ROOT.'/sections/requests/functions.php'); // get_request_tags()
 
 function get_group_info($GroupID, $Return = true) {
 	global $Cache, $DB;
@@ -135,6 +135,19 @@ function get_group_requests($GroupID) {
 		$DB->query("SELECT ID FROM requests WHERE GroupID = $GroupID AND TimeFilled = '0000-00-00 00:00:00'");
 		$Requests = $DB->collect('ID');
 		$Cache->cache_value('requests_group_'.$GroupID, $Requests, 0);
+	}
+	$Requests = get_requests($Requests);
+	return $Requests['matches'];
+}
+
+function get_group_requests_filled($TorrentID) {
+	global $DB, $Cache;
+	
+	$Requests = $Cache->get_value('requests_torrent_'.$TorrentID);
+	if ($Requests === FALSE) {
+		$DB->query("SELECT ID FROM requests WHERE TorrentID = $TorrentID");
+		$Requests = $DB->collect('ID');
+		$Cache->cache_value('requests_torrent_'.$TorrentID, $Requests, 0);
 	}
 	$Requests = get_requests($Requests);
 	return $Requests['matches'];
