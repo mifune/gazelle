@@ -2251,7 +2251,7 @@ function update_sphinx_requests($RequestID) {
 				UNIX_TIMESTAMP(LastVote) AS LastVote, CategoryID,
 				Title, FillerID, TorrentID,
 				UNIX_TIMESTAMP(TimeFilled) AS TimeFilled, Visible,
-				COUNT(rv.UserID) AS Votes, SUM(rv.Bounty) >> 10 AS Bounty
+				COUNT(rv.UserID) AS Votes, CEIL(SUM(rv.Bounty)/1024) AS Bounty
 			FROM requests AS r LEFT JOIN requests_votes AS rv ON rv.RequestID=r.ID
 				wHERE ID = " . $RequestID . "
 				GROUP BY r.ID");
