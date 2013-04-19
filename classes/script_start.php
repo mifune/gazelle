@@ -320,6 +320,7 @@ function user_info($UserID) {
 			i.CatchupTime,
 			m.Visible,
                   m.Signature,
+                  i.TorrentSignature,
 			m.GroupPermissionID,
             m.ipcc
 			FROM users_main AS m
@@ -328,7 +329,8 @@ function user_info($UserID) {
 
 		if($DB->record_count() == 0) { // Deleted user, maybe?
 			$UserInfo = array('ID'=>'','Username'=>'','PermissionID'=>0,'Paranoia'=>array(),'Donor'=>false,'Warned'=>'0000-00-00 00:00:00',
-                      'Avatar'=>'','Enabled'=>0,'Title'=>'', 'CatchupTime'=>0, 'Visible'=>'1','Signature'=>'', 'GroupPermissionID'=>0);
+                    'Avatar'=>'','Enabled'=>0,'Title'=>'', 'CatchupTime'=>0, 'Visible'=>'1','Signature'=>'','TorrentSignature'=>'',
+                    'GroupPermissionID'=>0,'ipcc'=>'??');
 
 		} else {
 			$UserInfo = $DB->next_record(MYSQLI_ASSOC, array('Paranoia', 'Title'));

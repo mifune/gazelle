@@ -759,7 +759,7 @@ if (count($Requests) > 0) {
 		<div class="box">
 			<table id="requests" class="hidden">
 				<tr class="head">
-					<td>Format / Bitrate / Media</td>
+					<td>Request name</td>
 					<td>Votes</td>
 					<td>Bounty</td>
 				</tr>
@@ -860,12 +860,12 @@ if(count($PersonalCollages)>0) {
         </div>
       <div style="clear:both"></div>
     </div>
-      <div style="clear:both"></div>
-	<div class="main_column">
+    <div style="clear:both"></div>
+    <div class="main_column">
 		<div class="head">
                 <strong>Description</strong>
                 <span style="float:right;"><a href="#" id="desctoggle" onclick="Desc_Toggle(); return false;">(Hide)</a></span>
-            </div>
+        </div>
 		<div class="box">
 			<div id="descbox" class="body">
 <? 
@@ -876,11 +876,26 @@ if(count($PersonalCollages)>0) {
                         } else 
                             echo "There is no information on this torrent.";
 ?>
-                  </div>
-		</div>
+            </div>
+<? 
+            $UserInfo = user_info($UserID);
+            $TorrentSig = $UserInfo['TorrentSignature'];
+            if($TorrentSig!='') {
+?> 
+                <div id="torrentsigbox" class="body">
+<? 
+                            $TorrentSig = $Text->full_format($TorrentSig, isset($PermissionsInfo['site_advanced_tags']) &&  $PermissionsInfo['site_advanced_tags'] );
+                            echo $TorrentSig;
+?>
+                </div>
+<?
+            }
+?>
+        </div>
+    </div>
             
-		<div class="head">Thanks</div>
-		<div class="box pad center">
+	<div class="head">Thanks</div>
+	<div class="box pad center">
 <?
 
     $Thanks = $Cache->get_value('torrent_thanks_'.$GroupID);
@@ -901,7 +916,7 @@ if(count($PersonalCollages)>0) {
                 <div  id="thanksdiv" class="pad<?if(!$Thanks)echo' hidden';?>" style="text-align:left">
                     <p><strong>The following people said thanks!</strong> &nbsp;<span id="thankstext"><?=$Thanks?></span></p>
                 </div>
-		</div>
+	</div>
 <? 
 /*
 $Results = $Cache->get_value('torrent_comments_'.$GroupID);

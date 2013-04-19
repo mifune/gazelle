@@ -23,14 +23,15 @@ $DB->query("SELECT
 			i.UnseededAlerts,
                   i.TimeZone,
             m.Flag,
-            i.DownloadAlt
+            i.DownloadAlt,
+            i.TorrentSignature
 			FROM users_main AS m
 			JOIN users_info AS i ON i.UserID = m.ID
 			LEFT JOIN permissions AS p ON p.ID=m.PermissionID
 			WHERE m.ID = '".db_string($UserID)."'");
 
 list($Username,$Email,$IRCKey,$Paranoia,$Signature,$PermissionID,$CustomPermissions,$Info,$Avatar,$Country,
-        $StyleID,$StyleURL,$SiteOptions,$UnseededAlerts,$TimeZone,$flag, $DownloadAlt)=$DB->next_record(MYSQLI_NUM, array(3,6,12));
+        $StyleID,$StyleURL,$SiteOptions,$UnseededAlerts,$TimeZone,$flag, $DownloadAlt, $TorrentSignature)=$DB->next_record(MYSQLI_NUM, array(3,6,12));
 
 $Permissions = get_permissions($PermissionID);
 list($Class,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($Permissions);
@@ -472,31 +473,103 @@ echo $Val->GenerateJS('userform');
 					<p class="min_padding">If changing this field you must enter your current password in the "Current password" field before saving your changes.</p>
 				</td>
 			</tr>
+            
+            
 			<tr>
-				<td class="label"><strong>Info</strong></td>
-				<td> 
-				<div class="box pad hidden" id="preview_info" style="text-align:left;"></div>
-				<div  class="" id="editor_info" >
-                              <? $Text->display_bbcode_assistant("preview_message_info", get_permissions_advtags($UserID, unserialize($CustomPermissions),$Permissions )); ?>
-                            <textarea id="preview_message_info" name="info" class="long" rows="8"><?=display_str($Info)?></textarea>
-                        </div>
-                        <input type="button" value="Toggle Preview" onclick="Preview_Toggle('info');" />
-                        </td>
-                  </tr>
+				<td colspan="2" class="right">
+					<input type="submit" value="Save Profile" title="Save all changes" />
+				</td>
+			</tr>
+			<tr class="colhead">
+				<td colspan="2">
+					<strong>User Profile</strong>
+				</td>
+			</tr>
 			<tr>
-				<td class="label"><strong>Signature<br/>(max <?=$MaxSigLength?> chars)<br/><span style="text-decoration: underline">max total size</span><br/><?=SIG_MAX_WIDTH?> px * <?=SIG_MAX_HEIGHT?> px</strong></td>
-				<td>
-				<div class="box pad hidden" id="preview_sig" style="text-align:left;"></div>
-				<div  class="" id="editor_sig" >
-                          <? $Text->display_bbcode_assistant("preview_message_sig", get_permissions_advtags($UserID, unserialize($CustomPermissions),$Permissions )); ?>
-                            <textarea  id="preview_message_sig" name="signature" class="long" 
-                                      rows="<?=($MaxSigLength !== 0 ? round(3 + ($MaxSigLength / 512)) : 2);?>" 
-                    <?=($MaxSigLength == 0 ? 'disabled="disabled"' : ''); ?>><?=($MaxSigLength == 0 ? 'You need to get promoted to Perv before you can have a signature!' : display_str($Signature));?></textarea>
-                        </div>
-                        <input type="button" value="Toggle Preview" onclick="Preview_Toggle('sig');" />
-                        </td>
+				<!--<td class="label"><strong>Profile</strong></td>-->
+				<td colspan="2"> 
+                    <div class="box pad hidden" id="preview_info" style="text-align:left;"></div>
+                    <div  class="" id="editor_info" >
+                        <? $Text->display_bbcode_assistant("preview_message_info", get_permissions_advtags($UserID, unserialize($CustomPermissions),$Permissions )); ?>
+                        <textarea id="preview_message_info" name="info" class="long" rows="8"><?=display_str($Info)?></textarea>
+                    </div>
+                    <input type="button" value="Toggle Preview" onclick="Preview_Toggle('info');" />
+                </td>
+            </tr>
+            
+			<tr>
+				<td colspan="2"> &nbsp; </td>
+			</tr>
+			<tr class="colhead">
+				<td colspan="2">
+					<strong>Signature </strong> &nbsp;(max <?=$MaxSigLength?> chars) <span style="text-decoration: underline">max total size</span> <?=SIG_MAX_WIDTH?> px * <?=SIG_MAX_HEIGHT?> px 
+				</td>
+			</tr>
+			<tr>
+                <?
+                $AdvancedTags = get_permissions_advtags($UserID, unserialize($CustomPermissions),$Permissions );
+                ?>
+				<!--<td class="label"><strong>Signature<br/>(max <?=$MaxSigLength?> chars)<br/><span style="text-decoration: underline">max total size</span><br/><?=SIG_MAX_WIDTH?> px * <?=SIG_MAX_HEIGHT?> px</strong></td>-->
+				<td colspan="2">
+<? 
+        if ($MaxSigLength>0) {
+ ?> 
+                    <div class="box pad hidden" id="preview_sig" style="text-align:left;"></div>
+                    <div id="editor_sig" >
+                        <? $Text->display_bbcode_assistant("preview_message_sig", $AdvancedTags); ?>
+                        <textarea  id="preview_message_sig" name="signature" class="long"  rows="8"><?=display_str($Signature);?></textarea>
+                    </div>
+                    <input type="button" value="Toggle Preview" onclick="Preview_Toggle('sig');" />
+ <?
+        } else {
+ ?>
+                    <div style="text-align:left;">
+                        <?=$Text->full_format('You need to get promoted before you can have a signature. see the [url=/articles.php?topic=ranks][b]User Classes[/b][/url] article.', $AdvancedTags ) ?>
+                    </div>     
+ <? 
+        }
+ ?> 
+                </td>
 			</tr> 
+ 
 			<tr>
+				<td colspan="2"> &nbsp; </td>
+			</tr>
+			<tr class="colhead">
+				<td colspan="2">
+					<strong>Torrent Signature</strong>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+<? 
+        if (check_perms('site_torrent_signature')) {
+ ?> 
+                    <div class="box pad hidden" id="preview_torrentsig" style="text-align:left;"></div>
+                    <div  class="" id="editor_torrentsig" >
+                        <? $Text->display_bbcode_assistant("preview_message_torrentsig", get_permissions_advtags($UserID, unserialize($CustomPermissions),$Permissions )); ?>
+                        <textarea  id="preview_message_torrentsig" name="torrentsignature" class="long"  rows="8"><?=display_str($TorrentSignature);?></textarea>
+                    </div>
+                    <input type="button" value="Toggle Preview" onclick="Preview_Toggle('torrentsig');" />
+ <?
+        } else {
+ ?>
+                    <div style="text-align:left;">
+                        <?=$Text->full_format('You need to get promoted before you can have a torrent signature. see the [url=/articles.php?topic=ranks][b]User Classes[/b][/url] article.', $AdvancedTags ) ?>
+                    </div>     
+ <? 
+        }
+ ?> 
+                </td>
+			</tr> 
+ 
+			<tr>
+				<td colspan="2" class="right">
+					<input type="submit" value="Save Profile" title="Save all changes" />
+				</td>
+			</tr>
+            
+			<!--<tr>
 				<td class="label"><strong>IRCKey</strong></td>
 				<td>
 					<input class="long" type="text" name="irckey" id="irckey" value="<?=display_str($IRCKey)?>" />
@@ -504,12 +577,7 @@ echo $Val->GenerateJS('userform');
 					<p class="min_padding">Note: This value is stored in plaintext and should not be your password.</p>
 					<p class="min_padding">Note: In order to be accepted as correct, your IRCKey must be between 6 and 32 characters.</p>
 				</td>
-			</tr>
-			<tr>
-				<td colspan="2" class="right">
-					<input type="submit" value="Save Profile" title="Save all changes" />
-				</td>
-			</tr>
+			</tr>-->
 			<tr class="colhead">
 				<td colspan="2">
 					<strong>Paranoia settings</strong>

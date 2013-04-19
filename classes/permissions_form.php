@@ -67,6 +67,7 @@
 	'site_play_slots' => 'Can play the slot machine.',
     'site_set_language' => 'Can set own user language(s) in settings',
 
+    'site_torrent_signature' => 'Can set and use a torrent signature',
      
      
 	'users_edit_usernames' => 'Can edit usernames.',
@@ -231,7 +232,8 @@ function permissions_form(){ ?>
 					<? display_perm('project_team', 'Part of the project team.'); ?>
 					<? display_perm('site_play_slots', 'Can play the slot machine.'); ?> 
 					<? display_perm('site_set_language', 'Can set own user language(s).', 'Can set own user language(s) on settings page.'); ?> 
- 
+                    <? display_perm('site_torrent_signature', 'Can set and use a torrent signature.'); ?> 
+  
 				</td>
 			</tr>
 		</table>

@@ -32,6 +32,7 @@ $Val->SetFields('avatar',0,'image', 'Avatar: The image URL you entered was not v
                  array('regex' => $whitelistregex, 'maxlength' => 255, 'minlength' => 6, 'maxfilesizeKB'=>-1, 'dimensions'=>array(300,500)));
 $Val->SetFields('info',0,'desc','Info',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>20000));	
 $Val->SetFields('signature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength'], 'dimensions'=>array(SIG_MAX_WIDTH, SIG_MAX_HEIGHT)));	
+$Val->SetFields('torrentsignature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength']));	
 $Val->SetFields('email',1,"email","You did not enter a valid email address.");
 $Val->SetFields('irckey',0,"string","You did not enter a valid IRCKey, must be between 6 and 32 characters long.",array('minlength'=>6,'maxlength'=>32));
 $Val->SetFields('cur_pass',0,"string","You did not enter a valid password, must be between 6 and 40 characters long.",array('minlength'=>6,'maxlength'=>40));
@@ -230,7 +231,8 @@ $Cache->begin_transaction('user_info_'.$UserID);
 $Cache->update_row(false, array(
 		'Avatar'=>$_POST['avatar'],
 		'Paranoia'=>$Paranoia,
-		'Signature'=>$_POST['signature']
+		'Signature'=>$_POST['signature'],
+		'TorrentSignature'=>$_POST['torrentsignature']
 
 ));
 $Cache->commit_transaction(0);
@@ -265,6 +267,7 @@ $SQL="UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET
 	m.Email='".db_string($_POST['email'])."',
 	m.IRCKey='".db_string($_POST['irckey'])."',
 	m.Flag='".db_string($Flag)."',
+	i.TorrentSignature='".db_string($_POST['torrentsignature'])."',
 	m.Signature='".db_string($_POST['signature'])."',";
 
 $SQL .= "m.Paranoia='".db_string(serialize($Paranoia))."'";

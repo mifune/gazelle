@@ -215,7 +215,8 @@ $SearchText = db_string(trim($Properties['Title']) . ' ' . $Text->db_clean_searc
 $Body = $Properties['GroupDescription'];
 
 if($Properties['TemplateFooter']!=''){
-    $Body .= "[br][br]$Properties[TemplateFooter]";
+    // template footers are kind of annoying... until we move them below torrent sigs lets just disable them
+    // $Body .= "[br][br]$Properties[TemplateFooter]";
 }
 // Trickery
 /* image is already validated by better regex in validator so skip this 
