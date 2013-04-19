@@ -658,6 +658,8 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
                                 <li id="nav_comments" class="normal"><a onmousedown="Stats('comments');" href="comments.php">Comments</a></li>
                                 <li id="nav_friends" class="normal"><a onmousedown="Stats('friends');" href="friends.php">Friends</a></li>
                                 
+                                <li id="nav_mydonations" class="normal"><a href="donate.php?action=my_donations">My Donations</a></li>
+                                
                                 <li id="nav_bonus" class="normal" title="Spend your credits in the bonus shop"><a href="bonus.php">Bonus Shop</a></li>
                                 
                                 <li id="nav_sandbox" class="normal"><a href="sandbox.php">Sandbox</a></li>

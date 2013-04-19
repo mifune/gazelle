@@ -75,7 +75,8 @@ show_header('My Donations','bitcoin,bbcode');
         } else {
     ?>
         This page queries the balance at the donation address in realtime.<br/>
-        It can take a few hours for the transfer to be fully verified on the bitcoin network (6 transactions), once it is you can submit your donation<br/><br/>
+        Once you have transferred some bitcoin to your donation address it can take a few hours for the transfer to be fully verified on the bitcoin network (6 transactions).<br/>
+        When your transfer is verified you must return to this page and choose how to submit your donation (for -gb or <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" />)<br/><br/>
     <?
         if ($eur_rate=='0'){   ?>
             <span class="red">The site was unable to get an exchange rate - you will not be able to submit a donation at this time</span><br/>
