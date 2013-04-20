@@ -2392,3 +2392,13 @@ img.win.flash {
     font-weight: bold;
     text-align: left;
 }
+
+
+#sig {
+    overflow: hidden;
+}
+#torrentsigbox {
+    padding: 3px 10px 10px 10px; 
+    overflow: hidden;
+    border-top: #ccc solid 1px;
+}

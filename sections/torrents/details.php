@@ -882,7 +882,7 @@ if(count($PersonalCollages)>0) {
             $TorrentSig = $UserInfo['TorrentSignature'];
             if($TorrentSig!='') {
 ?> 
-                <div id="torrentsigbox" class="body">
+                <div id="torrentsigbox" style="max-height: <?=TORRENT_SIG_MAX_HEIGHT?>px">
 <? 
                             $TorrentSig = $Text->full_format($TorrentSig, isset($PermissionsInfo['site_advanced_tags']) &&  $PermissionsInfo['site_advanced_tags'] );
                             echo $TorrentSig;
@@ -892,10 +892,10 @@ if(count($PersonalCollages)>0) {
             }
 ?>
         </div>
-    </div>
+    
             
-	<div class="head">Thanks</div>
-	<div class="box pad center">
+        <div class="head">Thanks</div>
+        <div class="box pad center">
 <?
 
     $Thanks = $Cache->get_value('torrent_thanks_'.$GroupID);
@@ -916,7 +916,7 @@ if(count($PersonalCollages)>0) {
                 <div  id="thanksdiv" class="pad<?if(!$Thanks)echo' hidden';?>" style="text-align:left">
                     <p><strong>The following people said thanks!</strong> &nbsp;<span id="thankstext"><?=$Thanks?></span></p>
                 </div>
-	</div>
+        </div>
 <? 
 /*
 $Results = $Cache->get_value('torrent_comments_'.$GroupID);
@@ -1045,7 +1045,7 @@ $AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
                         
             echo '
       <tr>
-            <td class="sig"><div id="sig"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
+            <td class="sig"><div id="sig" style="max-height: '.SIG_MAX_HEIGHT. 'px"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
       </tr>';
            }
 ?>

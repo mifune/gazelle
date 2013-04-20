@@ -2952,3 +2952,13 @@ blue smaller
     box-shadow:inset 0px 1px 3px #6a9bb7;
 }
 */
+
+
+#sig {
+    overflow: hidden;
+}
+#torrentsigbox {
+    padding: 3px 10px 10px 10px; 
+    overflow: hidden;
+    border-top: #ccc solid 1px;
+}

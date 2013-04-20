@@ -123,7 +123,7 @@ $AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
                         
             echo '
       <tr>
-            <td class="sig"><div id="sig"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
+            <td class="sig"><div id="sig" style="max-height: '.SIG_MAX_HEIGHT. 'px"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
       </tr>';
            }
 ?>

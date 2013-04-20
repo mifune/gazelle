@@ -2504,3 +2504,13 @@ img.win.flash {
 h2 span.arrow img {
     margin-top:4px;
 }
+
+
+#sig {
+    overflow: hidden;
+}
+#torrentsigbox {
+    padding: 3px 10px 10px 10px; 
+    overflow: hidden;
+    border-top: #ccc solid 1px;
+}
