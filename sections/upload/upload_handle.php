@@ -137,6 +137,9 @@ foreach ($FileList as $File) {
     if (preg_match('/\:/i', $Name)) {
         $Err = 'The torrent contains one or more files with a :, which is a forbidden character. Please rename the files as necessary and recreate the .torrent file.';
     }
+    if (!preg_match('/\./i', $Name)) {
+        $Err = 'The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.';
+    }
     // Add file and size to array
     $TmpFileList [] = $Name . '{{{' . $Size . '}}}'; // Name {{{Size}}}
 }
