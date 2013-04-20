@@ -138,10 +138,16 @@ foreach ($FileList as $File) {
         $Err = 'The torrent contains one or more files with a :, which is a forbidden character. Please rename the files as necessary and recreate the .torrent file.';
     }
     if (!preg_match('/\./i', $Name)) {
+    //if ( strpos($Name, '.')===false)  {
         $Err = 'The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.';
     }
     // Add file and size to array
     $TmpFileList [] = $Name . '{{{' . $Size . '}}}'; // Name {{{Size}}}
+}
+
+if ($Err) { // Show the upload form, with the data the user entered
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
 }
 
 // To be stored in the database
@@ -157,6 +163,7 @@ if (!isset($Properties['Title']) || $Properties['Title']=='') {
 $Validate = new VALIDATE;
 $Validate->SetFields('Title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>TITLE_MAXWORD_LENGTH)); 
 $Err = $Validate->ValidateForm($Properties, $Text); // Validate the form
+
 if ($Err) { // Show the upload form, with the data the user entered
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
