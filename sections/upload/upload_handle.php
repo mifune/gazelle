@@ -139,7 +139,7 @@ foreach ($FileList as $File) {
     }
     if (!preg_match('/\./i', $Name)) {
     //if ( strpos($Name, '.')===false)  {
-        $Err = 'The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.';
+        $Err = "The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.<br/><strong>note: this can also be caused by selecting 'create encrypted' in some clients</strong> in which case please recreate the .torrent file without encryption selected.";
     }
     // Add file and size to array
     $TmpFileList [] = $Name . '{{{' . $Size . '}}}'; // Name {{{Size}}}
