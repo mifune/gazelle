@@ -77,7 +77,7 @@ show_header('My Donations','bitcoin,bbcode');
         This page queries the balance at the donation address in realtime.<br/>
         Once you have transferred some bitcoin to your donation address it can take a few hours for the transfer to be fully verified on the bitcoin network (6 transactions).<br/>
         When your transfer is verified you must return to this page and choose how to submit your donation (for -gb or <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" />)<br/><br/>
-    <?
+    <? 
         if ($eur_rate=='0'){   ?>
             <span class="red">The site was unable to get an exchange rate - you will not be able to submit a donation at this time</span><br/>
             Hopefully this is a temporary issue with the MtGox webservice, if it persists please 
@@ -88,10 +88,9 @@ show_header('My Donations','bitcoin,bbcode');
     <?  }
             foreach($user_addresses as $address) {
                 list($ID, $public, $time) = $address;
-                // $public = '19hMEAaRMbEhfSkeU4GT8mgSuyR4t4M6TH';
                 $balance1 = check_bitcoin_balance($public, 1);
                 if ($balance1>0){
-                    $amount_euro = round($balance1*$eur_rate,2);
+                    $amount_euro = number_format($balance1*$eur_rate,2);
                     $balance2 = check_bitcoin_balance($public, 6);
                     $activetime = check_bitcoin_activation($public);
                 } else {
@@ -99,9 +98,11 @@ show_header('My Donations','bitcoin,bbcode');
                     $balance2 = 0;
                     $activetime = '';
                 }
-                $disabled_html = $balance2==0 || $eur_rate=='0' ? 'disabled="disabled" ':'';
+                $verified = $balance2>0 && $balance2==$balance1;
+                $can_submit =  $verified && $eur_rate!=='0';
+                $disabled_html = $can_submit ? '' : 'disabled="disabled" ';
     ?>
-            <div class="donate_details<?=($balance2>0?' green':'')?>">
+            <div class="donate_details<?=($can_submit?' green':'')?>">
                 <table class="noborder">
                     <tr>
                         <td>address</td><td><?=($activetime?'time activated':'')?></td>
@@ -109,7 +110,7 @@ show_header('My Donations','bitcoin,bbcode');
                     </tr>
                     <tr>
                         <td><?=$Text->full_format("[font=Courier New][b]{$public}[/b][/font]", true)?></td><td><?=($activetime?time_diff($activetime):'')?></td>
-                        <td><?=$balance1; if ($balance1>0) echo ($balance2==0?' (pending)':' (verified)')?></td><td><?=$amount_euro?></td>
+                        <td><?=$balance1; if ($balance1>0) echo ($verified?' (verified)':' (pending)')?></td><td><?=$amount_euro?></td>
                     </tr>
                     <?
                 if ($balance1>0) {

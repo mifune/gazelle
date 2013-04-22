@@ -16,15 +16,15 @@ show_header('Donate','bitcoin');
         if ($Body) {
             include(SERVER_ROOT.'/classes/class_text.php');
             $Text = new TEXT;
-
             echo $Text->full_format($Body , get_permissions_advtags($LoggedUser['ID']));  
-            //. " [size=2][b][i]".BITCOIN_ADDRESS."[/i][/b][/size]"
         }
         ?>
         <br/>
         <p style="font-size: 1.1em" title="rate is Mt.Gox weighted average: <?=$eur_rate?>">The current bitcoin exchange rate is 1 bitcoin = &euro;<?=number_format($eur_rate,2);?></p>
-        <br/>
-        <a style="font-weight: bold;font-size: 1.2em;" href="donate.php?action=my_donations&new=1"><span style="color:red;"> >> </span>click here to get a personal donation address<span style="color:red;"> << </span></a>
+        
+        <div style="text-align: center">
+            <a style="font-weight: bold;font-size: 1.6em;" href="donate.php?action=my_donations&new=1"><span style="color:red;"> >> </span>click here to get a personal donation address<span style="color:red;"> << </span></a>
+        </div>
     </div>
  
     <div class="head">Donate for <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" /></div>
@@ -51,7 +51,7 @@ show_header('Donate','bitcoin');
                 <?
                 while( list($title, $desc, $image, $cost) = $DB->next_record()) {
                     ?>
-                    <br/><img style="vertical-align: middle;" src="<?= STATIC_SERVER ?>common/badges/<?=$image?>" alt="<?=$title?>" title="<?=$title?>" />  &nbsp; If you donate <span style="font-size: 1.3em;font-weight: bolder">&euro;<?=$cost?></span> you will get a <?=$title?>  <strong>(<?=number_format($cost/$eur_rate,3)?> bitcoins)</strong>
+                    <br/> &nbsp; &nbsp;<img style="vertical-align: middle;" src="<?= STATIC_SERVER ?>common/badges/<?=$image?>" alt="<?=$title?>" title="<?=$title?>" />  &nbsp; If you donate <span style="font-size: 1.3em;font-weight: bolder">&euro;<?=$cost?></span> you will get a <?=$title?>  <strong>(<?=number_format($cost/$eur_rate,3)?> bitcoins)</strong>
                     <br/>
                     <?
                 }

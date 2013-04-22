@@ -13,12 +13,6 @@ if ( !isset($_GET['page']) && !$DonationTimeline = $Cache->get_value('donation_t
                        FROM bitcoin_donations WHERE state!='unused' 
                        GROUP BY Month ORDER BY received DESC LIMIT 18"); 
     
-    /*
-	$DB->query("SELECT STR_TO_DATE( DATE_FORMAT(received,'%X%V Monday'), '%X%V %W') AS WeekNum, SUM(amount_euro)  
-                       FROM bitcoin_donations WHERE state!='unused' 
-                       GROUP BY WeekNum ORDER BY received DESC LIMIT 18");
-    */
-    
 	$Timeline = $DB->to_array(false,MYSQLI_NUM);
 	//$Timeline[] = array('', '0');
 	$Timeline = array_reverse($Timeline);
@@ -152,10 +146,7 @@ show_header('Donation log','bitcoin');
         <div class="donate_details<?=($unused?'':' green')?>">
             <table class="noborder">
                 <tr>
-                    <td></td>
-                    <td>
-                        <!--<input type="button" onclick="ChangeStatesToCleared('<?=$numthispage?>')" value="change all state to cleared" />-->
-                    </td>  
+                    <td colspan="2"></td>
                     <td colspan="<?=($unused?'4':'6')?>" style="text-align:right;">
     <?                  if ($numthispage>0){      ?>
                             <span title="query all btc balances on this page (dont hammer the webservice too much though)">
@@ -193,9 +184,8 @@ show_header('Donation log','bitcoin');
                     $time = time_diff($received);
                 }
                 $row = $row=='b'?'a':'b';
-                //if ($add_title) $add_title = " title=\"address issued by $staffname\" ";
     ?>
-                <tr class="row<?=$row?>">
+                <tr class="row<?=$row?> record<?=$i?>">
                     <td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?> 
                             <a style="font-style: italic;font-size:0.8em;" href="donate.php?action=my_donations&userid=<?=$UserID?>" target="_blank" title="view users my donations page">[view log]</a></td>
                     <td><span class="address" id="address_<?=$i?>" <?=$add_title?>><?=$public?></span></td>
@@ -219,10 +209,13 @@ show_header('Donation log','bitcoin');
                     <td><span style="font-style: italic;" id="euros_<?=$i?>"></span></td>
                 </tr>
                 <? if ($state!='unused') {  ?>
-                    <tr class="row<?=$row?>">
+                    <tr class="row<?=$row?> record<?=$i?>">
                         <td><strong>status: <span id="status_<?=$i?>"><?=$state?></span></strong></td>
-                        <td colspan="<?=($admin_addresses?'5':'4')?>"><?=$comment?></td>
-                        <td colspan="2"><span id="state_button_<?=$i?>"></span></td>
+                        <td colspan="<?=($admin_addresses?'4':'3')?>"><?=$comment?></td>
+                        <td colspan="1"><? if ($admin_addresses) { ?><input type="button" onclick="ChangeState('<?=$i?>','<?=$public?>','unused', true)" value="unsubmit(!)" title="unsubmitting a donation sets its state back to just issued - this means the current balance can be resubmitted as a new donation. NOTE: this is for testing/emergency use only, it does not undo donor medals or -gb, it just changes the status of the donation so it can be resubmitted." /><? } ?></td>
+                        <!--<td colspan="2"><span id="state_button_<?=$i?>"></span></td> -->
+                        <td colspan="2" id="state_button_<?=$i?>"><? if ($admin_addresses && $state=='cleared') { ?><input type="button" onclick="ChangeState('<?=$i?>','<?=$public?>','submitted', false)" value="unclear(!)" title="unclearing a donation sets its state back to submitted. NOTE: this is for testing/un-fucking records that should not have been cleared, all it does is change the status of the donation back to submitted." /><? } ?></td>
+                        
                     </tr>
                 <? }                        ?>
     <?      }                       ?>
