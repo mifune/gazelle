@@ -724,8 +724,8 @@ if(isset($ActiveDrive['ID']) ) {
     <div id="donorbar">
         <div>
             <a href="forums.php?action=viewthread&amp;threadid=<?=$threadid;?>" title="click for details"><?=$name?></a>
-            <a class="link" href="donate.php" title="click to donate">
-                so far we have raised <strong>&euro;<?=number_format($raised_euros,2)?></strong> out of <strong>&euro;<?=number_format($target_euros,2)?></strong> - to help support the site click to donate
+            <a class="link" href="donate.php" title="click to donate"><!--so far we have raised <strong>&euro;<?=number_format($raised_euros,2)?></strong> out of-->
+                target: <strong>&euro;<?=number_format($target_euros,2)?></strong> - to help support the site click to donate
             </a>
             <div>
                 <a href="donate.php" title="click to donate">
