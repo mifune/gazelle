@@ -1475,7 +1475,6 @@ if (check_perms('users_mod', $Class)) {
                 echo " Total &nbsp;&nbsp; | ". hoursdays($SeedHoursTotal) .'<br/>'; 
                 echo " Today &nbsp;&nbsp; | ". hoursdays($SeedHoursDaily) . " | $CreditsDaily credits"; 
                 echo '</div>';
-                $SeedHistory = $AdminComment;
 ?>
 				<div class="box pad seedhistory scrollbox"><?=$Text->full_format($SeedHistory)?></div>
                       
