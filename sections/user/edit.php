@@ -537,7 +537,7 @@ echo $Val->GenerateJS('userform');
 			</tr>
 			<tr class="colhead">
 				<td colspan="2">
-					<strong>Torrent Footer</strong>
+					<strong>Torrent Footer</strong> &nbsp; <span style="text-decoration: underline">max height</span> <?=TORRENT_SIG_MAX_HEIGHT?> px
 				</td>
 			</tr>
 			<tr>
