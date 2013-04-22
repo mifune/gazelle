@@ -774,7 +774,8 @@ p.min_padding {
     height: 100%;
 }*/
 
-#bonuslog, #admincommentlinks {
+
+.scrollbox {
     max-height:400px;
     overflow: auto;
 }

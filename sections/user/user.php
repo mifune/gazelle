@@ -960,7 +960,7 @@ if (check_perms('users_view_bonuslog',$Class) || $OwnProfile) {
                 <span style="float:right;"><a href="#" onclick="$('#bonuslogdiv').toggle(); this.innerHTML=(this.innerHTML=='(Show Log)'?'(Hide Log)':'(Show Log)'); return false;">(Show Log)</a></span>&nbsp;
 
                 <div class="hidden" id="bonuslogdiv" style="padding-top: 10px;">
-                    <div id="bonuslog" class="box pad">
+                    <div id="bonuslog" class="box pad scrollbox">
                         <?=(!$BonusLog ? 'no bonus history' :$Text->full_format($BonusLog))?>
                     </div>
 <?
@@ -1448,7 +1448,7 @@ if (check_perms('users_mod', $Class)) {
 		<div class="box" >		
                   <div class="pad" id="notesdiv" style="padding-bottom: 20px;">
 				<input type="hidden" name="comment_hash" value="<?=$CommentHash?>">
-				<div id="admincommentlinks" class="AdminComment box pad"><?=$Text->full_format($AdminComment)?></div>
+				<div id="admincommentlinks" class="AdminComment box pad scrollbox"><?=$Text->full_format($AdminComment)?></div>
 				<textarea id="admincomment" onkeyup="resize('admincomment');" class="AdminComment hidden" name="AdminComment" cols="65" rows="26" style="width:98%;"><?=display_str($AdminComment)?></textarea>
 <?
         if (check_perms('users_admin_notes', $Class)) { ?>
@@ -1467,17 +1467,17 @@ if (check_perms('users_mod', $Class)) {
                 <span style="float:right;"><a id="historybutton" href="#" onclick="return Toggle_view('history');">(Hide)</a></span>&nbsp;
             </div>            
 		<div class="box">		
-                  <div class="pad" id="historydiv">
+            <div class="pad" id="historydiv">
                       This is a record of up/down from the tracker, plus credits awarded 
 <?
  
-                echo '<div class="box pad seedhistory">';
+                echo '<div class="box pad seedhistory scrollbox">';
                 echo " Total &nbsp;&nbsp; | ". hoursdays($SeedHoursTotal) .'<br/>'; 
                 echo " Today &nbsp;&nbsp; | ". hoursdays($SeedHoursDaily) . " | $CreditsDaily credits"; 
                 echo '</div>';
-                
+                $SeedHistory = $AdminComment;
 ?>
-				<div class="box pad seedhistory"><?=$Text->full_format($SeedHistory)?></div>
+				<div class="box pad seedhistory scrollbox"><?=$Text->full_format($SeedHistory)?></div>
                       
 			</div>
 		</div>
