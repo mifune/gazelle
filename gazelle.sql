@@ -2042,6 +2042,7 @@ CREATE TABLE IF NOT EXISTS `users_info` (
   `PermittedForums` varchar(150) NOT NULL DEFAULT '',
   `UnseededAlerts` enum('0','1') NOT NULL DEFAULT '0',
   `BonusLog` mediumtext NOT NULL,
+  `TorrentSignature` text NOT NULL,
   `RunHour` tinyint(2) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `UserID` (`UserID`),
   KEY `SupportFor` (`SupportFor`),
