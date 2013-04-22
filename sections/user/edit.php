@@ -537,7 +537,7 @@ echo $Val->GenerateJS('userform');
 			</tr>
 			<tr class="colhead">
 				<td colspan="2">
-					<strong>Torrent Signature</strong>
+					<strong>Torrent Footer</strong>
 				</td>
 			</tr>
 			<tr>
@@ -555,7 +555,7 @@ echo $Val->GenerateJS('userform');
         } else {
  ?>
                     <div style="text-align:left;">
-                        <?=$Text->full_format('You need to get promoted before you can have a torrent signature. see the [url=/articles.php?topic=ranks][b]User Classes[/b][/url] article.', $AdvancedTags ) ?>
+                        <?=$Text->full_format('You need to get promoted before you can have a torrent footer. see the [url=/articles.php?topic=ranks][b]User Classes[/b][/url] article.', $AdvancedTags ) ?>
                     </div>     
  <? 
         }
