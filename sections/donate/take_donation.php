@@ -37,7 +37,16 @@ if ($_REQUEST['donategb']) {
     $comment .= "ratio: - " . get_size($deduct_bytes);
 } else {
     $comment .= "love";
-    $DB->query("SELECT ID, Title, Badge, Rank, Image, Description FROM badges WHERE Type='Donor' AND Cost<='" . (int) round($amount) . "' ORDER BY Cost DESC LIMIT 1");
+    /* 
+    $DB->query("SELECT Sum(amount_euro) FROM bitcoin_donations WHERE state!='unused' AND userID='$UserID'");
+    if ($DB->record_count()>0) {
+        list($SumDonations) = $DB->next_record();
+        $SumDonations += $amount;
+    } else {
+        $SumDonations = $amount;
+    }
+     */
+    $DB->query("SELECT ID, Title, Badge, Rank, Image, Description FROM badges WHERE Type='Donor' AND Cost<='" . (int)round($amount) . "' ORDER BY Cost DESC LIMIT 1");
     if ($DB->record_count() > 0) {
         list($badgeid, $title, $badge, $rank, $image, $description) = $DB->next_record();
         $comment .= " (received badge: $title)";
@@ -65,8 +74,7 @@ if ($_REQUEST['donategb']) {
     $summary .= ", by donation system";
 
     $DB->query("UPDATE users_info as i JOIN users_main as m ON i.UserID=m.ID
-                               SET i.Donor='1',
-                                   i.AdminComment=CONCAT_WS( '\n', '".db_string($Summary)."', i.AdminComment),
+                               SET i.AdminComment=CONCAT_WS( '\n', '".db_string($Summary)."', i.AdminComment),
                                    m.Downloaded=(m.Downloaded-'$deduct_bytes')
                              WHERE m.ID='$UserID'");
 
