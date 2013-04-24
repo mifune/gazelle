@@ -287,14 +287,6 @@ if (!empty($_GET['size'])) {
     } else {
         $mul = 1;
     }
-    /*
-2.43 * 1024 = 2488.32 
-2.44 * 1024 = 2498.56
-2550122 / 1024= 2490.35333
-     * 
-  48.52 * 1024 = 49684.48
-   50873260 /1024 == 49680.918
-     */
     $size = (float)$_GET['size'] * $mul;
     $range = (float)($mul * 0.1);
     $min_sizekb = (int)floor($size - $range);
@@ -498,6 +490,18 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                         <td class="label" style="width:140px" title="Search Titles">Title:</td>
                         <td colspan="3">
                             <input type="text" spellcheck="false" size="40" name="title" class="inputtext" title="Supports full boolean search" value="<? form('title') ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label" style="width:140px" title="Search Size">Size:</td>
+                        <td colspan="3">
+                            <input type="text" spellcheck="false" size="30" name="size" class="smaller" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('size') ?>" />
+                            <select name="sizetype">
+									<option value="kb">KB</option>
+									<option value="mb">MB</option>
+									<option value="gb" selected="selected">GB</option>
+									<option value="tb">TB</option>
+							</select>
                         </td>
                     </tr>
                     <tr>
