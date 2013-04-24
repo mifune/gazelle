@@ -155,7 +155,7 @@ class SPHINX_SEARCH extends SphinxClient {
 		$this->SetFilter($Name, $Vals, $Exclude);
 	}
 	
-	function set_filter_range($Name, $Min, $Max, $Exclude) {
+	function set_filter_range($Name, $Min, $Max, $Exclude=false) {
 		$this->Filters[$Name] = array($Min.'-'.$Max);
 		$this->SetFilterRange($Name, $Min, $Max, $Exclude);
 	}

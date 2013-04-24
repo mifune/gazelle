@@ -277,6 +277,20 @@ if (!empty($_GET['filter_cat'])) {
     $SS->set_filter('newcategoryid', array_keys($_GET['filter_cat']));
 }
 
+if (!empty($_GET['size'])) {
+    if($_GET['sizetype']=='tb')
+        $mul = 1024 * 1024 * 1024;
+    elseif($_GET['sizetype']=='gb')
+        $mul = 1024 * 1024;
+    elseif($_GET['sizetype']=='mb')
+        $mul = 1024;
+    else 
+        $mul = 1;
+    $size = (float)$_GET['size'] * $mul;
+    $min_sizekb = (int)floor($size);
+    $max_sizekb = (int)ceil($size);
+    $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
+}
 
 if (!empty($_GET['page']) && is_number($_GET['page'])) {
     if (check_perms('site_search_many')) {
