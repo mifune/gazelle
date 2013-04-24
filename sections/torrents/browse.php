@@ -291,10 +291,14 @@ if (!empty($_GET['size'])) {
 2.43 * 1024 = 2488.32 
 2.44 * 1024 = 2498.56
 2550122 / 1024= 2490.35333
+     * 
+  48.52 * 1024 = 49684.48
+   50873260 /1024 == 49680.918
      */
     $size = (float)$_GET['size'] * $mul;
-    $min_sizekb = (int)floor($size);
-    $max_sizekb = (int)ceil($size + ($mul * 0.1));
+    $range = (float)($mul * 0.1);
+    $min_sizekb = (int)floor($size - $range);
+    $max_sizekb = (int)ceil($size + $range);
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
 }
 
