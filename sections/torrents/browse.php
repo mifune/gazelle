@@ -277,6 +277,9 @@ if (!empty($_GET['filter_cat'])) {
     $SS->set_filter('newcategoryid', array_keys($_GET['filter_cat']));
 }
 
+    
+if (!isset($_GET['sizerange'])) $_GET['sizerange'] = 0.01;
+
 if (!empty($_GET['size'])) {
     if($_GET['sizetype']=='tb') {
         $mul = 1024 * 1024 * 1024;
@@ -288,8 +291,9 @@ if (!empty($_GET['size'])) {
         $mul = 1;
     }
     $size = (float)$_GET['size'] * $mul;
-    $range = (float)($mul * 0.01);
-    $min_sizekb = (int)floor($size - $range);
+    $rangemod = (float)$_GET['sizerange'];
+    $range = (float)($mul * $rangemod);
+    $min_sizekb = (int)ceil($size - $range);
     $max_sizekb = (int)ceil($size + $range);
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
 }
@@ -492,20 +496,22 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                             <input type="text" spellcheck="false" size="40" name="title" class="inputtext" title="Supports full boolean search" value="<? form('title') ?>" />
                         </td>
                     </tr>
-                <? if ($_GET['showsize']==1 || check_perms('site_debug')) { ?>
                     <tr>
                         <td class="label" style="width:140px" title="Search Size"><span class="red">(beta)</span>&nbsp; Size:</td>
                         <td colspan="3">
-                            <input type="text" spellcheck="false" size="30" name="size" class="smaller" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('size') ?>" />
+                            <input type="text" spellcheck="false" size="25" name="size" class="smallish" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('size') ?>" />
                             <select name="sizetype">
-									<option value="kb">KB</option>
-									<option value="mb">MB</option>
-									<option value="gb" selected="selected">GB</option>
-									<option value="tb">TB</option>
+									<option value="kb" <?if($_GET['sizetype']=='kb')echo'selected="selected"'?> > KB </option>
+									<option value="mb" <?if($_GET['sizetype']=='mb')echo'selected="selected"'?>> MB </option>
+									<option value="gb" <?if($_GET['sizetype']=='gb')echo'selected="selected"'?>> GB </option>
+									<option value="tb" <?if($_GET['sizetype']=='tb')echo'selected="selected"'?>> TB </option>
 							</select>
+                <? //if ( check_perms('site_debug')) { ?>
+                            &nbsp; range &plusmn;
+                            <input type="text" spellcheck="false" size="10" name="sizerange" class="smallest" title="Advanced users! Specify a range modifier, default is &plusmn;0.01" value="<? form('sizerange') ?>" />
+                <? //} ?>
                         </td>
                     </tr>
-                <? } ?>
                     <tr>
                         <td class="label" style="width:140px" title="Search Files">File List:</td>
                         <td colspan="3">

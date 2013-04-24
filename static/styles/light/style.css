@@ -1419,6 +1419,10 @@ ul.poll li.graph {
     width:300px;
 }
 
+.filter_torrents .smallish {
+    width:200px;
+}
+
 .filter_torrents .smallest {
     width:50px;
 }
