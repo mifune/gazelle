@@ -278,19 +278,26 @@ if (!empty($_GET['filter_cat'])) {
 }
 
 if (!empty($_GET['size'])) {
-    if($_GET['sizetype']=='tb')
+    if($_GET['sizetype']=='tb') {
         $mul = 1024 * 1024 * 1024;
-    elseif($_GET['sizetype']=='gb')
+    } elseif($_GET['sizetype']=='gb') {
         $mul = 1024 * 1024;
-    elseif($_GET['sizetype']=='mb')
+    } elseif($_GET['sizetype']=='mb'){
         $mul = 1024;
-    else 
+    } else {
         $mul = 1;
+    }
+    /*
+2.43 * 1024 = 2488.32 
+2.44 * 1024 = 2498.56
+2550122 / 1024= 2490.35333
+     */
     $size = (float)$_GET['size'] * $mul;
     $min_sizekb = (int)floor($size);
-    $max_sizekb = (int)ceil($size);
+    $max_sizekb = (int)ceil($size + ($mul * 0.1));
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
 }
+
 
 if (!empty($_GET['page']) && is_number($_GET['page'])) {
     if (check_perms('site_search_many')) {
