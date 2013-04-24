@@ -492,6 +492,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                             <input type="text" spellcheck="false" size="40" name="title" class="inputtext" title="Supports full boolean search" value="<? form('title') ?>" />
                         </td>
                     </tr>
+                <? if ($_GET['showsize']==1 || check_perms('site_debug')) { ?>
                     <tr>
                         <td class="label" style="width:140px" title="Search Size"><span class="red">(beta)</span>&nbsp; Size:</td>
                         <td colspan="3">
@@ -504,6 +505,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
 							</select>
                         </td>
                     </tr>
+                <? } ?>
                     <tr>
                         <td class="label" style="width:140px" title="Search Files">File List:</td>
                         <td colspan="3">
