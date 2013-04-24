@@ -25,8 +25,8 @@ if ($ConvID = (int)$_GET['id']) {
 
 	show_header('Staff PM', 'staffpm,bbcode,jquery');
 
-	$UserInfo = user_info($UserID);
-	$UserStr = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], $UserInfo['Title'], true);
+	$OwnerInfo = user_info($UserID);
+	$UserStr = format_username($UserID, $OwnerInfo['Username'], $OwnerInfo['Donor'], $OwnerInfo['Warned'], $OwnerInfo['Enabled'], $OwnerInfo['PermissionID'], $OwnerInfo['Title'], true);
       $OwnerID = $UserID;
       if($ResolverID) {
           	$ResolverInfo = user_info($ResolverID);
@@ -256,10 +256,26 @@ if ($ConvID = (int)$_GET['id']) {
 					<input type="button" value="Unresolve" onClick="location.href='staffpm.php?action=unresolve&id=<?=$ConvID?>&return=1';" />
 <?			// }  
  	}
-	if (check_perms('users_give_donor')) { ?>
-					<input type="button" value="Make Donor" onClick="location.href='staffpm.php?action=make_donor&id=<?=$ConvID?>';" />
-<?	} ?>
+	?>
 				</form>
+                <?
+                if (check_perms('users_give_donor')) { ?>
+        <br/> 
+        <form action="donate.php" method="post">
+            <input type="hidden" name="action" value="submit_donate_manual" />
+            <input type="hidden" name="convid" value="<?=$ConvID?>" />
+            <input type="hidden" name="userid" value="<?=$OwnerID?>" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+            make <?=format_username($OwnerID, $OwnerInfo['Username'])?> a donor:
+            &nbsp; Amount: <strong style="font-size:19px;">&euro; </strong><input type="text" name="amount" value="" /> &nbsp; &nbsp; &nbsp;
+            <input type="submit" name="donategb" value="donate for -GB" /> 
+            <input type="submit" name="donatelove" value="donate for love" />
+        </form>
+					<!--<input type="button" value="Make Donor" onClick="location.href='staffpm.php?action=make_donor&id=<?=$ConvID?>';" />-->
+<?	} 
+                
+                
+                ?>
 			</div>
 		</div>
 	 

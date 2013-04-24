@@ -29,7 +29,25 @@ show_header('My Donations','bitcoin,bbcode');
 <!-- Donate -->
 <div class="thin">
     <h2><?=$Title?></h2>
-    
+<?
+    // manually enter a donation (for paypal etc)
+    if (check_perms('users_give_donor')) {
+?>
+    <div class="head">Manually enter a donation</div>
+    <div class="box pad">
+        <form action="donate.php" method="post" >
+            <input type="hidden" name="action" value="submit_donate_manual" />
+            <input type="hidden" name="userid" value="<?=$UserID?>" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+            
+            Amount: <strong style="font-size:19px;">&euro; </strong><input type="text" name="amount" value="" /> &nbsp; &nbsp; &nbsp;
+            <input type="submit" name="donategb" value="donate for -GB" /> 
+            <input type="submit" name="donatelove" value="donate for love" />
+        </form>
+    </div>
+<?
+    }
+?>
     <div class="head">Your unique donation address</div>
     <div class="box pad">
     <?
@@ -168,7 +186,8 @@ show_header('My Donations','bitcoin,bbcode');
     
         $DB->query("SELECT ID, state, public, time, userID, bitcoin_rate, received, amount_bitcoin, amount_euro, comment
                         FROM bitcoin_donations 
-                        WHERE state !='unused' AND userID='$UserID'");
+                        WHERE state !='unused' AND userID='$UserID'
+                    ORDER BY received DESC");
 
         $donation_records = $DB->to_array(false, MYSQL_NUM);
     

@@ -16,8 +16,11 @@ if (!isset($_REQUEST['action'])) {
             include(SERVER_ROOT . '/sections/donate/take_donation.php');
             break;
 
-
-
+        case 'submit_donate_manual':
+            // user submits their donation
+            include(SERVER_ROOT . '/sections/donate/take_manual_donation.php');
+            break;
+ 
         default:
             include(SERVER_ROOT . '/sections/donate/donate.php');
             break;
