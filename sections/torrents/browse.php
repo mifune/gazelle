@@ -493,7 +493,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                         </td>
                     </tr>
                     <tr>
-                        <td class="label" style="width:140px" title="Search Size">Size:</td>
+                        <td class="label" style="width:140px" title="Search Size"><span class="red">(beta)</span>&nbsp; Size:</td>
                         <td colspan="3">
                             <input type="text" spellcheck="false" size="30" name="size" class="smaller" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('size') ?>" />
                             <select name="sizetype">
