@@ -288,7 +288,7 @@ if (!empty($_GET['size'])) {
         $mul = 1;
     }
     $size = (float)$_GET['size'] * $mul;
-    $range = (float)($mul * 0.1);
+    $range = (float)($mul * 0.01);
     $min_sizekb = (int)floor($size - $range);
     $max_sizekb = (int)ceil($size + $range);
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
