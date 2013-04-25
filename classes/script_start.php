@@ -1804,12 +1804,14 @@ function update_hash($GroupID) {
 		SUM(t.Seeders) AS Seeders,
 		SUM(t.Leechers) AS Leechers,
 		BIT_OR(t.FreeTorrent-1) AS FreeTorrent,
-		GROUP_CONCAT(REPLACE(REPLACE(FileList, '|||', '\n '), '_', ' ') SEPARATOR '\n ') AS FileList,
+		GROUP_CONCAT(REPLACE(FileList, '|||', '\n ') SEPARATOR '\n ') AS FileList,
                 g.SearchText
 		FROM torrents AS t
 		JOIN torrents_group AS g ON g.ID=t.GroupID
 		WHERE g.ID=$GroupID
 		GROUP BY g.ID");
+    
+		//GROUP_CONCAT(REPLACE(REPLACE(FileList, '|||', '\n '), '_', ' ') SEPARATOR '\n ') AS FileList,
 	
 	$Cache->delete_value('torrents_details_'.$GroupID);
 	$Cache->delete_value('torrent_group_'.$GroupID);
