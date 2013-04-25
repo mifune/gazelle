@@ -279,6 +279,7 @@ if (!empty($_GET['filter_cat'])) {
 
     
 if (!isset($_GET['sizerange'])) $_GET['sizerange'] = 0.01;
+if (!isset($_GET['sizetype'])) $_GET['sizetype'] = 'gb';
 
 if (!empty($_GET['size'])) {
     if($_GET['sizetype']=='tb') {

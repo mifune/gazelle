@@ -26,6 +26,7 @@ if ($ConvID = (int)$_GET['id']) {
 	show_header('Staff PM', 'staffpm,bbcode,jquery');
 
 	$OwnerInfo = user_info($UserID);
+	$UserInfo = $OwnerInfo;
 	$UserStr = format_username($UserID, $OwnerInfo['Username'], $OwnerInfo['Donor'], $OwnerInfo['Warned'], $OwnerInfo['Enabled'], $OwnerInfo['PermissionID'], $OwnerInfo['Title'], true);
       $OwnerID = $UserID;
       if($ResolverID) {
@@ -80,9 +81,9 @@ if ($ConvID = (int)$_GET['id']) {
 			// Staff/FLS
 			$UserInfo = user_info($UserID);
 			$UserString = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], $UserInfo['Title'], true);
-            }
+        }
             // determine if conversation was started by user or not (checks first record for userID)
-            if (!isset($UserInitiated)) {
+        if (!isset($UserInitiated)) {
                 $UserInitiated = $UserID == $OwnerID;  
 ?> 
                 <div class="head">
@@ -103,7 +104,7 @@ if ($ConvID = (int)$_GET['id']) {
                 </div>
                 <br/>
 <?             
-            } 
+        } 
 ?>
             <div class="head">
                 <?=$UserString;?>
