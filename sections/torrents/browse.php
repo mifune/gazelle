@@ -517,7 +517,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                     <tr>
                         <td class="label" style="width:140px" title="Search Files">File List:</td>
                         <td colspan="3">
-                            <input type="text" spellcheck="false" size="40" name="filelist" class="inputtext" value="<? form('filelist') ?>" />
+                            <input type="text" spellcheck="false" size="40" name="filelist" class="inputtext" title="Matches exact filenames, OR exact bytesize" value="<? form('filelist') ?>" />
                         </td>
                     </tr>
                 <? } else { // BASIC SEARCH ?>
