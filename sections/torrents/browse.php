@@ -251,6 +251,7 @@ foreach (array('title'=>'groupname') as $Search=>$Queryname) {
     
 if (!empty($_GET['filelist'])) {
     $FileList = ' ' . trim($_GET['filelist']);
+    $FileList = str_replace('_', ' ', $FileList); 
     $FileList = str_replace(array('%'), '', $FileList);
     $FileList = trim($FileList);
     
