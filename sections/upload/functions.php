@@ -6,14 +6,17 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     $SS->limit(0, 10, 10);
     $SS->SetSortMode(SPH_SORT_ATTR_DESC, 'time');
     $SS->set_index(SPHINX_INDEX . ' delta');
-    
-    $SS->set_filter_range('size', 0, 1024);
+    //exclude small size
+    //$SS->set_filter_range('size', 0, 1024, true);
     
     $AllResults=array();
     //$Queries=array();
     foreach ($TorrentFilelist as $File) {
         list($Size, $Name) = $File;
    
+        //skip matching files < 1mb in size
+        if ($Size < 1024*1024) continue;
+        
         //$Queries[] =  $SS->EscapeString($Size);
         
         $Query = '@filelist "' . $SS->EscapeString($Size) .'"';  // . '"~20';
