@@ -46,7 +46,7 @@ function check_size_dupes($TorrentFilelist) {
         $Queries[] =  $SS->EscapeString($Size);
     }
     
-    $Query = '@filelist "' . implode(" | ", $Queries);  // . '"~20';
+    $Query = '@filelist "' . implode(' | ', $Queries).'"';  // . '"~20';
     
     $Results = $SS->search($Query, '', 0, array(), '', '');
     $TorrentCount = $SS->TotalResults;
