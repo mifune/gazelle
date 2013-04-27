@@ -1,8 +1,8 @@
 <?
 
-include(SERVER_ROOT.'/sections/bookmarks/functions.php');
+//include(SERVER_ROOT.'/sections/bookmarks/functions.php');
  
-define('MAX_NUM_DUPE_MATCHES', 50);
+//define('MAX_NUM_DUPE_MATCHES', 50);
 
 if (!$INLINE) {  
     show_header("Dupe check for $DupeTitle");
@@ -39,7 +39,7 @@ if (!$DupeResults || $NumDupes<1) {
         // Start printing torrent list
         $row='a';
         $lastday = 0;
-        $Bookmarks = all_bookmarks('torrent');
+        //$Bookmarks = all_bookmarks('torrent');
 
         foreach ($DupeResults as $GroupID2 => $GData) {   
             list($GroupID, $GroupName, $TagList, $Torrents, $FreeTorrent, $Image, $TotalLeechers, 
@@ -59,7 +59,7 @@ if (!$DupeResults || $NumDupes<1) {
             $TorrentTags = implode(' ', $TorrentTags);
 
 
-            $AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], in_array($GroupID, $Bookmarks));
+            $AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], false);   // in_array($GroupID, $Bookmarks));
 
             $row = ($row == 'a'? 'b' : 'a');
             $IsMarkedForDeletion = $Data['Status'] == 'Warned' || $Data['Status'] == 'Pending';
