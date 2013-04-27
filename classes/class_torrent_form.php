@@ -41,7 +41,7 @@ class TORRENT_FORM {
 
 
 	function head() {
-		global $LoggedUser;
+		global $LoggedUser,$DupeResults;
 ?>
 <a id="uploadform"></a>
 
@@ -59,6 +59,14 @@ class TORRENT_FORM {
             <div id="contentpreview" style="text-align:left;"></div>  
 	</div>
 	<form action="" enctype="multipart/form-data" method="post" id="upload_table" onsubmit="$('#post').raw().disabled = 'disabled'">
+      <?
+    if (is_array($DupeResults)) { 
+        include(SERVER_ROOT . '/sections/upload/display_dupes.php');
+      ?>
+		<input type="hidden" name="ignoredupes" value="true" />
+      <?
+    }
+      ?>
 		<div>
 			<input type="hidden" name="submit" value="true" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />

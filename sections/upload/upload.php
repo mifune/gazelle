@@ -288,11 +288,6 @@ foreach ($Whitelist as $ImageHost) {
 <?
     }
     
-    if (is_array($DupeResults)) {
-?>
-<?
-        include(SERVER_ROOT . '/sections/upload/display_dupes.php');
-    }
 ?>
     <a id="startform"></a>
 <?

@@ -126,11 +126,14 @@ list($TotalSize, $FileList) = $Tor->file_list();
 
 $TmpFileList = array();
 
-$DupeResults = check_size_dupes($FileList);
-if ($DupeResults) { // Show the upload form, with the data the user entered
-    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
-    include(SERVER_ROOT . '/sections/upload/upload.php');
-    die();
+if(empty($_POST['ignoredupes'])) { //
+    // do dupe check & return to upload page if detected
+    $DupeResults = check_size_dupes($FileList);
+    if ($DupeResults) { // Show the upload form, with the data the user entered
+        $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
+        include(SERVER_ROOT . '/sections/upload/upload.php');
+        die();
+    }
 }
 
 
@@ -247,7 +250,7 @@ if (!preg_match("/^" . URL_REGEX . "$/i", $Properties['Image'])) {
 $sqltime = db_string( sqltime() );
 
 //Needs to be here as it isn't set for add format until now
-$LogName .= $Properties['Title'];
+$LogName = $Properties['Title'];
 
 //For notifications--take note now whether it's a new group
 //$IsNewGroup = !$GroupID;
@@ -401,6 +404,27 @@ update_hash($GroupID);
     }
 //}
 
+    
+    
+if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning...
+    
+    $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
+    $Message = db_string("Possible dupe was uploaded:[br][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username]");
+   
+	$DB->query("INSERT INTO staff_pm_conversations 
+				 (Subject, Status, Level, UserID, Date)
+			VALUES ('$Subject', 'Unanswered', '0', '0', '".sqltime()."')");
+	// New message
+	$ConvID = $DB->inserted_id();
+	$DB->query("INSERT INTO staff_pm_messages
+				 (UserID, SentDate, Message, ConvID)
+			VALUES ('0', '".sqltime()."', '$Message', $ConvID)");
+    
+}
+    
+    
+    
+    
 //******************************************************************************//
 //--------------- IRC announce and feeds ---------------------------------------//
 $Announce = "";

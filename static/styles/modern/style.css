@@ -60,20 +60,7 @@ a:hover, .torrent_table .linkbox a:hover {
 tr.smallhead a, .cat_list a, tr.smallhead a:visited, .cat_list a:visited {
     color:#023174;
 }
-    /*   
-.linkbox a, .permission_container a,
-    .forum_index a, .forum_list a, #search_button, 
-    #request_table a, .cat_list a, .tags a, .head a, .colhead_dark a {
-    color: #bbb;
-    text-decoration: none;
-} 
-.linkbox a:visited, .permission_container a:visited,
-    .forum_index a:visited, .forum_list a:visited, #search_button:visited,
-    #request_table a:visited, .cat_list a:visited, .tags a:visited,
-    .head a:visited, .colhead_dark a:visited {
-    color: #888;   , .colhead a
-}
-*/
+
     
     
 .linkbox {
@@ -1316,7 +1303,8 @@ input.shopbutton.itembuy:hover {
 }
 
 #articles tr.colhead, #forums tr.colhead, #top10 tr.colhead, #torrents tr.colhead , #staff tr.colhead, #collage tr.colhead, 
-    #staffpm tr.colhead, #staffpms tr.colhead, #tools tr.colhead , #userhistory tr.colhead, #user tr.colhead, #reports tr.colhead, #requests tr.colhead  { 
+    #staffpm tr.colhead, #staffpms tr.colhead, #tools tr.colhead , #userhistory tr.colhead, #user tr.colhead, #reports tr.colhead, 
+    #requests tr.colhead , #upload tr.colhead  { 
     background-image: none;
     background-color: #d3e3f3;
     font-weight: bold; 
@@ -1326,7 +1314,8 @@ input.shopbutton.itembuy:hover {
     box-shadow:none;
 }
 #articles tr.colhead a, #forums tr.colhead a, #top10 tr.colhead a, #torrents tr.colhead a, #staff tr.colhead a, #collage tr.colhead a, 
-    #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a, #requests tr.colhead a { 
+    #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a, 
+    #requests tr.colhead a, #upload tr.colhead a { 
     font-weight: bold; 
     color: #888;
 }
