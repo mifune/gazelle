@@ -54,7 +54,7 @@ class TORRENT_FORM {
 		 
             //for testing form vars set action="http://www.tipjar.com/cgi-bin/test"
 ?>
-      <div id="messagebar" class="messagebar alert<? if(!$this->Error) echo ' hidden'?>"><? if($this->Error) echo display_str($this->Error) ; ?></div><br />
+      <div id="messagebar" class="messagebar alert<? if(!$this->Error) echo ' hidden'?>"><? if($this->Error) echo ($this->Error) ; ?></div><br />
       <div id="uploadpreviewbody" class="hidden"> 
             <div id="contentpreview" style="text-align:left;"></div>  
 	</div>
