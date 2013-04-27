@@ -126,14 +126,13 @@ list($TotalSize, $FileList) = $Tor->file_list();
 
 $TmpFileList = array();
 
-if(empty($_POST['ignoredupes'])) { //
-    // do dupe check & return to upload page if detected
-    $DupeResults = check_size_dupes($FileList);
-    if ($DupeResults) { // Show the upload form, with the data the user entered
-        $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
-        include(SERVER_ROOT . '/sections/upload/upload.php');
-        die();
-    }
+// do dupe check & return to upload page if detected
+$DupeResults = check_size_dupes($FileList);
+
+if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
+    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
 }
 
 
@@ -352,20 +351,6 @@ $Tags = explode(' ', strtolower($NewCategories[(int)$_POST['category']]['tag']."
 //}
 
 
-/*
-// Torrent
-$DB->query("
-	INSERT INTO torrents
-		(ID, GroupID, UserID, info_hash, FileCount, FileList, FilePath, Size, Time, FreeTorrent) 
-	VALUES
-		($GroupID, $GroupID, " . $LoggedUser['ID'] . ",
-		'" . db_string($InfoHash) . "', " . $NumFiles . ", " . $FileString . ", '" . $FilePath . "', " . $TotalSize . ", 
-		'$sqltime', '" . $Properties['FreeTorrent'] . "')");
-
-$Cache->increment('stats_torrent_count');
-$TorrentID = $GroupID;
-//$TorrentID = $DB->inserted_id();
-*/
 
 update_tracker('add_torrent', array('id' => $TorrentID, 'info_hash' => rawurlencode($InfoHash), 'freetorrent' => (int) $Properties['FreeTorrent']));
 
@@ -409,11 +394,14 @@ update_hash($GroupID);
 //--------------- possible dupe - send staff a pm ---------------------------------------//
     
 if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning...
-    
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
+    $Message = "[table][tr][th]Name[/th][th]duped file?[/th][/tr]";
+    foreach ($DupeResults as $ID => $dupedata) {
+        $Message .= "[tr][td][url=/torrents.php?id=$dupedata[ID]]$dupedata[Name][/url][/td][td]$dupedata[dupedfile][/td][/tr]" ;
+    }
+    $Message .= "[/table]";
     $Message = db_string("Possible dupe was uploaded:[br][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username]
-    [br]
-    View possible dupes: [url=/torrents.php?id=$GroupID&action=dupe_check]Dupecheck for torrent[/url]");
+[br]{$Message}[br][url=/torrents.php?id=$GroupID&action=dupe_check]View detailed possible dupelist for this torrent[/url]");
    
 	$DB->query("INSERT INTO staff_pm_conversations 
 				 (Subject, Status, Level, UserID, Date)

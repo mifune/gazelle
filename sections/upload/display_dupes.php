@@ -23,7 +23,7 @@ if (!$DupeResults || count($DupeResults)<1) {
         <tr class="colhead">
             <td class="small cats_col"></td>
             <td width="60%">Name</td>
-            <td width="40%">Duped file?</td>
+            <td width="40%">Exact size match</td>
             <td>Files</td>
             <td>Time</td>
             <td>Size</td>
@@ -88,7 +88,7 @@ if (!$DupeResults || count($DupeResults)<1) {
                     </div>
                     <? } ?>
                 </td>
-                <td class=""><?=$DupedFile?></td>
+                <td class="" title="File with exact match (bytesize)"><?=$DupedFile?></td>
                 <td class="center"><?=number_format($Data['FileCount'])?></td>
                 <td class="nobr"><?=time_diff($Data['Time'], 1) ?></td>
                 <td class="nobr"><?= get_size($Data['Size']) ?></td>
