@@ -1402,7 +1402,7 @@ td.colhead, .colhead td {
 
 .head+div.box, .colhead+div.box, tr.head+tr, tr#recentuploads, tr#recentsnatches, .head+table, #site_debug ,
        .main_column>table, .thin>table, .thin>form>table, #searchforum table, #searchthread table, #messageform .box,
-       .shadow, #upload_table, .report  { /* , tr:first-child */
+       .shadow, .report  { /* , tr:first-child */
     -moz-box-shadow:inset 2px 1px 3px #6a9bb7;
     -webkit-box-shadow:inset 2px 1px 3px #6a9bb7;
     box-shadow:inset 2px 1px 3px #6a9bb7;

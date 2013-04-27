@@ -65,9 +65,9 @@ class TORRENT_FORM {
 		$DupeTitle = $this->Torrent['Title']; 
         include(SERVER_ROOT . '/sections/upload/display_dupes.php');
       ?>
-        <div class="box pad"> 
-            If you have checked and are certain these are not dupes check this box to ignore the dupe check<br/>*(make sure you enter the same torrent file)
-            <input type="checkbox" name="ignoredupes" value="1" />
+        <div class="box pad shadow center"> 
+            If you have checked and are certain these are not dupes check this box to ignore the dupe check<br/>
+            <strong>Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1" /> *(make sure you enter the same torrent file)
         </div>
         <br/>
       <?
