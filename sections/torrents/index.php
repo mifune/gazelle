@@ -40,7 +40,7 @@ if(!empty($_REQUEST['action'])) {
             
             list($TotalSize, $FileList) = $Tor->file_list();
  
-            $DupeResults = check_size_dupes($FileList);
+            $DupeResults = check_size_dupes($FileList, $GroupID);
             //if ($DupeResults) { // Show the upload form, with the data the user entered
                     //$Err = 'The torrent contained one or more possible dupes. Please check carefully!';
                     $DupeTitle = $GroupName;

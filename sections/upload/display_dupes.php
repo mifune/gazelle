@@ -1,5 +1,6 @@
 <?
 
+include(SERVER_ROOT.'/sections/bookmarks/functions.php');
  
 
 if (!$INLINE) {  
@@ -21,8 +22,8 @@ if (!$DupeResults || count($DupeResults)<1) {
     <table class="torrent_table grouping" id="torrent_table">
         <tr class="colhead">
             <td class="small cats_col"></td>
-            <td width="100%">Name</td>
-            <td>Duped?</td>
+            <td width="60%">Name</td>
+            <td width="40%">Duped file?</td>
             <td>Files</td>
             <td>Time</td>
             <td>Size</td>
@@ -35,6 +36,8 @@ if (!$DupeResults || count($DupeResults)<1) {
         // Start printing torrent list
         $row='a';
         $lastday = 0;
+        $Bookmarks = all_bookmarks('torrent');
+
         foreach ($DupeResults as $GroupID => $GData) {   
             list($GroupID2, $GroupName, $TagList, $Torrents, $FreeTorrent, $Image, $TotalLeechers, 
                     $NewCategoryID, $SearchText, $TotalSeeders, $MaxSize, $TotalSnatched, $GroupTime, $DupedFile) = array_values($GData);
@@ -53,7 +56,7 @@ if (!$DupeResults || count($DupeResults)<1) {
             $TorrentTags = implode(' ', $TorrentTags);
 
 
-            //$AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], in_array($GroupID, $Bookmarks));
+            $AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], in_array($GroupID, $Bookmarks));
 
             $row = ($row == 'a'? 'b' : 'a');
             $IsMarkedForDeletion = $Data['Status'] == 'Warned' || $Data['Status'] == 'Pending';

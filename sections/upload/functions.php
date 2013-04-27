@@ -1,35 +1,4 @@
-<?php
-/*
-function check_size_dupes_sql($TorrentFilelist) {
-    global $SS;
-    
-    $User = user_info($UserID);
-    $Perms = get_permissions($User['PermissionID']);
-    $UserClass = $Perms['Class'];
- 
- 
-
-   $SQL = "SELECT SQL_CALC_FOUND_ROWS t.GroupID, t.ID AS TorrentID, t.Time, tg.NewCategoryID
-            FROM torrents AS t
-            JOIN torrents_group AS tg ON tg.ID=t.GroupID
-            WHERE t.Filelist LIKE '%$Words%'  
-            ORDER BY t.Time DESC LIMIT 10";
-
-    $DB->query($SQL);
-    $GroupIDs = $DB->collect('GroupID');
-    $TorrentsInfo = $DB->to_array('TorrentID', MYSQLI_ASSOC);
-
-    $DB->query("SELECT FOUND_ROWS()");
-    list($TorrentCount) = $DB->next_record();
-
-    if($TorrentCount==0) return false;
-    
-    $Results = get_groups($GroupIDs);
- 
-    $Results = $Results['matches'];
-    
-    return $Results;
-} */
+<?
 
 function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     global $SS;
@@ -67,8 +36,9 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
                     ksort($Results['matches'][$ID]);
                 }
             }
-            foreach ($Results['matches'] as $id => $tdata) {
-                if ( $tdata['ID']==$ExcludeID || isset( $AllResults[$tdata['ID']]) ) unset($Results['matches'][$id]);
+            foreach ($Results['matches'] as $ID => $tdata) {
+                //if ( $tdata['ID']==$ExcludeID || isset( $AllResults[$tdata['ID']]) ) unset($Results['matches'][$ID]);
+                if ( $tdata['ID']==$ExcludeID ) unset($Results['matches'][$ID]);
                 $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
             }
             
@@ -80,37 +50,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
  
     if(count($AllResults)<1) return false;
     return $AllResults;
-    
-    /*
-    $Query = '@filelist "' . implode(' | ', $Queries).'"';  // . '"~20';
-    
-    $Results = $SS->search($Query, '', 0, array(), '', '');
-    $TorrentCount = $SS->TotalResults;
-    
-    if($TorrentCount==0) return false;
-    
-    // These ones were not found in the cache, run SQL
-    if (!empty($Results['notfound'])) {
-
-        $SQLResults = get_groups($Results['notfound']);
-
-        if (is_array($SQLResults['notfound'])) { // Something wasn't found in the db, remove it from results
-            reset($SQLResults['notfound']);
-            foreach ($SQLResults['notfound'] as $ID) {
-                unset($SQLResults['matches'][$ID]);
-                unset($Results['matches'][$ID]);
-            }
-        }
-        // Merge SQL results with sphinx/memcached results
-        foreach ($SQLResults['matches'] as $ID => $SQLResult) {
-            $Results['matches'][$ID] = array_merge($Results['matches'][$ID], $SQLResult);
-            ksort($Results['matches'][$ID]);
-        }
-    }
-    $Results = $Results['matches'];
-    return $Results;
-    */
-    
+     
 }
 
 
