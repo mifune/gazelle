@@ -22,6 +22,7 @@ if (!$DupeResults || count($DupeResults)<1) {
         <tr class="colhead">
             <td class="small cats_col"></td>
             <td width="100%">Name</td>
+            <td>Duped?</td>
             <td>Files</td>
             <td>Time</td>
             <td>Size</td>
@@ -36,7 +37,7 @@ if (!$DupeResults || count($DupeResults)<1) {
         $lastday = 0;
         foreach ($DupeResults as $GroupID => $GData) {   
             list($GroupID2, $GroupName, $TagList, $Torrents, $FreeTorrent, $Image, $TotalLeechers, 
-                    $NewCategoryID, $SearchText, $TotalSeeders, $MaxSize, $TotalSnatched, $GroupTime) = array_values($GData);
+                    $NewCategoryID, $SearchText, $TotalSeeders, $MaxSize, $TotalSnatched, $GroupTime, $DupedFile) = array_values($GData);
 
             list($TorrentID, $Data) = each($Torrents);
 
@@ -86,6 +87,7 @@ if (!$DupeResults || count($DupeResults)<1) {
                     </div>
                     <? } ?>
                 </td>
+                <td class="nobr"><?=$DupedFile?></td>
                 <td class="center"><?=number_format($Data['FileCount'])?></td>
                 <td class="nobr"><?=time_diff($Data['Time'], 1) ?></td>
                 <td class="nobr"><?= get_size($Data['Size']) ?></td>

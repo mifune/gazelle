@@ -67,6 +67,10 @@ function check_size_dupes($TorrentFilelist) {
                     ksort($Results['matches'][$ID]);
                 }
             }
+            foreach ($Results['matches'] as $ID => $tdata) {
+                if ( isset( $AllResults[$ID]) ) unset($Results['matches'][$ID]);
+                $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
+            }
             $AllResults = array_merge($AllResults, $Results['matches']);
         }
     }
