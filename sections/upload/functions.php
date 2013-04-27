@@ -43,7 +43,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             }
             $AllResults = array_merge($AllResults, $Results['matches']);
             //$AllResults += $Results['matches'] ;  
-            if (count($AllResults)>=MAX_NUM_DUPE_MATCHES) break;
+            if (count($AllResults)>=50) break;
         }
     }
  

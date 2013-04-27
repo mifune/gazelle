@@ -13,7 +13,7 @@ if (!$INLINE) {
 }
 $NumDupes=count($DupeResults);
 ?>
-    <div class="head">Possible dupes<?if($NumDupes>=MAX_NUM_DUPE_MATCHES)echo " (only displaying first ".MAX_NUM_DUPE_MATCHES." matches)";?></div>
+    <div class="head">Possible dupes<?if($NumDupes>=50)echo " (only displaying first 50 matches)";?></div>
 <?
 if (!$DupeResults || $NumDupes<1) {
     ?>
