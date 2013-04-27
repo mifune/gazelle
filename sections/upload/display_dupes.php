@@ -10,10 +10,11 @@ if (!$INLINE) {
         <h2>Dupe check for <?=$DupeTitle?></h2> 
     <?   
 }
+$NumDupes=count($DupeResults);
 ?>
-    <div class="head">Possible dupes</div>
+    <div class="head">Possible dupes<?if($NumDupes>=10)echo" (only displaying first 10 matches)";?></div>
 <?
-if (!$DupeResults || count($DupeResults)<1) {
+if (!$DupeResults || $NumDupes<1) {
     ?>
     <div class="box pad">No files with the same bytesize were found in the torrents database</div>
     <?

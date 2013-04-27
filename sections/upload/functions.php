@@ -41,9 +41,9 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
                 if ( $tdata['ID']==$ExcludeID ) unset($Results['matches'][$ID]);
                 else $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
             }
-            $AllResults += $Results['matches'] ;
-            
-            //if (count($Results['matches'])>0)  $AllResults = array_merge($AllResults, $Results['matches']);
+            $AllResults = array_merge($AllResults, $Results['matches']);
+            //$AllResults += $Results['matches'] ;  
+            if (count($AllResults)>=10) break;
         }
     }
  
