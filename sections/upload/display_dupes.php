@@ -11,7 +11,8 @@ if (!$INLINE) {
         <h2>Dupe check for <?=$DupeTitle?></h2> 
     <?   
 }
-$NumDupes=count($DupeResults);
+if (!$DupeResults) $NumDupes =0;
+else $NumDupes=count($DupeResults);
 ?>
     <div class="head"><?if($NumDupes>0)echo $NumDupes?> Possible dupe<?if($NumDupes>1)echo 's'?><?if($NumDupes>=50)echo " (only displaying first 50 matches)";?></div>
 <?
