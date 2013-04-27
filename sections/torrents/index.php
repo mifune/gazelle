@@ -17,6 +17,38 @@ function js_pages($Action, $TorrentID, $NumResults, $CurrentPage) {
 if(!empty($_REQUEST['action'])) {
 	switch($_REQUEST['action']){
         
+        case 'dupe_check':
+            enforce_login();
+			//authorize(); 
+                    
+            if(!isset($_GET['id']) || !is_number($_GET['id'])) error(0);
+            $GroupID = (int)$_GET['id'];
+                
+            require(SERVER_ROOT.'/classes/class_torrent.php');
+            include(SERVER_ROOT . '/sections/upload/functions.php'); 
+                  
+            //$DB->query("SELECT File FROM torrents_files WHERE TorrentID='$TorrentID'");
+            $DB->query("SELECT tg.Name, tf.File 
+                          FROM torrents AS t 
+                          JOIN torrents_group AS tg ON tg.ID=t.GroupID 
+                          JOIN torrents_files AS tf ON t.ID=tf.TorrentID 
+                         WHERE tg.ID='$GroupID'");
+
+            list($GroupName, $Contents) = $DB->next_record(MYSQLI_NUM, array(0));
+            $Contents = unserialize(base64_decode($Contents));
+            $Tor = new TORRENT($Contents, true); // New TORRENT object
+            
+            list($TotalSize, $FileList) = $Tor->file_list();
+ 
+            $DupeResults = check_size_dupes($FileList);
+            if ($DupeResults) { // Show the upload form, with the data the user entered
+                    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
+                    $DupeTitle = $GroupName;
+                    include(SERVER_ROOT . '/sections/upload/display_dupes.php'); 
+            }
+            
+            break; 
+   
         case 'next':
 			enforce_login();
             

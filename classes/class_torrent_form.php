@@ -60,10 +60,16 @@ class TORRENT_FORM {
 	</div>
 	<form action="" enctype="multipart/form-data" method="post" id="upload_table" onsubmit="$('#post').raw().disabled = 'disabled'">
       <?
-    if (is_array($DupeResults)) { 
+    if (is_array($DupeResults)) {
+        $INLINE = true;
+		$DupeTitle = $this->Torrent['Title']; 
         include(SERVER_ROOT . '/sections/upload/display_dupes.php');
       ?>
-		<input type="hidden" name="ignoredupes" value="true" />
+        <div class="box pad"> 
+            If you have checked and are certain these are not dupes check this box to ignore the dupe check<br/>*(make sure you enter the same torrent file)
+            <input type="checkbox" name="ignoredupes" value="1" />
+        </div>
+        <br/>
       <?
     }
       ?>

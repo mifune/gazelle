@@ -1,9 +1,15 @@
 <?
 
+ 
 
+if (!$INLINE) {  
+    show_header("Dupe check for $DupeTitle");
+    ?>
+    <div class="thin">
+        <h2>Dupe check for <?=$DupeTitle?></h2> 
+    <?   
+}
 ?>
-
-
 <div class="head">Possible dupes</div>
 <table class="torrent_table grouping" id="torrent_table">
     <tr class="colhead">
@@ -85,4 +91,11 @@
     }
     ?>
 </table>
- 
+<?
+if(!$INLINE) {
+    ?>
+    </div>
+    <?
+    show_footer();
+}
+?>

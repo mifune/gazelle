@@ -405,11 +405,15 @@ update_hash($GroupID);
 //}
 
     
+//******************************************************************************//
+//--------------- possible dupe - send staff a pm ---------------------------------------//
     
 if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning...
     
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
-    $Message = db_string("Possible dupe was uploaded:[br][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username]");
+    $Message = db_string("Possible dupe was uploaded:[br][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username]
+    [br]
+    View possible dupes: [url=/torrents.php?id=$GroupID&action=dupe_check]Dupecheck for torrent[/url]");
    
 	$DB->query("INSERT INTO staff_pm_conversations 
 				 (Subject, Status, Level, UserID, Date)
