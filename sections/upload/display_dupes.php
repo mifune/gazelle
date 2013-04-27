@@ -11,8 +11,9 @@ if (!$INLINE) {
     <?   
 }
 $NumDupes=count($DupeResults);
+$max=MAX_NUM_DUPE_MATCHES;
 ?>
-    <div class="head">Possible dupes<?if($NumDupes>=MAX_NUM_DUPE_MATCHES)echo" (only displaying first ".MAX_NUM_DUPE_MATCHES." matches)";?></div>
+    <div class="head">Possible dupes<?if($NumDupes>=$max)echo " (only displaying first $max matches)";?></div>
 <?
 if (!$DupeResults || $NumDupes<1) {
     ?>
