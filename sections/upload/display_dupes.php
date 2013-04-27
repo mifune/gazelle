@@ -12,7 +12,7 @@ if (!$INLINE) {
 }
 $NumDupes=count($DupeResults);
 ?>
-    <div class="head">Possible dupes<?if($NumDupes>=10)echo" (only displaying first 10 matches)";?></div>
+    <div class="head">Possible dupes<?if($NumDupes>=MAX_NUM_DUPE_MATCHES)echo" (only displaying first ".MAX_NUM_DUPE_MATCHES." matches)";?></div>
 <?
 if (!$DupeResults || $NumDupes<1) {
     ?>
@@ -39,8 +39,8 @@ if (!$DupeResults || $NumDupes<1) {
         $lastday = 0;
         $Bookmarks = all_bookmarks('torrent');
 
-        foreach ($DupeResults as $GroupID => $GData) {   
-            list($GroupID2, $GroupName, $TagList, $Torrents, $FreeTorrent, $Image, $TotalLeechers, 
+        foreach ($DupeResults as $GroupID2 => $GData) {   
+            list($GroupID, $GroupName, $TagList, $Torrents, $FreeTorrent, $Image, $TotalLeechers, 
                     $NewCategoryID, $SearchText, $TotalSeeders, $MaxSize, $TotalSnatched, $GroupTime, $DupedFile) = array_values($GData);
 
             list($TorrentID, $Data) = each($Torrents);

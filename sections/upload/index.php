@@ -4,6 +4,7 @@ if(!check_perms('site_upload')) { error(403); }
 if($LoggedUser['DisableUpload']) {
 	error('Your upload privileges have been revoked.');
 }
+define('MAX_NUM_DUPE_MATCHES', 50);
 
 if(!empty($_POST['submit'])) {  
            // $Err ="upload";
