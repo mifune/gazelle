@@ -161,18 +161,19 @@ function user_dupes_table($UserID, $Username) {
     
     
     
-	$DB->query(" SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID
+	$DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
+				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
-                 SELECT e.ID AS UserID, um.IP, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.ID!= $UserID AND um.ID = $UserID
+                 (SELECT e.ID AS UserID, um.IP, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.IP=e.IP 
+				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.ID!= $UserID AND um.ID = $UserID)
                 UNION
-                 SELECT um.ID AS UserID, um.IP, 'history', 'account' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.ID != $UserID
+                 (SELECT um.ID AS UserID, um.IP, 'history', 'account' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
+				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.ID != $UserID)
                 UNION
-                 SELECT um.UserID AS UserID, um.IP, 'history', 'history' FROM users_history_ips AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID  
-                ORDER BY  UserID, IP   "); 
+                 (SELECT um.UserID AS UserID, um.IP, 'history', 'history' FROM users_history_ips AS um JOIN users_history_ips AS e ON um.IP=e.IP 
+				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID ) 
+                ORDER BY  UserID, IP  
+                LIMIT 50"); 
     /*
 	$DB->query(" SELECT e.UserID AS UserID, x.IP, 'tracker', 'account' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
 				 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID!= $UserID AND x.uid = $UserID
@@ -237,17 +238,18 @@ function user_dupes_table($UserID, $Username) {
      
     
     
-	$DB->query("SELECT e.UserID, um.Email, 'account', 'history' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID!= $UserID AND um.ID = $UserID
+	$DB->query("(SELECT e.UserID, um.Email, 'account', 'history' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
+				 WHERE um.Email != '' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
-                SELECT e.ID, um.Email, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.ID!= $UserID AND um.ID = $UserID
+                (SELECT e.ID, um.Email, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.Email=e.Email 
+				 WHERE um.Email != '' AND e.ID!= $UserID AND um.ID = $UserID)
                 UNION
-                SELECT um.ID, um.Email, 'history', 'account' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID = $UserID AND um.ID != $UserID
+                (SELECT um.ID, um.Email, 'history', 'account' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
+				 WHERE um.Email != '' AND e.UserID = $UserID AND um.ID != $UserID)
                 UNION
-                SELECT um.UserID, um.Email, 'history', 'history' FROM users_history_emails AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID = $UserID AND um.UserID != $UserID");
+                (SELECT um.UserID, um.Email, 'history', 'history' FROM users_history_emails AS um JOIN users_history_emails AS e ON um.Email=e.Email 
+				 WHERE um.Email != '' AND e.UserID = $UserID AND um.UserID != $UserID)
+                LIMIT 50");
     $EDupeCount = $DB->record_count();
     $EDupes = $DB->to_array();
     if ($EDupeCount>0) {
