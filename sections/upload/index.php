@@ -5,6 +5,7 @@ if($LoggedUser['DisableUpload']) {
 	error('Your upload privileges have been revoked.');
 }
 //define('MAX_NUM_DUPE_MATCHES', 50);
+include(SERVER_ROOT . '/sections/upload/functions.php');
 
 if(!empty($_POST['submit'])) {  
            // $Err ="upload";

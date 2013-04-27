@@ -13,7 +13,7 @@ include(SERVER_ROOT . '/classes/class_validate.php');
 include(SERVER_ROOT . '/classes/class_feed.php');
 include(SERVER_ROOT . '/classes/class_text.php');
 include(SERVER_ROOT . '/sections/torrents/functions.php');
-include(SERVER_ROOT . '/sections/upload/functions.php');
+//include(SERVER_ROOT . '/sections/upload/functions.php');
 
 enforce_login();
 authorize();

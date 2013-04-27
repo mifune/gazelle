@@ -9,7 +9,7 @@
 // called again.													   //
 //*********************************************************************//
 
-include(SERVER_ROOT.'/sections/upload/functions.php'); 
+//include(SERVER_ROOT.'/sections/upload/functions.php'); 
         
 ini_set('max_file_uploads', '100');
 show_header('Upload', 'upload,bbcode');
