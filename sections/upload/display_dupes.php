@@ -10,11 +10,11 @@
         <td class="small cats_col"></td>
         <td width="100%">Name</td>
         <td>Files</td>
-        <td><a href="<?= header_link('time') ?>">Time</a></td>
-        <td><a href="<?= header_link('size') ?>">Size</a></td>
-        <td class="sign"><a href="<?= header_link('snatched') ?>"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /></a></td>
-        <td class="sign"><a href="<?= header_link('seeders') ?>"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /></a></td>
-        <td class="sign"><a href="<?= header_link('leechers') ?>"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/leechers.png" alt="Leechers" title="Leechers" /></a></td>
+        <td>Time</td>
+        <td>Size</td>
+        <td class="sign"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /></td>
+        <td class="sign"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /></td>
+        <td class="sign"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/leechers.png" alt="Leechers" title="Leechers" /></td>
         <td>Uploader</td>
     </tr>
     <?
@@ -52,9 +52,9 @@
             </td>
             <td>
 
-<?              if (check_perms('torrents_review') && $Data['Status'] == 'Okay') { 
-                    echo  '&nbsp;'.get_status_icon('Okay');
-                }
+<?              //if (check_perms('torrents_review') && $Data['Status'] == 'Okay') { 
+                //    echo  '&nbsp;'.get_status_icon('Okay');
+                //}
                 if ($Data['ReportCount'] > 0) {
                     $Title = "This torrent has ".$Data['ReportCount']." active ".($Data['ReportCount'] > 1 ?'reports' : 'report');
                     $GroupName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
