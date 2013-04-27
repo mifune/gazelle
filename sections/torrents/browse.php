@@ -282,7 +282,7 @@ if (!empty($_GET['filter_cat'])) {
 if (!isset($_GET['sizerange'])) $_GET['sizerange'] = 0.01;
 if (!isset($_GET['sizetype'])) $_GET['sizetype'] = 'gb';
 
-if (!empty($_GET['size'])) {
+if (!empty($_GET['sizeall'])) {
     if($_GET['sizetype']=='tb') {
         $mul = 1024 * 1024 * 1024;
     } elseif($_GET['sizetype']=='gb') {
@@ -292,11 +292,11 @@ if (!empty($_GET['size'])) {
     } else {
         $mul = 1;
     }
-    $size = (float)$_GET['size'] * $mul;
+    $totalsize = (float)$_GET['sizeall'] * $mul;
     $rangemod = (float)$_GET['sizerange'];
     $range = (float)($mul * $rangemod);
-    $min_sizekb = (int)ceil($size - $range);
-    $max_sizekb = (int)ceil($size + $range);
+    $min_sizekb = (int)ceil($totalsize - $range);
+    $max_sizekb = (int)ceil($totalsize + $range);
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
 }
 
@@ -501,7 +501,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                     <tr>
                         <td class="label" style="width:140px" title="Search Size"><span class="red">(beta)</span>&nbsp; Size:</td>
                         <td colspan="3">
-                            <input type="text" spellcheck="false" size="25" name="size" class="smallish" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('size') ?>" />
+                            <input type="text" spellcheck="false" size="25" name="sizeall" class="smallish" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<? form('sizeall') ?>" />
                             <select name="sizetype">
 									<option value="kb" <?if($_GET['sizetype']=='kb')echo'selected="selected"'?> > KB </option>
 									<option value="mb" <?if($_GET['sizetype']=='mb')echo'selected="selected"'?>> MB </option>

@@ -9,6 +9,8 @@
 // called again.													   //
 //*********************************************************************//
 
+include(SERVER_ROOT.'/sections/upload/functions.php'); 
+        
 ini_set('max_file_uploads', '100');
 show_header('Upload', 'upload,bbcode');
 
@@ -239,7 +241,7 @@ foreach ($Whitelist as $ImageHost) {
     </div>
 <?
     if (check_perms('use_templates')) {
-        include(SERVER_ROOT.'/sections/upload/functions.php'); 
+        //include(SERVER_ROOT.'/sections/upload/functions.php'); 
         $Templates = get_templates($LoggedUser['ID']);
         
         $CanDelAny = check_perms('delete_any_template')?'1':'0';
@@ -284,6 +286,12 @@ foreach ($Whitelist as $ImageHost) {
             addDOMLoadEvent(SynchTemplates);
         //]]></script>
 <?
+    }
+    
+    if (is_array($DupeResults)) {
+?>
+<?
+        include(SERVER_ROOT . '/sections/upload/display_dupes.php');
     }
 ?>
     <a id="startform"></a>

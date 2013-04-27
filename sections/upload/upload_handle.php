@@ -13,6 +13,7 @@ include(SERVER_ROOT . '/classes/class_validate.php');
 include(SERVER_ROOT . '/classes/class_feed.php');
 include(SERVER_ROOT . '/classes/class_text.php');
 include(SERVER_ROOT . '/sections/torrents/functions.php');
+include(SERVER_ROOT . '/sections/upload/functions.php');
 
 enforce_login();
 authorize();
@@ -124,6 +125,14 @@ $Private = $Tor->make_private();
 list($TotalSize, $FileList) = $Tor->file_list();
 
 $TmpFileList = array();
+
+$DupeResults = check_size_dupes($FileList);
+if ($DupeResults) { // Show the upload form, with the data the user entered
+    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
+}
+
 
 foreach ($FileList as $File) {
     list($Size, $Name) = $File;
