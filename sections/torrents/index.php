@@ -34,7 +34,7 @@ if(!empty($_REQUEST['action'])) {
                           JOIN torrents_files AS tf ON t.ID=tf.TorrentID 
                          WHERE tg.ID='$GroupID'");
 
-            list($GroupName, $Contents) = $DB->next_record(MYSQLI_NUM, array(0));
+            list($GroupName, $Contents) = $DB->next_record(MYSQLI_NUM, array(1));
             $Contents = unserialize(base64_decode($Contents));
             $Tor = new TORRENT($Contents, true); // New TORRENT object
             
