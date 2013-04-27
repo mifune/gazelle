@@ -39,11 +39,11 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             foreach ($Results['matches'] as $ID => $tdata) {
                 //if ( $tdata['ID']==$ExcludeID || isset( $AllResults[$tdata['ID']]) ) unset($Results['matches'][$ID]);
                 if ( $tdata['ID']==$ExcludeID ) unset($Results['matches'][$ID]);
-                $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
+                else $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
             }
-            if (count($Results['matches'])>0) $AllResults += $Results['matches'] ;
+            $AllResults += $Results['matches'] ;
             
-            //$AllResults = array_merge($AllResults, $Results['matches']);
+            //if (count($Results['matches'])>0)  $AllResults = array_merge($AllResults, $Results['matches']);
         }
     }
  
