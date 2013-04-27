@@ -1,7 +1,5 @@
 <?
  
-include(SERVER_ROOT.'/sections/upload/functions.php'); 
-
 
 if (!is_number($_POST['template']) || !check_perms('use_templates') ) {
     echo json_encode(array(0, "You do not have permission to use templates", get_templatelist_html($LoggedUser['ID'])));

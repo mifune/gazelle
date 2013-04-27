@@ -246,9 +246,10 @@ foreach ($Whitelist as $ImageHost) {
         
         $CanDelAny = check_perms('delete_any_template')?'1':'0';
 ?>
+        <div class="head">Templates</div>
         <div class="box pad shadow">
-            <form action="" enctype="multipart/form-data"  method="post" onsubmit="return ($('#template').raw().value!=0);">
-                <div style="margin:10px 10%;display:inline">
+            <form action="" class="center" enctype="multipart/form-data"  method="post" onsubmit="return ($('#template').raw().value!=0);">
+                <div style="margin:5px auto 10px;" class="nobr center">
                     <label for="template">select template: </label>
                     <div id="template_container" style="display: inline-block">
                     <select id="template" name="template" onchange="SelectTemplate(<?=$CanDelAny?>);" title="Select a template (*=public)">
@@ -266,7 +267,7 @@ foreach ($Whitelist as $ImageHost) {
                     <input type="button" onclick="DeleteTemplate(<?=$CanDelAny?>);" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />
                     <input type="button" onclick="OverwriteTemplate(<?=$CanDelAny?>,<?=$tPublic?>);" name="save" id="save" value="save over" disabled="disabled" title="Save current form as selected template (overwrites data in this template)" />
                 </div>
-                <div style="margin:10px 15% 10px 0;display:inline">
+                <div style="margin:10px auto 5px;" class="nobr center">
                     
 <?          if (check_perms('make_private_templates')) {   
                     $addsep=true; ?>

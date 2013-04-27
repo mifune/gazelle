@@ -1,8 +1,7 @@
 <?
  
 //if ( !check_perms('use_templates') ) error(403);
- 
-include(SERVER_ROOT.'/sections/upload/functions.php'); 
+  
 
 
 // trim whitespace before setting/evaluating these fields

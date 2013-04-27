@@ -117,18 +117,7 @@ function SaveTemplate(can_delete_any, is_public, name, id){
         }
         $('#messagebar').show(); 
         SelectTemplate(can_delete_any);
-        /*
-            if (response==0) { //  
-                $('#messagebar').add_class('alert');
-                $('#messagebar').html("unexpected error!");
-            } else if ( parseInt(response)>0 ) {  
-                $('#messagebar').remove_class('alert');
-                $('#messagebar').html("added template '"+name+"' id#" + response  );
-            } else { // a non number == an error  if ( !isnumeric(response)) 
-                $('#messagebar').add_class('alert');
-                $('#messagebar').html(response);
-            }
-            $('#messagebar').show(); */
+       
     });
     return false;
 }
