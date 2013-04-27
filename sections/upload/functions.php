@@ -37,15 +37,44 @@ function check_size_dupes($TorrentFilelist) {
     $SS->limit(0, 10, 10);
     $SS->SetSortMode(SPH_SORT_ATTR_DESC, 'time');
     $SS->set_index(SPHINX_INDEX . ' delta');
-    $Queries=array();
+    $AllResults=array();
+    //$Queries=array();
     foreach ($TorrentFilelist as $File) {
         list($Size, $Name) = $File;
-        //$Name = str_replace('_', ' ', $Name); 
-        //$Name = str_replace(array('%'), '', $Name);
-        //$Queries[] =  $SS->EscapeString($Size)." | ".$SS->EscapeString($Name);
-        $Queries[] =  $SS->EscapeString($Size);
+   
+        //$Queries[] =  $SS->EscapeString($Size);
+        
+        $Query = '@filelist "' . $SS->EscapeString($Size) .'"';  // . '"~20';
+
+        $Results = $SS->search($Query, '', 0, array(), '', '');
+        $Num = $SS->TotalResults;
+        if ($Num>0){ 
+            // These ones were not found in the cache, run SQL
+            if (!empty($Results['notfound'])) {
+
+                $SQLResults = get_groups($Results['notfound']);
+
+                if (is_array($SQLResults['notfound'])) { // Something wasn't found in the db, remove it from results
+                    reset($SQLResults['notfound']);
+                    foreach ($SQLResults['notfound'] as $ID) {
+                        unset($SQLResults['matches'][$ID]);
+                        unset($Results['matches'][$ID]);
+                    }
+                }
+                // Merge SQL results with sphinx/memcached results
+                foreach ($SQLResults['matches'] as $ID => $SQLResult) {
+                    $Results['matches'][$ID] = array_merge($Results['matches'][$ID], $SQLResult);
+                    ksort($Results['matches'][$ID]);
+                }
+            }
+            $AllResults = array_merge($AllResults, $Results['matches']);
+        }
     }
+ 
+    if(count($AllResults)<1) return false;
+    return $AllResults;
     
+    /*
     $Query = '@filelist "' . implode(' | ', $Queries).'"';  // . '"~20';
     
     $Results = $SS->search($Query, '', 0, array(), '', '');
@@ -71,10 +100,10 @@ function check_size_dupes($TorrentFilelist) {
             ksort($Results['matches'][$ID]);
         }
     }
-
     $Results = $Results['matches'];
-    
     return $Results;
+    */
+    
 }
 
 

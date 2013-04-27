@@ -12,7 +12,7 @@ if (!$INLINE) {
 ?>
     <div class="head">Possible dupes</div>
 <?
-if (count($DupeResults)<1) {
+if (!$DupeResults || count($DupeResults)<1) {
     ?>
     <div class="box pad">No files with the same bytesize were found in the torrents database</div>
     <?
