@@ -6,6 +6,9 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     $SS->limit(0, 10, 10);
     $SS->SetSortMode(SPH_SORT_ATTR_DESC, 'time');
     $SS->set_index(SPHINX_INDEX . ' delta');
+    
+    $SS->set_filter_range('size', 0, 1024);
+    
     $AllResults=array();
     //$Queries=array();
     foreach ($TorrentFilelist as $File) {
