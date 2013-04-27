@@ -223,7 +223,7 @@ if(check_perms('torrents_review')){
             </span>
 <?      } ?>
 <?      //if(check_perms('torrents_delete') || $UserID == $LoggedUser['ID']) { ?>
-<?      if(check_perms('site_debug') ) {  // testing first ?>
+<?      if(check_perms('torrents_delete') ) {  // testing first ?>
             <a href="torrents.php?action=dupe_check&amp;id=<?=$GroupID ?>" title="Check for exact matches in filesize">[Dupe check]</a>
 <?      } ?>
 	</div>
