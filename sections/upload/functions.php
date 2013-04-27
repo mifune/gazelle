@@ -31,7 +31,7 @@ function check_size_dupes_sql($TorrentFilelist) {
     return $Results;
 } */
 
-function check_size_dupes($TorrentFilelist) {
+function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     global $SS;
     
     $SS->limit(0, 10, 10);
@@ -67,11 +67,14 @@ function check_size_dupes($TorrentFilelist) {
                     ksort($Results['matches'][$ID]);
                 }
             }
-            foreach ($Results['matches'] as $ID => $tdata) {
-                if ( isset( $AllResults[$ID]) ) unset($Results['matches'][$ID]);
+            foreach ($Results['matches'] as $id => $tdata) {
+                if ( $tdata['ID']==$ExcludeID || isset( $AllResults[$tdata['ID']]) ) unset($Results['matches'][$id]);
                 $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
             }
-            $AllResults = array_merge($AllResults, $Results['matches']);
+            
+            $AllResults += $Results['matches'] ;
+            
+            //$AllResults = array_merge($AllResults, $Results['matches']);
         }
     }
  

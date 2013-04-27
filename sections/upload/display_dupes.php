@@ -74,11 +74,9 @@ if (!$DupeResults || count($DupeResults)<1) {
                         $GroupName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
                     }
 
-                    ?>
-                        <?=$AddExtra?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
-
-                        <?=$AddExtra?>
-                        <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
+                    ?> 
+                    <?=$AddExtra?>
+                    <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
 
                     <br />
                     <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
@@ -87,7 +85,7 @@ if (!$DupeResults || count($DupeResults)<1) {
                     </div>
                     <? } ?>
                 </td>
-                <td class="nobr"><?=$DupedFile?></td>
+                <td class=""><?=$DupedFile?></td>
                 <td class="center"><?=number_format($Data['FileCount'])?></td>
                 <td class="nobr"><?=time_diff($Data['Time'], 1) ?></td>
                 <td class="nobr"><?= get_size($Data['Size']) ?></td>
