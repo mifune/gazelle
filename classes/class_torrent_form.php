@@ -102,7 +102,7 @@ class TORRENT_FORM {
 					Torrent file
 				</td>
 				<td>
-					<input id="file" type="file" name="file_input" size="70" /><br/>[max torrent filesize: 1mb]
+					<input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: 1mb]
 				</td>
                 </tr>
                 <tr class="uploadbody">
@@ -151,15 +151,15 @@ class TORRENT_FORM {
                 ?>
                     <div id="tagtext"></div>
 <?              if($OfficialTags) { ?>
-					<select id="genre_tags" name="genre_tags" onchange="add_tag();return false;" <?=$this->Disabled?>>
+					<select id="genre_tags" name="genre_tags" onchange="add_tag();return false;" style="vertical-align: top" <?=$this->Disabled?>>
 						<option>---</option>
 <?                  foreach(display_array($OfficialTags) as $Tag) { ?>
 						<option value="<?=$Tag ?>"><?=$Tag ?></option>
 <?                  }   ?>
 					</select>
 <?              } 
-                ?>
-                    <textarea id="tags" name="tags" class="medium" style="height:1.4em;" <?=$this->Disabled?>><?=display_str($Torrent['TagList']) ?></textarea>
+                ?>  <!--style="height:1.4em;"-->  
+                    <textarea id="tags" name="tags" class="medium" rows="3" <?=$this->Disabled?> ><?=display_str($Torrent['TagList']) ?></textarea>
                     <br />
                 </td>
 			</tr> 

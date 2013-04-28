@@ -150,20 +150,111 @@ function get_current_btc_rate() {
     global $DB, $Cache;
     
     $rate = $Cache->get_value('eur_bitcoin');
-    if ($rate==false){
+    if ($rate===false){
         $rate = '0';
-        $tickerarray = get_ticker_eur();
+        $rate = query_eur_rate();
+        if(!$rate){ 
+            $Cache->cache_value('eur_bitcoin', 0, 60); // one minute
+        } else {
+            $Cache->cache_value('eur_bitcoin', $rate, 3600); // one hour
+        }
+        /* $tickerarray = get_ticker_eur();
         if($tickerarray){
             $rate = $tickerarray['vwap'];
             $Cache->cache_value('eur_bitcoin', $rate, 3600); // one hour
-        }
+        } */
     }
     return $rate;
 }
 
 
 
-function get_ticker_eur() {
+
+function query_btc_rate_bitstamp($testing=false) {
+         /*
+        // Fetch the current rate from MtGox
+        //echo " $type $geo $currency";
+        $ch = curl_init('https://www.bitstamp.net/api/ticker/');
+        curl_setopt($ch, CURLOPT_REFERER, 'Mozilla/5.0 (compatible; MtGox PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'CakeScript/0.1');
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $mtgoxjson = curl_exec($ch);
+        curl_close($ch);
+
+        */
+        $mtgoxjson = file_get_contents("https://www.bitstamp.net/api/ticker/");
+    
+        if($testing) return $mtgoxjson;
+        
+        // Decode from an object to array
+        if($mtgoxjson){
+            
+            $output_mtgox = json_decode($mtgoxjson, true);
+            //$output_mtgox_1 = get_object_vars($output_mtgox);
+            //$mtgox_array = get_object_vars($output_mtgox_1['ticker']);
+            //error( print_r($output_mtgox));
+            // something's wrong
+            if (!$output_mtgox) {
+                return false;
+            }
+ 
+
+            $currencyRate = $output_mtgox['low'];
+            
+            return $currencyRate;
+        }
+        return false; 
+ 
+ }
+
+
+function query_eur_rate($testing=false) {
+         
+        // Fetch the current rate from MtGox
+        /*
+        $ch = curl_init('https://data.mtgox.com/api/1/BTCEUR/ticker');
+        curl_setopt($ch, CURLOPT_REFERER, 'Mozilla/4.0 (compatible; MtGox PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'CakeScript/0.4');
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $mtgoxjson = curl_exec($ch);
+        curl_close($ch); */
+
+        $mtgoxjson = file_get_contents("https://data.mtgox.com/api/1/BTCEUR/ticker");
+        
+        if($testing) return $mtgoxjson;
+        
+        // Decode from an object to array
+        if($mtgoxjson){
+            
+            $output_mtgox = json_decode($mtgoxjson, true);
+            
+            // something's wrong
+            if (!$output_mtgox OR !isset($output_mtgox['result'])) {
+                return false;
+            }
+
+            if ($output_mtgox['result'] !== 'success') {
+                
+                return false;
+            }
+
+            $currencyRate = $output_mtgox['return']['vwap']['value'];
+            
+            return $currencyRate;
+        }
+        return false; 
+ 
+ }
+ 
+
+// old version api 0
+function get_ticker_eur_v0() {
         
         $currency = "EUR";
         
