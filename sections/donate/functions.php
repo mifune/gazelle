@@ -143,7 +143,9 @@ function check_bitcoin_activation($address) {
 }
 
 
-
+// http://api.bitcoincharts.com/v1/weighted_prices.json
+// https://www.bitstamp.net/api/ticker/
+// https://data.mtgox.com/api/1/BTCEUR/ticker
 
     
 function get_current_btc_rate() {
