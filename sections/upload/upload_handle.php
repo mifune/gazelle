@@ -126,7 +126,7 @@ list($TotalSize, $FileList) = $Tor->file_list();
 
 $TmpFileList = array();
 
-if (check_perms('torrents_delete')){ // for testing on live site
+//if (check_perms('torrents_delete')){ // for testing on live site
 // do dupe check & return to upload page if detected
 $DupeResults = check_size_dupes($FileList);
 
@@ -135,7 +135,7 @@ if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
 }
-}
+//}
 
 foreach ($FileList as $File) {
     list($Size, $Name) = $File;
