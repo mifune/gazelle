@@ -108,7 +108,29 @@ $count =count($AddedIDs);
 if ($count>0){
     
     $Values = "('".implode("', '$GroupID', '$VoteValue', '$UserID'), ('", $AddedIDs)."', '$GroupID', '$VoteValue', '$UserID')";
-
+    
+    if ( !empty($LoggedUser['NotVoteUpTags']) ) {
+        // add without voting up if already present
+        $DB->query("INSERT IGNORE INTO torrents_tags 
+                              (TagID, GroupID, PositiveVotes, UserID) VALUES 
+                              $Values");
+    } else {
+        // add and vote up
+        $DB->query("INSERT INTO torrents_tags 
+                              (TagID, GroupID, PositiveVotes, UserID) VALUES 
+                              $Values
+                              ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1");
+    
+        $Values = "('$GroupID', '".implode("', '$UserID', 'up'), ('$GroupID', '", $AddedIDs)."', '$UserID', 'up')";
+        $DB->query("INSERT IGNORE INTO torrents_tags_votes 
+                                (GroupID, TagID, UserID, Way) VALUES
+                                $Values
+                                ON DUPLICATE KEY UPDATE Way='up'");
+    }
+    
+    $DB->query("UPDATE tags SET Uses=Uses+1 WHERE ID IN (".implode(',',$AddedIDs).")");
+    
+    /*
     $DB->query("INSERT INTO torrents_tags 
                               (TagID, GroupID, PositiveVotes, UserID) VALUES 
                               $Values
@@ -120,7 +142,7 @@ if ($count>0){
 
     if ( empty($LoggedUser['NotVoteUpTags']) ) {
         $DB->query("INSERT IGNORE INTO torrents_tags_votes (GroupID, TagID, UserID, Way) VALUES $Values");
-    }
+    }  */
     
     $DB->query("INSERT INTO group_log (GroupID, UserID, Time, Info)
                   VALUES ('$GroupID'," . $LoggedUser['ID'] . ",'" . sqltime() . "','" . db_string('Tag'.($count>1?'s':''). " ".implode(', ',$AddedTags)." added to torrent") . "')");

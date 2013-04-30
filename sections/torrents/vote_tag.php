@@ -22,18 +22,25 @@ if($LastVote!=$Way){
     if($LastVote){
         $DB->query("DELETE FROM torrents_tags_votes WHERE TagID='$TagID' AND GroupID='$GroupID' AND UserID='$UserID'");
         $msg = "Removed $LastVote vote for tag ";
+        if($Way == 'down') { // $LastVote == 'up'
+            $Change = "PositiveVotes=PositiveVotes-1";
+            echo json_encode (array(-1, $msg));
+        } else {  // $LastVote == 'down'
+            $Change = "NegativeVotes=NegativeVotes-1";
+            echo json_encode (array(1, $msg));
+        }
     } else {
         $DB->query("INSERT IGNORE INTO torrents_tags_votes (GroupID, TagID, UserID, Way) VALUES ('$GroupID', '$TagID', '$UserID', '$Way')");
         $msg = "Voted $Way for tag ";
+        if($Way == 'down') {
+            $Change = "NegativeVotes=NegativeVotes+1";
+            echo json_encode (array(-1, $msg));
+        } else {
+            $Change = "PositiveVotes=PositiveVotes+1";
+            echo json_encode (array(1, $msg));
+        }
     }
     
-    if($Way == 'down') {
-        $Change = "NegativeVotes=NegativeVotes+1";
-        echo json_encode (array(-1, $msg));
-    } else {
-        $Change = "PositiveVotes=PositiveVotes+1";
-        echo json_encode (array(1, $msg));
-    }
     $DB->query("UPDATE torrents_tags SET $Change WHERE TagID='$TagID' AND GroupID='$GroupID'");
 
     $DB->query("DELETE FROM torrents_tags WHERE TagID='$TagID' AND GroupID='$GroupID' AND NegativeVotes>PositiveVotes");

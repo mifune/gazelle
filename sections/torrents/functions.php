@@ -3,12 +3,15 @@
 
 function get_group_info($GroupID, $Return = true) {
 	global $Cache, $DB;
+    
+    $GroupID=(int)$GroupID;
+    
 	$TorrentCache=$Cache->get_value('torrents_details_'.$GroupID);
 	
 	//TODO: Remove LogInDB at a much later date.
 	if(!is_array($TorrentCache) || !isset($TorrentCache[1][0]['LogInDB'])) {
 		// Fetch the group details
-
+        /*
 		$SQL = "SELECT
                     g.Body,
                     g.Image,
@@ -25,11 +28,56 @@ function get_group_info($GroupID, $Return = true) {
 			LEFT JOIN torrents_tags AS tt ON tt.GroupID=g.ID
 			LEFT JOIN tags ON tags.ID=tt.TagID
 			WHERE g.ID='".db_string($GroupID)."'
-			GROUP BY NULL";
+			GROUP BY NULL"; */
 
+
+        /*
+		$DB->query("
+            SELECT
+                GROUP_CONCAT(ttv.UserID SEPARATOR '|'),
+                GROUP_CONCAT(um.Username SEPARATOR '|'),
+                GROUP_CONCAT(ttv.Way SEPARATOR '|') ,
+                TagID              
+            FROM torrents_tags_votes AS ttv
+			LEFT JOIN users_main AS um ON um.ID=ttv.UserID
+            WHERE GroupID='$GroupID'
+            GROUP BY TagID    "); */
+        
+        
+		$SQL = "SELECT
+                g.Body,
+                g.Image,
+                g.ID,
+                g.Name,
+                g.NewCategoryID,
+                g.Time
+			FROM torrents_group AS g
+			WHERE g.ID='$GroupID' ";
+        
 		$DB->query($SQL);
 		$TorrentDetails=$DB->to_array();
+        
 
+		$DB->query("
+            SELECT
+                tags.Name,
+                tt.TagID,
+                tt.UserID,
+                um1.Username,
+                tt.PositiveVotes,
+                tt.NegativeVotes,
+                GROUP_CONCAT(ttv.UserID SEPARATOR '|'),
+                GROUP_CONCAT(um2.Username SEPARATOR '|'),
+                GROUP_CONCAT(ttv.Way SEPARATOR '|') 
+			FROM torrents_tags AS tt  
+			LEFT JOIN tags ON tags.ID=tt.TagID
+            LEFT JOIN torrents_tags_votes AS ttv ON ttv.GroupID=tt.GroupID AND ttv.TagID=tt.TagID
+			LEFT JOIN users_main AS um1 ON um1.ID=tt.UserID
+			LEFT JOIN users_main AS um2 ON um2.ID=ttv.UserID
+            WHERE tt.GroupID='$GroupID'
+            GROUP BY tt.TagID    ");
+		$TagDetails=$DB->to_array();
+        
 		// Fetch the individual torrents
 
 		$DB->query("
@@ -100,15 +148,16 @@ function get_group_info($GroupID, $Return = true) {
             $CacheTime = 600; // lets just see how it goes with a time of 10 mins
 		}
 		// Store it all in cache
-            $Cache->cache_value('torrents_details_'.$GroupID,array($TorrentDetails,$TorrentList),$CacheTime);
+            $Cache->cache_value('torrents_details_'.$GroupID,array($TorrentDetails,$TorrentList,$TagDetails),$CacheTime);
 
 	} else { // If we're reading from cache
 		$TorrentDetails=$TorrentCache[0];
 		$TorrentList=$TorrentCache[1];
+		$TagDetails=$TorrentCache[2];
 	}
 
 	if($Return) {
-		return array($TorrentDetails,$TorrentList);
+		return array($TorrentDetails,$TorrentList,$TagDetails);
 	}
 }
 
@@ -213,14 +262,40 @@ function get_taglist_html($GroupID, $tagsort) {
     global $LoggedUser;
     
     $TorrentCache = get_group_info($GroupID, true);
-    $TorrentDetails = $TorrentCache[0];
+    //$TorrentDetails = $TorrentCache[0];
     $TorrentList = $TorrentCache[1];
-
+    $TorrentTags = $TorrentCache[2];
+    
     // Group details - get tag details
-    list(, , , , , , $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
+    //list(, , , , , , $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
  
     if(!$tagsort || !in_array($tagsort, array('score','az','added'))) $tagsort = 'score';
 
+    $Tags = array();
+    if ($TorrentTags != '') {
+        foreach ($TorrentTags as $TagKey => $TagDetails) {
+            list($TagName, $TagID, $TagUserID, $TagPositiveVotes, $TagNegativeVotes, 
+                    $TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TagDetails;
+
+            $Tags[$TagKey]['name'] = $TagName;
+            $Tags[$TagKey]['score'] = ($TagPositiveVotes - $TagNegativeVotes);
+            $Tags[$TagKey]['id']= $TagID;
+            $Tags[$TagKey]['userid']= $TagUserID;
+            $Tags[$TagKey]['username']= $TagUsername;
+
+            $TagVoteUsernames = explode('|',$TagVoteUsernames);
+            $TagVoteWays = explode('|',$TagVoteWays);
+            $VoteMsgs=array( "added by $TagUsername");
+            foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
+                if (!$TagVoteUsername) continue;
+                $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+            }
+            $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs) . count($VoteMsgs);
+        }
+
+        uasort($Tags, "sort_$tagsort");
+    }
+/*
     $Tags = array();
     if ($TorrentTags != '') {
           $TorrentTags=explode('|',$TorrentTags);
@@ -234,9 +309,19 @@ function get_taglist_html($GroupID, $tagsort) {
                 $Tags[$TagKey]['score'] = ($TagPositiveVotes[$TagKey] - $TagNegativeVotes[$TagKey]);
                 $Tags[$TagKey]['id']=$TorrentTagIDs[$TagKey];
                 $Tags[$TagKey]['userid']=$TorrentTagUserIDs[$TagKey];
+                
+                list($TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TorrentTagVotes[$Tags[$TagKey]['id']];
+                $TagVoteUsernames = explode('|',$TagVoteUsernames);
+                $TagVoteWays = explode('|',$TagVoteWays);
+                $VoteMsgs=array();
+                foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
+                    $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+                }
+                $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
           }
           uasort($Tags, "sort_$tagsort");
     }
+ */
     // grab authorID from torrent details
     list(, , , , , , , , , , , $UserID) = $TorrentList[0];
     $IsUploader =  $UserID == $LoggedUser['ID']; 
@@ -251,7 +336,7 @@ function get_taglist_html($GroupID, $tagsort) {
 
         ?>
                                 <li id="tlist<?=$Tag['id']?>">
-                                      <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;"><?=display_str($Tag['name'])?></a>
+                                      <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;" title="<?=$Tag['votes']?>"><?=display_str($Tag['name'])?></a>
                                       <div style="float:right; display:block; letter-spacing: -1px;">
         <?		if(check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid'])){  ?>
                                       <a title="Vote down tag '<?=$Tag['name']?>'" href="#tags" onclick="return Vote_Tag(<?="'{$Tag['name']}',{$Tag['id']},$GroupID,'down'"?>)" style="font-family: monospace;" >[-]</a>
@@ -265,7 +350,7 @@ function get_taglist_html($GroupID, $tagsort) {
                                       
         <?		} ?>
         <?		if(check_perms('users_warn')){ ?>
-                                      <a title="User that added tag '<?=$Tag['name']?>'" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
+                                      <a title="Tag '<?=$Tag['name']?>' added by <?=$Tag['username']?>" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
         <?		} ?>
         <?		if(check_perms('site_delete_tag') ) { // || ($IsUploader && $LoggedUser['ID']==$Tag['userid']) 
                                   /*    <a title="Delete tag '<?=$Tag['name']?>'" href="torrents.php?action=delete_tag&amp;groupid=<?=$GroupID?>&amp;tagid=<?=$Tag['id']?>&amp;auth=<?=$LoggedUser['AuthKey']?>" style="font-family: monospace;">[X]</a> */

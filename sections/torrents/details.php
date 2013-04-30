@@ -20,10 +20,12 @@ $TorrentCache = get_group_info($GroupID, true);
 
 $TorrentDetails = $TorrentCache[0];
 $TorrentList = $TorrentCache[1];
+$TorrentTags = $TorrentCache[2];
 
 // Group details
-list($Body, $Image, $GroupID, $GroupName, $GroupCategoryID,
-    $GroupTime, $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
+//list($Body, $Image, $GroupID, $GroupName, $GroupCategoryID,
+//    $GroupTime, $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
+list($Body, $Image, $GroupID, $GroupName, $GroupCategoryID, $GroupTime ) = array_shift($TorrentDetails);
 
 $DisplayName=$GroupName;
 $AltName=$GroupName; // Goes in the alt text of the image
@@ -33,6 +35,33 @@ $Title=$GroupName; // goes in <title>
 $tagsort = isset($_GET['tsort'])?$_GET['tsort']:'score';
 if(!in_array($tagsort, array('score','az','added'))) $tagsort = 'score';
 
+
+$Tags = array();
+if ($TorrentTags != '') {
+	foreach ($TorrentTags as $TagKey => $TagDetails) {
+        list($TagName, $TagID, $TagUserID, $TagUsername, $TagPositiveVotes, $TagNegativeVotes, 
+                $TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TagDetails;
+        
+		$Tags[$TagKey]['name'] = $TagName;
+		$Tags[$TagKey]['score'] = ($TagPositiveVotes - $TagNegativeVotes);
+		$Tags[$TagKey]['id']= $TagID;
+		$Tags[$TagKey]['userid']= $TagUserID;
+		$Tags[$TagKey]['username']= $TagUsername;
+        
+        $TagVoteUsernames = explode('|',$TagVoteUsernames);
+        $TagVoteWays = explode('|',$TagVoteWays);
+        $VoteMsgs=array( "added by $TagUsername");
+        foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
+            if (!$TagVoteUsername) continue;
+            $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+        }
+        $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
+    }
+    
+	uasort($Tags, "sort_$tagsort");
+}
+
+/*
 $Tags = array();
 if ($TorrentTags != '') {
 	$TorrentTags=explode('|',$TorrentTags);
@@ -46,9 +75,18 @@ if ($TorrentTags != '') {
 		$Tags[$TagKey]['score'] = ($TagPositiveVotes[$TagKey] - $TagNegativeVotes[$TagKey]);
 		$Tags[$TagKey]['id']=$TorrentTagIDs[$TagKey];
 		$Tags[$TagKey]['userid']=$TorrentTagUserIDs[$TagKey];
+        
+        list($TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TorrentTagVotes[$Tags[$TagKey]['id']];
+        $TagVoteUsernames = explode('|',$TagVoteUsernames);
+        $TagVoteWays = explode('|',$TagVoteWays);
+        $VoteMsgs=array();
+        foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
+            $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+        }
+        $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
 	}
 	uasort($Tags, "sort_$tagsort");
-}
+} */
 //advance tagsort for link
 if($tagsort=='score') $tagsort2='az';
 else if($tagsort=='az') $tagsort2='added';
@@ -504,7 +542,7 @@ if(count($Tags) > 0) {
 
         ?>
                                 <li id="tlist<?=$Tag['id']?>">
-                                      <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;"><?=display_str($Tag['name'])?></a>
+                                      <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;" title="<?=$Tag['votes']?>"><?=display_str($Tag['name'])?></a>
                                       <div style="float:right; display:block; letter-spacing: -1px;">
         <?		if(empty($LoggedUser['DisableTagging']) && 
                                     (check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid']))) {  ?>
@@ -519,7 +557,7 @@ if(count($Tags) > 0) {
                                       
         <?		} ?>
         <?		if(check_perms('users_warn')){ ?>
-                                      <a title="User that added tag '<?=$Tag['name']?>'" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
+                                      <a title="Tag '<?=$Tag['name']?>' added by <?=$Tag['username']?>" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
         <?		} ?>
         <?		if(check_perms('site_delete_tag') ) { // || ($IsUploader && $LoggedUser['ID']==$Tag['userid']) 
                                   /*    <a title="Delete tag '<?=$Tag['name']?>'" href="torrents.php?action=delete_tag&amp;groupid=<?=$GroupID?>&amp;tagid=<?=$Tag['id']?>&amp;auth=<?=$LoggedUser['AuthKey']?>" style="font-family: monospace;">[X]</a> */

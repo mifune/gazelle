@@ -100,15 +100,27 @@ if ($OldCategoryID != $CategoryID) {
 
     $TagID = $DB->inserted_id();
                 
-    $Vote = empty($LoggedUser['NotVoteUpTags'])?9:8;
+    /* $Vote = empty($LoggedUser['NotVoteUpTags'])?9:8;
     $DB->query("INSERT INTO torrents_tags
                 (TagID, GroupID, UserID, PositiveVotes) VALUES
                 ($TagID, $GroupID, $LoggedUser[ID], $Vote)
-                ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1; ");
+                ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1; "); */
      
     if (empty($LoggedUser['NotVoteUpTags'])){
+        
+        $DB->query("INSERT INTO torrents_tags
+                    (TagID, GroupID, UserID, PositiveVotes) VALUES
+                    ($TagID, $GroupID, $LoggedUser[ID], 9)
+                    ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1; ");
+     
         $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
                                 ($TagID, $GroupID, $LoggedUser[ID], 'up');");
+    } else {
+        
+        $DB->query("INSERT IGNORE INTO torrents_tags
+                    (TagID, GroupID, UserID, PositiveVotes) VALUES
+                    ($TagID, $GroupID, $LoggedUser[ID], 8); ");
+     
     }
 }
 
