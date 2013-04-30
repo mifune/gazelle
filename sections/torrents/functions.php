@@ -262,7 +262,7 @@ function get_taglist_html($GroupID, $tagsort) {
     global $LoggedUser;
     
     $TorrentCache = get_group_info($GroupID, true);
-    //$TorrentDetails = $TorrentCache[0];
+    $TorrentDetails = $TorrentCache[0];
     $TorrentList = $TorrentCache[1];
     $TorrentTags = $TorrentCache[2];
     
@@ -274,7 +274,7 @@ function get_taglist_html($GroupID, $tagsort) {
     $Tags = array();
     if ($TorrentTags != '') {
         foreach ($TorrentTags as $TagKey => $TagDetails) {
-            list($TagName, $TagID, $TagUserID, $TagPositiveVotes, $TagNegativeVotes, 
+            list($TagName, $TagID, $TagUserID, $TagUsername, $TagPositiveVotes, $TagNegativeVotes, 
                     $TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TagDetails;
 
             $Tags[$TagKey]['name'] = $TagName;
