@@ -63,13 +63,14 @@ class TORRENT_FORM {
     if (is_array($DupeResults)) {
         $INLINE = true;
 		$DupeTitle = $this->Torrent['Title']; 
+		$SearchTags = $this->Torrent['TagList']; 
         include(SERVER_ROOT . '/sections/upload/display_dupes.php');
       ?>
-        <div class="box pad shadow center"> 
-            If you have checked and are certain these are not dupes check this box to ignore the dupe check<br/>
-            <strong>Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1"<? 
+        <div class="box pad shadow center rowa"> 
+            If you have checked and are certain these are not dupes check this box to ignore the dupe check 
+            <div style="margin-top:6px"><strong style="font-size:1.2em;">Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1"<? 
                                             if (isset($this->Torrent['IgnoreDupes']) && $this->Torrent['IgnoreDupes']==1) {
-                                                echo ' checked="checked"'; }   ?> /> 
+                                                echo ' checked="checked"'; }   ?> /> </div>
         </div>
         <br/>
       <?

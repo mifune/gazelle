@@ -1,7 +1,7 @@
 <?
 
 function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
-    global $SS;
+    global $SS, $ExcludeBytesDupeCheck;
     
     $SS->limit(0, 10, 10);
     $SS->SetSortMode(SPH_SORT_ATTR_DESC, 'time');
@@ -16,7 +16,15 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
    
         //skip matching files < 1mb in size
         if ($Size < 1024*1024) continue;
-        
+        //if(array_key_exists("'$Size'", $ExcludeBytesDupeCheck)) {
+        if(isset($ExcludeBytesDupeCheck[$Size])) {
+            $ExcludeSize=$ExcludeBytesDupeCheck[$Size];
+            $FakeEntry = array( array( 'excluded'=> $ExcludeBytesDupeCheck[$Size], 
+                                       'dupedfileexact'=>$Name, 
+                                       'dupedfile'=>"$Name (".  get_size($Size).")" ) );
+            $AllResults = array_merge($AllResults, $FakeEntry);
+            continue;
+        }
         //$Queries[] =  $SS->EscapeString($Size);
         
         $Query = '@filelist "' . $SS->EscapeString($Size) .'"';  // . '"~20';
