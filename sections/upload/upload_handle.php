@@ -42,7 +42,8 @@ $Properties['TagList'] = $_POST['tags'];
 $Properties['Image'] = $_POST['image'];
 $Properties['GroupDescription'] = $_POST['desc'];
 $Properties['TemplateFooter'] = $_POST['templatefooter'];
-      
+$Properties['IgnoreDupes'] = $_POST['ignoredupes'];
+
 //$Properties['GroupID'] = $_POST['groupid'];
 $RequestID = $_POST['requestid'];
 

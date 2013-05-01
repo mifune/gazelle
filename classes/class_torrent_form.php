@@ -67,7 +67,9 @@ class TORRENT_FORM {
       ?>
         <div class="box pad shadow center"> 
             If you have checked and are certain these are not dupes check this box to ignore the dupe check<br/>
-            <strong>Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1" /> *(make sure you enter the same torrent file)
+            <strong>Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1"<? 
+                                            if (isset($this->Torrent['IgnoreDupes']) && $this->Torrent['IgnoreDupes']==1) {
+                                                echo ' checked="checked"'; }   ?> /> 
         </div>
         <br/>
       <?
