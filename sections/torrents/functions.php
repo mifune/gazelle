@@ -290,7 +290,7 @@ function get_taglist_html($GroupID, $tagsort) {
                 if (!$TagVoteUsername) continue;
                 $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
             }
-            $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs) . count($VoteMsgs);
+            $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs) ;
         }
 
         uasort($Tags, "sort_$tagsort");

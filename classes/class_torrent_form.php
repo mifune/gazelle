@@ -29,7 +29,7 @@ class TORRENT_FORM {
 		
 		global $NewCategories, $Media, $TorrentID;
 		
-                $this->NewCategories = $NewCategories;
+        $this->NewCategories = $NewCategories;
 		$this->Media = $Media;
 		$this->TorrentID = $TorrentID;
 		
@@ -102,7 +102,16 @@ class TORRENT_FORM {
 					Torrent file
 				</td>
 				<td>
-					<input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: 1mb]
+<?                  if (isset($this->Torrent['tempfileid']) 
+                            && is_number($this->Torrent['tempfileid']) 
+                            && $this->Torrent['tempfileid']>0)  {     ?>
+                        <input type="hidden" name="tempfileid" value="<?=display_str($this->Torrent['tempfileid'])?>" />
+                        <input type="hidden" name="tempfilename" value="<?=display_str($this->Torrent['tempfilename'])?>" />
+                        <input id="file" type="text" size="70" disabled="disabled" value="<?=display_str($this->Torrent['tempfilename'])?>" />
+                        <br/>[already loaded file]
+<?                  } else {    ?>
+                        <input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: 1mb]
+<?                  }           ?>
 				</td>
                 </tr>
                 <tr class="uploadbody">

@@ -45,13 +45,18 @@ $Properties['TemplateFooter'] = $_POST['templatefooter'];
       
 //$Properties['GroupID'] = $_POST['groupid'];
 $RequestID = $_POST['requestid'];
- 
-//******************************************************************************//
-//--------------- Validate data in upload form ---------------------------------//
-//** note: if the same field is set to be validated more than once then each time it is set it overwrites the previous test
-//** ie.. one test per field max, last one set for a specific field is what is used
-//$Validate->SetFields('title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>64));
-$Validate->SetFields('tags', '1', 'string', 'You must enter at least one tag.', array('maxlength' => 1000, 'minlength' => 2));
+
+$LogScoreAverage = 0;
+$SendPM = 0;
+$LogMessage = "";
+$CheckStamp = "";
+
+$HideDNU = true;
+$HideWL = true;
+
+
+/*
+$Validate->SetFields('tags', '1', 'string', 'You must enter at least one tag.', array('maxlength' => 10000, 'minlength' => 2));
 $whitelist_regex = get_whitelist_regex();
 $Validate->SetFields('image', '0', 'image', 'The image URL you entered was not valid.', array('regex' => $whitelist_regex, 'maxlength' => 255, 'minlength' => 12));
 $Validate->SetFields('desc', '1', 'desc', 'Description', array('regex' => $whitelist_regex, 'minimages'=>1, 'maxlength' => 1000000, 'minlength' => 20));
@@ -77,10 +82,6 @@ if(!$Err ){ // if we already have an error lets report what we have (much friend
     }
 }
 
-$LogScoreAverage = 0;
-$SendPM = 0;
-$LogMessage = "";
-$CheckStamp = "";
     
 $HideDNU = true;
 $HideWL = true;
@@ -89,54 +90,129 @@ if ($Err) { // Show the upload form, with the data the user entered
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
 }
+*/
 
-/***************************************************************************** 
-//--------------- Make variables ready for database input ----------------------//
-// Shorten and escape $Properties for database input
-$T = array();
-foreach ($Properties as $Key => $Value) {
-    $T[$Key] = "'" . db_string(trim($Value)) . "'";
-    if (!$T[$Key]) {
-        $T[$Key] = NULL;
+
+
+if (isset($_POST['tempfileid']) && is_number($_POST['tempfileid'])) {
+    $Properties['tempfilename'] = $_POST['tempfilename'];
+    $Properties['tempfileid'] = (int)$_POST['tempfileid'];
+} else {
+    $Properties['tempfilename'] = false;
+    $Properties['tempfileid'] = null;
+}
+$FileName = '';
+
+if($Properties['tempfileid']) {
+     
+    //******************************************************************************//
+    //--------------- Get already loaded torrent file ----------------------------------------//
+    
+    $DB->query("SELECT filename, file FROM torrents_files_temp WHERE ID='$Properties[tempfileid]'");
+
+    list($FileName, $Contents) = $DB->next_record(MYSQLI_NUM, array(1));
+    
+    if (!$FileName) {
+        $Properties['tempfilename'] = '';
+        $Properties['tempfileid'] = null;
+        $Err = 'Error getting torrent file. Please re-upload.';
+        include(SERVER_ROOT . '/sections/upload/upload.php');
+        die();
+    }
+    
+    $Contents = unserialize(base64_decode($Contents));
+    $Tor = new TORRENT($Contents, true); // New TORRENT object 
+    
+} else {
+    
+    $File = $_FILES['file_input']; // This is our torrent file
+    $TorrentName = $File['tmp_name'];
+    $FileName = $File['name'];
+
+    if (!is_uploaded_file($TorrentName) || !filesize($TorrentName)) {
+        $Err = 'No torrent file uploaded, or file is empty.';
+    } else if (substr(strtolower($File['name']), strlen($File['name']) - strlen(".torrent")) !== ".torrent") {
+        $Err = "You seem to have put something other than a torrent file into the upload field. (" . $File['name'] . ").";
+    }
+
+    if ($Err) { // Show the upload form, with the data the user entered
+        include(SERVER_ROOT . '/sections/upload/upload.php');
+        die();
+    }
+
+    //******************************************************************************//
+    //--------------- Generate torrent file ----------------------------------------//
+
+
+    $File = fopen($TorrentName, 'rb'); // open file for reading
+    $Contents = fread($File, 10000000);
+    $Tor = new TORRENT($Contents); // New TORRENT object
+    fclose($File);
+
+    // Remove uploader's passkey from the torrent.
+    // We put the downloader's passkey in on download, so it doesn't matter what's in there now,
+    // so long as it's not useful to any leet hax0rs looking in an unprotected /torrents/ directory
+    $Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
+
+    
+}
+
+
+
+
+//******************************************************************************//
+//--------------- Check this torrent file does not already exist ----------------------------------------//
+
+
+$InfoHash = pack("H*", sha1($Tor->Val['info']->enc()));
+$DB->query("SELECT ID FROM torrents WHERE info_hash='" . db_string($InfoHash) . "'");
+if ($DB->record_count() > 0) {
+    list($ID) = $DB->next_record();
+    $DB->query("SELECT TorrentID FROM torrents_files WHERE TorrentID = " . $ID);
+    if ($DB->record_count() > 0) {
+        $Err = '<a href="torrents.php?torrentid=' . $ID . '">The exact same torrent file already exists on the site!</a>';
+    } else {
+        //One of the lost torrents.
+        $DB->query("INSERT INTO torrents_files (TorrentID, File) VALUES ($ID, '" . db_string($Tor->dump_data()) . "')");
+        $Err = '<a href="torrents.php?torrentid=' . $ID . '">Thankyou for fixing this torrent</a>';
     }
 }
 
-$SearchText = db_string(trim($Properties['Title']) . ' ' . $Text->db_clean_search(trim($Properties['GroupDescription'])));
 
-*/
+if (!empty($Err)) { // Show the upload form, with the data the user entered
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
+} 
 
-//******************************************************************************//
-//--------------- Generate torrent file ----------------------------------------//
+
+$sqltime = db_string( sqltime() );
 
 
-$File = fopen($TorrentName, 'rb'); // open file for reading
-$Contents = fread($File, 10000000);
-$Tor = new TORRENT($Contents); // New TORRENT object
-fclose($File);
-
-// Remove uploader's passkey from the torrent.
-// We put the downloader's passkey in on download, so it doesn't matter what's in there now,
-// so long as it's not useful to any leet hax0rs looking in an unprotected /torrents/ directory
-$Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
-// $Private is true or false. true means that the uploaded torrent was private, false means that it wasn't.
-$Private = $Tor->make_private();
-// The torrent is now private.
 // File list and size
 list($TotalSize, $FileList) = $Tor->file_list();
 
-$TmpFileList = array();
 
 //if (check_perms('torrents_delete')){ // for testing on live site
 // do dupe check & return to upload page if detected
 $DupeResults = check_size_dupes($FileList);
 
 if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
+
+    //******************************************************************************//
+    //--------------- Temp store torrent file -------------------------------------------//
+    if(!$Properties['tempfileid']) {
+        $DB->query("INSERT INTO torrents_files_temp (filename, file, time) 
+                         VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')"); 
+        $Properties['tempfileid'] = $DB->inserted_id();
+        $Properties['tempfilename'] = $FileName;
+    }
     $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
 }
 //}
 
+$TmpFileList = array();
 foreach ($FileList as $File) {
     list($Size, $Name) = $File;
 
@@ -162,24 +238,80 @@ if ($Err) { // Show the upload form, with the data the user entered
     die();
 }
 
+
+//******************************************************************************//
+//--------------- Validate data in upload form ---------------------------------//
+//** note: if the same field is set to be validated more than once then each time it is set it overwrites the previous test
+//** ie.. one test per field max, last one set for a specific field is what is used
+
 // To be stored in the database
 $FilePath = $Tor->Val['info']->Val['files'] ? db_string($Tor->Val['info']->Val['name']) : "";
 
+if (!isset($_POST['title']) || $_POST['title']=='') {
+    if ($FilePath) $_POST['title'] = $FilePath;
+    else if (isset($TmpFileList[0])) $_POST['title'] = $TmpFileList[0];
+    $Properties['Title'] = $_POST['title'];
+}
+
+$Validate->SetFields('category', '1', 'inarray', 'Please select a category.', array('inarray' => array_keys($NewCategories)));
+$Validate->SetFields('title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>TITLE_MAXWORD_LENGTH)); 
+$Validate->SetFields('tags', '1', 'string', 'You must enter at least one tag.', array('maxlength' => 10000, 'minlength' => 2));
+$whitelist_regex = get_whitelist_regex();
+$Validate->SetFields('image', '0', 'image', 'The image URL you entered was not valid.', array('regex' => $whitelist_regex, 'maxlength' => 255, 'minlength' => 12));
+$Validate->SetFields('desc', '1', 'desc', 'Description', array('regex' => $whitelist_regex, 'minimages'=>1, 'maxlength' => 1000000, 'minlength' => 20));
+
+$Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
+
+if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)){
+        $Err = "There are errors in your bbcode (unclosed tags)";
+}
+
+if ($Err) { // Show the upload form, with the data the user entered
+    //******************************************************************************//
+    //--------------- Temp store torrent file -------------------------------------------//
+    if(!$Properties['tempfileid']) {
+        $DB->query("INSERT INTO torrents_files_temp (filename, file, time) 
+                         VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')"); 
+        $Properties['tempfileid'] = $DB->inserted_id();
+        $Properties['tempfilename'] = $FileName;
+    }
+    
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
+}
+
+
+
+/*
+// To be stored in the database
+$FilePath = $Tor->Val['info']->Val['files'] ? db_string($Tor->Val['info']->Val['name']) : "";
 
 
 if (!isset($Properties['Title']) || $Properties['Title']=='') {
     if ($FilePath) $Properties['Title'] = $FilePath;
     else if (isset($TmpFileList[0])) $Properties['Title'] = $TmpFileList[0];
 }
+ * */
 
+
+
+/*
 $Validate = new VALIDATE;
 $Validate->SetFields('Title', '1', 'string', 'You must enter a Title.', array('maxlength' => 200, 'minlength' => 2, 'maxwordlength'=>TITLE_MAXWORD_LENGTH)); 
 $Err = $Validate->ValidateForm($Properties, $Text); // Validate the form
 
-if ($Err) { // Show the upload form, with the data the user entered
+if ($Err) { // Show the upload form, with the data the user entered 
+    //--------------- Temp store torrent file -------------------------------------------//
+    if(!$Properties['tempfileid']) {
+        $DB->query("INSERT INTO torrents_files_temp (filename, file, time) 
+                         VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')"); 
+        $Properties['tempfileid'] = $DB->inserted_id();
+        $Properties['tempfilename'] = $FileName;
+    }
+    
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
-}
+} */
 
 
 
@@ -189,13 +321,17 @@ $FileString = "'" . db_string(implode('|||', $TmpFileList)) . "'";
 // Number of files described in torrent
 $NumFiles = count($FileList);
 
+// $Private is true or false. true means that the uploaded torrent was private, false means that it wasn't.
+$Private = $Tor->make_private();
+// The torrent is now private.
+
 // The string that will make up the final torrent file
 $TorrentText = $Tor->enc();
 
 $TorrentSize = strlen($Tor->dump_data());
 
 // Infohash
-
+ /*
 $InfoHash = pack("H*", sha1($Tor->Val['info']->enc()));
 $DB->query("SELECT ID FROM torrents WHERE info_hash='" . db_string($InfoHash) . "'");
 if ($DB->record_count() > 0) {
@@ -214,8 +350,8 @@ if ($DB->record_count() > 0) {
 if (!empty($Err)) { // Show the upload form, with the data the user entered
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
-}
-
+} */
+ 
 
 //******************************************************************************//
 //--------------- Make variables ready for database input ----------------------//
@@ -236,10 +372,10 @@ $SearchText = db_string(trim($Properties['Title']) . ' ' . $Text->db_clean_searc
 
 $Body = $Properties['GroupDescription'];
 
-if($Properties['TemplateFooter']!=''){
+//if($Properties['TemplateFooter']!=''){
     // template footers are kind of annoying... until we move them below torrent sigs lets just disable them
     // $Body .= "[br][br]$Properties[TemplateFooter]";
-}
+//}
 // Trickery
 /* image is already validated by better regex in validator so skip this 
 if (!preg_match("/^" . URL_REGEX . "$/i", $Properties['Image'])) {
@@ -247,7 +383,6 @@ if (!preg_match("/^" . URL_REGEX . "$/i", $Properties['Image'])) {
     $T['Image'] = "''";
 } */
 
-$sqltime = db_string( sqltime() );
 
 //Needs to be here as it isn't set for add format until now
 $LogName = $Properties['Title'];
@@ -319,36 +454,49 @@ if($TorrentID>$GroupID) {
 
 
 
+// mifune: in case of comma delineators. 
+$Tags = str_replace(',', ' ', $Properties['TagList']);
 // lanz: insert the category tag here. 
-$Tags = explode(' ', strtolower($NewCategories[(int)$_POST['category']]['tag']." ".$Properties['TagList']));
-//$Tags = array_unique($Tags);
+$Tags = explode(' ', strtolower($NewCategories[(int)$_POST['category']]['tag']." ".$Tags));
+
 //if (!$Properties['GroupID']) {
-    $TagsAdded=array();
-    foreach ($Tags as $Tag) {
-        $Tag = strtolower(trim($Tag,'.')); // trim dots from the beginning and end
-        if (!is_valid_tag($Tag) || !check_tag_input($Tag)) continue;
-        $Tag = get_tag_synonym($Tag);
-        if (!empty($Tag)) { // mifune: modified this to not add duplicates in the same input string
-            if (!in_array($Tag, $TagsAdded)){ // and to create new tags as Uses=1 which seems more correct
-                $TagsAdded[] = $Tag;
-                $DB->query("INSERT INTO tags
+$TagsAdded=array();
+foreach ($Tags as $Tag) {
+    if (empty($Tag)) continue;  
+    $Tag = strtolower(trim(trim($Tag,'.'))); // trim dots from the beginning and end
+    if (!is_valid_tag($Tag) || !check_tag_input($Tag)) continue;
+    $Tag = get_tag_synonym($Tag);
+    
+    if (!empty($Tag)) {  
+        if (!in_array($Tag, $TagsAdded)){  
+            $TagsAdded[] = $Tag;
+            $DB->query("INSERT INTO tags
                             (Name, UserID, Uses) VALUES
                             ('" . $Tag . "', $LoggedUser[ID], 1)
                             ON DUPLICATE KEY UPDATE Uses=Uses+1;");
-                $TagID = $DB->inserted_id();
-                $Vote = empty($LoggedUser['NotVoteUpTags'])?9:8;
+            $TagID = $DB->inserted_id();
+                
+            if (empty($LoggedUser['NotVoteUpTags'])){
+                    
+                $DB->query("INSERT INTO torrents_tags
+                            (TagID, GroupID, UserID, PositiveVotes) VALUES
+                            ($TagID, $GroupID, $LoggedUser[ID], 9)
+                            ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1;");
+                    
+                $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
+                                ($TagID, $GroupID, $LoggedUser[ID], 'up');");
+            } else {
+                    
                 $DB->query("INSERT IGNORE INTO torrents_tags
                             (TagID, GroupID, UserID, PositiveVotes) VALUES
-                            ($TagID, $GroupID, $LoggedUser[ID], $Vote);");
-                if (empty($LoggedUser['NotVoteUpTags'])){
-                    $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
-                                ($TagID, $GroupID, $LoggedUser[ID], 'up');");
-                }
+                            ($TagID, $GroupID, $LoggedUser[ID], 8);");
             }
         }
     }
-    // replace the original tag array with corrected tags
-    $Tags = $TagsAdded;
+}
+// replace the original tag array with corrected tags
+$Tags = $TagsAdded;
+
 //}
 
 
@@ -356,6 +504,13 @@ $Tags = explode(' ', strtolower($NewCategories[(int)$_POST['category']]['tag']."
 update_tracker('add_torrent', array('id' => $TorrentID, 'info_hash' => rawurlencode($InfoHash), 'freetorrent' => (int) $Properties['FreeTorrent']));
 
 
+//******************************************************************************//
+//--------------- Delete any temp torrent file -------------------------------------------//
+
+if(is_number($Properties['tempfileid']) && $Properties['tempfileid'] > 0) { 
+    $DB->query("DELETE FROM torrents_files_temp WHERE ID='$Properties[tempfileid]'");  
+}
+    
 
 //******************************************************************************//
 //--------------- Write torrent file -------------------------------------------//
