@@ -153,12 +153,16 @@ if($Properties['tempfileid']) {
     // Remove uploader's passkey from the torrent.
     // We put the downloader's passkey in on download, so it doesn't matter what's in there now,
     // so long as it's not useful to any leet hax0rs looking in an unprotected /torrents/ directory
-    $Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
+    // $Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
 
     
 }
 
+$Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
 
+// $Private is true or false. true means that the uploaded torrent was private, false means that it wasn't.
+$Private = $Tor->make_private();
+// The torrent is now private.
 
 
 //******************************************************************************//
@@ -323,7 +327,7 @@ $FileString = "'" . db_string(implode('|||', $TmpFileList)) . "'";
 $NumFiles = count($FileList);
 
 // $Private is true or false. true means that the uploaded torrent was private, false means that it wasn't.
-$Private = $Tor->make_private();
+// $Private = $Tor->make_private();
 // The torrent is now private.
 
 // The string that will make up the final torrent file

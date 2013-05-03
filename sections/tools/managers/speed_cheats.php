@@ -320,10 +320,21 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     $IPDupeCount = $DB->record_count();
                     $IPDupes = $DB->to_array();
                     
+                    $bantype='ban_speed_cheat'; 
                     $viewlink='';
-                    if ($_GET['viewptnupspeed']==1)  $viewlink="&matchspeed=$MaxUpSpeed";
-                    if ($_GET['viewptnupload']==1)  $viewlink.="&matchuploaded=$MaxUploaded";
-                    //else $viewlink="viewspeed=0";
+                    $pattern=0;
+                    if ($_GET['viewptnupspeed']==1){
+                        $viewlink="&matchspeed=$MaxUpSpeed";
+                        $bantype='ban_pattern_cheat';
+                        $pattern=$CountRecords;
+                    }
+                    if ($_GET['viewptnupload']==1) {
+                        $viewlink.="&matchuploaded=$MaxUploaded";
+                        $bantype='ban_pattern_cheat';
+                        $pattern=$CountRecords;
+                    }
+                    if($pattern>0) $pattern= "&pattern=$pattern";
+                    else $pattern='';
                     
 ?> 
                     <tr class="row<?=$row?>">
@@ -340,7 +351,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                            <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?
                             if ($Enabled=='1'){  ?>
-                                <a href="tools.php?action=ban_speed_cheat&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+                                <a href="tools.php?action=<?="$bantype$pattern"?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
 <?                          }
                            
                            ?>
