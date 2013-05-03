@@ -258,7 +258,14 @@ show_header('Speed Reports','watchlist');
     <br/>
 <?
 //---------- print records
-            
+
+if (isset($_GET['matchspeed']) && is_number($_GET['matchspeed']))
+    $WHERESTART = "upspeed='".(int)$_GET['matchspeed']."'";
+elseif (isset($_GET['matchuploaded']) && is_number($_GET['matchuploaded']))
+    $WHERESTART = "xbt.uploaded='".(int)$_GET['matchuploaded']."'";
+else
+    $WHERESTART = "upspeed>='$ViewSpeed'";
+
 list($Page,$Limit) = page_limit(50);
 
 $DB->query("SELECT Count(*) FROM xbt_peers_history");
@@ -273,7 +280,7 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                      LEFT JOIN users_info AS ui ON ui.UserID=xbt.uid
                      LEFT JOIN torrents AS t ON t.ID=xbt.fid
                      LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID
-                         WHERE upspeed>='$ViewSpeed' $WHERE
+                         WHERE $WHERESTART $WHERE
                       ORDER BY $OrderBy $OrderWay
                          LIMIT $Limit");
 $Records = $DB->to_array();

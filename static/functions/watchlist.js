@@ -12,7 +12,16 @@ function change_view_reports(userid, torrentid){
 function change_view(){
     var viewspeed=$('#viewspeed').raw().options[$('#viewspeed').raw().selectedIndex].value;
     var banspeed =  $('#banspeed').raw().options[$('#banspeed').raw().selectedIndex].value;
-    location.href = "tools.php?action=speed_cheats&viewspeed="+viewspeed+"&banspeed="+banspeed+($('#viewbanned').raw().checked?'&viewbanned=1':'');
+    location.href = "tools.php?action=speed_cheats&viewspeed="+viewspeed+"&banspeed="+banspeed+($('#viewbanned').raw().checked?'&viewbanned=1':'')
+              +($('#viewptnupload').raw().checked?'&viewptnupload=1':'')+($('#viewptnupspeed').raw().checked?'&viewptnupspeed=1':'');
+}
+// set all checkboxes in formElem by val of checkbox passed
+function toggle_pattern() {
+    var checked = $('#viewptnall').raw().checked;
+	//if () { checked=true; } else { checked=false; }
+    $('#viewptnupload').raw().checked=checked;
+    $('#viewptnupspeed').raw().checked=checked;
+	change_view();
 }
 
 function preview_users() {

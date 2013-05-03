@@ -47,15 +47,19 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $_GET['order_way'] = 'desc';
     $OrderWay = 'desc';
 }
+
                        //     xbt.id, uid, Username, xbt.downloaded, remaining, t.Size, xbt.uploaded, 
                      ////       upspeed, downspeed, timespent, peer_id, xbt.ip, tg.ID, fid, tg.Name, xbt.mtime
                                     
 // User 	Remaining 	Uploaded 	UpSpeed 	ClientIPaddress 	date time 	
 //	TorrentID 	Total 	Downloaded 	DownSpeed 	                	total time 
                                     
-if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'count', 'mtime' ))) {
+
+
+                                                                    //  'patternupspeed','patternuploaded'
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'uploaded', 'count', 'time', ))) {
     $_GET['order_by'] = 'upspeed';
-    $OrderBy = 'MAX(xbt.upspeed)'; 
+    $OrderBy = 'upspeed';   // 'MAX(xbt.upspeed)'; 
 } else {
     $OrderBy = $_GET['order_by'];
 }
@@ -93,7 +97,7 @@ show_header('Speed Cheats','watchlist');
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
  
             <tr class="colhead"><td colspan="3">view settings: </td></tr>
-            <tr class="rowb">  
+            <tr class="rowb">
                 <td class="center">
                     Viewing: <?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)
 <?                  if ($ViewInfo!='all over speed specified') { ?>
@@ -141,8 +145,30 @@ show_header('Speed Cheats','watchlist');
                     </select>
                 </td>
             </tr>
+            <tr class="rowb">
+                <td class="center">
+                    Pattern Matching:
+                </td>
+                <td colspan="2" class="left">
+                    <label for="viewptnupspeed" title="Display records with matching upspeeds">matching upspeeds</label>
+                    <input type="checkbox" value="1" onchange="change_view()"
+                         id="viewptnupspeed" name="viewptnupspeed" <? 
+                         if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed'])echo' checked="checked"'?> />
+                    &nbsp;&nbsp;
+                    <label for="viewptnupload" title="Display records with matching upspeeds">matching uploads</label>
+                    <input type="checkbox" value="1" onchange="change_view()"
+                         id="viewptnupload" name="viewptnupload" <? 
+                         if (isset($_GET['viewptnupload']) && $_GET['viewptnupload'])echo' checked="checked"'?> />
+                    &nbsp;&nbsp;
+                    <label for="viewptnall" title="Display records with matching upspeeds and matching uploaded">toggle both</label>
+                    <input type="checkbox" value="1" onchange="toggle_pattern()"
+                         id="viewptnall" name="viewptnall" <? 
+                         if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed'] && 
+                                 isset($_GET['viewptnupload']) && $_GET['viewptnupload'])echo' checked="checked"'?> />
+                </td>
+            </tr>
         </form>
-        <tr class="colhead"><td colspan="3">group ban tool: </td></tr>
+        <tr class="colhead"><td colspan="3">group speed ban tool: </td></tr>
         <tr class="rowb">
             <form id="speedrecords" action="tools.php" method="post" onsubmit="return prompt_before_multiban();">
                 <input type="hidden" name="action" value="ban_speed_cheat" />
@@ -171,36 +197,54 @@ show_header('Speed Cheats','watchlist');
 //---------- print records
             
 list($Page,$Limit) = page_limit(50);
- 
+ /*
 if ($OrderBy=="upspeed") $SQLOrderBy="MAX(xbt.upspeed)";
+elseif ($OrderBy=="uploaded") $SQLOrderBy="MAX(xbt.uploaded)"; 
 elseif ($OrderBy=="mtime") $SQLOrderBy="MAX(xbt.mtime)"; 
 elseif ($OrderBy=="count") $SQLOrderBy="Count(xbt.id)";
-else $SQLOrderBy=$OrderBy;
+else $SQLOrderBy=$OrderBy; */
 
-    if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
-        $ViewInfo .= ' (all)';
-    } else {
-        $WHERE .= " AND (um.ID IS NULL OR um.Enabled='1')";
-        $ViewInfo .= ' (enabled only)';
-    }
-    
+if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+    $ViewInfo .= ' (all)';
+} else {
+    $WHERE .= " AND um.Enabled='1' ";
+    //$WHERE .= " AND (um.ID IS NULL OR um.Enabled='1')";
+    $ViewInfo .= ' (enabled only)';
+}
+
+$GroupBy = '';
+if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed']){
+    $GroupBy .= ", xbt.upspeed";
+    $Having = 'HAVING Count(xbt.id)>1';
+}
+if (isset($_GET['viewptnupload']) && $_GET['viewptnupload']){
+    $GroupBy .= ", xbt.uploaded";
+    $Having = 'HAVING Count(xbt.id)>1';
+}
+
+
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
-                             uid, Username, Count(xbt.id), MAX(upspeed), MAX(mtime), 
+                             uid, Username, Count(xbt.id) as count, MAX(upspeed) as upspeed, MAX(xbt.uploaded) as uploaded, MAX(mtime) as time, 
                              GROUP_CONCAT(DISTINCT LEFT(xbt.peer_id,8) SEPARATOR '|'), 
                              GROUP_CONCAT(DISTINCT xbt.ip SEPARATOR '|'),
                              ui.Donor, ui.Warned, um.Enabled, um.PermissionID
                           FROM xbt_peers_history AS xbt
-                     LEFT JOIN users_main AS um ON um.ID=xbt.uid
-                     LEFT JOIN users_info AS ui ON ui.UserID=xbt.uid
+                          JOIN users_main AS um ON um.ID=xbt.uid
+                          JOIN users_info AS ui ON ui.UserID=xbt.uid
                      LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
                          WHERE (xbt.upspeed)>='$ViewSpeed'
                            AND nc.UserID IS NULL $WHERE
-                      GROUP BY xbt.uid   
-                      ORDER BY $SQLOrderBy $OrderWay 
+                      GROUP BY xbt.uid $GroupBy 
+                        $Having
+                      ORDER BY $OrderBy $OrderWay 
                          LIMIT $Limit");
 
-/* for later - pattern matching: 
-SELECT uid, upspeed, uploaded, count(id) as cnt FROM xbt_peers_history
+
+/*  pattern matching: 
+SELECT uid, upspeed, uploaded, count(id) as cnt 
+FROM xbt_peers_history
+JOIN users_main AS um ON um.ID=xbt.uid
+JOIN users_info AS ui ON ui.UserID=xbt.uid
 WHERE upspeed!=0 
 GROUP BY  upspeed, uid, uploaded HAVING cnt > 1
  */
@@ -222,11 +266,11 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 <td style="width:70px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
+                <td class="center"><a href="<?=header_link('uploaded') ?>">Max Uploaded</a></td>
                 <td class="center" title="number of records that are over the speed limit"><a href="<?=header_link('count') ?>">count</a></td>
                 <td class="center"><span style="color:#777">-clientID-</span></td>
                 <td class="center">Client IP addresses</td>
-                <td class="center" style="min-width:120px"><a href="<?=header_link('mtime') ?>">last seen</a></td>
-                <!--<td class="center"></td>-->
+                <td class="center" style="min-width:120px"><a href="<?=header_link('time') ?>">last seen</a></td>
             </tr>
 <?
             $row = 'a';
@@ -238,7 +282,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 <?
             } else {
                 foreach ($Records as $Record) {
-                    list( $UserID, $Username, $CountRecords, $MaxUpSpeed, $LastTime, $PeerIDs, $IPs, $IsDonor, $Warned, $Enabled, $ClassID) = $Record;
+                    list( $UserID, $Username, $CountRecords, $MaxUpSpeed, $MaxUploaded, $LastTime, $PeerIDs, $IPs, $IsDonor, $Warned, $Enabled, $ClassID) = $Record;
                     $row = ($row === 'a' ? 'b' : 'a');
                     
                     $PeerIDs = explode('|', $PeerIDs);
@@ -276,10 +320,15 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     $IPDupeCount = $DB->record_count();
                     $IPDupes = $DB->to_array();
                     
+                    $viewlink='';
+                    if ($_GET['viewptnupspeed']==1)  $viewlink="&matchspeed=$MaxUpSpeed";
+                    if ($_GET['viewptnupload']==1)  $viewlink.="&matchuploaded=$MaxUploaded";
+                    //else $viewlink="viewspeed=0";
+                    
 ?> 
                     <tr class="row<?=$row?>">
                         <td>
-                           <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
+                           <a href="?action=speed_records&viewspeed=0<?=$viewlink?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
                            <div style="display:inline-block">
 <?                         if (!array_key_exists($UserID, $Watchlist)) {   
 ?>                            <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="wl add" /></a><br/><?
@@ -310,6 +359,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                             
                         </td>
                         <td class="center"><?=speed_span($MaxUpSpeed, $KeepSpeed, 'red', get_size($MaxUpSpeed).'/s')?></td>
+                        <td class="center"><?=get_size($MaxUploaded)?></td>
                         <td class="center"><?=$CountRecords?></td>
                         <td class="center"><?
                             foreach($PeerIDs as $PeerID) {

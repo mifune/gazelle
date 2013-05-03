@@ -246,7 +246,7 @@ if (check_perms('users_manage_cheats', $Class)) {
 <?  } else {?>    
 		[<a onclick="watchlist_add('<?=$UserID?>');return false;" href="#" title="Add this user to the speed records user watchlist">Add to watchlist</a>]
 <?  } ?>
-        [<a href="/tools.php?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View speed records for this user">View speed records</a>]
+        [<a href="/tools.php?action=speed_records&viewspeed=0&userid=<?=$UserID;if($Enabled=='0')echo"&viewbanned=1";?>" title="View speed records for this user">View speed records</a>]
     </span>
 <?
 } ?>
