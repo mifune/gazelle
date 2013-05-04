@@ -230,6 +230,9 @@ foreach ($FileList as $File) {
     if (preg_match('/\:/i', $Name)) {
         $Err = 'The torrent contains one or more files with a :, which is a forbidden character. Please rename the files as necessary and recreate the .torrent file.';
     }
+    if (preg_match('/\.torrent/i', $Name)) {
+        $Err = 'The torrent contains one or more .torrent files inside the torrent. Please remove all .torrent files from your upload and recreate the .torrent file.';
+    }
     if (!preg_match('/\./i', $Name)) {
     //if ( strpos($Name, '.')===false)  {
         $Err = "The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.<br/><strong>note: this can also be caused by selecting 'create encrypted' in some clients</strong> in which case please recreate the .torrent file without encryption selected.";
