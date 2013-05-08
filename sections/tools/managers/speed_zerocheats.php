@@ -5,7 +5,7 @@ include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
 
 if(!check_perms('users_manage_cheats')) { error(403); }
 
-$Action = 'speed_cheats';
+$Action = 'speed_zerocheats';
 
 if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
