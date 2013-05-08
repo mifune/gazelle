@@ -230,12 +230,12 @@ $Having = '';
 if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed']){
     $GroupBy .= ", xbt.upspeed";
     $Having = 'HAVING Count(xbt.id)>1';
-    if (isset($_GET['viewptnzero']) && $_GET['viewptnzero']) $WHERE .= " AND xbt.upspeed!=0 ";
+    if (!$_GET['viewptnzero']) $WHERE .= " AND xbt.upspeed!=0 ";
 }
 if (isset($_GET['viewptnupload']) && $_GET['viewptnupload']){
     $GroupBy .= ", xbt.uploaded";
     $Having = 'HAVING Count(xbt.id)>1';
-    if (isset($_GET['viewptnzero']) && $_GET['viewptnzero']) $WHERE .= " AND xbt.uploaded!=0 ";
+    if (!$_GET['viewptnzero']) $WHERE .= " AND xbt.uploaded!=0 ";
 }
 
 
