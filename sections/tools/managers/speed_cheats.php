@@ -69,8 +69,8 @@ $DB->query("SELECT DeleteRecordsMins, KeepSpeed FROM site_options ");
 list($DeleteRecordsMins, $KeepSpeed) = $DB->next_record();
         
 $ViewSpeed = isset($_GET['viewspeed'])?(int)$_GET['viewspeed']:$KeepSpeed;
-$BanSpeed = isset($_GET['banspeed'])?(int)$_GET['banspeed']:$BanSpeed;
- 
+$BanSpeed = isset($_GET['banspeed'])?(int)$_GET['banspeed']:$KeepSpeed;
+
 show_header('Speed Cheats','watchlist');
 
 ?>
@@ -172,6 +172,12 @@ show_header('Speed Cheats','watchlist');
                          id="viewptnall" name="viewptnall" <? 
                          if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed'] && 
                                  isset($_GET['viewptnupload']) && $_GET['viewptnupload'])echo' checked="checked"'?> />
+                    
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    (<label for="viewptnzero" title="Show matches with zero speed or zero download stats">show 0 speed/dld matches</label>
+                    <input type="checkbox" value="1" onchange="change_view()"
+                         id="viewptnzero" name="viewptnzero" <? 
+                         if (isset($_GET['viewptnzero']) && $_GET['viewptnzero'] )echo' checked="checked"'?> />)
                 </td>
             </tr>
         </form>
@@ -220,13 +226,16 @@ if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
 }
 
 $GroupBy = '';
+$Having = '';
 if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed']){
     $GroupBy .= ", xbt.upspeed";
     $Having = 'HAVING Count(xbt.id)>1';
+    if (isset($_GET['viewptnzero']) && $_GET['viewptnzero']) $WHERE .= " AND xbt.upspeed!=0 ";
 }
 if (isset($_GET['viewptnupload']) && $_GET['viewptnupload']){
     $GroupBy .= ", xbt.uploaded";
     $Having = 'HAVING Count(xbt.id)>1';
+    if (isset($_GET['viewptnzero']) && $_GET['viewptnzero']) $WHERE .= " AND xbt.uploaded!=0 ";
 }
 
 
@@ -329,17 +338,17 @@ $Pages=get_pages($Page,$NumResults,25,9);
                     $IPDupeCount = $DB->record_count();
                     $IPDupes = $DB->to_array();
                     
-                    $bantype='ban_speed_cheat'; 
+                    $bantype=1; //'ban_speed_cheat'; 
                     $viewlink='';
                     $pattern=0;
                     if ($_GET['viewptnupspeed']==1){
                         $viewlink="&matchspeed=$MaxUpSpeed";
-                        $bantype='ban_pattern_cheat';
+                        $bantype=2; //'ban_pattern_cheat';
                         $pattern=$CountRecords;
                     }
                     if ($_GET['viewptnupload']==1) {
                         $viewlink.="&matchuploaded=$MaxUploaded";
-                        $bantype='ban_pattern_cheat';
+                        $bantype=2; //'ban_pattern_cheat';
                         $pattern=$CountRecords;
                     }
                     if($pattern>0) $pattern= "&pattern=$pattern";
@@ -359,10 +368,13 @@ $Pages=get_pages($Page,$NumResults,25,9);
  ?>                        </div>
                            <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?
-                            if ($Enabled=='1'){  ?>
-                                <a href="tools.php?action=<?="$bantype$pattern"?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
-<?                          }
-                           
+                            if ($Enabled=='1'){  
+                                if($bantype==1) { ?>
+                                <a href="tools.php?action=ban_speed_cheat<?=$pattern?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (speeding)"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+<?                              } else {?>
+                                <a href="tools.php?action=ban_pattern_cheat<?=$pattern?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (pattern matching)"><img src="static/common/symbols/ban2.png" alt="ban" /></a>
+<?                              }
+                            }
                            ?>
                         </td>
                         <td class="center">

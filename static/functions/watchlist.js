@@ -13,7 +13,8 @@ function change_view(){
     var viewspeed=$('#viewspeed').raw().options[$('#viewspeed').raw().selectedIndex].value;
     var banspeed =  $('#banspeed').raw().options[$('#banspeed').raw().selectedIndex].value;
     location.href = "tools.php?action=speed_cheats&viewspeed="+viewspeed+"&banspeed="+banspeed+($('#viewbanned').raw().checked?'&viewbanned=1':'')
-              +($('#viewptnupload').raw().checked?'&viewptnupload=1':'')+($('#viewptnupspeed').raw().checked?'&viewptnupspeed=1':'');
+              +($('#viewptnupload').raw().checked?'&viewptnupload=1':'')+($('#viewptnupspeed').raw().checked?'&viewptnupspeed=1':'')
+                +($('#viewptnzero').raw().checked?'&viewptnzero=1':'');
 }
 // set all checkboxes in formElem by val of checkbox passed
 function toggle_pattern() {

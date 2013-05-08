@@ -60,8 +60,8 @@ function print_user_watchlist() {
 function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
     
 ?> 
-        <div class="head"><?=$Title?> &nbsp;<img src="static/common/symbols/<?=$TitleIcon?>.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#<?=$ListType?>').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(view)</a></span>&nbsp;</div>
-        <table id="<?=$ListType?>" class="hidden">
+        <div class="head"><?=$Title?> &nbsp;<img src="static/common/symbols/<?=$TitleIcon?>.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#<?=$ListType?>').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(hide)</a></span>&nbsp;</div>
+        <table id="<?=$ListType?>" class="">
             <tr class="rowa"> 
                 <td colspan="6" style="text-align: left;color:grey"> 
                     <?=$Help?>
@@ -96,7 +96,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
                             <td class="center">
                                 <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
 <?                          if ($ListType=='watchlist' && $Enabled=='1'){ ?>
-                                &nbsp;<a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
+                                &nbsp;<a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (speeding)"><img src="static/common/symbols/ban.png" alt="ban" /></a>
 <?                          }  ?>
                             </td>
                             <td class="center"><?=format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false)?></td>
