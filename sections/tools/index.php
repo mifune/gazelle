@@ -102,6 +102,10 @@ switch ($_REQUEST['action']) {
 
     
     
+    case 'speed_watchlist':
+        include(SERVER_ROOT . '/sections/tools/managers/speed_watchlist.php');
+        break;
+    
     case 'speed_records':
         include(SERVER_ROOT . '/sections/tools/managers/speed_reports_list.php');
         break;

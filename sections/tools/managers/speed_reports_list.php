@@ -74,11 +74,20 @@ show_header('Speed Reports','watchlist');
 ?>
 <div class="thin">
     <h2>Speed Reports</h2>
+	<div class="linkbox"> 
+       
+		<a href="tools.php?action=speed_watchlist">[Watchlist]</a>
+		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+		<a href="tools.php?action=speed_records">[Speed Records]</a>
+	</div>
+    <br/>
     <?
     
-    $Watchlist = print_user_watchlist('records');
+    //$Watchlist = get_user_watchlist(); 
+    //$Excludelist = get_user_notcheatslist(); 
     
-    $Excludelist = print_user_notcheatslist('records');
+    //$Watchlist = print_user_watchlist('records');
+    //$Excludelist = print_user_notcheatslist('records');
 
     //---------- torrrent watch
 
@@ -266,7 +275,7 @@ elseif (isset($_GET['matchuploaded']) && is_number($_GET['matchuploaded']))
 else
     $WHERESTART = "upspeed>='$ViewSpeed'";
 
-list($Page,$Limit) = page_limit(50);
+list($Page,$Limit) = page_limit(25);
 
 $DB->query("SELECT Count(*) FROM xbt_peers_history");
 list($TotalResults) = $DB->next_record();
@@ -274,12 +283,15 @@ list($TotalResults) = $DB->next_record();
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                             xbt.id, uid, Username, xbt.downloaded, remaining, t.Size, xbt.uploaded, 
                             upspeed, downspeed, timespent, peer_id, xbt.ip, tg.ID, fid, tg.Name, xbt.mtime,
-                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID
+                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID,
+                                IF(w.UserID,'1','0'), IF(nc.UserID,'1','0')
                           FROM xbt_peers_history AS xbt
                      LEFT JOIN users_main AS um ON um.ID=xbt.uid
                      LEFT JOIN users_info AS ui ON ui.UserID=xbt.uid
                      LEFT JOIN torrents AS t ON t.ID=xbt.fid
                      LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID
+                     LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
+                     LEFT JOIN users_watch_list AS w ON w.UserID=xbt.uid
                          WHERE $WHERESTART $WHERE
                       ORDER BY $OrderBy $OrderWay
                          LIMIT $Limit");
@@ -287,7 +299,7 @@ $Records = $DB->to_array();
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
  
-$Pages=get_pages($Page,$NumResults,50,9);
+$Pages=get_pages($Page,$NumResults,25,9);
 
  // array('Username', 'Name', 'remaining', 'Size', 'uploaded', 'downloaded',
                                   //              'upspeed', 'downspeed', 'ip', 'mtime', 'timespent' ) 
@@ -334,7 +346,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 foreach ($Records as $Record) {
                     list($ID, $UserID, $Username, $Downloaded, $Remaining, $Size, $Uploaded, $UpSpeed, $DownSpeed, 
                                        $Timespent, $ClientPeerID, $IP, $GroupID, $TorrentID, $Name, $Time,
-                                       $IsDonor, $Warned, $Enabled, $ClassID) = $Record;
+                                       $IsDonor, $Warned, $Enabled, $ClassID, $OnWatchlist, $OnExcludeList) = $Record;
                     $row = ($row === 'a' ? 'b' : 'a');
                     $ipcc = geoip($IP);
 ?> 
@@ -344,10 +356,10 @@ $Pages=get_pages($Page,$NumResults,50,9);
                             <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
 <?                          }   ?>
                             <div style="display:inline-block">
-<?                          if (!array_key_exists($UserID, $Watchlist)) {   
+<?                          if (!$OnWatchlist) {        // array_key_exists($UserID, $Watchlist)) {   
 ?>                           <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><br/><?
                             }
-                            if (!array_key_exists($UserID, $Excludelist)) {   
+                            if (!$OnExcludeList) {        // array_key_exists($UserID, $Excludelist)) {   
 ?>                           <a onclick="excludelist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="view" /></a><?
                             } 
 ?>                          </div>

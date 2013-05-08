@@ -10,7 +10,7 @@ function print_speed_option($speed, $selected_speed){
 }
 
 
-function print_user_notcheatslist($returnto) {
+function get_user_notcheatslist() {
     global $DB;
     $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
                                  ui.Donor, ui.Warned, um.Enabled, um.PermissionID
@@ -21,12 +21,11 @@ function print_user_notcheatslist($returnto) {
               ORDER BY Time DESC");
     
     $Userlist = $DB->to_array('UserID');
-    return print_user_list($Userlist,'excludelist','Exclude users list','watchedgreen', 
-            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page',$returnto);
+    return $Userlist;
 }
 
 
-function print_user_watchlist($returnto) {
+function get_user_watchlist() {
     global $DB;
     $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
                                  ui.Donor, ui.Warned, um.Enabled, um.PermissionID
@@ -37,14 +36,28 @@ function print_user_watchlist($returnto) {
               ORDER BY Time DESC");
     
     $Watchlist = $DB->to_array('UserID');
-    return print_user_list($Watchlist,'watchlist','User watch list','watchedred', 'Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
-                    note: use the list sparingly - this can quickly fill the database with a huge number of records.',$returnto);
+    return $Watchlist;
+}
+
+function print_user_notcheatslist() {
+    $Userlist = get_user_notcheatslist();
+    print_user_list($Userlist,'excludelist','Exclude users list','watchedgreen', 
+            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
+    return $Userlist;
+}
+
+
+function print_user_watchlist() {
+    $Watchlist = get_user_watchlist();
+    print_user_list($Watchlist,'watchlist','User watch list','watchedred', 'Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
+                    note: use the list sparingly - this can quickly fill the database with a huge number of records.');
+    return $Watchlist;
 }
 
 
 
 
-function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) {
+function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
     
 ?> 
         <div class="head"><?=$Title?> &nbsp;<img src="static/common/symbols/<?=$TitleIcon?>.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#<?=$ListType?>').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(view)</a></span>&nbsp;</div>
@@ -79,12 +92,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) 
 ?> 
     
                     <tr class="row<?=$row?>">
-                      <!--  <form action="tools.php" method="post">
-                            <input type="hidden" name="action" value="edit_userwl" />
-                            <input type="hidden" name="viewspeed" value="<?=$ViewSpeed?>" />
-                            <input type="hidden" name="userid" value="<?=$UserID?>" /> 
-                            <input type="hidden" name="returnto" value="<?=$Returnto?>" /> 
-                            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" /> -->
+                     
                             <td class="center">
                                 <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
 <?                          if ($ListType=='watchlist' && $Enabled=='1'){ ?>
@@ -118,7 +126,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help,$Returnto) 
     </table>
     <br/>   
 <?
-    return $Userlist;
+    //return $Userlist;
 }
 
 ?>

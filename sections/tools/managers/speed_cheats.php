@@ -77,10 +77,17 @@ show_header('Speed Cheats','watchlist');
 <div class="thin">
     <h2>(possible) cheaters</h2>
      
+	<div class="linkbox"> 
+       
+		<a href="tools.php?action=speed_watchlist&view=issued">[Watchlist]</a>
+		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+		<a href="tools.php?action=speed_records">[Speed Records]</a>
+	</div>
+    <br/>
 <?
-    $Watchlist = print_user_watchlist('cheats');
-     
-    $Excludelist = print_user_notcheatslist('cheats');
+    //$Watchlist = get_user_watchlist();  // print_user_watchlist('cheats');
+      
+    //$Excludelist = print_user_notcheatslist('cheats');
 ?>
     <div class="head">options</div>
 <?
@@ -196,7 +203,7 @@ show_header('Speed Cheats','watchlist');
 <?
 //---------- print records
             
-list($Page,$Limit) = page_limit(50);
+list($Page,$Limit) = page_limit(25);
  /*
 if ($OrderBy=="upspeed") $SQLOrderBy="MAX(xbt.upspeed)";
 elseif ($OrderBy=="uploaded") $SQLOrderBy="MAX(xbt.uploaded)"; 
@@ -227,11 +234,12 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                              uid, Username, Count(xbt.id) as count, MAX(upspeed) as upspeed, MAX(xbt.uploaded) as uploaded, MAX(mtime) as time, 
                              GROUP_CONCAT(DISTINCT LEFT(xbt.peer_id,8) SEPARATOR '|'), 
                              GROUP_CONCAT(DISTINCT xbt.ip SEPARATOR '|'),
-                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID
+                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID, IF(w.UserID,'1','0')
                           FROM xbt_peers_history AS xbt
                           JOIN users_main AS um ON um.ID=xbt.uid
                           JOIN users_info AS ui ON ui.UserID=xbt.uid
                      LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
+                     LEFT JOIN users_watch_list AS w ON w.UserID=xbt.uid
                          WHERE (xbt.upspeed)>='$ViewSpeed'
                            AND nc.UserID IS NULL $WHERE
                       GROUP BY xbt.uid $GroupBy 
@@ -254,7 +262,7 @@ $Records = $DB->to_array();
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
  
-$Pages=get_pages($Page,$NumResults,50,9);
+$Pages=get_pages($Page,$NumResults,25,9);
 
 ?>
     
@@ -282,7 +290,8 @@ $Pages=get_pages($Page,$NumResults,50,9);
 <?
             } else {
                 foreach ($Records as $Record) {
-                    list( $UserID, $Username, $CountRecords, $MaxUpSpeed, $MaxUploaded, $LastTime, $PeerIDs, $IPs, $IsDonor, $Warned, $Enabled, $ClassID) = $Record;
+                    list( $UserID, $Username, $CountRecords, $MaxUpSpeed, $MaxUploaded, $LastTime, $PeerIDs, $IPs, 
+                            $IsDonor, $Warned, $Enabled, $ClassID, $OnWatchlist) = $Record;
                     $row = ($row === 'a' ? 'b' : 'a');
                     
                     $PeerIDs = explode('|', $PeerIDs);
@@ -341,12 +350,12 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         <td>
                            <a href="?action=speed_records&viewspeed=0<?=$viewlink?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
                            <div style="display:inline-block">
-<?                         if (!array_key_exists($UserID, $Watchlist)) {   
+<?                         if (!$OnWatchlist) {         // array_key_exists($UserID, $Watchlist)) {   
 ?>                            <a onclick="watchlist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="wl add" /></a><br/><?
                            }   
-                            if (!array_key_exists($UserID, $Excludelist)) {   
+                            //if (!array_key_exists($UserID, $Excludelist)) {   
  ?>                           <a onclick="excludelist_add('<?=$UserID?>',true);return false;" href="#" title="Add <?=$Username?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="excl add" /></a><?
-                            }  
+                            //}  
  ?>                        </div>
                            <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?
@@ -400,7 +409,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 $DupeInfo = user_info($EUserID);
 ?> 
             <tr>
-                <td>
+                <!--<td>
                     <a href="?action=speed_records&viewspeed=0&userid=<?=$EUserID?>" title="View records for just <?=$DupeInfo['Username']?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
                     <div style="display:inline-block">
                 <?  if (!array_key_exists($EUserID, $Watchlist)) {   
@@ -411,7 +420,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     } ?>    
                     </div>
                     <a onclick="remove_records('<?=$EUserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$DupeInfo['Username']?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
-                </td>
+                </td>-->
                 <td align="center">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
                 </td>
