@@ -185,6 +185,8 @@ if ($DB->record_count() > 0) {
 
 
 if (!empty($Err)) { // Show the upload form, with the data the user entered
+        $Properties['tempfilename'] = '';
+        $Properties['tempfileid'] = null;
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
 } 
@@ -195,27 +197,6 @@ $sqltime = db_string( sqltime() );
 
 // File list and size
 list($TotalSize, $FileList) = $Tor->file_list();
-
-
-//if (check_perms('torrents_delete')){ // for testing on live site
-// do dupe check & return to upload page if detected
-$DupeResults = check_size_dupes($FileList);
-
-if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
-
-    //******************************************************************************//
-    //--------------- Temp store torrent file -------------------------------------------//
-    if(!$Properties['tempfileid']) {
-        $DB->query("INSERT INTO torrents_files_temp (filename, file, time) 
-                         VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')"); 
-        $Properties['tempfileid'] = $DB->inserted_id();
-        $Properties['tempfilename'] = $FileName;
-    }
-    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
-    include(SERVER_ROOT . '/sections/upload/upload.php');
-    die();
-}
-//}
 
 $TmpFileList = array();
 foreach ($FileList as $File) {
@@ -242,9 +223,61 @@ foreach ($FileList as $File) {
 }
 
 if ($Err) { // Show the upload form, with the data the user entered
+        $Properties['tempfilename'] = '';
+        $Properties['tempfileid'] = null;
     include(SERVER_ROOT . '/sections/upload/upload.php');
     die();
 }
+
+//if (check_perms('torrents_delete')){ // for testing on live site
+// do dupe check & return to upload page if detected
+$DupeResults = check_size_dupes($FileList);
+
+if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
+
+    //******************************************************************************//
+    //--------------- Temp store torrent file -------------------------------------------//
+    if(!$Properties['tempfileid']) {
+        $DB->query("INSERT INTO torrents_files_temp (filename, file, time) 
+                         VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')"); 
+        $Properties['tempfileid'] = $DB->inserted_id();
+        $Properties['tempfilename'] = $FileName;
+    }
+    $Err = 'The torrent contained one or more possible dupes. Please check carefully!';
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
+}
+//}
+
+/*
+$TmpFileList = array();
+foreach ($FileList as $File) {
+    list($Size, $Name) = $File;
+
+    if (preg_match('/INCOMPLETE~\*                                                         /i', $Name)) {
+        $Err = 'The torrent contained one or more forbidden files (' . $Name . ').';
+    }
+    if (preg_match('/\?/i', $Name)) {
+        $Err = 'The torrent contains one or more files with a ?, which is a forbidden character. Please rename the files as necessary and recreate the .torrent file.';
+    }
+    if (preg_match('/\:/i', $Name)) {
+        $Err = 'The torrent contains one or more files with a :, which is a forbidden character. Please rename the files as necessary and recreate the .torrent file.';
+    }
+    if (preg_match('/\.torrent/i', $Name)) {
+        $Err = 'The torrent contains one or more .torrent files inside the torrent. Please remove all .torrent files from your upload and recreate the .torrent file.';
+    }
+    if (!preg_match('/\./i', $Name)) {
+    //if ( strpos($Name, '.')===false)  {
+        $Err = "The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.<br/><strong>note: this can also be caused by selecting 'create encrypted' in some clients</strong> in which case please recreate the .torrent file without encryption selected.";
+    }
+    // Add file and size to array
+    $TmpFileList [] = $Name . '{{{' . $Size . '}}}'; // Name {{{Size}}}
+}
+
+if ($Err) { // Show the upload form, with the data the user entered
+    include(SERVER_ROOT . '/sections/upload/upload.php');
+    die();
+} */
 
 
 //******************************************************************************//
