@@ -1,45 +1,12 @@
 <?
 
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
-
-// The "order by x" links on columns headers
-function header_link($SortKey, $DefaultWay = "desc") {
-    global $OrderBy, $OrderWay;
-    if ($SortKey == $OrderBy) {
-        if ($OrderWay == "desc") {
-            $NewWay = "asc";
-        } else {
-            $NewWay = "desc";
-        }
-    } else {
-        $NewWay = $DefaultWay;
-    }
-
-    return "tools.php?action=speed_records&amp;order_way=" . $NewWay . "&amp;order_by=" . $SortKey . "&amp;" . get_url(array('order_way', 'order_by'));
-}
-
-
-function format_torrentid($torrentID, $name, $maxlen = 20) {
-    if ($torrentID == 0) return 'None';
-    if ($name == '') $tname = $torrentID;
-    else $tname = $name;
-    $str = '<a href="torrents.php?torrentid='.$torrentID.'" title="'.$tname.'">'. cut_string($tname, $maxlen).'</a>';
-    if ($name == '') $str = "torrent not found [$str]";
-    return $str;
-}
-function size_span($speed, $text) {
-    return '<span style="color:'.($speed>0?'black':'lightgrey').'">'.$text.'</span>';
-}
-function speed_span($speed, $highlightlimit, $color, $text) {
-    if ($speed>=$highlightlimit) $scolor = $color;
-    elseif ($speed>0) $scolor = 'black';
-    else $scolor = 'lightgrey';
-    return '<span style="color:'.$scolor.'">'.$text.'</span>';
-}
+ 
 
 
 if(!check_perms('users_manage_cheats')) { error(403); }
 
+$Action = 'speed_records';
 
 if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
@@ -74,13 +41,13 @@ show_header('Speed Reports','watchlist');
 ?>
 <div class="thin">
     <h2>Speed Reports</h2>
-	<div class="linkbox"> 
-       
-		<a href="tools.php?action=speed_watchlist">[Watchlist]</a>
-		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+	<div class="linkbox">
+		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
+		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
 		<a href="tools.php?action=speed_records">[Speed Records]</a>
+		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
 	</div>
-    <br/>
     <?
     
     //$Watchlist = get_user_watchlist(); 

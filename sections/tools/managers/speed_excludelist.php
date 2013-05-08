@@ -2,7 +2,7 @@
 
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
 
-$Action = 'speed_watchlist';
+$Action = 'speed_excludelist';
  
 if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
@@ -17,13 +17,14 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
 } else {
     $OrderBy = $_GET['order_by'];
 }
-
-show_header('Watchlist','watchlist');
+ 
+show_header('Exclude list','watchlist');
 
 ?>
 <div class="thin">
-    <h2>Speed Watchlist</h2>
-	<div class="linkbox">
+    <h2>Exclude list</h2>
+     
+	<div class="linkbox"> 
 		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
 		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
 		<a href="tools.php?action=speed_records">[Speed Records]</a>
@@ -31,20 +32,19 @@ show_header('Watchlist','watchlist');
 		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
 	</div>
 <?
- 
     list($Page,$Limit) = page_limit(50);
-
+     
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
-                        wl.UserID, um.Username as Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
+                       wl.UserID, um.Username as Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
                                  ui.Donor, ui.Warned, um.Enabled, um.PermissionID
-                  FROM users_watch_list AS wl
+                  FROM users_not_cheats AS wl
              LEFT JOIN users_main AS um ON um.ID=wl.UserID
              LEFT JOIN users_info AS ui ON ui.UserID=wl.UserID
              LEFT JOIN users_main AS um2 ON um2.ID=wl.StaffID
               ORDER BY $OrderBy $OrderWay
                  LIMIT $Limit");
     
-    $Watchlist = $DB->to_array('UserID');
+    $Userlist = $DB->to_array('UserID');
     $DB->query("SELECT FOUND_ROWS()");
     list($NumResults) = $DB->next_record();
   
@@ -53,16 +53,12 @@ show_header('Watchlist','watchlist');
 ?>
 	<div class="linkbox"><?=$Pages?></div>
 <?
-
-    print_user_list($Watchlist,'watchlist',"User watch list ($NumResults users)",'watchedred', 'Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
-                    note: use the list sparingly - this can quickly fill the database with a huge number of records.');
+     
+    print_user_list($Userlist,'excludelist',"Exclude users list ($NumResults users)",'watchedgreen', 
+            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
     
-
 ?>
 	<div class="linkbox"><?=$Pages?></div>
-<?
-
-?>
-     
+   
 </div>
 <? show_footer(); ?>

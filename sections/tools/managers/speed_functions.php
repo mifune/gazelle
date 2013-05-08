@@ -1,6 +1,39 @@
     
 <?
  
+// The "order by x" links on columns headers
+function header_link($SortKey, $DefaultWay = "desc") {
+    global $Action, $OrderBy, $OrderWay;
+    if ($SortKey == $OrderBy) {
+        if ($OrderWay == "desc") {
+            $NewWay = "asc";
+        } else {
+            $NewWay = "desc";
+        }
+    } else {
+        $NewWay = $DefaultWay;
+    }
+
+    return "tools.php?action=$Action&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
+}
+
+function format_torrentid($torrentID, $name, $maxlen = 20) {
+    if ($torrentID == 0) return 'None';
+    if ($name == '') $tname = $torrentID;
+    else $tname = $name;
+    $str = '<a href="torrents.php?torrentid='.$torrentID.'" title="'.$tname.'">'. cut_string($tname, $maxlen).'</a>';
+    if ($name == '') $str = "torrent not found [$str]";
+    return $str;
+}
+function size_span($speed, $text) {
+    return '<span style="color:'.($speed>0?'black':'lightgrey').'">'.$text.'</span>';
+}
+function speed_span($speed, $highlightlimit, $color, $text) {
+    if ($speed>=$highlightlimit) $scolor = $color;
+    elseif ($speed>0) $scolor = 'black';
+    else $scolor = 'lightgrey';
+    return '<span style="color:'.$scolor.'">'.$text.'</span>';
+}
 
 
 function print_speed_option($speed, $selected_speed){
@@ -9,7 +42,7 @@ function print_speed_option($speed, $selected_speed){
 <?
 }
 
-
+/*
 function get_user_notcheatslist() {
     global $DB;
     $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
@@ -24,7 +57,13 @@ function get_user_notcheatslist() {
     return $Userlist;
 }
 
-
+function print_user_notcheatslist() {
+    $Userlist = get_user_notcheatslist();
+    print_user_list($Userlist,'excludelist','Exclude users list','watchedgreen', 
+            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
+    return $Userlist;
+}
+ 
 function get_user_watchlist() {
     global $DB;
     $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
@@ -39,20 +78,13 @@ function get_user_watchlist() {
     return $Watchlist;
 }
 
-function print_user_notcheatslist() {
-    $Userlist = get_user_notcheatslist();
-    print_user_list($Userlist,'excludelist','Exclude users list','watchedgreen', 
-            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
-    return $Userlist;
-}
-
 
 function print_user_watchlist() {
     $Watchlist = get_user_watchlist();
     print_user_list($Watchlist,'watchlist','User watch list','watchedred', 'Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
                     note: use the list sparingly - this can quickly fill the database with a huge number of records.');
     return $Watchlist;
-}
+} */
 
 
 
@@ -69,10 +101,10 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
             </tr>
             <tr class="colhead">
                 <td class="center"></td>
-                <td class="center">User</td>
-                <td class="center">Time added</td>
-                <td class="center">added by</td>
-                <td class="center">comment</td>
+                <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
+                <td class="center"><a href="<?=header_link('Time') ?>">Time added</a></td>
+                <td class="center"><a href="<?=header_link('Staffname') ?>">added by</a></td>
+                <td class="center"><a href="<?=header_link('Comment') ?>">comment</a></td>
                 <!--<td class="center" width="100px" title="keep torrent records related to this user">keep torrents</td>-->
                 <td class="center" width="120px"></td>
             </tr>
@@ -114,17 +146,12 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
 <?                          } else {?>
                               <input type="button" onclick="excludelist_remove('<?=$UserID?>',true);return false;" value="Remove" title="Remove user from exclude list" />
 <?                          } ?>
-                                <!--<input type="submit" name="submit" value="Save" title="Save edited value" />
-                                <input type="submit" name="submit" value="Delete records" title="Remove all of this users records from the saved speed records" /> -->
-                               <!-- <input type="submit" name="submit" value="Remove" title="Remove user from watchlist" />  -->
                             </td>
-                      <!--  </form> -->
                     </tr>
 <?              }
             }
 ?>
     </table>
-    <br/>   
 <?
     //return $Userlist;
 }

@@ -105,6 +105,9 @@ switch ($_REQUEST['action']) {
     case 'speed_watchlist':
         include(SERVER_ROOT . '/sections/tools/managers/speed_watchlist.php');
         break;
+    case 'speed_excludelist':
+        include(SERVER_ROOT . '/sections/tools/managers/speed_excludelist.php');
+        break;
     
     case 'speed_records':
         include(SERVER_ROOT . '/sections/tools/managers/speed_reports_list.php');
@@ -112,9 +115,12 @@ switch ($_REQUEST['action']) {
     case 'speed_cheats':
         include(SERVER_ROOT . '/sections/tools/managers/speed_cheats.php');
         break;
+    case 'speed_zerocheats':
+        include(SERVER_ROOT . '/sections/tools/managers/speed_zerocheats.php');
+        break;
     
     
-    case 'ban_pattern_cheat':
+    case 'ban_zero_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
  
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
@@ -122,14 +128,20 @@ switch ($_REQUEST['action']) {
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
             
-/*  pattern matching: 
-SELECT uid, upspeed, uploaded, count(id) as cnt 
-FROM xbt_peers_history
-JOIN users_main AS um ON um.ID=xbt.uid
-JOIN users_info AS ui ON ui.UserID=xbt.uid
-WHERE upspeed!=0 
-GROUP BY  upspeed, uid, uploaded HAVING cnt > 1
- */
+            disable_users(array($_REQUEST['userid']), "Disabled for cheating (0 stat downloading) by $LoggedUser[Username]", 2);
+            
+        } 
+        
+        header("Location: tools.php?action=speed_zerocheats");
+        
+        break;
+    case 'ban_pattern_cheat':
+        if (!check_perms('admin_manage_cheats')) error(403);
+ 
+        if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
+            
+            $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
+            if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
              
             disable_users(array($_REQUEST['userid']), "Disabled for cheating ($_REQUEST[pattern] matching records) by $LoggedUser[Username]", 2);
             
