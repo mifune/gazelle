@@ -19,7 +19,7 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
 
 
                                     
-if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'history', 'time' ))) {
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'history', 'time' ,'JoinDate' ))) {
     $_GET['order_by'] = 'upspeed';
     $OrderBy = 'upspeed'; 
 } else {
@@ -213,7 +213,7 @@ list($Page,$Limit) = page_limit(50);
     
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                    uid, Username, COUNT(x.fid) as Peercount, Count(DISTINCT ud.TorrentID) as Grabbed, 
-                            MAX(x.upspeed) as upspeed, MAX(x.mtime) as time,
+                            MAX(x.upspeed) as upspeed, MAX(x.mtime) as time, ui.JoinDate, 
                              GROUP_CONCAT(DISTINCT LEFT(x.peer_id,8) SEPARATOR '|'), 
                              GROUP_CONCAT(DISTINCT x.ip SEPARATOR '|'),
                              ui.Donor, ui.Warned, um.Enabled, um.PermissionID, IF(w.UserID,'1','0'), IF(nc.UserID,'1','0'),
@@ -247,24 +247,25 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 <td style="width:70px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
                 <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
-                <td class="center" title="number of current peer records"><a href="<?=header_link('peercount') ?>">count</a></td>
+                <td class="center" title="number of current peer records"><a href="<?=header_link('peercount') ?>">peer on</a></td>
                 <td class="center" title="number of grabbed files"><a href="<?=header_link('grabbed') ?>">grabbed</a></td>
                 <td class="center" title="has seed history"><a href="<?=header_link('history') ?>">tracker history</a></td>
                 <td class="center"><span style="color:#777">-clientID-</span></td>
                 <td class="center">Client IP addresses</td>
                 <td class="center" style="min-width:120px"><a href="<?=header_link('time') ?>">last seen</a></td>
+                <td class="center" style="min-width:120px"><a href="<?=header_link('JoinDate') ?>">joined</a></td>
             </tr>
 <?
             $row = 'a';
             if($NumResults==0){
 ?> 
                     <tr class="rowb">
-                        <td class="center" colspan="9">no zero stat peers</td>
+                        <td class="center" colspan="10">no zero stat peers</td>
                     </tr>
 <?
             } else {
                 foreach ($Records as $Record) {
-                    list( $UserID, $Username, $CountRecords, $Grabbed, $MaxUpSpeed, $LastTime,  $PeerIDs, $IPs, 
+                    list( $UserID, $Username, $CountRecords, $Grabbed, $MaxUpSpeed, $LastTime, $JoinDate,  $PeerIDs, $IPs, 
                             $IsDonor, $Warned, $Enabled, $ClassID, $OnWatchlist, $OnExcludelist, $HasSeedHistory) = $Record;
                     $row = ($row === 'a' ? 'b' : 'a');
                     
@@ -338,12 +339,13 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         ?> 
                         </td>
                         <td class="center"><?=time_diff($LastTime, 2, true, false, 1)?></td>
+                        <td class="center"><?=time_diff($JoinDate, 2, true, false, 0)?></td>
                     </tr>
 <?
             if ($IPDupeCount>0) { 
 ?>
                     <tr id="linkeddiv<?=$UserID?>" style="font-size:0.9em;" class="hidden row<?=$row?>">
-                        <td colspan="8"> 
+                        <td colspan="10"> 
             <table width="100%" class="border">
 <?
             $i = 0;
