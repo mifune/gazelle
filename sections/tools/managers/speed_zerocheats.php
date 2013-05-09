@@ -18,8 +18,8 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
 }
 
 
-                                    
-if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'history', 'time' ,'JoinDate' ))) {
+                                    // 'upspeed', 
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'peercount', 'grabbed', 'history', 'time' ,'JoinDate' ))) {
     $_GET['order_by'] = 'upspeed';
     $OrderBy = 'upspeed'; 
 } else {
@@ -244,9 +244,9 @@ $Pages=get_pages($Page,$NumResults,50,9);
     <div class="head"><?=$NumResults?> users with suspicious zero stats</div>
         <table>
             <tr class="colhead">
-                <td style="width:70px"></td>
+                <td style="width:20px"></td>
                 <td class="center"><a href="<?=header_link('Username') ?>">User</a></td>
-                <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
+                <!--<td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>-->
                 <td class="center" title="number of current peer records"><a href="<?=header_link('peercount') ?>">peer on</a></td>
                 <td class="center" title="number of grabbed files"><a href="<?=header_link('grabbed') ?>">grabbed</a></td>
                 <td class="center" title="has seed history"><a href="<?=header_link('history') ?>">tracker history</a></td>
@@ -292,6 +292,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 ?> 
                     <tr class="row<?=$row?>">
                         <td>
+                            <!--
                            <a href="?action=speed_records&viewspeed=0&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
                            <div style="display:inline-block">
 <?                         if (!$OnWatchlist) {   
@@ -302,6 +303,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                             }  
  ?>                        </div>
                            <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
+                            -->
 <?
                             if ($Enabled=='1'){  ?>
                                 <a href="tools.php?action=ban_zero_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat zero stat cheat"><img src="static/common/symbols/ban2.png" alt="ban" /></a>
@@ -322,7 +324,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 ?>
                             
                         </td>
-                        <td class="center"><?=speed_span($MaxUpSpeed, $KeepSpeed, 'red', get_size($MaxUpSpeed).'/s')?></td>
+                        <!--<td class="center"><?=speed_span($MaxUpSpeed, $KeepSpeed, 'red', get_size($MaxUpSpeed).'/s')?></td>-->
                         <td class="center"><?=$CountRecords?></td>
                         <td class="center"><?=$Grabbed?></td>
                         <td class="center"><?=history_span($HasSeedHistory)?></td>
