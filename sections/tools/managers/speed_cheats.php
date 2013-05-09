@@ -37,6 +37,18 @@ list($DeleteRecordsMins, $KeepSpeed) = $DB->next_record();
 $ViewSpeed = isset($_GET['viewspeed'])?(int)$_GET['viewspeed']:$KeepSpeed;
 $BanSpeed = isset($_GET['banspeed'])?(int)$_GET['banspeed']:$KeepSpeed;
 
+$WHERE = '';
+$ViewInfo = ">= ".get_size($ViewSpeed);
+
+if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+    $ViewInfo .= ' (all)';
+} else {
+    $WHERE .= " AND um.Enabled='1' ";
+    //$WHERE .= " AND (um.ID IS NULL OR um.Enabled='1')";
+    $ViewInfo .= ' (enabled only)';
+}
+
+
 show_header('Speed Cheats','watchlist');
 
 ?>
@@ -73,9 +85,6 @@ show_header('Speed Cheats','watchlist');
             <tr class="rowb">
                 <td class="center">
                     Viewing: <?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)
-<?                  if ($ViewInfo!='all over speed specified') { ?>
-                        <a href="tools.php?action=speed_records&viewspeed=<?=$ViewSpeed?>" title="Removes any user or torrent filters for viewing (still applies speed filter)">View All</a>
-<?                  } ?>
                 </td>
                 <td class="center">
                             <label for="viewbanned" title="Keep Speed">include disabled users </label>
@@ -181,7 +190,7 @@ if ($OrderBy=="upspeed") $SQLOrderBy="MAX(xbt.upspeed)";
 elseif ($OrderBy=="uploaded") $SQLOrderBy="MAX(xbt.uploaded)"; 
 elseif ($OrderBy=="mtime") $SQLOrderBy="MAX(xbt.mtime)"; 
 elseif ($OrderBy=="count") $SQLOrderBy="Count(xbt.id)";
-else $SQLOrderBy=$OrderBy; */
+else $SQLOrderBy=$OrderBy; 
 
 if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
     $ViewInfo .= ' (all)';
@@ -189,7 +198,7 @@ if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
     $WHERE .= " AND um.Enabled='1' ";
     //$WHERE .= " AND (um.ID IS NULL OR um.Enabled='1')";
     $ViewInfo .= ' (enabled only)';
-}
+} */
 
 $GroupBy = '';
 $Having = '';

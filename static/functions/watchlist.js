@@ -16,6 +16,13 @@ function change_view(){
               +($('#viewptnupload').raw().checked?'&viewptnupload=1':'')+($('#viewptnupspeed').raw().checked?'&viewptnupspeed=1':'')
                 +($('#viewptnzero').raw().checked?'&viewptnzero=1':'');
 }
+
+function change_zero_view() {
+    var viewdays=$('#viewdays').raw().options[$('#viewdays').raw().selectedIndex].value;
+    var grabbed =parseInt($('#grabbed').raw().value);
+    location.href = "tools.php?action=speed_zerocheats&viewdays="+viewdays+"&grabbed="+grabbed;
+}
+
 // set all checkboxes in formElem by val of checkbox passed
 function toggle_pattern() {
     var checked = $('#viewptnall').raw().checked;

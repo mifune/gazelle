@@ -133,7 +133,8 @@ show_header('Speed Reports','watchlist');
         $WHERE = " AND xbt.fid='$_GET[torrentid]' ";
         $ViewInfo = "Torrent ($_GET[torrentid]) &nbsp;&nbsp; ". $TWatchlist[$_GET['torrentid']]['Name'] .' &nbsp;&nbsp; ';
     } else {
-        $ViewInfo = 'all over speed specified';
+        //$ViewInfo = 'all over speed specified';
+        $ViewInfo = ">= ".get_size($ViewSpeed);
     }
     if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
         $ViewInfo .= ' (all)';
@@ -195,8 +196,8 @@ show_header('Speed Reports','watchlist');
             <tr>  
                 <td class="center">
                     Viewing: <?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)
-<?                  if ($ViewInfo!='all over speed specified') { ?>
-                        <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&viewbanned=<?=$_GET['viewbanned']?>" title="Removes any user or torrent filters for viewing (still applies speed filter)">View All</a>
+<?                  if ($ViewInfo!= ">= ".get_size($ViewSpeed)) { ?>
+                        <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&viewbanned=<?=$_GET['viewbanned']?>&order_by=<?=$OrderBy?>&order_way=<?=$OrderWay?>" title="Removes any user or torrent filters for viewing (still applies speed filter)">View All</a>
 <?                  } ?>
                 </td>
                 <td class="center">

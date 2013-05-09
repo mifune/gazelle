@@ -2,6 +2,9 @@
 
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
  
+function history_span($value) {
+    return '<span style="color:'.($value=='true'?'red':'lightgrey').'">'.$value.'</span>';
+}
 
 if(!check_perms('users_manage_cheats')) { error(403); }
 
@@ -14,11 +17,7 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'desc';
 }
 
-                       //     xbt.id, uid, Username, xbt.downloaded, remaining, t.Size, xbt.uploaded, 
-                     ////       upspeed, downspeed, timespent, peer_id, xbt.ip, tg.ID, fid, tg.Name, xbt.mtime
-                                    
-// User 	Remaining 	Uploaded 	UpSpeed 	ClientIPaddress 	date time 	
-//	TorrentID 	Total 	Downloaded 	DownSpeed 	                	total time 
+
                                     
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'time' ))) {
     $_GET['order_by'] = 'upspeed';
@@ -27,7 +26,13 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
     $OrderBy = $_GET['order_by'];
 }
 
-         
+
+$NumGrabbed = isset($_GET['grabbed']) ? (int)$_GET['grabbed'] : 1;
+$ViewDays = isset($_GET['viewdays']) ? (int)$_GET['viewdays'] : 1;
+
+
+$ViewInfo = "Min files: $NumGrabbed, joined > $ViewDays day ago" ;
+
 show_header('Zero Stat Cheats','watchlist');
 
 ?>
@@ -45,6 +50,45 @@ show_header('Zero Stat Cheats','watchlist');
 
     $CanManage = check_perms('admin_manage_cheats');
  
+    
+    
+?>
+  
+    <table class="box pad"> 
+            <tr class="colhead"><td colspan="3">view settings: </td></tr>
+            <tr class="rowb">
+                <td class="center">
+                    Viewing: <?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)
+
+                </td>
+                <td class="center">
+
+                    <label for="grabbed" title="Minimum number of grabbed files">Grabbed files </label>
+                    <input type="text" id="grabbed" name="grabbed" size="3" value="<?=$NumGrabbed?>" onblur="change_zero_view()" />
+                </td>
+                <td class="center">
+                    
+                    <label for="viewdays" title="Exclude users who joined recently">Exclude users who joined in the last</label>
+                    <select id="viewdays" name="viewdays" title="Exclude users who joined in the specified time" onchange="change_zero_view()">
+                        <option value="0"<?=($ViewDays==0?' selected="selected"':'');?>>&nbsp;0&nbsp;&nbsp;</option>
+                        <option value="1"<?=($ViewDays==1?' selected="selected"':'');?>>&nbsp;1 day&nbsp;&nbsp;</option>
+                        <option value="7"<?=($ViewDays==7?' selected="selected"':'');?>>&nbsp;1 week&nbsp;&nbsp;</option>
+                        <option value="28"<?=($ViewDays==28?' selected="selected"':'');?>>&nbsp;4 weeks&nbsp;&nbsp;</option>
+                        <option value="28"<?=($ViewDays==28?' selected="selected"':'');?>>&nbsp;26 weeks&nbsp;&nbsp;</option>
+                        <option value="365"<?=($ViewDays==365?' selected="selected"':'');?>>&nbsp;1 year&nbsp;&nbsp;</option>
+ 
+                    </select>
+                     
+                </td>
+            </tr>
+    </table>
+    <br/>  
+    
+    
+    
+    
+<?    
+    
 //---------- print records
             
 list($Page,$Limit) = page_limit(50);
@@ -157,7 +201,7 @@ list($Page,$Limit) = page_limit(50);
 
 
 /*  
- * 
+ * AND um.Enabled='1'
  * 
                          WHERE nc.UserID IS NULL
  */
@@ -168,15 +212,18 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                             MAX(x.upspeed) as upspeed, MAX(x.mtime) as time,
                              GROUP_CONCAT(DISTINCT LEFT(x.peer_id,8) SEPARATOR '|'), 
                              GROUP_CONCAT(DISTINCT x.ip SEPARATOR '|'),
-                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID, IF(w.UserID,'1','0')
+                             ui.Donor, ui.Warned, um.Enabled, um.PermissionID, IF(w.UserID,'1','0'), IF(nc.UserID,'1','0'),
+                             IF(ui.SeedHistory,'true','false') as history
                FROM xbt_files_users AS x 
                JOIN torrents AS t ON t.ID=x.fid AND x.active=1 
-               JOIN users_main AS um ON um.ID=x.uid AND  um.Downloaded=0 AND ( um.Uploaded=524288000 OR  um.Uploaded=0) AND um.Enabled='1'  
+               JOIN users_main AS um ON um.ID=x.uid AND  um.Downloaded=0 AND ( um.Uploaded=524288000 OR  um.Uploaded=0)   
                JOIN users_info AS ui ON ui.UserID=um.ID
                LEFT JOIN users_downloads AS ud ON ud.UserID=um.ID
                LEFT JOIN users_watch_list AS w ON w.UserID=x.uid
                LEFT JOIN users_not_cheats AS nc ON nc.UserID=x.uid
+                         WHERE ui.JoinDate<'".time_minus(3600*24*$ViewDays)."' 
                       GROUP BY x.uid   
+                        HAVING Grabbed >= '$NumGrabbed'
                       ORDER BY $OrderBy $OrderWay 
                          LIMIT $Limit");
 
@@ -198,23 +245,23 @@ $Pages=get_pages($Page,$NumResults,50,9);
                 <td class="center"><a href="<?=header_link('upspeed') ?>">Max UpSpeed</a></td>
                 <td class="center" title="number of current peer records"><a href="<?=header_link('peercount') ?>">count</a></td>
                 <td class="center" title="number of grabbed files"><a href="<?=header_link('grabbed') ?>">grabbed</a></td>
+                <td class="center" title="has seed history"><a href="<?=header_link('history') ?>">tracker history</a></td>
                 <td class="center"><span style="color:#777">-clientID-</span></td>
                 <td class="center">Client IP addresses</td>
                 <td class="center" style="min-width:120px"><a href="<?=header_link('time') ?>">last seen</a></td>
-                <!--<td class="center"></td>-->
             </tr>
 <?
             $row = 'a';
             if($NumResults==0){
 ?> 
                     <tr class="rowb">
-                        <td class="center" colspan="8">no zero stat peers</td>
+                        <td class="center" colspan="9">no zero stat peers</td>
                     </tr>
 <?
             } else {
                 foreach ($Records as $Record) {
-                    list( $UserID, $Username, $CountRecords, $Grabbed, $MaxUpSpeed, $LastTime, 
-                            $PeerIDs, $IPs, $IsDonor, $Warned, $Enabled, $ClassID, $OnWatchlist, $OnExcludelist) = $Record;
+                    list( $UserID, $Username, $CountRecords, $Grabbed, $MaxUpSpeed, $LastTime,  $PeerIDs, $IPs, 
+                            $IsDonor, $Warned, $Enabled, $ClassID, $OnWatchlist, $OnExcludelist, $HasSeedHistory) = $Record;
                     $row = ($row === 'a' ? 'b' : 'a');
                     
                     $PeerIDs = explode('|', $PeerIDs);
@@ -273,6 +320,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         <td class="center"><?=speed_span($MaxUpSpeed, $KeepSpeed, 'red', get_size($MaxUpSpeed).'/s')?></td>
                         <td class="center"><?=$CountRecords?></td>
                         <td class="center"><?=$Grabbed?></td>
+                        <td class="center"><?=history_span($HasSeedHistory)?></td>
                         <td class="center"><?
                             foreach($PeerIDs as $PeerID) {
                         ?>  <span style="color:#555"><?=substr($PeerID,0,8)  ?></span> <br/>
