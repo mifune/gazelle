@@ -63,15 +63,10 @@ show_header('Speed Cheats','watchlist');
 		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
 	</div>
 <?
-    //$Watchlist = get_user_watchlist();  // print_user_watchlist('cheats');
-      
-    //$Excludelist = print_user_notcheatslist('cheats');
-?>
-    <div class="head">options</div>
-<?
-
+ 
     $CanManage = check_perms('admin_manage_cheats');
 ?>
+    <div class="head">options</div>
     <table class="box pad">
         <form action="tools.php" method="post">
             

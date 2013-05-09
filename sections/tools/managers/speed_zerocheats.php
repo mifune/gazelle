@@ -3,7 +3,7 @@
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
  
 function history_span($value) {
-    return '<span style="color:'.($value=='true'?'red':'lightgrey').'">'.$value.'</span>';
+    return '<span style="color:'.($value=='false'?'red':'lightgrey').'">'.$value.'</span>';
 }
 
 if(!check_perms('users_manage_cheats')) { error(403); }
@@ -19,7 +19,7 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
 
 
                                     
-if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'time' ))) {
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', 'upspeed', 'peercount', 'grabbed', 'history', 'time' ))) {
     $_GET['order_by'] = 'upspeed';
     $OrderBy = 'upspeed'; 
 } else {
@@ -27,11 +27,20 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
 }
 
 
-$NumGrabbed = isset($_GET['grabbed']) ? (int)$_GET['grabbed'] : 1;
+$NumGrabbed = isset($_GET['grabbed']) ? (int)$_GET['grabbed'] : 2;
 $ViewDays = isset($_GET['viewdays']) ? (int)$_GET['viewdays'] : 1;
 
 
 $ViewInfo = "Min files: $NumGrabbed, joined > $ViewDays day ago" ;
+
+$WHERE = ''; 
+
+if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+    $ViewInfo .= ' (all)';
+} else {
+    $WHERE .= " AND um.Enabled='1' ";
+    $ViewInfo .= ' (enabled only)';
+}
 
 show_header('Zero Stat Cheats','watchlist');
 
@@ -46,20 +55,15 @@ show_header('Zero Stat Cheats','watchlist');
 		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
 		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
 	</div> 
-<?
-
-    $CanManage = check_perms('admin_manage_cheats');
  
-    
-    
-?>
-  
+    <div class="head">options</div>
     <table class="box pad"> 
-            <tr class="colhead"><td colspan="3">view settings: </td></tr>
+        <tr class="colhead"><td colspan="3">view settings: <span style="float:right;font-weight: normal"><?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)</span> </td></tr>
             <tr class="rowb">
                 <td class="center">
-                    Viewing: <?=$ViewInfo?> &nbsp; (order: <?="$OrderBy $OrderWay"?>)
-
+                            <label for="viewbanned" title="Keep Speed">include disabled users </label>
+                        <input type="checkbox" value="1" onchange="change_zero_view()"
+                               id="viewbanned" name="viewbanned" <? if (isset($_GET['viewbanned']) && $_GET['viewbanned'])echo' checked="checked"'?> />
                 </td>
                 <td class="center">
 
@@ -221,7 +225,7 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                LEFT JOIN users_downloads AS ud ON ud.UserID=um.ID
                LEFT JOIN users_watch_list AS w ON w.UserID=x.uid
                LEFT JOIN users_not_cheats AS nc ON nc.UserID=x.uid
-                         WHERE ui.JoinDate<'".time_minus(3600*24*$ViewDays)."' 
+                         WHERE ui.JoinDate<'".time_minus(3600*24*$ViewDays)."' $WHERE
                       GROUP BY x.uid   
                         HAVING Grabbed >= '$NumGrabbed'
                       ORDER BY $OrderBy $OrderWay 

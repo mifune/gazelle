@@ -20,7 +20,7 @@ function change_view(){
 function change_zero_view() {
     var viewdays=$('#viewdays').raw().options[$('#viewdays').raw().selectedIndex].value;
     var grabbed =parseInt($('#grabbed').raw().value);
-    location.href = "tools.php?action=speed_zerocheats&viewdays="+viewdays+"&grabbed="+grabbed;
+    location.href = "tools.php?action=speed_zerocheats&viewdays="+viewdays+"&grabbed="+grabbed+($('#viewbanned').raw().checked?'&viewbanned=1':'');
 }
 
 // set all checkboxes in formElem by val of checkbox passed
