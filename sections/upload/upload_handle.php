@@ -594,11 +594,20 @@ if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning..
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
     $Message = "[table][tr][th]Name[/th][th]duped file?[/th][/tr]";
     foreach ($DupeResults as $ID => $dupedata) {
-        $Message .= "[tr][td][url=/torrents.php?id=$dupedata[ID]]$dupedata[Name][/url][/td][td]$dupedata[dupedfile][/td][/tr]" ;
+        if(isset($dupedata['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
+ 
+            $Message .= "[tr][td]This could match many files because it is $dupedata[excluded][br]Please make sure you have searched carefully to ensure this is not a dupe.";
+            $Message .= "[br]Try [url=/torrents.php?action=advanced&taglist=".urlencode(implode($Tags, ' ')) ."]searching tags[/url]";
+            $Message .= " and [url=/torrents.php?action=advanced&searchtext=".urlencode($LogName)."]searching title[/url]";
+            $Message .= " and [url=/torrents.php?action=advanced&filelist=".urlencode($dupedata['dupedfileexact'])."]searching filelist[/url][/td]";
+            $Message .= "[td]$dupedata[dupedfile][/td][/tr]" ;
+        } else {
+            $Message .= "[tr][td][url=/torrents.php?id=$dupedata[ID]]$dupedata[Name][/url][/td][td]$dupedata[dupedfile][/td][/tr]" ;
+        }
     }
     $Message .= "[/table]";
-    $Message = db_string("Possible dupe was uploaded:[br][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username]
-[br]{$Message}[br][url=/torrents.php?id=$GroupID&action=dupe_check]View detailed possible dupelist for this torrent[/url]");
+    $Message = db_string("Possible dupe was uploaded:[br][size=2][b][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username][/b][/size]
+[br]{$Message}[br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
    
 	$DB->query("INSERT INTO staff_pm_conversations 
 				 (Subject, Status, Level, UserID, Date)
