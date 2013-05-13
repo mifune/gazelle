@@ -255,10 +255,10 @@ else {
 
 						if(isset($_POST['keeplogged']) && $_POST['keeplogged']) {
 							$KeepLogged = 1;
-							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false);
+							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false,true);
 						} else {
 							$KeepLogged = 0;
-							setcookie('session', $Cookie,0,'/','',false);
+							setcookie('session', $Cookie,0,'/','',false,true);
 						}
 						
 						//TODO: another tracker might enable this for donors, I think it's too stupid to bother adding that
