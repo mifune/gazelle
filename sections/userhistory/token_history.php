@@ -102,7 +102,7 @@ $Pages=get_pages($Page, $NumResults, 50);
     <div class="head">Slots in use for <?=format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'])?></div>
     <table>
         <tr class="colhead">
-            <td><a href="<?=header_link('Torrent') ?>">Torrent</a></td>
+            <td style="width:45%"><a href="<?=header_link('Torrent') ?>">Torrent</a></td>
             <td class="center"><a href="<?=header_link('Size') ?>">Size</a></td>
             <td class="center"><a href="<?=header_link('Time') ?>">Time posted</a></td>
             <td class="center"><a href="<?=header_link('Freeleech') ?>">Freeleech</a></td>
