@@ -121,15 +121,19 @@ $Pages=get_pages($Page, $NumResults, 50);
             if ($FreeLeech == '0000-00-00 00:00:00') {
                 $fl = 'No';
             } else {
-                $fl = $FreeLeech > sqltime() ? 
-                    time_diff($FreeLeech) : '<span class="time" title="' . time_diff($FreeLeech,2,false,false,1) . '">Expired</span>';
+                $fl = time_diff($FreeLeech) ;
+                if ($FreeLeech <= sqltime() ) $fl = '<span class="red">'.$fl. '</span>' ;
+                //$fl = $FreeLeech > sqltime() ? 
+                //    time_diff($FreeLeech) : '<span class="time" title="' . time_diff($FreeLeech,2,false,false,1) . '">Expired</span>';
             }
 
             if ($DoubleSeed == '0000-00-00 00:00:00') {
                 $ds = 'No';
             } else {
-                $ds = $DoubleSeed > sqltime() ?
-                    time_diff($DoubleSeed) : '<span class="time" title="' . time_diff($DoubleSeed,2,false,false,1) . '">Expired</span>';
+                $ds = time_diff($DoubleSeed) ;
+                if ($DoubleSeed <= sqltime() ) $ds = '<span class="red">'.$ds. '</span>' ;
+               // $ds = $DoubleSeed > sqltime() ?
+                //    time_diff($DoubleSeed) : '<span class="time" title="' . time_diff($DoubleSeed,2,false,false,1) . '">Expired</span>';
             }
 ?>
         <tr class="<?=($i?'rowa':'rowb')?>">
