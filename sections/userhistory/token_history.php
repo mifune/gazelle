@@ -103,8 +103,8 @@ $Pages=get_pages($Page, $NumResults, 50);
     <table>
         <tr class="colhead">
             <td style="width:45%"><a href="<?=header_link('Torrent') ?>">Torrent</a></td>
-            <td class="center"><a href="<?=header_link('Size') ?>">Size</a></td>
-            <td class="center"><a href="<?=header_link('Time') ?>">Time posted</a></td>
+            <td><a href="<?=header_link('Size') ?>">Size</a></td>
+            <td><a href="<?=header_link('Time') ?>">Time posted</a></td>
             <td class="center"><a href="<?=header_link('Freeleech') ?>">Freeleech</a></td>
             <td class="center"><a href="<?=header_link('Doubleseed') ?>">Doubleseed</a></td>
         </tr>
@@ -121,25 +121,27 @@ $Pages=get_pages($Page, $NumResults, 50);
             if ($FreeLeech == '0000-00-00 00:00:00') {
                 $fl = 'No';
             } else {
-                $fl = time_diff($FreeLeech) ;
-                if ($FreeLeech <= sqltime() ) $fl = '<span class="red">'.$fl. '</span>' ;
-                //$fl = $FreeLeech > sqltime() ? 
-                //    time_diff($FreeLeech) : '<span class="time" title="' . time_diff($FreeLeech,2,false,false,1) . '">Expired</span>';
+                $fl = time_diff($FreeLeech,2,true,false,1) ;
+                //if ($FreeLeech <= sqltime() ) $fl = '<span style="color:red">'.$fl. '</span>' ;
+                
+                $fl = $FreeLeech > sqltime() ? 
+                    time_diff($FreeLeech) : '<span style="color:red" title="' . time_diff($FreeLeech,2,false,false,1) . '">Expired</span>';
             }
 
             if ($DoubleSeed == '0000-00-00 00:00:00') {
                 $ds = 'No';
             } else {
-                $ds = time_diff($DoubleSeed) ;
-                if ($DoubleSeed <= sqltime() ) $ds = '<span class="red">'.$ds. '</span>' ;
-               // $ds = $DoubleSeed > sqltime() ?
-                //    time_diff($DoubleSeed) : '<span class="time" title="' . time_diff($DoubleSeed,2,false,false,1) . '">Expired</span>';
+                $ds = time_diff($DoubleSeed,2,true,false,1);
+                //if ($DoubleSeed <= sqltime() ) $ds = '<span style="color:red">'.$ds. '</span>' ;
+                
+                $ds = $DoubleSeed > sqltime() ?
+                    time_diff($DoubleSeed) : '<span style="color:red" title="' . time_diff($DoubleSeed,2,false,false,1) . '">Expired</span>';
             }
 ?>
         <tr class="<?=($i?'rowa':'rowb')?>">
             <td><?=$Name?></td>
-            <td class="center"><?=get_size($Size)?></td>
-            <td class="center"><?=time_diff($Time)?></td>
+            <td><?=get_size($Size)?></td>
+            <td><?=time_diff($Time,2,true,false,1)?></td>
             <td class="center"><?=$fl?></td>
             <td class="center"><?=$ds?></td>
         </tr>
