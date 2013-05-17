@@ -149,7 +149,7 @@ $DonateLevels = array ( 1 => 1.0, 10 => 1.5, 50 => 2.0, 100 => 5 );
 define('TORRENT_SIG_MAX_HEIGHT', 800);
 
 // key should be bytesize to exclude from dupe via bytesize check, value is reason displayed to user
-$ExcludeBytesDupeCheck = array ( 1065353216=>'a standard vob size',  1073739776 => 'a standard vob size' );
+$ExcludeBytesDupeCheck = array ( 734015488=>'a standard cd size', 1065353216=>'a standard vob size',  1073739776 => 'a standard vob size' );
 
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');

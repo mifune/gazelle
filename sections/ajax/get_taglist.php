@@ -5,10 +5,15 @@ if (!check_perms('site_manage_tags')) error(403,true);
 
 
 $Char = $_GET['char'];
+$MinUses = (int)$_GET['minuses'];
 
 if ($Char == 'all') $WHERE= "";
 elseif ($Char == 'other') $WHERE= " AND t.Name REGEXP '^[^a-z]' ";
 else  $WHERE= " AND LEFT( t.Name, 1)='$Char' ";
+
+if ($MinUses>0){
+    $WHERE .= " AND t.Uses >= '$MinUses' ";
+}
 
 $DB->query("SELECT t.ID, t.Name, t.Uses, Count(ts.ID)
                                   FROM tags AS t 

@@ -23,7 +23,7 @@ show_header('Sandbox', 'bbcode');
                     <div id="preview_content" class="box pad"></div> 
                 </div>
                 <? $Text->display_bbcode_assistant("body",get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
-                <textarea id="body" name="body" class="long" rows="10"></textarea>
+                <textarea id="body" name="body" class="long" rows="10" onkeyup="resize('body');" ></textarea>
                 <div class="center">
                     <input  id="preview_button" type="button" value="Preview" onclick="Sandbox_Preview();" /> 
                 </div>

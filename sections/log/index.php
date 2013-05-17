@@ -100,6 +100,8 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 		switch ($MessageParts[$i]) {
 			case "Tag":
 			case "tag":
+			case "Synonym":
+			case "synonym":
 				$Tag = $MessageParts[$i + 1];
 				//$Tag = str_replace(',', '', $Tag);
 				if (is_string($Tag)) {

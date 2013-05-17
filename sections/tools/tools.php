@@ -44,6 +44,8 @@ show_header('Staff Tools');
 			<tr><td><a href="tools.php?action=news">News</a></td></tr>
 <? } if (check_perms('site_manage_tags')) { ?>
 			<tr><td><a href="tools.php?action=official_tags">Official Tags Manager</a></td></tr> 
+<? } if (check_perms('site_convert_tags')) { ?>
+			<tr><td><a href="tools.php?action=official_synonyms">Official Synonyms Manager</a></td></tr> 
 <? } if (check_perms('users_mod')) { ?>
 			<tr><td><a href="torrents.php?action=allcomments">Recent Comments</a></td></tr> 
 <? } if (check_perms('users_manage_cheats')) { ?>

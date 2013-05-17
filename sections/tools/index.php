@@ -485,18 +485,23 @@ switch ($_REQUEST['action']) {
     case 'ocelot':
         include(SERVER_ROOT . '/sections/tools/managers/ocelot.php');
         break;
+    
+    
+    
+
     case 'official_tags':
         include(SERVER_ROOT . '/sections/tools/managers/official_tags.php');
         break;
-
-
-
-
-
     case 'official_tags_alter':
         include(SERVER_ROOT . '/sections/tools/managers/official_tags_alter.php');
         break;
 
+    case 'official_synonyms':
+        include(SERVER_ROOT . '/sections/tools/managers/official_synonyms.php');
+        break;
+    case 'official_synonyms_alter':
+        include(SERVER_ROOT . '/sections/tools/managers/official_synonyms_alter.php');
+        break;
 
 
 

@@ -21,6 +21,12 @@ switch ($_GET['action']){
 		require(SERVER_ROOT.'/sections/ajax/check_donation.php');
 		break;
     
+	case 'check_synonym_list':
+		require(SERVER_ROOT.'/sections/ajax/check_synonym_list.php');
+		break;
+	case 'input_synonyms_list':
+		require(SERVER_ROOT.'/sections/ajax/input_synonyms_list.php');
+		break;
 	case 'get_taglist':
 		require(SERVER_ROOT.'/sections/ajax/get_taglist.php');
 		break;
