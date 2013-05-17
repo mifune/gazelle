@@ -15,7 +15,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
         list($Size, $Name) = $File;
    
         //skip matching files < 1mb in size
-        if ($Size < 1024*1024) continue; 
+        if ($Size < 1024*1024*2) continue; 
         
         if(isset($ExcludeBytesDupeCheck[$Size])) { 
             $FakeEntry = array( array( 'excluded'=> $ExcludeBytesDupeCheck[$Size], 
