@@ -1,7 +1,7 @@
 <?
 
 function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
-    global $SS, $ExcludeBytesDupeCheck;
+    global $SS, $ExcludeBytesDupeCheck, $Image_FileTypes;
     
     $SS->limit(0, 10, 10);
     $SS->SetSortMode(SPH_SORT_ATTR_DESC, 'time');
@@ -16,6 +16,11 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
    
         //skip matching files < 1mb in size
         if ($Size < 1024*1024*2) continue; 
+        
+        //preg_match_all('/\.([^\.]*)\{\{\{/ism', $FileList, $Extensions);
+        preg_match('/\.[^\.]+$/i', $Name, $ext);
+        if (in_array($ext[0], $Image_FileTypes)) continue;
+        
         
         if(isset($ExcludeBytesDupeCheck[$Size])) { 
             $FakeEntry = array( array( 'excluded'=> $ExcludeBytesDupeCheck[$Size], 
