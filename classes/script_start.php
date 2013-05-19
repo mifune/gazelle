@@ -2333,7 +2333,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             $DB->query("SELECT x.fid 
                           FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid 
                          WHERE x.uid='$UserID' AND x.fid='$TorrentID' ");
-            $snatched = ($DB->record_count()>0) ? '1' : '0';
+            $snatched = ($DB->record_count()>0) ? '1' : 'unset';
                         
             $SnatchedTorrents[$TorrentID] = $snatched ;
             // slightly heterodox method - xbt_snatched is updated directly from the tracker ... so we need
@@ -2351,7 +2351,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
                 $DB->query("SELECT ud.TorrentID 
                                   FROM users_downloads AS ud JOIN torrents AS t ON t.ID=ud.TorrentID 
                                  WHERE ud.UserID='$UserID' AND ud.TorrentID='$TorrentID' ");
-                $grabbed = ($DB->record_count()>0) ? '1' : '0';
+                $grabbed = ($DB->record_count()>0) ? '1' : 'unset';
 
                 $GrabbedTorrents[$TorrentID] = $grabbed ;
                 $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
