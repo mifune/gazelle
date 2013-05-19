@@ -201,7 +201,7 @@ foreach ($TorrentList as $GroupID=>$Group) {
 ?>
 				<img src="<?=$Image?>" alt="<?=$DisplayName?>" title="<?=$DisplayName?>"  />
 <?	} else { ?>
-				<?=$DisplayName?>
+				<div class="noimagepad"><div class="box noimage" title="<?=$DisplayName?>" ><?=$DisplayName?></div></div>
 <?	} ?>
 			</a>
 		</li>
@@ -417,7 +417,7 @@ if($CollageCovers != 0) { ?>
 }?>
 			</ul>
 		</div>
-<?		if ($NumGroups > $CollageCovers) { ?>
+<?		if ($NumGroups > $CollageCovers) {  ?>
 		<div class="linkbox pager" style="clear: left;" id="pageslinksdiv">
 			<span id="firstpage" class="invisible"><a href="#" class="pageslink" onClick="collageShow.page(0, this); return false;">&lt;&lt; First</a> | </span>
 			<span id="prevpage" class="invisible"><a href="#" id="prevpage"  class="pageslink" onClick="collageShow.prevPage(); return false;">&lt; Prev</a> | </span>
@@ -431,7 +431,7 @@ if($CollageCovers != 0) { ?>
 		<script type="text/javascript">
 			collageShow.init(<?=json_encode($CollagePages)?>);
 		</script>
-<?		}
+<? 		}
 } ?>
             <div class="head"><strong>Description</strong></div>
 		<div class="box">

@@ -19,10 +19,16 @@ ul.collage_images li {
     margin: 0;
     list-style: none;
     list-style-type: none;
+   /*  min-height: 180px; 
     max-height: 280px;
     min-width: 160px;
     max-width: 160px;
+   */
+    max-height: 350px;
+    min-width: 200px;
+    max-width: 200px;
     text-align: center;
+    padding: 5px 3px ;
 }
 
 ul.collage_images li a {
@@ -31,9 +37,16 @@ ul.collage_images li a {
 }
 
 ul.collage_images img {
-    max-height: 280px;
-    min-width: 160px;
-    max-width: 160px;
+    max-height: 350px;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+
+div.noimagepad {
+}
+div.noimage {
+    padding: 10px 5px 10px;
 }
 
 
