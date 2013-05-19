@@ -2346,6 +2346,17 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
         
         if($SnatchedTorrents[$TorrentID]!=='1') { // only needed if not snatched
             $GrabbedTorrents = $Cache->get_value('users_torrents_grabbed_' .$UserID );
+            if ($GrabbedTorrents===false) {
+
+                $DB->query("SELECT ud.TorrentID 
+                                  FROM users_downloads AS ud JOIN torrents AS t ON t.ID=ud.TorrentID 
+                                 WHERE ud.UserID='$UserID' ");
+                
+                $GrabbedTorrents = $DB->to_array('TorrentID');
+ 
+                $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
+            }
+            /*
             if ($GrabbedTorrents===false || !isset($GrabbedTorrents[$TorrentID])) {
 
                 $DB->query("SELECT ud.TorrentID 
@@ -2355,7 +2366,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
 
                 $GrabbedTorrents[$TorrentID] = $grabbed ;
                 $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
-            }
+            }*/
         }
       
         
@@ -2375,7 +2386,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Previously Snatched Torrent">';
                 $Icons .= '<span class="icon icon_disk_snatched"></span>';
                 $Icons .= '</a>';               
-            } elseif ($GrabbedTorrents[$TorrentID] == '1') {
+            } elseif (isset($GrabbedTorrents[$TorrentID] )) {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'"  title="Previously Grabbed Torrent File">';
                 $Icons .= '<span class="icon icon_disk_grabbed"></span>';
                 $Icons .= '</a>';
@@ -2393,7 +2404,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
                 $Icons .= '<span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
             } elseif ($SnatchedTorrents[$TorrentID] == '1') {
                 $Icons .= '<span class="icon icon_disk_snatched" title="Warning: This torrent is marked for deletion"></span>';           
-            } elseif ($GrabbedTorrents[$TorrentID] == '1') {
+            } elseif (isset($GrabbedTorrents[$TorrentID] )) {
                 $Icons .= '<span class="icon icon_disk_grabbed" title="Warning: This torrent is marked for deletion"></span>'; 
                 
             } //elseif (empty($TorrentUserStatus[$TorrentID])) {

@@ -168,7 +168,7 @@ if ($_REQUEST['usetoken'] == 1 && $FreeTorrent == 0) {
 $DB->query("INSERT INTO users_downloads (UserID, TorrentID, Time) VALUES ('$UserID', '$TorrentID', '".sqltime()."') ON DUPLICATE KEY UPDATE Time=VALUES(Time)");
 
 $GrabbedTorrents = $Cache->get_value('users_torrents_grabbed_' .$UserID );
-$GrabbedTorrents[$TorrentID] =  '1' ;
+$GrabbedTorrents[$TorrentID] =  array($TorrentID) ;
 $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
 
       
