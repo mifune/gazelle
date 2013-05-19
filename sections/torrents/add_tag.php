@@ -26,7 +26,10 @@ if (!check_perms('site_add_tag') && !$IsAuthor) error(403,true);
 $Tags = explode(' ', $_POST['tagname']);
 
 $VoteValue = $IsAuthor ? 8: 4;
-if ( empty($LoggedUser['NotVoteUpTags']) ) $VoteValue += 1;
+if ( empty($LoggedUser['NotVoteUpTags']) ) {
+    $UserVote = check_perms('site_vote_tag_enhanced') ? ENHANCED_VOTE_POWER : 1;
+    $VoteValue += $UserVote;
+}
 
 $Results = array();
 $CheckedTags = array();
@@ -119,7 +122,7 @@ if ($count>0){
         $DB->query("INSERT INTO torrents_tags 
                               (TagID, GroupID, PositiveVotes, UserID) VALUES 
                               $Values
-                              ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1");
+                              ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+$UserVote");
     
         $Values = "('$GroupID', '".implode("', '$UserID', 'up'), ('$GroupID', '", $AddedIDs)."', '$UserID', 'up')";
         $DB->query("INSERT IGNORE INTO torrents_tags_votes 

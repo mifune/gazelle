@@ -508,32 +508,34 @@ foreach ($Tags as $Tag) {
     if (!is_valid_tag($Tag) || !check_tag_input($Tag)) continue;
     $Tag = get_tag_synonym($Tag);
     
-    if (!empty($Tag)) {  
-        if (!in_array($Tag, $TagsAdded)){  
-            $TagsAdded[] = $Tag;
-            $DB->query("INSERT INTO tags
+    if (empty($Tag)) continue;  
+    if (in_array($Tag, $TagsAdded)) continue;
+    
+    $TagsAdded[] = $Tag;
+    $DB->query("INSERT INTO tags
                             (Name, UserID, Uses) VALUES
                             ('" . $Tag . "', $LoggedUser[ID], 1)
                             ON DUPLICATE KEY UPDATE Uses=Uses+1;");
-            $TagID = $DB->inserted_id();
+    $TagID = $DB->inserted_id();
                 
-            if (empty($LoggedUser['NotVoteUpTags'])){
-                    
-                $DB->query("INSERT INTO torrents_tags
+    if (empty($LoggedUser['NotVoteUpTags'])){
+            
+        $UserVote = check_perms('site_vote_tag_enhanced') ? ENHANCED_VOTE_POWER : 1;
+        $VoteValue = $UserVote + 8;
+               
+        $DB->query("INSERT INTO torrents_tags
                             (TagID, GroupID, UserID, PositiveVotes) VALUES
-                            ($TagID, $GroupID, $LoggedUser[ID], 9)
-                            ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1;");
-                    
-                $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
+                            ($TagID, $GroupID, $LoggedUser[ID], $VoteValue)
+                            ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+$UserVote;");
+                
+        $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
                                 ($TagID, $GroupID, $LoggedUser[ID], 'up');");
-            } else {
-                    
-                $DB->query("INSERT IGNORE INTO torrents_tags
+    } else {
+        $DB->query("INSERT IGNORE INTO torrents_tags
                             (TagID, GroupID, UserID, PositiveVotes) VALUES
                             ($TagID, $GroupID, $LoggedUser[ID], 8);");
-            }
-        }
     }
+      
 }
 // replace the original tag array with corrected tags
 $Tags = $TagsAdded;

@@ -52,6 +52,7 @@
             'site_add_tag' => 'Can add tags.',
             'site_add_multiple_tags' => 'Can add multiple tags at once.',
 	'site_delete_tag' => 'Can delete tags.',
+	'site_vote_tag_enhanced' => 'Has extra tag voting power (&plusmn;'. ENHANCED_VOTE_POWER . ')',
             'site_manage_tags' => 'Can manage official tag list and synonyms.',
             'site_convert_tags' => 'Can convert tags to synonyms.',
      
@@ -220,6 +221,8 @@ function permissions_form(){ ?>
                                           <? display_perm('site_add_tag', 'Can add tags.'); ?>
             <? display_perm('site_add_multiple_tags','Can add multiple tags at once.'); ?>
 					<? display_perm('site_delete_tag', 'Can delete tags.'); ?>
+					<? display_perm('site_vote_tag_enhanced', 'Has extra tag voting power (&plusmn;'. ENHANCED_VOTE_POWER . ')','extra tag voting power is defined in config'); ?>
+ 
                                          
 					<? display_perm('site_disable_ip_history', 'Disable IP history.'); ?>
 					<? display_perm('zip_downloader', 'Download multiple torrents at once.'); ?>
