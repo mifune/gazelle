@@ -2330,7 +2330,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
          
         $SnatchedTorrents = $Cache->get_value('users_torrents_snatched_' .$UserID );
         if ($SnatchedTorrents===false) {
-            $DB->query("SELECT DISTINCT x.fid 
+            $DB->query("SELECT DISTINCT x.fid as TorrentID
                           FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid 
                          WHERE x.uid='$UserID' ");
                         
