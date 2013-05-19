@@ -2329,13 +2329,13 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
      
          
         $SnatchedTorrents = $Cache->get_value('users_torrents_snatched_' .$UserID );
-        if ($SnatchedTorrents===false || !isset($SnatchedTorrents[$TorrentID])) {
+        if ($SnatchedTorrents===false || !isset($SnatchedTorrents[$TorrentID]['Snatched'])) {
             $DB->query("SELECT x.fid 
                           FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid 
                          WHERE x.uid='$UserID' AND x.fid='$TorrentID' ");
-            $snatched = ($DB->record_count()>0) ? '1' : 'X';
+            $snatched = ($DB->record_count()>0) ? '1' : '0';
                         
-            $SnatchedTorrents[$TorrentID] = $snatched ;
+            $SnatchedTorrents[$TorrentID] = array('TorrentID'=>$TorrentID, 'Snatched'=>$snatched) ;
             // slightly heterodox method - xbt_snatched is updated directly from the tracker ... so we need
             // to hard reset every now and again, but we also want to be able to add when just the element is missing - we just cant 
             // reset the cache timeout every time we add an element or it will never time out, so we use this to force a reset 
@@ -2382,7 +2382,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'"  title="Currently Leeching Torrent">';
                 $Icons .= '<span class="icon icon_disk_leech"></span>';
                 $Icons .= '</a>';
-            } elseif ($SnatchedTorrents[$TorrentID] == '1') {
+            } elseif ($SnatchedTorrents[$TorrentID]['Snatched'] == '1') {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Previously Snatched Torrent">';
                 $Icons .= '<span class="icon icon_disk_snatched"></span>';
                 $Icons .= '</a>';               
@@ -2402,7 +2402,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
                 $Icons .= '<span class="icon icon_disk_seed" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';                 
             } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
                 $Icons .= '<span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
-            } elseif ($SnatchedTorrents[$TorrentID] == '1') {
+            } elseif ($SnatchedTorrents[$TorrentID]['Snatched'] == '1') {
                 $Icons .= '<span class="icon icon_disk_snatched" title="Warning: This torrent is marked for deletion"></span>';           
             } elseif (isset($GrabbedTorrents[$TorrentID] )) {
                 $Icons .= '<span class="icon icon_disk_grabbed" title="Warning: This torrent is marked for deletion"></span>'; 
