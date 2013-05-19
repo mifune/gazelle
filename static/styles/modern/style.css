@@ -1034,6 +1034,13 @@ table.boxstat a, table.boxstat a:visited {
     background: url('images/diskup.png') no-repeat center center;
 }
 
+.icon_disk_grabbed {
+    background: url('images/diskgrabbed.png') no-repeat center center;
+}
+.icon_disk_snatched {
+    background: url('images/disksnatched.png') no-repeat center center;
+}
+
 .icon_warning {
     background: url('images/warn_still.gif') no-repeat center center;
 }

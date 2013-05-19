@@ -235,11 +235,13 @@ if ($_POST['ResetEmailHistory'] && check_perms('users_edit_reset_keys')) {
 if ($_POST['ResetSnatchList'] && check_perms('users_edit_reset_keys')) {
 	$DB->query("DELETE FROM xbt_snatched WHERE uid='$UserID'");
 	$EditSummary[]='Snatch List cleared';
+    $Cache->delete_value('users_torrents_snatched_' . $UserID);
 }
 
 if ($_POST['ResetDownloadList'] && check_perms('users_edit_reset_keys')) {
 	$DB->query("DELETE FROM users_downloads WHERE UserID='$UserID'");
 	$EditSummary[]='Download List cleared';
+    $Cache->delete_value('users_torrents_grabbed_' . $UserID);
 }
 
 if (($_POST['ResetSession'] || $_POST['LogOut']) && check_perms('users_logout')) {

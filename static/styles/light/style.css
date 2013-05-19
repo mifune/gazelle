@@ -967,6 +967,14 @@ table.boxstat td:first-child {
 .icon_disk_seed {
     background: url('images/diskup.png') no-repeat center center;
 }
+
+.icon_disk_grabbed {
+    background: url('images/diskgrabbed.png') no-repeat center center;
+}
+.icon_disk_snatched {
+    background: url('images/disksnatched.png') no-repeat center center;
+}
+
 .icon_bookmarked {
     background: url('images/star16.png') no-repeat center center;
 }
