@@ -98,15 +98,16 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 	$DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
 		
 	$Clients = $DB->to_array();
-	$Pie1 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	$Pie2 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	$Pie3 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    $Pies = array();
+	for($i=0;$i<3;$i++) {
+        $Pies[$i]  = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    }
     $Results2=array();
     $Results3=array();
 	foreach($Clients as $Client) {
 		list($Label,$Users) = $Client;
-		$Pie1->add($Label,$Users);
-                  //  } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
+		$Pies[0]->add($Label,$Users);
+        // break down versions - matches formats "name v.1.0" or "name/mv22/0101" or "name/v2345" or "name/v1234(mv4444)"
         if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)|([^/]*)\/([^/]*)|([^\s]*)\s(.*))$#', $Label, $matches)) {
             // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label2 = $matches[1] .'/'.$matches[2];
@@ -115,36 +116,26 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
             $Label2 = $Label;
             $Label3 = $Label;
         }
-        
+        // record users per client/ per major version as well
         if (!isset($Results2[$Label2])) $Results2[$Label2] = $Users;
         else $Results2[$Label2] += $Users;
-		//$Pies[1]->add($Label2,$Users);
         if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
-        else $Results3[$Label3] += $Users;
-        /*
-        if (preg_match('#^(?|([^/]*)\/(.*)|([^\s]*)\s([^\s]*))$#', $Label, $matches)) {
-            // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
-            $Label3 = $matches[1] .'/'.$matches[2];
-        } else $Label3 = $Label;
-        if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
-        else $Results3[$Label3] += $Users;
-		//$Pies[2]->add($Label3,$Users);
-        */
+        else $Results3[$Label3] += $Users; 
 	}
 	foreach($Results2 as $Label=>$Users) {
-		$Pie2->add($Label,$Users);
+		$Pies[1]->add($Label,$Users);
     }
 	foreach($Results3 as $Label=>$Users) {
-		$Pie3->add($Label,$Users);
+		$Pies[2]->add($Label,$Users);
     }
     $ClientDistribution=array();
-	/* foreach($Pies as $Pie) {
+	foreach($Pies as $Pie) {
         $Pie->transparent();
         $Pie->color('00D025');
         $Pie->generate();
         $ClientDistribution[] = $Pie->url(); 
-    } */
-    
+    }
+    /*
     $Pie1->transparent();
     $Pie1->color('00D025');
     $Pie1->generate();
@@ -159,7 +150,7 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
     $Pie3->color('00D025');
     $Pie3->generate();
     $ClientDistribution[2] = $Pie3->url(); 
-    
+    */
 	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
@@ -223,10 +214,9 @@ show_header('Detailed User Statistics');
     <div class="head">User Clients</div>
     <div class="box pad center">
         <div class=" ">
-        [<a onclick="$('#clientdist1').hide(); $('#clientdist2').hide(); $('#clientdist3').show(); return false;" href="#" >client overview</a>]
-        [<a onclick="$('#clientdist1').hide(); $('#clientdist3').hide(); $('#clientdist2').show(); return false;" href="#" >client detail</a>]
-         
-        [<a onclick="$('#clientdist2').hide(); $('#clientdist3').hide(); $('#clientdist1').show(); return false;" href="#" >client detail+</a>]
+        [<a onclick="$('#clientdist1').hide(); $('#clientdist2').hide(); $('#clientdist3').show(); return false;" href="#" >clients</a>]&nbsp;&nbsp;&nbsp;
+        [<a onclick="$('#clientdist1').hide(); $('#clientdist3').hide(); $('#clientdist2').show(); return false;" href="#" >major version</a>]&nbsp;&nbsp;&nbsp;
+        [<a onclick="$('#clientdist2').hide(); $('#clientdist3').hide(); $('#clientdist1').show(); return false;" href="#" >minor version</a>]
          
         </div>
          
