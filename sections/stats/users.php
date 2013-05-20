@@ -53,11 +53,10 @@ if(!$ClassDistribution = $Cache->get_value('class_distribution')) {
 	$Pie->color('FF33CC');
 	$Pie->generate();
 	$ClassDistribution = $Pie->url();
-	$Cache->cache_value('class_distribution',$ClassDistribution,3600*24*14);
+	$Cache->cache_value('class_distribution',$ClassDistribution,3600*36); // 24*14
 }
 if(!$PlatformDistribution = $Cache->get_value('platform_distribution')) {
 	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	
 	
 	$DB->query("SELECT OperatingSystem, COUNT(UserID) AS Users FROM users_sessions GROUP BY OperatingSystem ORDER BY Users DESC");
 	
@@ -71,12 +70,11 @@ if(!$PlatformDistribution = $Cache->get_value('platform_distribution')) {
 	$Pie->color('8A00B8');
 	$Pie->generate();
 	$PlatformDistribution = $Pie->url();
-	$Cache->cache_value('platform_distribution',$PlatformDistribution,3600*24*14);
+	$Cache->cache_value('platform_distribution',$PlatformDistribution,3600*36);
 }
 
 if(!$BrowserDistribution = $Cache->get_value('browser_distribution')) {
 	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	
 	
 	$DB->query("SELECT Browser, COUNT(UserID) AS Users FROM users_sessions GROUP BY Browser ORDER BY Users DESC");
 	
@@ -90,7 +88,26 @@ if(!$BrowserDistribution = $Cache->get_value('browser_distribution')) {
 	$Pie->color('008AB8');
 	$Pie->generate();
 	$BrowserDistribution = $Pie->url();
-	$Cache->cache_value('browser_distribution',$BrowserDistribution,3600*24*14);
+	$Cache->cache_value('browser_distribution',$BrowserDistribution,3600*36);
+}
+
+// clients we can get from current peers
+if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
+	include_once(SERVER_ROOT.'/classes/class_charts.php');
+	
+	$DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
+		
+	$Clients = $DB->to_array();
+	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	foreach($Clients as $Client) {
+		list($Label,$Users) = $Client;
+		$Pie->add($Label,$Users);
+	}
+	$Pie->transparent();
+	$Pie->color('00D025');
+	$Pie->generate();
+	$ClientDistribution = $Pie->url();
+	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
 //Timeline generation

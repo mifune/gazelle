@@ -73,7 +73,7 @@ if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
 
     $SiteStats = array_reverse($DB->to_array());
     
-} 
+}
 
 if (!$SiteStats) {
     $SiteStats = $Cache->get_value('site_stats');

@@ -157,12 +157,14 @@ for($i = 0; $i < $Limit; $i++) {
                 <div class="head colhead_dark">Stats</div>
                 <div class="box">
 			<ul class="stats nobullet">
+                
+<?      if (check_perms('site_view_stats')) { ?>
 				<li class="center"> [<a href="stats.php?action=users">User Graphs</a>] &nbsp; [<a href="stats.php?action=site">Site History</a>]</li>
-<? if (USER_LIMIT>0) { ?>
-				<li>Maximum Users: <?=number_format(USER_LIMIT) ?></li>
+<?      }
 
-<?
-}
+        if (USER_LIMIT>0) { ?>
+				<li>Maximum Users: <?=number_format(USER_LIMIT) ?></li>
+<?      }
 
 if(($UserCount = $Cache->get_value('stats_user_count')) === false){
 	$DB->query("SELECT COUNT(ID) FROM users_main WHERE Enabled='1'");
@@ -192,6 +194,21 @@ if (($UserStats = $Cache->get_value('stats_users')) === false) {
 				<li>Users active this month: <?=number_format($UserStats['Month'])?> (<?=number_format($UserStats['Month']/$UserCount*100,2)?>%)</li>
 <?
 
+// overall data stats
+if (check_perms('site_stats_advanced')) { 
+    
+    if (($DataStats = $Cache->get_value('stats_data')) === false) {
+        
+        $DB->query("SELECT Sum(Size) FROM torrents ");
+        list($DataStats['TotalSize']) = $DB->next_record();
+        $Cache->cache_value('stats_data',$DataStats,0);
+    }
+?>
+				<li>Total Data: <?=number_format($DataStats['TotalSize'])?></li>
+<?
+}
+
+// torrent stats
 if(($TorrentCountLastDay = $Cache->get_value('stats_torrent_count_daily')) === false) {
       $DB->query("SELECT COUNT(ID) FROM torrents WHERE Time > '".time_minus(3600*24,true)."'");
       list($TorrentCountLastDay) = $DB->next_record();
