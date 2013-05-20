@@ -201,7 +201,7 @@ if (check_perms('site_stats_advanced')) {
         
         $DB->query("SELECT Sum(Size) FROM torrents ");
         list($DataStats['TotalSize']) = $DB->next_record();
-        $Cache->cache_value('stats_data',$DataStats,0);
+        $Cache->cache_value('stats_data',$DataStats,3600*24);
     }
 ?>
 				<li>Total Data: <?=get_size($DataStats['TotalSize'])?></li>

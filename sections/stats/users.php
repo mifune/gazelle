@@ -98,16 +98,16 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 	$DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
 		
 	$Clients = $DB->to_array();
-	$Pies[0] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	$Pies[1] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	$Pies[2] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+	$Pie1 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+	$Pie2 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+	$Pie3 = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
     $Results2=array();
     $Results3=array();
 	foreach($Clients as $Client) {
 		list($Label,$Users) = $Client;
-		$Pies[0]->add($Label,$Users);
+		$Pie1->add($Label,$Users);
                   //  } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
-        if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)$#', $Label, $matches)) {
+        if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\))$#', $Label, $matches)) {
             // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label2 = $matches[1] .'/'.$matches[2];
         } else $Label2 = $Label;
@@ -115,7 +115,7 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
         else $Results2[$Label2] += $Users;
 		//$Pies[1]->add($Label2,$Users);
         
-        if (preg_match('#^(?|([^/]*)/([^/]*)|([^\s]*)\s([^\s]*)$#', $Label, $matches)) {
+        if (preg_match('#^(?|([^/]*)/([^/]*)|([^\s]*)\s([^\s]*))$#', $Label, $matches)) {
             // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label3 = $matches[1] .'/'.$matches[2];
         } else $Label3 = $Label;
@@ -124,18 +124,34 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 		//$Pies[2]->add($Label3,$Users);
 	}
 	foreach($Results2 as $Label=>$Users) {
-		$Pies[1]->add($Label,$Users);
+		$Pie2->add($Label,$Users);
     }
 	foreach($Results3 as $Label=>$Users) {
-		$Pies[2]->add($Label,$Users);
+		$Pie3->add($Label,$Users);
     }
     $ClientDistribution=array();
-	foreach($Pies as $Pie) {
+	/* foreach($Pies as $Pie) {
         $Pie->transparent();
         $Pie->color('00D025');
         $Pie->generate();
         $ClientDistribution[] = $Pie->url(); 
-    }
+    } */
+    
+    $Pie1->transparent();
+    $Pie1->color('00D025');
+    $Pie1->generate();
+    $ClientDistribution[0] = $Pie1->url(); 
+    
+    $Pie2->transparent();
+    $Pie2->color('00D025');
+    $Pie2->generate();
+    $ClientDistribution[1] = $Pie2->url(); 
+    
+    $Pie3->transparent();
+    $Pie3->color('00D025');
+    $Pie3->generate();
+    $ClientDistribution[2] = $Pie3->url(); 
+    
 	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
