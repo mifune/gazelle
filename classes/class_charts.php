@@ -99,7 +99,7 @@ class PIE_CHART extends GOOGLE_CHARTS {
 
 	public function generate() {
 		$Sum = array_sum($this->Data);
-		$Other = isset($this->Options['Other']);
+		$Other = isset($this->Options['Other'])? floatval($this->Options['Other']):false;
 		$Sort = isset($this->Options['Sort']);
 		$LabelPercent = isset($this->Options['Percentage']);
 
@@ -118,7 +118,7 @@ class PIE_CHART extends GOOGLE_CHARTS {
 		foreach ($this->Data as $Key => $Value) {
 			$ThisPercentage = number_format(($Value/$Sum)*100, 2);
 			$ThisData = ($Value/$Sum)*4095;
-			if ($Other && $ThisPercentage < 1) {
+			if ($Other && $ThisPercentage < $Other) {
 				$OtherPercentage += $ThisPercentage;
 				$OtherData += $ThisData;
 				unset($Data[$Key]);

@@ -98,15 +98,44 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 	$DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
 		
 	$Clients = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	$Pies[0] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+	$Pies[1] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+	$Pies[2] = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    $Results2=array();
+    $Results3=array();
 	foreach($Clients as $Client) {
 		list($Label,$Users) = $Client;
-		$Pie->add($Label,$Users);
+		$Pies[0]->add($Label,$Users);
+                  //  } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
+        if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)$#', $Label, $matches)) {
+            // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
+            $Label2 = $matches[1] .'/'.$matches[2];
+        } else $Label2 = $Label;
+        if (!isset($Results2[$Label2])) $Results2[$Label2] = $Users;
+        else $Results2[$Label2] += $Users;
+		//$Pies[1]->add($Label2,$Users);
+        
+        if (preg_match('#^(?|([^/]*)/([^/]*)|([^\s]*)\s([^\s]*)$#', $Label, $matches)) {
+            // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
+            $Label3 = $matches[1] .'/'.$matches[2];
+        } else $Label3 = $Label;
+        if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
+        else $Results3[$Label3] += $Users;
+		//$Pies[2]->add($Label3,$Users);
 	}
-	$Pie->transparent();
-	$Pie->color('00D025');
-	$Pie->generate();
-	$ClientDistribution = $Pie->url();
+	foreach($Results2 as $Label=>$Users) {
+		$Pies[1]->add($Label,$Users);
+    }
+	foreach($Results3 as $Label=>$Users) {
+		$Pies[2]->add($Label,$Users);
+    }
+    $ClientDistribution=array();
+	foreach($Pies as $Pie) {
+        $Pie->transparent();
+        $Pie->color('00D025');
+        $Pie->generate();
+        $ClientDistribution[] = $Pie->url(); 
+    }
 	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
@@ -169,7 +198,18 @@ show_header('Detailed User Statistics');
     <br />
     <div class="head">User Clients</div>
     <div class="box pad center">
-          <img src="<?=$ClientDistribution?>" />
+        <div class=" ">
+        [<a onclick="$('#clientdist1').hide(); $('#clientdist2').hide(); $('#clientdist3').show(); return false;" href="#" >client overview</a>]
+        [<a onclick="$('#clientdist1').hide(); $('#clientdist3').hide(); $('#clientdist2').show(); return false;" href="#" >client detail</a>]
+         
+        [<a onclick="$('#clientdist2').hide(); $('#clientdist3').hide(); $('#clientdist1').show(); return false;" href="#" >client detail+</a>]
+         
+        </div>
+         
+        <br />
+        <img id="clientdist1" src="<?=$ClientDistribution[0]?>" class="hidden" />
+        <img id="clientdist2" src="<?=$ClientDistribution[1]?>" class="hidden" />
+        <img id="clientdist3" src="<?=$ClientDistribution[2]?>" />
     </div>
     <br />
     <div class="head">Geographical Distribution Map</div>
