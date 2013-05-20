@@ -147,8 +147,11 @@ $ExcludeForums = array( 9 ); // exclude games forum from latest topics (user opt
 $DonateLevels = array ( 1 => 1.0, 10 => 1.5, 50 => 2.0, 100 => 5 );
 
 define('TORRENT_SIG_MAX_HEIGHT', 800);
-
 define('ENHANCED_VOTE_POWER', 2);
+//kind of random var but testing/changing this with live data is required 
+//- this is the % under which results are aggregated by the clients graph, 
+//if its too low (num clients depending) it breaks the google url api 
+define('CLIENT_GRAPH_OTHER_PERCENT', 0.5);
 
 // key should be bytesize to exclude from dupe via bytesize check, value is reason displayed to user
 $ExcludeBytesDupeCheck = array ( 734015488=>'a standard cd size', 1065353216=>'a standard vob size',  1073739776 => 'a standard vob size' );

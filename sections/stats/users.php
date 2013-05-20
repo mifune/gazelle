@@ -102,8 +102,8 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 	//for($i=0;$i<3;$i++) {
         //$Pies[$i]  = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
     //}
-    $Pies[0]  = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
-    $Pies[1]  = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+    $Pies[0]  = new PIE_CHART(750,400,array('Other'=>CLIENT_GRAPH_OTHER_PERCENT,'Percentage'=>1));
+    $Pies[1]  = new PIE_CHART(750,400,array('Other'=>CLIENT_GRAPH_OTHER_PERCENT,'Percentage'=>1));
     $Pies[2]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
     $Results2=array();
     $Results3=array();
