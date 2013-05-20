@@ -99,9 +99,12 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 		
 	$Clients = $DB->to_array();
     $Pies = array();
-	for($i=0;$i<3;$i++) {
-        $Pies[$i]  = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-    }
+	//for($i=0;$i<3;$i++) {
+        //$Pies[$i]  = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    //}
+    $Pies[0]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
+    $Pies[1]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
+    $Pies[2]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
     $Results2=array();
     $Results3=array();
 	foreach($Clients as $Client) {
@@ -135,22 +138,6 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
         $Pie->generate();
         $ClientDistribution[] = $Pie->url(); 
     }
-    /*
-    $Pie1->transparent();
-    $Pie1->color('00D025');
-    $Pie1->generate();
-    $ClientDistribution[0] = $Pie1->url(); 
-    
-    $Pie2->transparent();
-    $Pie2->color('00D025');
-    $Pie2->generate();
-    $ClientDistribution[1] = $Pie2->url(); 
-    
-    $Pie3->transparent();
-    $Pie3->color('00D025');
-    $Pie3->generate();
-    $ClientDistribution[2] = $Pie3->url(); 
-    */
 	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
