@@ -107,21 +107,29 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 		list($Label,$Users) = $Client;
 		$Pie1->add($Label,$Users);
                   //  } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
-        if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\))$#', $Label, $matches)) {
+        if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)|([^/]*)\/([^/]*)|([^\s]*)\s(.*))$#', $Label, $matches)) {
             // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label2 = $matches[1] .'/'.$matches[2];
-        } else $Label2 = $Label;
+            $Label3 = $matches[1];
+        } else {
+            $Label2 = $Label;
+            $Label3 = $Label;
+        }
+        
         if (!isset($Results2[$Label2])) $Results2[$Label2] = $Users;
         else $Results2[$Label2] += $Users;
 		//$Pies[1]->add($Label2,$Users);
-        
-        if (preg_match('#^(?|([^/]*)/([^/]*)|([^\s]*)\s([^\s]*))$#', $Label, $matches)) {
+        if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
+        else $Results3[$Label3] += $Users;
+        /*
+        if (preg_match('#^(?|([^/]*)\/(.*)|([^\s]*)\s([^\s]*))$#', $Label, $matches)) {
             // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label3 = $matches[1] .'/'.$matches[2];
         } else $Label3 = $Label;
         if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
         else $Results3[$Label3] += $Users;
 		//$Pies[2]->add($Label3,$Users);
+        */
 	}
 	foreach($Results2 as $Label=>$Users) {
 		$Pie2->add($Label,$Users);
