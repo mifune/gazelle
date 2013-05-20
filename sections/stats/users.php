@@ -167,6 +167,11 @@ show_header('Detailed User Statistics');
           <img src="<?=$BrowserDistribution?>" />
     </div>
     <br />
+    <div class="head">User Clients</div>
+    <div class="box pad center">
+          <img src="<?=$ClientDistribution?>" />
+    </div>
+    <br />
     <div class="head">Geographical Distribution Map</div>
     <div class="box center"> 
           <br />

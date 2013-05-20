@@ -204,7 +204,7 @@ if (check_perms('site_stats_advanced')) {
         $Cache->cache_value('stats_data',$DataStats,0);
     }
 ?>
-				<li>Total Data: <?=number_format($DataStats['TotalSize'])?></li>
+				<li>Total Data: <?=get_size($DataStats['TotalSize'])?></li>
 <?
 }
 
