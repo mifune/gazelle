@@ -100,6 +100,7 @@ class TEXT {
         ':snap:' => 'snap.gif',
         
         ':cupcake:' => 'cupcake.gif',
+        ':emplove:' => 'loveemp.gif',
         
         ':strongbench:' => 'strongbench.gif',
         ':weakbench:' => 'weakbench.gif',
@@ -131,6 +132,9 @@ class TEXT {
         ':smallprint:' => 'deal.gif',
         //----------------------------
 
+        ':tick:' => 'tick.gif',
+        ':cross:' => 'cross.gif',
+        
         ':happydancing:' => 'happydancing.gif',
         ':argh:' => 'frustrated.gif',
         ':tumble:' => 'tumbleweed.gif',

@@ -105,7 +105,17 @@ show_header('Compose', 'inbox,bbcode');
             </div>
         </div>
         <?
-    } 
+    }
+    
+    if(isset($StaffIDs[$ToID])){
+?>   
+        <div class="box pad shadow">
+            You are sending a PM to a member of staff. IF this is regarding a staffing issue 
+            <strong class="important_text">please use the <a href="staff.php?show=1&assign=mod">staff message form</a> instead.</strong> (You can specify if you want it to only be seen by admins or mods+ if you need to)
+            <br />This way it can be dealt with appropriately and quickly. Please note - PM's sent to staff that are about staffing or moderation issues may be responded to as a new staff message by any appropriate staff member.
+        </div>
+<?
+    }
 ?>
 
     <div id="preview" class="hidden"></div>

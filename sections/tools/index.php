@@ -567,19 +567,27 @@ switch ($_REQUEST['action']) {
 
             $Values = array();
             if (is_numeric($_REQUEST['id'])) {
-                $JoinOn = ( $_POST['IsClass'] == 1) ? 'PermissionID' : 'GroupPermissionID';
+                /* $JoinOn = ( $_POST['isclass'] == 1) ? 'PermissionID' : 'GroupPermissionID';
                 $DB->query("SELECT p.ID,p.Name,p.Level,p.Values,p.DisplayStaff,p.IsUserClass,
-                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color,COUNT(u.ID) 
+                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color, COUNT(u.ID) 
                                     FROM permissions AS p LEFT JOIN users_main AS u ON u.$JoinOn=p.ID WHERE p.ID='" . db_string($_REQUEST['id']) . "' GROUP BY p.ID");
                 list($ID, $Name, $Level, $Values, $DisplayStaff, $IsUserClass, $MaxSigLength, $MaxAvatarWidth, $MaxAvatarHeight, $Color, $UserCount) = $DB->next_record(MYSQLI_NUM, array(3));
+                */
+                $DB->query("SELECT p.ID,p.Name,p.Level,p.Values,p.DisplayStaff,p.IsUserClass,
+                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color 
+                                    FROM permissions AS p WHERE p.ID='" . db_string($_REQUEST['id']) . "' ");
+                list($ID, $Name, $Level, $Values, $DisplayStaff, $IsUserClass, $MaxSigLength, $MaxAvatarWidth, $MaxAvatarHeight, $Color) = $DB->next_record(MYSQLI_NUM, array(3));
 
                 if ($IsUserClass == '1' && ($Level > $LoggedUser['Class'] || $_REQUEST['level'] > $LoggedUser['Class'])) {
                     error(403);
                 }
+                $JoinOn = $IsUserClass == '1' ? 'PermissionID' : 'GroupPermissionID';
+                $DB->query("SELECT COUNT(ID) FROM users_main WHERE $JoinOn='" . db_string($_REQUEST['id']) . "' ");
+                list($UserCount) = $DB->next_record(MYSQLI_NUM); 
 
                 $Values = unserialize($Values);
             } else {
-                $IsUserClass = isset($_POST['isclass']) && $_POST['isclass'] == 1 ? '1' : '0';
+                $IsUserClass = isset($_REQUEST['isclass']) && $_REQUEST['isclass'] == 1 ? '1' : '0';
             }
 
 
@@ -616,6 +624,9 @@ switch ($_REQUEST['action']) {
                     }
                     $Level = 202;
                     $DisplayStaff = '0';
+                    $Val->SetFields('color', true, 'string', 'You did not enter a valid hex color.', array('minlength' => 6, 'maxlength' => 6));
+                    $Color = strtolower($_REQUEST['color']);
+                    
                 }
                 if (!$Err)
                     $Err = $Val->ValidateForm($_POST);

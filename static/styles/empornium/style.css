@@ -2415,3 +2415,48 @@ img.win.flash {
     overflow: hidden;
     border-top: #ccc solid 1px;
 }
+
+
+
+#user_dropdown {
+    display:inline;
+    position: relative;
+    white-space:nowrap;
+}
+#user_dropdown ul {
+    list-style: none;
+    display: none;
+    position: absolute;
+    left: -8px;
+    top: 1.3em;
+    background-color:#e3eefd;
+    color: #000;
+    border: 1px solid #005488;
+    border-radius: 8px;  
+    -moz-border-radius: 8px; 
+    -webkit-border-radius: 8px;  
+    z-index: 10;
+}
+#user_dropdown:hover ul {
+    display: block; 
+    /* width: 160px; */
+}
+#user_dropdown ul li {
+    margin: 0px;
+    padding: 0px;
+}
+#user_dropdown ul a {
+    display: block; 
+}
+#user_dropdown ul li a {
+    margin: 0px; 
+    text-align: left;
+    padding: 1px 8px 1px 8px;
+    white-space:nowrap;
+}
+
+#user_dropdown ul li a:hover {
+    background-color: #0d245a;
+    color: white;
+    text-decoration: none;
+}

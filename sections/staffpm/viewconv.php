@@ -27,11 +27,11 @@ if ($ConvID = (int)$_GET['id']) {
 
 	$OwnerInfo = user_info($UserID);
 	$UserInfo = $OwnerInfo;
-	$UserStr = format_username($UserID, $OwnerInfo['Username'], $OwnerInfo['Donor'], $OwnerInfo['Warned'], $OwnerInfo['Enabled'], $OwnerInfo['PermissionID'], $OwnerInfo['Title'], true);
+	$UserStr = format_username($UserID, $OwnerInfo['Username'], $OwnerInfo['Donor'], $OwnerInfo['Warned'], $OwnerInfo['Enabled'], $OwnerInfo['PermissionID'], $OwnerInfo['Title'], true, $OwnerInfo['GroupPermissionID'], $IsFLS);
       $OwnerID = $UserID;
       if($ResolverID) {
           	$ResolverInfo = user_info($ResolverID);
-            $ResolverStr = format_username($ResolverID, $ResolverInfo['Username'], $ResolverInfo['Donor'], $ResolverInfo['Warned'], $ResolverInfo['Enabled'], $ResolverInfo['PermissionID']);
+            $ResolverStr = format_username($ResolverID, $ResolverInfo['Username'], $ResolverInfo['Donor'], $ResolverInfo['Warned'], $ResolverInfo['Enabled'], $ResolverInfo['PermissionID'], false, true, $ResolverInfo['GroupPermissionID']);
 	}
 	// Get assigned
 	if ($AssignedToUser == '') { // Assigned to class
@@ -40,7 +40,7 @@ if ($ConvID = (int)$_GET['id']) {
 		if ($Assigned != 'Sysop') { $Assigned .= "+"; }
       } else {  // Assigned to user
             $AssignInfo = user_info($AssignedToUser);
-		$Assigned = format_username($AssignedToUser, $AssignInfo['Username'], $AssignInfo['Donor'], $AssignInfo['Warned'], $AssignInfo['Enabled'], $AssignInfo['PermissionID']);
+		$Assigned = format_username($AssignedToUser, $AssignInfo['Username'], $AssignInfo['Donor'], $AssignInfo['Warned'], $AssignInfo['Enabled']); //, $AssignInfo['PermissionID'], false, false, $AssignInfo['GroupPermissionID']);
       }
 ?>
 <div class="thin">
@@ -77,10 +77,12 @@ if ($ConvID = (int)$_GET['id']) {
 		if ($UserID == $OwnerID) {
 			// User, use prepared string
 			$UserString = $UserStr;
+            //$UserString = format_username($UserID, $OwnerInfo['Username'], $OwnerInfo['Donor'], $OwnerInfo['Warned'], $OwnerInfo['Enabled'], $OwnerInfo['PermissionID'], $OwnerInfo['Title'], true, $OwnerInfo['GroupPermissionID'], $IsFLS);
+   
 		} else {
 			// Staff/FLS
 			$UserInfo = user_info($UserID);
-			$UserString = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], $UserInfo['Title'], true);
+			$UserString = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], $UserInfo['Title'], true, $UserInfo['GroupPermissionID'], $IsFLS);
         }
             // determine if conversation was started by user or not (checks first record for userID)
         if (!isset($UserInitiated)) {
@@ -88,13 +90,13 @@ if ($ConvID = (int)$_GET['id']) {
 ?> 
                 <div class="head">
                     Status: <?=$Status; if($ResolverStr && $Status=='Resolved' ) echo " by $ResolverStr"; ?> 
-<?                  if($UserInitiated){ ?>
+<?                  //if($UserInitiated){ ?>
                         <span style="float:right"><em>Assigned to: <?=$Assigned?></em></span>    
-<?                  }  ?> 
+<?                  //}  ?> 
                 </div>
                 <div class="box pad vertical_space colhead">
                     <span style="float:right"> 
-<?                      $SenderString = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, true);
+<?                      $SenderString = format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, true, $UserInfo['GroupPermissionID'], $IsFLS);
                         echo "sent by $SenderString&nbsp;&nbsp;"; ?>
                     </span>
                     Sent to  <?=$UserInitiated?'<strong>Staff</strong>':$UserStr;?> 

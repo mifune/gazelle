@@ -346,7 +346,7 @@ echo $Pages;
 //---------- Begin printing
 foreach($Thread as $Key => $Post){
 	list($PostID, $AuthorID, $AddedTime, $Body, $EditedUserID, $EditedTime, $EditedUsername) = array_values($Post);
-	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature) = array_values(user_info($AuthorID));
+	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature,,$GroupPermissionID) = array_values(user_info($AuthorID));
       $AuthorPermissions = get_permissions($PermissionID);
       list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
       ?>
@@ -354,7 +354,7 @@ foreach($Thread as $Key => $Post){
 	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
-				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
+				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true,$GroupPermissionID,true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
 				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','r<?=$RequestID?>','<?=$Username?>');">[Quote]</a>
 <?if ( ($AuthorID == $LoggedUser['ID'] && ( time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME ) )
                                                                                             || check_perms('site_moderate_forums') ) { ?>				

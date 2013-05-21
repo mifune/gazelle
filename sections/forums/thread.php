@@ -413,7 +413,7 @@ if($ThreadInfo['StickyPostID']) {
 }
 foreach($Thread as $Key => $Post){
 	list($PostID, $AuthorID, $AddedTime, $Body, $EditedUserID, $EditedTime, $EditedUsername) = array_values($Post);
-	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature) = array_values(user_info($AuthorID));
+	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature,,$GroupPermissionID) = array_values(user_info($AuthorID));
 	$AuthorPermissions = get_permissions($PermissionID);
       list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
       // we need to get custom permissions for this author
@@ -429,7 +429,7 @@ foreach($Thread as $Key => $Post){
 	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a class="post_id" href='forums.php?action=viewthread&amp;threadid=<?=$ThreadID?>&amp;postid=<?=$PostID?>#post<?=$PostID?>'>#<?=$PostID?></a>
-				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true)?>
+				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true, $GroupPermissionID, true)?>
                         <?=time_diff($AddedTime,2)?> 
 <? if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')){ ?> 
 				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','f<?=$ThreadID?>','<?=$Username?>');">[Quote]</a> 

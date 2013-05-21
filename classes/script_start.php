@@ -96,7 +96,7 @@ $Debug->set_flag('start user handling');
 // Get permissions
 list($Classes, $ClassLevels, $ClassNames) = $Cache->get_value('classes');
 if (!$Classes || !$ClassLevels) {
-    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName FROM permissions WHERE IsUserClass='1' ORDER BY Level");
+    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName FROM permissions ORDER BY IsUserClass, Level"); //WHERE IsUserClass='1' 
     $Classes = $DB->to_array('ID');
     $ClassLevels = $DB->to_array('Level');
     $ClassNames = $DB->to_array('ShortName');
@@ -1547,15 +1547,46 @@ function make_hash($Str, $Secret) {
   $IsDonor, $IsWarned and $IsEnabled can be omitted for a *very* abbreviated version
  */
 
-function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000-00-00 00:00:00', $Enabled = 1, $Class = false, $Title = false, $DrawInBox = false) {
+function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000-00-00 00:00:00', 
+                            $Enabled = 1, $Class = false, $Title = false, $DrawInBox = false, $GroupPerm = false, $DropDown=false) {
+    global $DB, $Cache, $LoggedUser, $Classes;
     if ($UserID == 0) {
         return 'System';
     } elseif ($Username == '') {
         return "Unknown [$UserID]";
     }
     $str = '<a href="user.php?id=' . $UserID . '">' . $Username . '</a>';
+    if($DropDown && $LoggedUser['ID']!==$UserID){
+        $ddlist = '<li><a href="user.php?id='.$UserID.'" title="View '.$Username.'\'s profile">View profile</a></li>';
+        //if($Classes[$Class]['Level']>=STAFF_LEVEL){
+        //    $ddlist .= '<li><a href="staff.php?show=1" title="Start a staff conversation">Message Staff</a></li>';
+        //}
+        $ddlist .= '<li><a href="inbox.php?action=compose&amp;to='.$UserID.'" title="Send a Private Message to '.$Username.'">Send PM</a></li>';
+            
+        $Friends = $Cache->get_value('user_friends_'.$LoggedUser['ID']);
+        if ($Friends===false){
+                //$Results = $DB->get_query_id();
+                //$DB->set_query_id($Results);
+                $DB->query("SELECT FriendID, Type FROM friends WHERE UserID='$LoggedUser[ID]'");
+                $Friends = $DB->to_array('FriendID');
+                $Cache->cache_value('user_friends_'.$LoggedUser['ID'], $Friends);
+        }
+        $FType = isset($Friends[$UserID]) ? $Friends[$UserID]['Type'] : false;
+        if(!$FType || $FType != 'friends' ) { 
+                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'">Add to friends</a></li>';
+        } elseif ($FType == 'friends'){ 
+                $ddlist .= '<li><a href="friends.php?action=Defriend&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'">Remove friend</a></li>';
+        }
+        if(!$FType || $FType != 'blocked' ) {
+                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'">Block User</a></li>';
+        } elseif ($FType == 'blocked'){ 
+                $ddlist .= '<li><a href="friends.php?action=Unblock&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'">Remove block</a></li>';
+        }
+        $ddlist .= '<li><a href="reports.php?action=report&amp;type=user&amp;id='.$UserID.'">Report User</a></li>';
+         
+        $str = "<div id=\"user_dropdown\">$str<ul>$ddlist</ul></div>";
+    }
     $str.=($IsDonor) ? '<a href="donate.php"><img src="' . STATIC_SERVER . 'common/symbols/donor.png" alt="Donor" title="Donor" /></a>' : '';
-
 
     $str.=($IsWarned != '0000-00-00 00:00:00' && $IsWarned !== false) ? '<img src="' . STATIC_SERVER . 'common/symbols/warned.png" alt="Warned" title="Warned" />' : '';
     
@@ -1567,9 +1598,12 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     }
     //$str.=(!$IsEnabled) ? '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' : '';
 
-    $str.=($Class) ? ' (' . make_class_string($Class, TRUE) . ')' : '';
-    $str.=($Title && $Class) ? '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' : '';
-    $str.=($Title && !$Class) ? '&nbsp;(<span class="user_title">' . display_str($Title) . '</span>)' : '';
+    if($GroupPerm) $str.= ' (' . make_class_string($GroupPerm, TRUE) . ')' ;
+    if($Class) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
+    if($Title){
+        if($Class || $GroupPerm) $str.= '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' ;
+        else $str.= '&nbsp;(<span class="user_title">' . display_str($Title) . '</span>)' ;
+    }
     if ($DrawInBox)
         ( $str = '<span class="user_name">' . $str . '</span>' );
     return $str;

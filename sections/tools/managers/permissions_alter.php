@@ -60,6 +60,10 @@ echo $Val->GenerateJS('permform');
 			<td class="label">Group Permission</td>
 			<td><input type="text" name="name" id="name" value="<?=(!empty($Name) ? display_str($Name) : '')?>" /></td>
 		</tr> 
+		<tr>
+			<td class="label">Rank Color</td>
+			<td><input type="text" name="color" style="font-weight:bold;color: #<?=display_str($Color)?>" value="<?=(!empty($Color) ? display_str($Color) : '')?>" /></td>
+		</tr>
 <?      }
 
 if (is_numeric($_REQUEST['id'])) { ?>

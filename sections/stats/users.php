@@ -99,9 +99,7 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
 		
 	$Clients = $DB->to_array();
     $Pies = array();
-	//for($i=0;$i<3;$i++) {
-        //$Pies[$i]  = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-    //}
+    //we will split the results to get minor/major/client only versions of the pie charts
     $Pies[0]  = new PIE_CHART(750,400,array('Other'=>CLIENT_GRAPH_OTHER_PERCENT,'Percentage'=>1));
     $Pies[1]  = new PIE_CHART(750,400,array('Other'=>CLIENT_GRAPH_OTHER_PERCENT,'Percentage'=>1));
     $Pies[2]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
@@ -109,26 +107,28 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
     $Results3=array();
 	foreach($Clients as $Client) {
 		list($Label,$Users) = $Client;
+        // minor version (ie. the whole client info)
 		$Pies[0]->add($Label,$Users);
-        // break down versions - matches formats "name v.1.0" or "name/mv22/0101" or "name/v2345" or "name/v1234(mv4444)"
+        // break down versions - matches formats "name/mv22/0101" or "name/v1234(mv4444)" or "name/v2345" or "name v.1.0" 
         if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)|([^/]*)\/([^/]*)|([^\s]*)\s(.*))$#', $Label, $matches)) {
-            // matches in form aa/bb/cc or aa/bb(cc) - Label2 == aa/bb
             $Label2 = $matches[1] .'/'.$matches[2];
             $Label3 = $matches[1];
         } else {
             $Label2 = $Label;
             $Label3 = $Label;
         }
-        // record users per client/ per major version as well
+        // record users per client/ per major version 
         if (!isset($Results2[$Label2])) $Results2[$Label2] = $Users;
         else $Results2[$Label2] += $Users;
         if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
         else $Results3[$Label3] += $Users; 
 	}
 	foreach($Results2 as $Label=>$Users) {
+        // major version (ie. client/vXXX)
 		$Pies[1]->add($Label,$Users);
     }
 	foreach($Results3 as $Label=>$Users) {
+        // client info only (ie. client)
 		$Pies[2]->add($Label,$Users);
     }
     $ClientDistribution=array();

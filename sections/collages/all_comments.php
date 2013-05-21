@@ -69,7 +69,7 @@ echo $Pages;
 //---------- Begin printing
 foreach($Thread as $Post){
 	list($PostID, $AuthorID, $AddedTime, $Body) = $Post;
-	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature) = array_values(user_info($AuthorID));
+	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature,,$GroupPermissionID) = array_values(user_info($AuthorID));
       $AuthorPermissions = get_permissions($PermissionID);
       list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
             
@@ -78,7 +78,7 @@ foreach($Thread as $Post){
 	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
-				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=collages_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
+				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true, $GroupPermissionID, true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=collages_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
 <? if (!$ThreadInfo['IsLocked']){ ?>				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','c<?=$CollageID?>','<?=$Username?>');">[Quote]</a><? }
 if (($AuthorID == $LoggedUser['ID'] && time_ago($AddedTime)<USER_EDIT_POST_TIME) || check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>');">[Edit]</a><? }
 if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
@@ -135,7 +135,7 @@ if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')) {
 					<tr class="smallhead">
 						<td colspan="2">
 							<span style="float:left;"><a href='#quickreplypreview'>#XXXXXX</a>
-								<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true)?>
+								<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true, $LoggedUser['GroupPermissionID'], true)?>
 							Just now
 							</span>
 							<span id="barpreview" style="float:right;">
