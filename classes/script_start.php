@@ -1598,7 +1598,7 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     }
     //$str.=(!$IsEnabled) ? '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' : '';
 
-    if($GroupPerm) $str.= ' (' . make_class_string($GroupPerm, TRUE) . ')' ;
+    if($GroupPerm) $str.= ' '. make_groupperm_string($GroupPerm, TRUE).' ';  // ' (' . make_groupperm_string($GroupPerm, TRUE) . ')' ;
     if($Class) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
     if($Title){
         if($Class || $GroupPerm) $str.= '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' ;
@@ -1607,6 +1607,15 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     if ($DrawInBox)
         ( $str = '<span class="user_name">' . $str . '</span>' );
     return $str;
+}
+
+function make_groupperm_string($GroupPermID, $Usespan = false) {
+    global $Classes;
+    if ($Usespan === false) {
+        return $Classes[$GroupPermID]['Name'];
+    } else {
+        return '<span alt="' . $GroupPermID . '" class="groupperm" style="color:#'. $Classes[$GroupPermID]['Color'] . '">' . $Classes[$GroupPermID]['Name'] . '</span>';
+    }
 }
 
 function make_class_string($ClassID, $Usespan = false) {

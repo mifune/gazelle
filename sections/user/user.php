@@ -183,7 +183,7 @@ show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
 
 ?>
 <div class="thin">
-	<h2><?=format_username($UserID, $Username, false, $Warned, $Enabled, $ClassID, $CustomTitle, true)?></h2>
+	<h2><?=format_username($UserID, $Username, false, $Warned, $Enabled, $ClassID, $CustomTitle, true, $GroupPermID)?></h2>
 	<div class="linkbox">
 <?  if (!$OwnProfile) { ?>
 		[<a href="inbox.php?action=compose&amp;to=<?=$UserID?>" title="Send a Private Message to <?=$Username?>">Send PM</a>]

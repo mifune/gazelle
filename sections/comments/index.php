@@ -62,6 +62,7 @@ $Comments = $DB->query("SELECT
 	m.ID AS UserID,
 	m.Username,
 	m.PermissionID,
+	m.GroupPermissionID,
 	m.Enabled,
             m.CustomPermissions,
 	
@@ -123,7 +124,7 @@ $DB->set_query_id($Comments);
      $Posts = $DB->to_array(false,MYSQLI_ASSOC,array('CustomPermissions'));
 
 foreach($Posts as $Post){
-	list($UserID, $Username, $Class, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = array_values($Post);
+	list($UserID, $Username, $Class, $GroupPermID, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = array_values($Post);
           
 //while(list($UserID, $Username, $Class, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = $DB->next_record(MYSQLI_BOTH,  array('CustomPermissions'))) {
 	$AuthorPermissions = get_permissions($Class);
@@ -133,7 +134,7 @@ foreach($Posts as $Post){
 		<tr class='smallhead'>
 			<td  colspan="2">
 				<span style="float:left;"><a href='torrents.php?id=<?=$GroupID?>&amp;postid=<?=$PostID?>#post<?=$PostID?>'>#<?=$PostID?></a>
-					by <?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, false, true)?> <?=time_diff($AddedTime) ?>
+					by <?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, false, true, $GroupPermID)?> <?=time_diff($AddedTime) ?>
 					on <a href="torrents.php?id=<?=$GroupID?>"><?=$Title?></a>
 				</span>
 			</td>

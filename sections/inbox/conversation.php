@@ -39,7 +39,7 @@ $DB->query("SELECT UserID, Username, PermissionID, CustomPermissions, Enabled, D
 	WHERE pm.ConvID='$ConvID'");
 $UsersInMessages = $DB->to_array(); */
 
-$DB->query("SELECT pm.UserID, Username, PermissionID, CustomPermissions, Enabled, Donor, Warned, Title
+$DB->query("SELECT pm.UserID, Username, PermissionID, GroupPermissionID, CustomPermissions, Enabled, Donor, Warned, Title
 	FROM pm_conversations_users AS pm
 	JOIN users_info AS ui ON ui.UserID=pm.UserID
 	JOIN users_main AS um ON um.ID=pm.UserID
@@ -47,10 +47,10 @@ $DB->query("SELECT pm.UserID, Username, PermissionID, CustomPermissions, Enabled
 $UsersInMessages = $DB->to_array();
 //$SenderID=-1;
 foreach($UsersInMessages as $UserM){
-    list($PMUserID, $Username, $PermissionID, $CustomPermissions, $Enabled, $Donor, $Warned, $Title) = $UserM;
+    list($PMUserID, $Username, $PermissionID, $GroupPermID, $CustomPermissions, $Enabled, $Donor, $Warned, $Title) = $UserM;
 	$PMUserID = (int)$PMUserID;
     //if($SenderID==-1)$SenderID=$PMUserID;//kind of hacky way of getting the sender without waiting for loop thru messages later
-	$Users[$PMUserID]['UserStr'] = format_username($PMUserID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $Title, true);
+	$Users[$PMUserID]['UserStr'] = format_username($PMUserID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $Title, true, $GroupPermID);
 	$Users[$PMUserID]['Username'] = $Username;
 	$Users[$PMUserID]['AdvTags'] = get_permissions_advtags($PMUserID, $CustomPermissions);
 }

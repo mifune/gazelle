@@ -3008,3 +3008,10 @@ blue smaller
     color: white;
     text-decoration: none;
 }
+
+.groupperm {
+    display:inline-block;
+    position: relative;
+    top:-3px;
+    font-size:0.8em;
+}

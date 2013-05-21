@@ -39,15 +39,15 @@ $DB->query("SELECT
 	WHERE c.ID='$ConvID' AND UserID='$UserID'");
 list($Subject, $Sticky, $UnRead, $ForwardedID, $ForwardedName) = $DB->next_record();
 
-$DB->query("SELECT UserID, Username, PermissionID, Enabled, Donor, Warned
+$DB->query("SELECT UserID, Username, PermissionID, GroupPermissionID, Enabled, Donor, Warned
 	FROM pm_messages AS pm
 	JOIN users_info AS ui ON ui.UserID=pm.SenderID
 	JOIN users_main AS um ON um.ID=pm.SenderID
 	WHERE pm.ConvID='$ConvID'");
 
-while(list($PMUserID, $Username, $PermissionID, $Enabled, $Donor, $Warned) = $DB->next_record()) {
+while(list($PMUserID, $Username, $PermissionID, $GroupPermissionID, $Enabled, $Donor, $Warned) = $DB->next_record()) {
 	$PMUserID = (int)$PMUserID;
-	$Users[$PMUserID]['UserStr'] = format_username($PMUserID, $Username, $Donor, $Warned, $Enabled, $PermissionID);
+	$Users[$PMUserID]['UserStr'] = format_username($PMUserID, $Username, $Donor, $Warned, $Enabled, $PermissionID,false,false,$GroupPermissionID);
 	$Users[$PMUserID]['Username'] = $Username;
 }
 $Users[0]['UserStr'] = 'System'; // in case it's a message from the system

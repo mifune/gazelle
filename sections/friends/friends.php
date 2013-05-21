@@ -31,6 +31,7 @@ $DB->query("SELECT
 	m.Uploaded,
 	m.Downloaded,
 	m.PermissionID,
+	m.GroupPermissionID,
 	m.Enabled,
 	m.Paranoia,
 	i.Donor,
@@ -78,14 +79,14 @@ if($Results == 0) {
 } else {
     // Start printing out friends
     foreach($Friends as $Friend) {
-          list($FriendID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $Friend;
+          list($FriendID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $GroupPermID, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $Friend;
     ?>
     <form action="friends.php" method="post">
           <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
           <table class="friends_table vertical_margin">
                 <tr>
                       <td class="colhead" colspan="3">
-                            <span style="float:left;"><?=format_username($FriendID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true)?>
+                            <span style="float:left;"><?=format_username($FriendID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true, $GroupPermID)?>
     <?	if(check_paranoia('ratio', $Paranoia, $Class, $FriendID)) { ?>
                             &nbsp;Ratio: <strong><?=ratio($Uploaded, $Downloaded)?></strong>
     <?	} ?>

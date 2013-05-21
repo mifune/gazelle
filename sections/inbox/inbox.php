@@ -116,7 +116,8 @@ if ($Section == 'sentbox'){
           ui.Warned,
           um.Enabled, 
           cu.ReceivedDate AS Date, 
-          um.PermissionID
+          um.PermissionID, 
+          um.GroupPermissionID
           FROM pm_conversations AS c
           LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
           LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID AND pms.SenderID!='$UserID' 
@@ -200,7 +201,7 @@ echo $Pages;
 				</tr>
 <?
 	$Row = 'a';
-	while(list($ConvID, $Subject, $Unread, $Sticky, $SenderID, $Username, $Donor, $Warned, $Enabled, $Date, $ClassID) = $DB->next_record()) {
+	while(list($ConvID, $Subject, $Unread, $Sticky, $SenderID, $Username, $Donor, $Warned, $Enabled, $Date, $ClassID, $GroupPermID) = $DB->next_record()) {
 		if($Unread === '1') {
 			$RowClass = 'unreadpm';
 		} else {
@@ -218,7 +219,7 @@ echo $Pages;
 <?
 		if($Unread) { echo '</strong>';} ?>
 					</td>
-					<td><?=format_username($SenderID, $Username, $Donor, $Warned, $Enabled, $ClassID)?></td>
+					<td><?=format_username($SenderID, $Username, $Donor, $Warned, $Enabled, $ClassID, false, false, $GroupPermID)?></td>
 					<td><?=time_diff($Date)?></td>
 				</tr>
 <?	} ?>

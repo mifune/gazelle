@@ -31,6 +31,7 @@ $DB->query("SELECT
 	m.Uploaded,
 	m.Downloaded,
 	m.PermissionID,
+	m.GroupPermissionID,
 	m.Enabled,
 	m.Paranoia,
 	i.Donor,
@@ -176,7 +177,7 @@ if($Results == 0) {
 	echo '<p>There are no users in this group</p>';
 } else {
     foreach($Users as $User) {
-          list($UserID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $User;
+          list($UserID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $GroupPermID, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $User;
     ?>
     <form action="groups.php" method="post">
           <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
@@ -186,7 +187,7 @@ if($Results == 0) {
           <table class="friends_table vertical_margin">
                 <tr>
                       <td class="colhead" colspan="3">
-                            <span style="float:left;"><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true)?>
+                            <span style="float:left;"><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true, $GroupPermID, true)?>
     <?	if(check_paranoia('ratio', $Paranoia, $Class, $UserID)) { ?>
                             &nbsp;Ratio: <strong><?=ratio($Uploaded, $Downloaded)?></strong>
     <?	} ?>

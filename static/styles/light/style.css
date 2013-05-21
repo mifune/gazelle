@@ -2547,7 +2547,7 @@ h2 span.arrow img {
     border-radius: 8px;  
     -moz-border-radius: 8px; 
     -webkit-border-radius: 8px;  
-    z-index: 10;
+    z-index: 10000;
 }
 #user_dropdown:hover ul {
     display: block; 
@@ -2572,4 +2572,12 @@ h2 span.arrow img {
     background-color: #0d245a ;
     color: white;
     text-decoration: none;
+}
+
+.groupperm {
+    display:inline-block;
+    position: relative;
+    top:-5px;
+    font-size:0.8em;
+    font-weight: bold;
 }
