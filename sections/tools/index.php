@@ -649,10 +649,8 @@ switch ($_REQUEST['action']) {
                         $DB->query("UPDATE permissions SET Level='" . db_string($Level) . "',Name='" . db_string($Name) . "',`Values`='" . db_string(serialize($Values)) . "',DisplayStaff='" . db_string($DisplayStaff) . "',MaxSigLength='" . db_string($MaxSigLength) . "',MaxAvatarWidth='" . db_string($MaxAvatarWidth) . "',MaxAvatarHeight='" . db_string($MaxAvatarHeight) . "',Color='" . db_string($Color) . "' WHERE ID='" . db_string($_REQUEST['id']) . "'");
                         $Cache->delete_value('perm_' . $_REQUEST['id']);
                     }
-                    if ($IsUserClass)
-                        $Cache->delete_value('classes');
-                    else
-                        $Cache->delete_value('group_permissions');
+                    $Cache->delete_value('classes');
+                    $Cache->delete_value('group_permissions');
                 } else {
                     error($Err);
                 }
