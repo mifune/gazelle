@@ -132,8 +132,8 @@ $Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 50
                 </select>
             </td>
             <td class="center">
-                <label for="days" title="include where ban was >= weeks">banned within last </label>&nbsp;
-                <input type="text" size="2" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)" id="days" name="weeks"  value="<?=$Weeks?>" />
+                <label for="weeks" title="include where ban was >= weeks">banned within last </label>&nbsp;
+                <input type="text" size="2" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)" id="weeks" name="weeks"  value="<?=$Weeks?>" />
                 weeks
             </td>
         </tr>
