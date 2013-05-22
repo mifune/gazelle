@@ -119,7 +119,7 @@ $Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 50
     <table width="100%">
         <tr>   
            <td class="colhead center" colspan="2">
-                Viewing: banned for <?=$Reasons[$BanReason]?> in the last <?=$Days?> weeks &nbsp; (order: <?="$OrderBy $OrderWay"?>)
+                Viewing: banned for <?=$Reasons[$BanReason]?> in the last <?=$Weeks?> weeks &nbsp; (order: <?="$OrderBy $OrderWay"?>)
             </td>
         </tr>
         <tr>
