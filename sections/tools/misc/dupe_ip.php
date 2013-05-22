@@ -83,7 +83,7 @@ show_header('Dupe IPs','dupeip');
         if($NumResults==0){
 ?> 
                     <tr class="rowb">
-                        <td class="center" colspan="4">no duped ips</td>
+                        <td class="center" colspan="5">no duped ips</td>
                     </tr>
 <?      } else {
             $i=0;
