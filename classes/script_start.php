@@ -1573,16 +1573,16 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
         }
         $FType = isset($Friends[$UserID]) ? $Friends[$UserID]['Type'] : false;
         if(!$FType || $FType != 'friends' ) { 
-                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'">Add to friends</a></li>';
+                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'" title="Add this user to your friends list">Add to friends</a></li>';
         } elseif ($FType == 'friends'){ 
-                $ddlist .= '<li><a href="friends.php?action=Defriend&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'">Remove friend</a></li>';
+                $ddlist .= '<li><a href="friends.php?action=Defriend&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'" title="Remove this user from your friends list">Remove friend</a></li>';
         }
         if(!$FType || $FType != 'blocked' ) {
-                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'">Block User</a></li>';
+                $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'" title="Add this user to your blocked list (blocks from sending PMs to you)">Block User</a></li>';
         } elseif ($FType == 'blocked'){ 
-                $ddlist .= '<li><a href="friends.php?action=Unblock&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'">Remove block</a></li>';
+                $ddlist .= '<li><a href="friends.php?action=Unblock&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'" title="Remove this user from your blocked list">Remove block</a></li>';
         }
-        $ddlist .= '<li><a href="reports.php?action=report&amp;type=user&amp;id='.$UserID.'">Report User</a></li>';
+        // $ddlist .= '<li><a href="reports.php?action=report&amp;type=user&amp;id='.$UserID.'">Report User</a></li>';
          
         $str = "<div id=\"user_dropdown\">$str<ul>$ddlist</ul></div>";
     }
@@ -1598,7 +1598,7 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     }
     //$str.=(!$IsEnabled) ? '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' : '';
 
-    if($GroupPerm) $str.= ' '. make_groupperm_string($GroupPerm, TRUE).' ';  // ' (' . make_groupperm_string($GroupPerm, TRUE) . ')' ;
+    if($GroupPerm) $str.= make_groupperm_string($GroupPerm, TRUE) ;  // ' (' . make_groupperm_string($GroupPerm, TRUE) . ')' ;
     if($Class) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
     if($Title){
         if($Class || $GroupPerm) $str.= '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' ;

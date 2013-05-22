@@ -2466,4 +2466,6 @@ img.win.flash {
     position: relative;
     top:-3px;
     font-size:0.9em;
+    font-weight: bold;
+    margin: 0px 1px 0px 2px;
 }

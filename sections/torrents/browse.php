@@ -524,7 +524,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                     <tr>
                         <td class="label" style="width:140px" title="Searches Title and Description">Search Terms:</td>
                         <td colspan="3">
-                            <input type="text" spellcheck="false" size="40" name="searchtext" class="inputtext" title="Use -word to exclude a word" value="<? form('searchtext') ?>" />
+                            <input type="text" spellcheck="false" size="40" name="searchtext" class="inputtext" title="Use 'Any' or 'All' option to determine whether search is AND or OR" value="<? form('searchtext') ?>" />
                             <input type="radio" name="search_type" id="search_type0" value="0" <? selected('search_type', 0, 'checked') ?> /><label for="search_type0"> Any</label>&nbsp;&nbsp;
                             <input type="radio" name="search_type" id="search_type1" value="1"  <? selected('search_type', 1, 'checked') ?> /><label for="search_type1"> All</label>
                             <? if (!empty($LoggedUser['SearchType'])) { ?>
@@ -546,7 +546,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                 <tr>                    
                     <td class="label" style="width:140px" title="Search Tags">Tags:</td>
                     <td colspan="3">
-                        <input type="text" size="40" id="tags" name="taglist" class="inputtext" title="Use -tag to exclude tag" value="<?= str_replace('_', '.', form('taglist', true)) ?>" />&nbsp;					
+                        <input type="text" size="40" id="tags" name="taglist" class="inputtext" title="Use 'Any' or 'All' option to determine whether search is AND or OR" value="<?= str_replace('_', '.', form('taglist', true)) ?>" />&nbsp;					
                         <input type="radio" name="tags_type" id="tags_type0" value="0" <? selected('tags_type', 0, 'checked') ?> /><label for="tags_type0"> Any</label>&nbsp;&nbsp;
                         <input type="radio" name="tags_type" id="tags_type1" value="1"  <? selected('tags_type', 1, 'checked') ?> /><label for="tags_type1"> All</label>
                     
