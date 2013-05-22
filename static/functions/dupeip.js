@@ -33,7 +33,7 @@ function get_users(el_id, ip) {
 
 
 function change_view(order,way){
-    var days = parseInt($('#days').raw().value);
+    var weeks = parseInt($('#weeks').raw().value);
     var banr = $('#ban_reason').raw().selectedIndex ;
-    location.href = "tools.php?action=banned_ip_users&ban_reason="+banr+"&days="+days+"&order_by="+order+"&order_way="+way;
+    location.href = "tools.php?action=banned_ip_users&ban_reason="+banr+"&weeks="+weeks+"&order_by="+order+"&order_way="+way;
 }

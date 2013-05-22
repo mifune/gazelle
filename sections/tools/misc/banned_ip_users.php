@@ -41,7 +41,7 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('new_id', 'ne
 $Reasons = array(0=>'Unknown',1=>'Manual',2=>'Ratio',3=>'Inactive',4=>'Cheating' );
 $BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int)$_GET['ban_reason'] : 4 ;
 
-$Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 5000) ? (int)$_GET['days'] : 7 ;
+$Weeks =  (isset($_GET['weeks']) && is_number($_GET['weeks']) && $_GET['weeks'] < 5000) ? (int)$_GET['weeks'] : 7 ;
 
 list($Page,$Limit) = page_limit(25);
 
@@ -62,34 +62,39 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
              LIMIT $Limit ;");
 */
 
-$DB->query("SELECT SQL_CALC_FOUND_ROWS
-                   n.ID as new_id, 
-                   n.JoinDate as joindate, 
-                   b.IP as IP, 
-                   b.ID as b_id, 
-                   b.BanDate as bandate, 
-                   n.Username as new_name, 
-                   b.Username as b_name
-              FROM (SELECT bu.ID, bu.Username, bi.BanDate, bu.IP
-                    FROM users_info as bi 
-                    JOIN users_main as bu ON bi.UserID=bu.ID 
-                    WHERE bu.Enabled='2' AND bi.Banreason='$BanReason' AND bi.BanDate > (NOW() - INTERVAL $Days DAY)
-                        ) AS b
-              JOIN (SELECT nu.ID, nu.Username, ni.JoinDate, nu.IP
-                    FROM users_info as ni 
-                    JOIN users_main as nu ON ni.UserID=nu.ID 
-                    WHERE nu.Enabled='1'  
-                        ) AS n
-                        ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
-          ORDER BY $OrderBy $OrderWay
-             LIMIT $Limit ;");
+$CachedDupeResults = $Cache->get_value("dupeip_users_{$BanReason}_{$Weeks}_$OrderBy{$OrderWay}_$Page");
+if($CachedDupeResults===false) {
+    $DB->query("SELECT SQL_CALC_FOUND_ROWS
+                       n.ID as new_id, 
+                       n.JoinDate as joindate, 
+                       b.IP as IP, 
+                       b.ID as b_id, 
+                       b.BanDate as bandate, 
+                       n.Username as new_name, 
+                       b.Username as b_name
+                  FROM (SELECT bu.ID, bu.Username, bi.BanDate, bu.IP
+                        FROM users_info as bi 
+                        JOIN users_main as bu ON bi.UserID=bu.ID 
+                        WHERE bu.Enabled='2' AND bi.Banreason='$BanReason' AND bi.BanDate > (NOW() - INTERVAL $Weeks WEEK)
+                            ) AS b
+                  JOIN (SELECT nu.ID, nu.Username, ni.JoinDate, nu.IP
+                        FROM users_info as ni 
+                        JOIN users_main as nu ON ni.UserID=nu.ID 
+                        WHERE nu.Enabled='1'  
+                            ) AS n
+                            ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
+              ORDER BY $OrderBy $OrderWay
+                 LIMIT $Limit ;");
 
+    $DupeRecords = $DB->to_array();
+    $DB->query("SELECT FOUND_ROWS()");
+    list($NumResults) = $DB->next_record();
+    $CachedDupeResults = array($NumResults, $DupeRecords);
+    $Cache->cache_value("dupeip_users_{$BanReason}_{$Weeks}_$OrderBy{$OrderWay}_$Page", $CachedDupeResults, 3600*24);
+} else {
+    list($NumResults, $DupeRecords) = $CachedDupeResults;
+}
 
-
-$DupeRecords = $DB->to_array();
-$DB->query("SELECT FOUND_ROWS()");
-list($NumResults) = $DB->next_record();
- 
 $Pages=get_pages($Page,$NumResults,25,9);
 
 
@@ -114,12 +119,12 @@ $Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 50
     <table width="100%">
         <tr>   
            <td class="colhead center" colspan="2">
-                Viewing: banned for <?=$Reasons[$BanReason]?> in the last <?=$Days?> days &nbsp; (order: <?="$OrderBy $OrderWay"?>)
+                Viewing: banned for <?=$Reasons[$BanReason]?> in the last <?=$Days?> weeks &nbsp; (order: <?="$OrderBy $OrderWay"?>)
             </td>
         </tr>
         <tr>
             <td class="center">
-                <label for="ban_reason" title="View Speed">Ban Reason </label>
+                <label for="ban_reason" title="View Speed">Ban Reason </label>&nbsp;
                 <select id="ban_reason" name="ban_reason" title="" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)">
 <?                  foreach($Reasons as $Key=>$Reason) {   ?>
                         <option value="<?=$Key?>" <?=($Key==$BanReason?' selected="selected"':'');?>>&nbsp;<?=$Reason;?> &nbsp;</option>
@@ -127,8 +132,9 @@ $Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 50
                 </select>
             </td>
             <td class="center">
-                <label for="days" title="include where ban was >= days">banned within days: </label>
-                <input type="text" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)" id="days" name="days"  value="<?=$Days?>" />
+                <label for="days" title="include where ban was >= weeks">banned within last </label>&nbsp;
+                <input type="text" size="2" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)" id="days" name="weeks"  value="<?=$Weeks?>" />
+                weeks
             </td>
         </tr>
     </table>
