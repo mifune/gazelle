@@ -26,8 +26,8 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
 }
  
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('NumUsers', 'IP', 'StartTime', 'EndTime' ))) {
-    $_GET['order_by'] = 'EndTime';
-    $OrderBy = 'EndTime'; 
+    $_GET['order_by'] = 'NumUsers';
+    $OrderBy = 'NumUsers'; 
 } else {
     $OrderBy = $_GET['order_by'];
 }
@@ -44,6 +44,7 @@ $RS = $DB->query("SELECT
                     Max(EndTime) as EndTime
                   FROM users_history_ips 
                   GROUP BY IP
+                  HAVING NumUsers>1
                   ORDER BY $OrderBy $OrderWay
                   LIMIT $Limit ");
 

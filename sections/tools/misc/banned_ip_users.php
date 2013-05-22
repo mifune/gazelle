@@ -20,7 +20,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
         $NewWay = $DefaultWay;
     }
 
-    return "tools.php?action=banned&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
+    return "tools.php?action=banned_ip_users&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
 if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
@@ -39,14 +39,13 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('new_id', 'ne
  * BanReason 0 - Unknown, 1 - Manual, 2 - Ratio, 3 - Inactive, 4 - Cheating.
  */
 $Reasons = array(0=>'Unknown',1=>'Manual',2=>'Ratio',3=>'Inactive',4=>'Cheating' );
-$BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int)$_GET['ban_reason'] : 2 ;
+$BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int)$_GET['ban_reason'] : 4 ;
 
-$Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 5000) ? (int)$_GET['days'] : 14 ;
+$Days =  (isset($_GET['days']) && is_number($_GET['days']) && $_GET['days'] < 5000) ? (int)$_GET['days'] : 7 ;
 
-list($Page,$Limit) = page_limit(50);
+list($Page,$Limit) = page_limit(25);
 
-
-
+/*
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                    nu.ID as new_id, 
                    ni.JoinDate as joindate, 
@@ -56,18 +55,42 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
                    nu.Username as new_name, 
                    bu.Username as b_name
               FROM users_info as bi 
-              JOIN users_main as bu ON bi.UserID=bu.ID AND bu.Enabled='2' 
-                    AND bi.Banreason='$BanReason' AND bi.BanDate > NOW() - INTERVAL $Days DAY
+              JOIN users_main as bu ON bi.UserID=bu.ID AND bu.Enabled='2' AND bi.Banreason='$BanReason' AND bi.BanDate > NOW() - INTERVAL $Days DAY
               JOIN users_main AS nu ON nu.Enabled='1' AND  nu.ID!=bu.ID AND nu.IP=bu.IP    
               JOIN users_info AS ni ON ni.UserID=nu.ID AND ni.JoinDate>bi.BanDate 
           ORDER BY $OrderBy $OrderWay
              LIMIT $Limit ;");
+*/
+
+$DB->query("SELECT SQL_CALC_FOUND_ROWS
+                   n.ID as new_id, 
+                   n.JoinDate as joindate, 
+                   b.IP as IP, 
+                   b.ID as b_id, 
+                   b.BanDate as bandate, 
+                   n.Username as new_name, 
+                   b.Username as b_name
+              FROM (SELECT bu.ID, bu.Username, bi.BanDate, bu.IP
+                    FROM users_info as bi 
+                    JOIN users_main as bu ON bi.UserID=bu.ID 
+                    WHERE bu.Enabled='2' AND bi.Banreason='$BanReason' AND bi.BanDate > (NOW() - INTERVAL $Days DAY)
+                        ) AS b
+              JOIN (SELECT nu.ID, nu.Username, ni.JoinDate, nu.IP
+                    FROM users_info as ni 
+                    JOIN users_main as nu ON ni.UserID=nu.ID 
+                    WHERE nu.Enabled='1'  
+                        ) AS n
+                        ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
+          ORDER BY $OrderBy $OrderWay
+             LIMIT $Limit ;");
+
+
 
 $DupeRecords = $DB->to_array();
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
  
-$Pages=get_pages($Page,$NumResults,50,9);
+$Pages=get_pages($Page,$NumResults,25,9);
 
 
 show_header('Dupe IPs','dupeip');
