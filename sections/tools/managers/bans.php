@@ -75,85 +75,85 @@ $DB->set_query_id($Bans);
 ?>
 
 <div class="thin">
-<h2>IP Bans</h2>
-<div>
-	<form action="" method="get">
-		<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
-			<tr>
-				<td class="label"><label for="ip">IP:</label></td>
-				<td>
-					<input type="hidden" name="action" value="ip_ban" />
-					<input type="text" id="ip" name="ip" size="20" value="<?=(!empty($_GET['ip']) ? display_str($_GET['ip']) : '')?>" />
-				</td>
-				<td class="label"><label for="notes">Notes:</label></td>
-				<td>
-					<input type="hidden" name="action" value="ip_ban" />
-					<input type="text" id="notes" name="notes" size="60" value="<?=(!empty($_GET['notes']) ? display_str($_GET['notes']) : '')?>" />
-				</td>
-				<td>
-					<input type="submit" value="Search" />
-				</td>
-			</tr>
-		</table>	
-	</form>
-</div>
-<br />
+    <h2>IP Bans</h2>
+    <div>
+        <form action="" method="get">
+            <table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
+                <tr>
+                    <td class="label"><label for="ip">IP:</label></td>
+                    <td>
+                        <input type="hidden" name="action" value="ip_ban" />
+                        <input type="text" id="ip" name="ip" size="20" value="<?=(!empty($_GET['ip']) ? display_str($_GET['ip']) : '')?>" />
+                    </td>
+                    <td class="label"><label for="notes">Notes:</label></td>
+                    <td>
+                        <input type="hidden" name="action" value="ip_ban" />
+                        <input type="text" id="notes" name="notes" size="60" value="<?=(!empty($_GET['notes']) ? display_str($_GET['notes']) : '')?>" />
+                    </td>
+                    <td>
+                        <input type="submit" value="Search" />
+                    </td>
+                </tr>
+            </table>	
+        </form>
+    </div>
+    <br />
 
-<h3>Manage</h3>
-<?=$PageLinks?>
-<table width="100%">
-	<tr class="colhead">
-		<td colspan="2">Range</td>
-		<td>Notes</td>
-		<td>Submit</td>
-	</tr>
-	<tr class="rowa">
-		<form action="" method="post">
-			<input type="hidden" name="action" value="ip_ban" />
-			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-			<td colspan="2">
-				<input type="text" size="12" name="start" />
-				<input type="text" size="12" name="end" />
-			</td>
-			<td>
-				<input type="text" size="72" name="notes" />
-			</td>
-			<td>
-				<input type="submit" name="submit" value="Create" />
-			</td>
-			
-		</form>
-	</tr>
+    <h2>Manage</h2>
+    <div class="linkbox"><?=$PageLinks?></div>
+    <table width="100%">
+        <tr class="colhead">
+            <td colspan="2">Range</td>
+            <td>Notes</td>
+            <td>Submit</td>
+        </tr>
+        <tr class="rowa">
+            <form action="" method="post">
+                <input type="hidden" name="action" value="ip_ban" />
+                <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+                <td colspan="2">
+                    <input type="text" size="12" name="start" />
+                    <input type="text" size="12" name="end" />
+                </td>
+                <td>
+                    <input type="text" size="72" name="notes" />
+                </td>
+                <td>
+                    <input type="submit" name="submit" value="Create" />
+                </td>
+
+            </form>
+        </tr>
 <?
-$Row = 'a';
-while(list($ID, $Start, $End, $Reason) = $DB->next_record()){
-	$Row = ($Row === 'a' ? 'b' : 'a');
-	$Start=long2ip($Start);
-	$End=long2ip($End);
+    $Row = 'a';
+    while(list($ID, $Start, $End, $Reason) = $DB->next_record()){
+        $Row = ($Row === 'a' ? 'b' : 'a');
+        $Start=long2ip($Start);
+        $End=long2ip($End);
 ?>
-	<tr class="row<?=$Row?>">
-		<form action="" method="post">
-			<input type="hidden" name="id" value="<?=$ID?>" />
-			<input type="hidden" name="action" value="ip_ban" />
-			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-			<td colspan="2">
-				<input type="text" size="12" name="start" value="<?=$Start?>" />
-				<input type="text" size="12" name="end" value="<?=$End?>" />
-			</td>
-			<td>
-				<input type="text" size="72" name="notes" value="<?=$Reason?>" />
-			</td>
-			<td>
-				<input type="submit" name="submit" value="Edit" />
-				<input type="submit" name="submit" value="Delete" />
-			</td>
-			
-		</form>
-	</tr>
+        <tr class="row<?=$Row?>">
+            <form action="" method="post">
+                <input type="hidden" name="id" value="<?=$ID?>" />
+                <input type="hidden" name="action" value="ip_ban" />
+                <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+                <td colspan="2">
+                    <input type="text" size="12" name="start" value="<?=$Start?>" />
+                    <input type="text" size="12" name="end" value="<?=$End?>" />
+                </td>
+                <td>
+                    <input type="text" size="72" name="notes" value="<?=$Reason?>" />
+                </td>
+                <td>
+                    <input type="submit" name="submit" value="Edit" />
+                    <input type="submit" name="submit" value="Delete" />
+                </td>
+
+            </form>
+        </tr>
 <?
-}
+    }
 ?>
-</table>
-<?=$PageLinks?>
+    </table>
+    <div class="linkbox"><?=$PageLinks?></div>
 </div>
 <? show_footer(); ?>

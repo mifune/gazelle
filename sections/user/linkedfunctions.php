@@ -160,7 +160,7 @@ function user_dupes_table($UserID, $Username) {
 	}
     
     
-    
+    /*
 	$DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
 				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
@@ -174,7 +174,7 @@ function user_dupes_table($UserID, $Username) {
 				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID ) 
                 ORDER BY  UserID, IP  
                 LIMIT 50"); 
-    /*
+    
 	$DB->query(" SELECT e.UserID AS UserID, x.IP, 'tracker', 'account' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
 				 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID!= $UserID AND x.uid = $UserID
                  GROUP BY x.uid
@@ -190,6 +190,18 @@ function user_dupes_table($UserID, $Username) {
                  SELECT e1.UserID AS UserID, e1.IP, 'account', 'account' FROM users_history_ips AS e1 JOIN users_history_ips AS e ON e1.IP=e.IP 
 				 WHERE e1.IP != '127.0.0.1' AND e1.IP !='' AND e.UserID = $UserID AND e1.UserID != $UserID  
                 ORDER BY  UserID, IP   "); */
+    
+    
+    
+    
+	$DB->query("SELECT um.UserID AS UserID, um.IP 
+                  FROM users_history_ips AS um 
+                  JOIN users_history_ips AS me ON um.IP=me.IP 
+				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND me.UserID = $UserID AND um.UserID != $UserID 
+              ORDER BY UserID, IP  
+                LIMIT 50"); 
+    
+    
     $IPDupeCount = $DB->record_count();
     $IPDupes = $DB->to_array();
     if ($IPDupeCount>0) {
@@ -202,7 +214,7 @@ function user_dupes_table($UserID, $Username) {
             <table width="100%" id="iplinkeddiv" class="shadow">
 <?
             foreach($IPDupes AS $IPDupe) {
-                list($EUserID, $IP, $EType1, $EType2) = $IPDupe;
+                list($EUserID, $IP) = $IPDupe;  //, $EType1, $EType2) = $IPDupe;
                 $DupeInfo = user_info($EUserID);
 
             $Row = ($Row == 'a') ? 'b' : 'a';
@@ -214,9 +226,9 @@ function user_dupes_table($UserID, $Username) {
                 <td align="left">
                     <?=display_ip($IP, $DupeInfo['ipcc'])?>
                 </td>
-                <td align="left">
+                <!-- <td align="left">
                     <?="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
-                </td>
+                </td> -->
                 <td>
 <?
                     if ( !array_key_exists($EUserID, $Dupes) ) {
@@ -237,7 +249,7 @@ function user_dupes_table($UserID, $Username) {
     
      
     
-    
+    /*
 	$DB->query("(SELECT e.UserID, um.Email, 'account', 'history' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
 				 WHERE um.Email != '' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
@@ -250,6 +262,17 @@ function user_dupes_table($UserID, $Username) {
                 (SELECT um.UserID, um.Email, 'history', 'history' FROM users_history_emails AS um JOIN users_history_emails AS e ON um.Email=e.Email 
 				 WHERE um.Email != '' AND e.UserID = $UserID AND um.UserID != $UserID)
                 LIMIT 50");
+    */
+    
+    
+	$DB->query("SELECT um.UserID, um.Email 
+                  FROM users_history_emails AS um 
+                  JOIN users_history_emails AS me ON um.Email=me.Email 
+				 WHERE um.Email != '' AND me.UserID = $UserID AND um.UserID != $UserID 
+              ORDER BY UserID, Email  
+                LIMIT 50"); 
+    
+    
     $EDupeCount = $DB->record_count();
     $EDupes = $DB->to_array();
     if ($EDupeCount>0) {
@@ -276,25 +299,14 @@ function user_dupes_table($UserID, $Username) {
                 <td align="left">
                     <?=$EEmail?>
                 </td>
-                <td align="left">
+                <!-- <td align="left">
                     <?="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
-                </td>
+                </td> -->
                 <td>
 <?
-                    if ( !array_key_exists($EUserID, $Dupes) ) {
-?>
+                    if ( !array_key_exists($EUserID, $Dupes) ) {   ?>
 						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>">link</a>]
-                   <!-- <form method="POST" >
-                        <input type="hidden" name="action" value="dupes" />
-                        <input type="hidden" name="dupeaction" value="link" />
-                        <input type="hidden" name="userid" value="<?=$UserID?>" />
-                        <input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                        <input type="hidden" name="targetid" value="<?=$EUserID?>" />
-                        <input type="submit" name="submitlink" value="Link" id="submitlink" />
-                    </form> -->
-<?
-                    }
-?>
+<?                  }       ?>
                 </td> 
             </tr>
 <?

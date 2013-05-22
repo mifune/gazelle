@@ -1,70 +1,113 @@
 <?
 if(!check_perms('users_view_ips')) { error(403); }
-show_header('Dupe IPs');
-?>
-<div class="thin">
-	<h2>Dupe IPs</h2>
-<?
+
 define('USERS_PER_PAGE', 50);
 define('IP_OVERLAPS', 5);
+
+function header_link($SortKey, $DefaultWay = "desc") {
+    global $OrderBy, $OrderWay;
+    if ($SortKey == $OrderBy) {
+        if ($OrderWay == "desc") {
+            $NewWay = "asc";
+        } else {
+            $NewWay = "desc";
+        }
+    } else {
+        $NewWay = $DefaultWay;
+    }
+
+    return "tools.php?action=dupe_ips&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
+}
+if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
+    $OrderWay = 'asc'; // For header links
+} else {
+    $_GET['order_way'] = 'desc';
+    $OrderWay = 'desc';
+}
+ 
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('NumUsers', 'IP', 'StartTime', 'EndTime' ))) {
+    $_GET['order_by'] = 'EndTime';
+    $OrderBy = 'EndTime'; 
+} else {
+    $OrderBy = $_GET['order_by'];
+}
+
+
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
 
 $RS = $DB->query("SELECT 
-	SQL_CALC_FOUND_ROWS
-	m.ID,
-	m.IP,
-	m.Username,
-	m.PermissionID,
-	m.Enabled,
-	i.Donor,
-	i.Warned,
-	i.JoinDate,
-	(SELECT COUNT(DISTINCT h.UserID) FROM users_history_ips AS h WHERE h.IP=m.IP) AS Uses
-	FROM users_main AS m 
-	LEFT JOIN users_info AS i ON i.UserID=m.ID
-	WHERE (SELECT COUNT(DISTINCT h.UserID) FROM users_history_ips AS h WHERE h.IP=m.IP) >= ".IP_OVERLAPS."
-	AND m.Enabled = '1'
-	AND m.IP != '127.0.0.1'
-	ORDER BY Uses DESC LIMIT $Limit");
-$DB->query("SELECT FOUND_ROWS()");
-list($Results) = $DB->next_record();
-$DB->set_query_id($RS);
+                    SQL_CALC_FOUND_ROWS
+                    Count(UserID) as NumUsers,
+                    IP,
+                    Max(StartTime) as StartTime,
+                    Max(EndTime) as EndTime
+                  FROM users_history_ips 
+                  GROUP BY IP
+                  ORDER BY $OrderBy $OrderWay
+                  LIMIT $Limit ");
 
-if($DB->record_count()) {
+                   // GROUP_CONCAT(UserID SEPARATOR '|') AS UserIDs, 
+                //  WHERE IP != '127.0.0.1'
+
+$DupeIPtotals = $DB->to_array();
+$DB->query("SELECT FOUND_ROWS()");
+list($NumResults) = $DB->next_record();
+ 
+$Pages=get_pages($Page,$NumResults,USERS_PER_PAGE,9);
+
+
+show_header('Dupe IPs','dupeip');
+
 ?>
+<div class="thin">
+	<h2>Dupe IPs</h2>
 	<div class="linkbox">
-<?
-	$Pages=get_pages($Page,$Results,USERS_PER_PAGE, 11) ;
-	echo $Pages;
-?>
+		<strong><a href="tools.php?action=dupe_ips">[Dupe IP's]</a></strong>
+		<a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a>
 	</div>
+ 
+	<div class="linkbox"> <?=$Pages; ?> </div>
+    
+	<div class="head">Duped IP's</div>
 	<table width="100%">
 		<tr class="colhead">
-			<td>User</td>
-			<td>IP</td>
-			<td>Dupes</td>
-			<td>Registered</td>
+			<td><a href="<?=header_link('IP') ?>">IP</a></td>
+			<td class="center">Host</td>
+			<td class="center"><a href="<?=header_link('NumUsers') ?>">Num Users</a></td>
+			<td class="center"><a href="<?=header_link('StartTime') ?>">Last Start Time</a></td>
+            <td class="center"><a href="<?=header_link('EndTime') ?>">Last End Time</a></td>
 		</tr>
 <?
-	while(list($UserID, $IP, $Username, $PermissionID, $Enabled, $Donor, $Warned, $Joined, $Uses)=$DB->next_record()) {
-	$Row = ($Row == 'b') ? 'a' : 'b';
+        if($NumResults==0){
+?> 
+                    <tr class="rowb">
+                        <td class="center" colspan="4">no duped ips</td>
+                    </tr>
+<?      } else {
+            $i=0;
+            foreach ($DupeIPtotals as $Record) {
+                list($NumUsers, $IP, $StartTime, $EndTime) = $Record;
+                $Row = ($Row == 'a') ? 'b' : 'a';
+                $i++;
 ?>
-		<tr class="row<?=$Row?>">
-			<td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?></td>
-			<td><span style="float:left;"><?=get_host($IP)." ($IP)"?></span><span style="float:right;">[<a href="userhistory.php?action=ips&amp;userid=<?=$UserID?>" title="History">H</a>|<a href="user.php?action=search&amp;ip_history=on&amp;ip=<?=display_str($IP)?>" title="Search">S</a>]</span></td>
-			<td><?=display_str($Uses)?></td>
-			<td><?=time_diff($Joined)?></td>
-		</tr>
-<?	} ?>
+                <tr class="row<?=$Row?>">
+                    <td><?=display_str($IP)?><span style="float:right;">[<a href="user.php?action=search&amp;ip_history=on&amp;ip=<?=display_str($IP)?>" title="User Search on this IP" target="_blank">S</a>]</span></td>
+                    <td class="center"><?=get_host($IP)?></td>
+                    <td class="center"><?=display_str($NumUsers)?> &nbsp;
+                     <span style="float:right;">
+                         <a href="#" id="button_<?=$i?>" onclick="get_users('<?=$i?>', '<?=urlencode($IP)?>');return false;">(show)</a>
+                     </span>&nbsp;
+                    </td>
+                    <td class="center"><?=time_diff($StartTime)?></td>
+                    <td class="center"><?=time_diff($EndTime)?></td>
+                </tr>
+                <tr id="users_<?=$i?>" class="hidden"></tr>
+<?          } 
+        } 
+?>
 	</table>
-	<div class="linkbox">
-<? echo $Pages; ?>
-	</div>
-<? } else { ?>
-	<h2>There are currently no users with more than <?=IP_OVERLAPS?> IP overlaps.</h2>
-<? }
-?>
+	<div class="linkbox"> <?=$Pages; ?> </div>
 </div>
 <?
 show_footer();

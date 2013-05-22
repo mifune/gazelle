@@ -2593,7 +2593,7 @@ function error($Error, $Ajax=false) {
 }
 
 /**
- * @param BanReason 0 - Unknown, 1 - Manual, 2 - Ratio, 3 - Inactive, 4 - Unused.
+ * @param BanReason 0 - Unknown, 1 - Manual, 2 - Ratio, 3 - Inactive, 4 - Cheating.
  */
 function disable_users($UserIDs, $AdminComment, $BanReason = 1) {
     global $Cache, $DB;

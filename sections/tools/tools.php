@@ -109,7 +109,9 @@ if (check_perms('admin_update_geoip')) {
 			<tr><td><a href="tools.php?action=clear_cache">Clear/view a cache key</a></td></tr>
 <? } if (check_perms('users_view_ips')) { ?>
 			<tr><td><a href="tools.php?action=dupe_ips">Duplicate IPs</a></td></tr>
+			<tr><td><a href="tools.php?action=banned_ip_users">Returning Dupe IPs</a></td></tr>
 
+			<tr><td><a href="tools.php?action=dupe_ips_old">Old Duplicate IPs</a></td></tr>
 <? } if (check_perms('site_debug')) { ?>
 			<tr><td><a href="schedule.php?auth=<?=$LoggedUser['AuthKey']?>" onClick="return confirm('Are you sure you want to run the site schedule (may take minutes to complete)?');">Schedule</a></td></tr>
 			<tr><td><a href="tools.php?action=branches">Git branches</a></td></tr>

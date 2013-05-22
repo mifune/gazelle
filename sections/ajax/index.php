@@ -31,6 +31,10 @@ switch ($_GET['action']){
 		require(SERVER_ROOT.'/sections/ajax/get_taglist.php');
 		break;
     
+	case 'get_ip_dupes':
+		require(SERVER_ROOT.'/sections/ajax/get_ip_dupes.php');
+		break;
+    
     case 'get_badge_info':
 		require(SERVER_ROOT.'/sections/ajax/get_badge_info.php');
 		break;

@@ -128,7 +128,7 @@ switch ($_REQUEST['action']) {
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
             
-            disable_users(array($_REQUEST['userid']), "Disabled for cheating (0 stat downloading) by $LoggedUser[Username]", 2);
+            disable_users(array($_REQUEST['userid']), "Disabled for cheating (0 stat downloading) by $LoggedUser[Username]", 4);
             
         } 
         
@@ -143,7 +143,7 @@ switch ($_REQUEST['action']) {
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
              
-            disable_users(array($_REQUEST['userid']), "Disabled for cheating ($_REQUEST[pattern] matching records) by $LoggedUser[Username]", 2);
+            disable_users(array($_REQUEST['userid']), "Disabled for cheating ($_REQUEST[pattern] matching records) by $LoggedUser[Username]", 4);
             
         } 
         if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
@@ -162,7 +162,7 @@ switch ($_REQUEST['action']) {
             
             $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_REQUEST[userid]' ");
             list($Maxspeed) = $DB->next_record();
-            disable_users(array($_REQUEST['userid']), "Disabled for speeding (maxspeed=" . get_size($Maxspeed) . "/s) by $LoggedUser[Username]", 2);
+            disable_users(array($_REQUEST['userid']), "Disabled for speeding (maxspeed=" . get_size($Maxspeed) . "/s) by $LoggedUser[Username]", 4);
             
         } elseif ($_POST['banusers'] && is_number($_POST['banspeed']) && $_POST['banspeed'] > 0) {
 
@@ -176,7 +176,7 @@ switch ($_REQUEST['action']) {
                 $UserIDs = explode('|', $UserIDs);
                 if( count($UserIDs)>0 ) {
                     //error(print_r($UserIDs, true));
-                    disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 2);
+                    disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 4);
                 }
             }
         }
@@ -796,8 +796,14 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/misc/repair_geodist.php');
         break;
 
+    case 'dupe_ips_old':
+        include(SERVER_ROOT . '/sections/tools/misc/dupe_ip_old.php');
+        break;
     case 'dupe_ips':
         include(SERVER_ROOT . '/sections/tools/misc/dupe_ip.php');
+        break;
+    case 'banned_ip_users':
+        include(SERVER_ROOT . '/sections/tools/misc/banned_ip_users.php');
         break;
 
     case 'clear_cache':
