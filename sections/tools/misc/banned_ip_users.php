@@ -41,7 +41,8 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('new_id', 'ne
 $Reasons = array(0=>'Unknown',1=>'Manual',2=>'Ratio',3=>'Inactive',4=>'Cheating' );
 $BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int)$_GET['ban_reason'] : 4 ;
 
-$Weeks =  (isset($_GET['weeks']) && is_number($_GET['weeks']) && $_GET['weeks'] < 5000) ? (int)$_GET['weeks'] : 7 ;
+$Weeks =  (isset($_GET['weeks']) && is_number($_GET['weeks']) ) ? (int)$_GET['weeks'] : 1 ;
+if ($Weeks > 104) $Weeks = 104;
 
 list($Page,$Limit) = page_limit(25);
 
