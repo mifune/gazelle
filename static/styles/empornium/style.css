@@ -199,6 +199,8 @@ ul.thin li { margin:0px 0px; padding:0px; }
 #menu ul {
     position: relative;
     z-index: 1;
+    white-space:nowrap;
+    display: inline-block;
 }
 
 #menu ul li {
@@ -2469,3 +2471,22 @@ img.win.flash {
     font-weight: bold;
     margin: 0px 1px 0px 2px;
 }
+
+.user_peers {
+    font-size: 12px;
+    font-weight: bold;
+}
+a#nav_seeding {
+    margin-left:25px;
+}
+a#nav_leeching {
+    margin-left:5px;
+}
+#nav_seeding_r {
+    color:#41eB00;
+}
+#nav_leeching_r {
+    color:#FF6600;
+}
+
+ 

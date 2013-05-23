@@ -348,6 +348,8 @@ if(check_perms('admin_reports')) {
 			<li id="nav_requests"><a href="requests.php">Requests</a></li>
                                 <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
 			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+		</ul>
+		<ul>
 			<li id="nav_irc"><a href="chat.php">Chat</a></li>
 			<li id="nav_top10"><a href="top10.php">Top10</a></li>
 			<li id="nav_rules"><a href="articles.php?topic=rules">Rules</a></li>
@@ -530,17 +532,21 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
 		</ul>
 	</div>
     </div>
-    
+<?
+    list($Seeding, $Leeching)=user_peers($LoggedUser['ID']);
+?>
     <div id="header_bottom">
             <div id="major_stats_left">
                 <ul id="userinfo_major">
-                        <li id="nav_logout" class="brackets"><a href="logout.php?auth=<?=$LoggedUser['AuthKey']?>">Logout</a></li>
-                      <li id="nav_donate" class="brackets"><a href="donate.php">Donate</a></li>
-                                <li id="nav_conncheck" class="normal"><a href="user.php?action=connchecker">Conn-Checker</a></li> 
+                    <li id="nav_logout" class="brackets"><a href="logout.php?auth=<?=$LoggedUser['AuthKey']?>">Logout</a></li>
+                    <li id="nav_donate" class="brackets"><a href="donate.php">Donate</a></li>
+                    <li id="nav_conncheck" class="normal"><a href="user.php?action=connchecker">Conn-Checker</a></li>
+                    
+                    <li><a id="nav_seeding" class="user_peers" href="torrents.php?type=seeding&amp;userid=<?=$LoggedUser['ID']?>" title="View seeding torrents">seed: <span id="nav_seeding_r"><?=number_format($Seeding)?></span></a></li>
+                    <li><a id="nav_leeching" class="user_peers" href="torrents.php?type=leeching&amp;userid=<?=$LoggedUser['ID']?>" title="View leeching torrents">leech: <span id="nav_leeching_r"><?=number_format($Leeching)?></span></a></li>
                 </ul>
             </div>
-        <?    
-           
+<?    
 
 if ($Sitewide_Freeleech_On) {
     

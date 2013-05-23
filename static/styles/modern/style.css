@@ -255,10 +255,18 @@ ul.thin li { margin:0px 0px; padding:0px; }
     padding-top: 12px;
     font-size: 1.1em;
 }
-
+/*
+ ########################  CHANGED HERE ####################################################  CHANGED HERE ############################
+ ########################  CHANGED HERE ####################################################  CHANGED HERE ############################
+ ########################  CHANGED HERE ####################################################  CHANGED HERE ############################
+ ########################  CHANGED HERE ####################################################  CHANGED HERE ############################
+ ########################  CHANGED HERE ####################################################  CHANGED HERE ############################
+*/
 #menu ul {
     position: relative;
     z-index: 1;
+    white-space:nowrap;
+    display: inline-block;
 }
 
 #menu ul li {
@@ -1863,11 +1871,6 @@ img.avatar {
 }
 */
 
-blockquote {
-    margin: 10px;
-    padding: 10px;
-    border: 1px dashed #98AAB1;
-}
 
 /* Signatures layout */ 
 
@@ -2133,18 +2136,51 @@ a.postlink {
 }
 span.quote_label {
   /*  text-align:left; */
-    float:left;
+    float:left; 
     font-size: 8pt;
     margin-left:10px;
-    margin-bottom: 4px;
+    margin-bottom: 0px;
+    position: relative;
+}
+blockquote {
+    margin: 6px 5px 5px;
+    padding: 10px;
+/*  border: 1px solid #98AAB1;  */
+    border: 1px dashed #98AAB1;
 }
 blockquote.bbcode {
     clear:both;
     background-color: #f4f4f4;
     color: #333;
     text-align: left;
-   /* font-size: 0.9em; */
+/*  border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+    box-shadow: 0 1px 0 #fff inset,0 2px 0 rgba(0,0,90,0.12),0 -2px 0 rgba(255,255,255,0.66) inset; */
 }
+/*
+span.quote_label:before {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 15px;
+    left: 6px;
+    border: none;
+    border-top: 1px solid #98AAB1;
+    border-left: 1px solid #98AAB1;
+    -webkit-box-shadow: 0 1px white inset,1px 0 white inset;
+    box-shadow: 0 1px white inset,1px 0 white inset;
+    background: #f4f4f4;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    z-index: 0;
+} */
+
 code.error {
     display:inline-block;
     color: #c00;
@@ -3017,3 +3053,24 @@ blue smaller
     font-weight: bold;
     margin: 0px 0px 0px 2px;
 }
+
+.user_peers {
+    font-size: 12px;
+    font-weight: bold;
+}
+a#nav_seeding {
+    margin-left:20px;
+}
+a#nav_leeching {
+    margin-left:5px;
+}
+#nav_seeding_r {
+    color:#41eB00;
+}
+#nav_leeching_r {
+    color:#FF6600;
+}
+
+ 
+  
+  

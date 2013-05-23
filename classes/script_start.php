@@ -458,6 +458,31 @@ function user_heavy_info($UserID) {
     return $HeavyInfo;
 }
 
+/**
+ * get the users seed leech info (caches for 15 mins)
+ * 
+ * @param int $UserID 
+ * @return array Returns array('Seeding'=>$Seeding, 'Leeching'=>$Leeching)
+ */
+function user_peers($UserID) { 
+    global $DB, $Cache;
+    $PeerInfo = $Cache->get_value('user_peers_' . $UserID);
+    if ($PeerInfo===false) {
+        $DB->query("SELECT IF(remaining=0,'Seeding','Leeching') AS Type, COUNT(x.uid) 
+                      FROM xbt_files_users AS x
+                      JOIN torrents AS t ON t.ID=x.fid 
+                     WHERE x.uid='$UserID' AND x.active=1 
+                  GROUP BY Type");
+        $PeerCount = $DB->to_array(0, MYSQLI_NUM, false);
+        $Seeding = isset($PeerCount['Seeding'][1]) ? $PeerCount['Seeding'][1] : 0;
+        $Leeching = isset($PeerCount['Leeching'][1]) ? $PeerCount['Leeching'][1] : 0;
+        $PeerInfo = array('Seeding'=>$Seeding, 'Leeching'=>$Leeching);
+        $Cache->cache_value('user_peers_' . $UserID, $PeerInfo, 900);
+    }
+    return $PeerInfo;
+}
+
+
 function update_site_options($UserID, $NewOptions) {
     if (!is_number($UserID)) {
         error(0);
