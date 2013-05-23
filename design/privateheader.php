@@ -533,7 +533,7 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
 	</div>
     </div>
 <?
-    list($Seeding, $Leeching)=user_peers($LoggedUser['ID']);
+    list($Seeding, $Leeching)= array_values(user_peers($LoggedUser['ID']));
 ?>
     <div id="header_bottom">
             <div id="major_stats_left">

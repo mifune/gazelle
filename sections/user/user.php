@@ -732,7 +732,7 @@ list($NumTagVotes) = $DB->next_record();
 <?
 
 if (check_paranoia_here('seeding+') || check_paranoia_here('leeching+')) {
-    list($Seeding, $Leeching)=user_peers($UserID);
+    list($Seeding, $Leeching)=array_values(user_peers($UserID));
     /*
 	$DB->query("SELECT IF(remaining=0,'Seeding','Leeching') AS Type, COUNT(x.uid) FROM xbt_files_users AS x INNER JOIN torrents AS t ON t.ID=x.fid WHERE x.uid='$UserID' AND x.active=1 GROUP BY Type");
 	$PeerCount = $DB->to_array(0, MYSQLI_NUM, false);
