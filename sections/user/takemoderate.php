@@ -656,7 +656,9 @@ if ($DisableRequests!=$Cur['DisableRequests'] && check_perms('users_disable_any'
 if ($EnableUser!=$Cur['Enabled'] && check_perms('users_disable_users')) {
 	$EnableStr = 'account '.translateUserStatus($Cur['Enabled']).'->'.translateUserStatus($EnableUser);
 	if($EnableUser == '2') {
-		disable_users($UserID, '', 1);
+        $BanReason = (int)$_POST['ban_reason'];
+        if($BanReason<0 || $BanReason>4) $BanReason=1;
+		disable_users($UserID, '', $BanReason);
 	} elseif($EnableUser == '1') {
 		$Cache->increment('stats_user_count');
 		update_tracker('add_user', array('id' => $UserID, 'passkey' => $Cur['torrent_pass']));

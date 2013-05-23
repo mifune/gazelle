@@ -69,7 +69,8 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
 		m.SeedHours,
 		m.SeedHoursDaily,
 		m.CreditsDaily,
-            m.Flag
+            m.Flag,
+            i.BanReason
 		FROM users_main AS m
 		JOIN users_info AS i ON i.UserID = m.ID
 		LEFT JOIN users_main AS inviter ON i.Inviter = inviter.ID
@@ -86,7 +87,7 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
               $AdminComment, $Donor, $Warned, $SupportFor, $RestrictedForums, $PermittedForums, $InviterID, $InviterName, $ForumPosts, 
               $RatioWatchEnds, $RatioWatchDownload, $SuppressConnPrompt, $DisableAvatar, $DisableInvites, $DisablePosting, $DisableForums, $DisableTagging, 
               $DisableUpload, $DisablePM, $DisableIRC, $DisableRequests, $DisableCountry, $FLTokens, $PersonalFreeLeech, $CommentHash,
-              $BonusCredits,$BonusLog,$MaxAvatarWidth, $MaxAvatarHeight, $SeedHistory, $SeedHoursTotal, $SeedHoursDaily, $CreditsDaily, $flag) = $DB->next_record(MYSQLI_NUM, array(14));
+              $BonusCredits,$BonusLog,$MaxAvatarWidth, $MaxAvatarHeight, $SeedHistory, $SeedHoursTotal, $SeedHoursDaily, $CreditsDaily, $flag, $BanReason) = $DB->next_record(MYSQLI_NUM, array(14));
 
 } else { // Person viewing is a normal user
 	$DB->query("SELECT
@@ -124,7 +125,8 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
                 p.MaxAvatarHeight,
             i.RatioWatchEnds,
             i.RatioWatchDownload,
-            m.Flag
+            m.Flag,
+            i.BanReason
 		FROM users_main AS m
 		JOIN users_info AS i ON i.UserID = m.ID
 		LEFT JOIN permissions AS p ON p.ID=m.PermissionID
@@ -139,7 +141,7 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
 	list($Username, $Email, $LastAccess, $IP, $ipcc, $Class, $Uploaded, $Downloaded, $RequiredRatio, $ClassID, $GroupPermID, 
               $Enabled, $Paranoia, $Invites, $CustomTitle, $torrent_pass, $DisableLeech, $JoinDate, $Info, $Avatar, $FLTokens, 
               $Country, $Donor, $Warned, $ForumPosts, $InviterID, $DisableInvites, $InviterName,$BonusCredits,$BonusLog,
-              $MaxAvatarWidth,$MaxAvatarHeight, $RatioWatchEnds, $RatioWatchDownload, $flag) = $DB->next_record(MYSQLI_NUM, array(12));
+              $MaxAvatarWidth,$MaxAvatarHeight, $RatioWatchEnds, $RatioWatchDownload, $flag, $BanReason) = $DB->next_record(MYSQLI_NUM, array(12));
 }
  
 
@@ -1959,6 +1961,7 @@ if (check_perms('users_mod', $Class)) {
     }
 
 	if (check_perms('users_disable_any')) {
+            $Reasons = array(0=>'Unknown',1=>'Manual',2=>'Ratio',3=>'Inactive',4=>'Cheating' );
 ?>
 			<tr>
 				<td class="label">Account:</td>
@@ -1972,6 +1975,14 @@ if (check_perms('users_mod', $Class)) {
 						<option value="delete">Delete Account</option>
 <?		} ?>
 					</select>
+                    &nbsp;&nbsp;
+                    <label for="ban_reason" title="When disabling a user this will be recorded as the ban reason">Ban Reason (when disabling) </label>&nbsp;
+                    <select name="ban_reason" title="When disabling a user this will be recorded as the ban reason">
+<?                      foreach($Reasons as $Key=>$Reason) {   ?>
+                            <option value="<?=$Key?>" <?=($Key==$BanReason?' selected="selected"':'');?>>&nbsp;<?=$Reason;?> &nbsp;</option>
+<?                      } ?>
+                    </select>
+                    
 				</td>
 			</tr>
 			<tr>
