@@ -348,8 +348,8 @@ if(check_perms('admin_reports')) {
 			<li id="nav_requests"><a href="requests.php">Requests</a></li>
                                 <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
 			<li id="nav_forums"><a href="forums.php">Forums</a></li>
-		</ul>
-		<ul>
+		<!-- </ul>
+		<ul> save for css changing update -->
 			<li id="nav_irc"><a href="chat.php">Chat</a></li>
 			<li id="nav_top10"><a href="top10.php">Top10</a></li>
 			<li id="nav_rules"><a href="articles.php?topic=rules">Rules</a></li>
