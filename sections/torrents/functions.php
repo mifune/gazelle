@@ -11,39 +11,7 @@ function get_group_info($GroupID, $Return = true) {
 	//TODO: Remove LogInDB at a much later date.
 	if(!is_array($TorrentCache) || !isset($TorrentCache[1][0]['LogInDB'])) {
 		// Fetch the group details
-        /*
-		$SQL = "SELECT
-                    g.Body,
-                    g.Image,
-			g.ID,
-			g.Name,
-			g.NewCategoryID,
-			g.Time,
-			GROUP_CONCAT(DISTINCT tags.Name SEPARATOR '|'),
-			GROUP_CONCAT(DISTINCT tags.ID SEPARATOR '|'),
-			GROUP_CONCAT(tt.UserID SEPARATOR '|'),
-			GROUP_CONCAT(tt.PositiveVotes SEPARATOR '|'),
-			GROUP_CONCAT(tt.NegativeVotes SEPARATOR '|')
-			FROM torrents_group AS g
-			LEFT JOIN torrents_tags AS tt ON tt.GroupID=g.ID
-			LEFT JOIN tags ON tags.ID=tt.TagID
-			WHERE g.ID='".db_string($GroupID)."'
-			GROUP BY NULL"; */
-
-
-        /*
-		$DB->query("
-            SELECT
-                GROUP_CONCAT(ttv.UserID SEPARATOR '|'),
-                GROUP_CONCAT(um.Username SEPARATOR '|'),
-                GROUP_CONCAT(ttv.Way SEPARATOR '|') ,
-                TagID              
-            FROM torrents_tags_votes AS ttv
-			LEFT JOIN users_main AS um ON um.ID=ttv.UserID
-            WHERE GroupID='$GroupID'
-            GROUP BY TagID    "); */
-        
-        
+     
 		$SQL = "SELECT
                 g.Body,
                 g.Image,
@@ -176,7 +144,7 @@ function get_group_info($GroupID, $Return = true) {
         
         foreach ($TorrentList as &$Torrent) {
             $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
-            $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
+            $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders']+100,'Leechers'=>$Torrent['Leechers']+100,'Snatched'=>$Torrent['Snatched']+100);
             $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
         }
         

@@ -2234,7 +2234,7 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 				$Found[$Torrent['GroupID']]['Torrents'][$Torrent['ID']] = $Torrent;
 		
                 $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
-                $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
+                $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders']+100,'Leechers'=>$Torrent['Leechers']+100,'Snatched'=>$Torrent['Snatched']+100);
                 $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
                 
 				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
