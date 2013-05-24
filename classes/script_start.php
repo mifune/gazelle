@@ -2405,21 +2405,6 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             $SnatchedTorrents = $DB->to_array('TorrentID');
             $Cache->cache_value('users_torrents_snatched_' . $UserID, $SnatchedTorrents, 21600);
         }
-        /*
-        if ($SnatchedTorrents===false || !isset($SnatchedTorrents[$TorrentID]['Snatched'])) {
-            $DB->query("SELECT x.fid 
-                          FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid 
-                         WHERE x.uid='$UserID' AND x.fid='$TorrentID' ");
-            $snatched = ($DB->record_count()>0) ? '1' : '0';
-                        
-            $SnatchedTorrents[$TorrentID] = array('TorrentID'=>$TorrentID, 'Snatched'=>$snatched) ;
-            // slightly heterodox method - xbt_snatched is updated directly from the tracker ... so we need
-            // to hard reset every now and again, but we also want to be able to add when just the element is missing - we just cant 
-            // reset the cache timeout every time we add an element or it will never time out, so we use this to force a reset 
-            // every 6 hrs but also allow adding elements to the cached array
-            $storeseconds = (strtotime("tomorrow 00:00:00") - time()) % 21600; 
-            $Cache->cache_value('users_torrents_snatched_' . $UserID, $SnatchedTorrents, $storeseconds);
-        } */
         
         $GrabbedTorrents = $Cache->get_value('users_torrents_grabbed_' .$UserID );
         if ($GrabbedTorrents===false) {
@@ -2431,19 +2416,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             $GrabbedTorrents = $DB->to_array('TorrentID');
             $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
         }
-            /*
-            if ($GrabbedTorrents===false || !isset($GrabbedTorrents[$TorrentID])) {
 
-                $DB->query("SELECT ud.TorrentID 
-                                  FROM users_downloads AS ud JOIN torrents AS t ON t.ID=ud.TorrentID 
-                                 WHERE ud.UserID='$UserID' AND ud.TorrentID='$TorrentID' ");
-                $grabbed = ($DB->record_count()>0) ? '1' : 'X';
-
-                $GrabbedTorrents[$TorrentID] = $grabbed ;
-                $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
-            }*/
-         
-      
         
         
         //icon_disk_grabbed icon_disk_snatched

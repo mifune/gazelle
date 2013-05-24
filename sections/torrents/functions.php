@@ -162,6 +162,15 @@ function get_group_info($GroupID, $Return = true) {
 }
 
 
+function get_status_icon_staff($Status, $Staffname, $Reason){
+    if ($Status == 'Warned' || $Status == 'Pending') 
+        return "<span title=\"$Status: [$Reason] by $Staffname\" class=\"icon icon_warning\"></span>";
+    elseif ($Status == 'Okay') 
+        return '<span title="This torrent has been checked by staff ('.$Staffname.') and is okay" class="icon icon_okay"></span>';
+    else return '';
+}
+
+
 function get_status_icon($Status){
     if ($Status == 'Warned' || $Status == 'Pending') return '<span title="This torrent will be automatically deleted unless the uploader fixes it" class="icon icon_warning"></span>';
     elseif ($Status == 'Okay') return '<span title="This torrent has been checked by staff and is okay" class="icon icon_okay"></span>';

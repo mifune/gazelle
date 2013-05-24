@@ -706,9 +706,16 @@ $Bookmarks = all_bookmarks('torrent');
             <td>
                     <? //print_torrent_status($TorrentID, $Data['Status']); ?>
 
-<?              if (check_perms('torrents_review') && $Data['Status'] == 'Okay') { 
-                    echo  '&nbsp;'.get_status_icon('Okay');
+<?              
+                if(check_perms('torrents_review')) {
+                    $AddExtra = get_status_icon_staff($Data['Status'], $Data['StatusUsername'], $Data['StatusDescription']) . $AddExtra;
+                } else {
+                    $AddExtra = get_status_icon($Data['Status']) . $AddExtra;
                 }
+                //if (check_perms('torrents_review') && $Data['Status'] == 'Okay') { 
+                    //echo  '&nbsp;'.get_status_icon('Okay');
+                    //$AddExtra = get_status_icon('Okay') . $AddExtra;
+                //}
                 if ($Data['ReportCount'] > 0) {
                     $Title = "This torrent has ".$Data['ReportCount']." active ".($Data['ReportCount'] > 1 ?'reports' : 'report');
                     $GroupName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
