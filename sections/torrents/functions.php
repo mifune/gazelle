@@ -76,7 +76,7 @@ function get_group_info($GroupID, $Return = true) {
 			LEFT JOIN users_main AS um2 ON um2.ID=ttv.UserID
             WHERE tt.GroupID='$GroupID'
             GROUP BY tt.TagID    ");
-		$TagDetails=$DB->to_array();
+		$TagDetails=$DB->to_array(false, MYSQLI_NUM);
         
 		// Fetch the individual torrents
 /*
@@ -173,20 +173,34 @@ function get_group_info($GroupID, $Return = true) {
 			}
 			die();
 		}
-		if(in_array(0, $DB->collect('Seeders'))) {
+        
+        foreach ($TorrentList as &$Torrent) {
+            $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
+            $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
+            $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
+        }
+        
+		/* if(in_array(0, $DB->collect('Seeders'))) {
 			$CacheTime = 120;
 			//$CacheTime = 600;
 		} else {
 			//$CacheTime = 3600;
             $CacheTime = 600; // lets just see how it goes with a time of 10 mins
-		}
+		} */
+        
 		// Store it all in cache
-            $Cache->cache_value('torrents_details_'.$GroupID,array($TorrentDetails,$TorrentList,$TagDetails),$CacheTime);
+        $Cache->cache_value('torrents_details_'.$GroupID,array($TorrentDetails,$TorrentList,$TagDetails), 3600);
 
 	} else { // If we're reading from cache
 		$TorrentDetails=$TorrentCache[0];
 		$TorrentList=$TorrentCache[1];
 		$TagDetails=$TorrentCache[2];
+        foreach ($TorrentList as &$Torrent) {
+            $TorrentPeerInfo = get_peers($Torrent['ID']);
+            $Torrent['Seeders']=$TorrentPeerInfo['Seeders'];
+            $Torrent['Leechers']=$TorrentPeerInfo['Leechers'];
+            $Torrent['Snatched']=$TorrentPeerInfo['Snatched'];
+        }
 	}
 
 	if($Return) {

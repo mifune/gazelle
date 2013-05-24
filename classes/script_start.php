@@ -2163,6 +2163,7 @@ function check_perms($PermissionName, $MinClass = 0) {
 }
 
 
+
 // Function to get data and torrents for an array of GroupIDs.
 // In places where the output from this is merged with sphinx filters, it will be in a different order.
 function get_groups($GroupIDs, $Return = true, $Torrents = true) {
@@ -2177,6 +2178,14 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 		if(!empty($Data) && (@$Data['ver'] >= 5)) {
 			unset($NotFound[$GroupID]);
 			$Found[$GroupID] = $Data['d'];
+            if($Torrents) {
+                foreach ($Found[$GroupID]['Torrents'] as $TID=>&$TData) {
+                    $TorrentPeerInfo = get_peers($TID);
+                    $TData['Seeders']=$TorrentPeerInfo['Seeders'];
+                    $TData['Leechers']=$TorrentPeerInfo['Leechers'];
+                    $TData['Snatched']=$TorrentPeerInfo['Snatched'];
+                }
+            }
 		}
 	}
 	
@@ -2224,6 +2233,10 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 			while($Torrent = $DB->next_record(MYSQLI_ASSOC, true)) {
 				$Found[$Torrent['GroupID']]['Torrents'][$Torrent['ID']] = $Torrent;
 		
+                $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
+                $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
+                $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
+                
 				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
 				$Cache->cache_value('torrent_group_light_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
 			}
@@ -2239,6 +2252,22 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 
 		return $Matches;
 	}
+}
+
+
+
+function get_peers($TorrentID) {
+    global $DB, $Cache, $LoggedUser;
+	
+	$TorrentPeerInfo = $Cache->get_value('torrent_peers_'.$TorrentID);
+	if ($TorrentPeerInfo===false) {  
+            // testing with 'dye'
+        $DB->query("SELECT Seeders+100, Leechers+100, Snatched+100 FROM torrents WHERE ID ='$TorrentID'");
+        $TorrentPeerInfo = $DB->next_record(MYSQLI_ASSOC) ;
+		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 600; 
+        $Cache->cache_value('torrent_peers_'.$TorrentID, $TorrentPeerInfo, $CacheTime); 
+    }
+    return $TorrentPeerInfo;
 }
 
 
