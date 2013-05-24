@@ -534,6 +534,10 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
     </div>
 <?
     list($Seeding, $Leeching)= array_values(user_peers($LoggedUser['ID']));
+    function get_peer_span($Spanid, $Num) {
+        if($Num>0) return '<span id="'.$Spanid.'">'.number_format($Num).'</span>';
+        else return '0';
+    }
 ?>
     <div id="header_bottom">
             <div id="major_stats_left">
@@ -542,8 +546,8 @@ if(!$Mobile && $LoggedUser['Rippy'] != 'Off') {
                     <li id="nav_donate" class="brackets"><a href="donate.php">Donate</a></li>
                     <li id="nav_conncheck" class="normal"><a href="user.php?action=connchecker">Conn-Checker</a></li>
                     
-                    <li><a id="nav_seeding" class="user_peers" href="torrents.php?type=seeding&amp;userid=<?=$LoggedUser['ID']?>" title="View seeding torrents">seed: <span id="nav_seeding_r"><?=number_format($Seeding)?></span></a></li>
-                    <li><a id="nav_leeching" class="user_peers" href="torrents.php?type=leeching&amp;userid=<?=$LoggedUser['ID']?>" title="View leeching torrents">leech: <span id="nav_leeching_r"><?=number_format($Leeching)?></span></a></li>
+                    <li><a id="nav_seeding" class="user_peers" href="torrents.php?type=seeding&amp;userid=<?=$LoggedUser['ID']?>" title="View seeding torrents">seed: <?=get_peer_span('nav_seeding_r',$Seeding)?></a></li>
+                    <li><a id="nav_leeching" class="user_peers" href="torrents.php?type=leeching&amp;userid=<?=$LoggedUser['ID']?>" title="View leeching torrents">leech: <?=get_peer_span('nav_leeching_r',$Leeching)?></a></li>
                 </ul>
             </div>
 <?    
