@@ -47,53 +47,6 @@ function get_group_info($GroupID, $Return = true) {
 		$TagDetails=$DB->to_array(false, MYSQLI_NUM);
         
 		// Fetch the individual torrents
-/*
-		$DB->query("
-			SELECT
-			t.ID,
-			t.FileCount,
-			t.Size,
-			t.Seeders,
-			t.Leechers,
-			t.Snatched,
-			t.FreeTorrent,
-                        t.double_seed,
-			t.Time,
-			t.FileList,
-			t.FilePath,
-			t.UserID,
-			um.Username,
-			t.last_action,
-			tbt.TorrentID,
-			tbf.TorrentID,
-			tfi.TorrentID,
-			t.LastReseedRequest,
-			tln.TorrentID AS LogInDB,
-			t.ID AS HasFile,
-                        tr.ID AS ReviewID,
-                        tr.Status,
-                        tr.ConvID,
-                        tr.Time AS StatusTime,
-                        tr.KillTime,
-                        IF(tr.ReasonID = 0, tr.Reason, rr.Description) AS StatusDescription,
-                        tr.UserID AS StatusUserID,
-                        su.Username AS StatusUsername
-			FROM torrents AS t
-			LEFT JOIN users_main AS um ON um.ID=t.UserID
-                        LEFT JOIN torrents_reviews AS tr ON tr.GroupID=t.GroupID
-                        LEFT JOIN review_reasons AS rr ON rr.ID=tr.ReasonID
-                        LEFT JOIN users_main AS su ON su.ID=tr.UserID
-			LEFT JOIN torrents_bad_tags AS tbt ON tbt.TorrentID=t.ID
-			LEFT JOIN torrents_bad_folders AS tbf on tbf.TorrentID=t.ID
-			LEFT JOIN torrents_bad_files AS tfi on tfi.TorrentID=t.ID
-			LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
-			WHERE t.GroupID='".db_string($GroupID)."' 
-                        AND (tr.Time IS NULL OR tr.Time=(SELECT MAX(torrents_reviews.Time) 
-                                                              FROM torrents_reviews 
-                                                              WHERE torrents_reviews.GroupID=t.GroupID))
-			AND flags != 1
-			GROUP BY t.ID
-			ORDER BY t.ID"); */
 
 		$DB->query("
 			SELECT
@@ -143,8 +96,8 @@ function get_group_info($GroupID, $Return = true) {
 		}
         
         foreach ($TorrentList as &$Torrent) {
-            $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
-            $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders']+100,'Leechers'=>$Torrent['Leechers']+100,'Snatched'=>$Torrent['Snatched']+100);
+            $CacheTime = $Torrent['Seeders']==0 ? 120 : 900; 
+            $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
             $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
         }
         

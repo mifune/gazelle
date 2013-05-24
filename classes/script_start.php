@@ -2211,18 +2211,6 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 		}
 		
 		if ($Torrents) {          
-            /*
-            $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
-                                        Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount,
-                                        tr.Status, tr.KillTime
-                                    FROM torrents AS t 
-                                        JOIN users_main AS um ON t.UserID=um.ID
-                                        LEFT JOIN (SELECT TorrentID, count(*) as ReportCount FROM reportsv2 WHERE Type != 'edited' AND Status != 'Resolved' GROUP BY TorrentID) AS r ON r.TorrentID=t.ID
-                                        LEFT JOIN torrents_reviews AS tr ON tr.GroupID=t.GroupID
-                                            WHERE t.GroupID IN($IDs) AND (tr.Time IS NULL OR tr.Time=(SELECT MAX(torrents_reviews.Time) 
-                                            FROM torrents_reviews 
-                                            WHERE torrents_reviews.GroupID=t.GroupID))
-                                    ORDER BY GroupID DESC, t.ID"); */
             
             $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
                                         Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount 
@@ -2236,8 +2224,8 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 			while($Torrent = $DB->next_record(MYSQLI_ASSOC, true)) {
 				$Found[$Torrent['GroupID']]['Torrents'][$Torrent['ID']] = $Torrent;
 		
-                $CacheTime = $Torrent['Seeders']==0 ? 120 : 600; 
-                $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders']+100,'Leechers'=>$Torrent['Leechers']+100,'Snatched'=>$Torrent['Snatched']+100);
+                $CacheTime = $Torrent['Seeders']==0 ? 120 : 900; 
+                $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
                 $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
                 
 				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
@@ -2265,9 +2253,9 @@ function get_peers($TorrentID) {
 	$TorrentPeerInfo = $Cache->get_value('torrent_peers_'.$TorrentID);
 	if ($TorrentPeerInfo===false) {  
             // testing with 'dye'
-        $DB->query("SELECT Seeders+100 as Seeders, Leechers+100 as Leechers, Snatched+100 as Snatched FROM torrents WHERE ID ='$TorrentID'");
+        $DB->query("SELECT Seeders, Leechers, Snatched FROM torrents WHERE ID ='$TorrentID'");
         $TorrentPeerInfo = $DB->next_record(MYSQLI_ASSOC) ;
-		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 600; 
+		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 900; 
         $Cache->cache_value('torrent_peers_'.$TorrentID, $TorrentPeerInfo, $CacheTime); 
     }
     return $TorrentPeerInfo;
