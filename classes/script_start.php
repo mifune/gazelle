@@ -2181,6 +2181,9 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
             if($Torrents) {
                 foreach ($Found[$GroupID]['Torrents'] as $TID=>&$TData) {
                     $TorrentPeerInfo = get_peers($TID);
+                    $TData[3]=$TorrentPeerInfo['Seeders'];
+                    $TData[4]=$TorrentPeerInfo['Leechers'];
+                    $TData[5]=$TorrentPeerInfo['Snatched'];
                     $TData['Seeders']=$TorrentPeerInfo['Seeders'];
                     $TData['Leechers']=$TorrentPeerInfo['Leechers'];
                     $TData['Snatched']=$TorrentPeerInfo['Snatched'];
@@ -2262,7 +2265,7 @@ function get_peers($TorrentID) {
 	$TorrentPeerInfo = $Cache->get_value('torrent_peers_'.$TorrentID);
 	if ($TorrentPeerInfo===false) {  
             // testing with 'dye'
-        $DB->query("SELECT Seeders+100, Leechers+100, Snatched+100 FROM torrents WHERE ID ='$TorrentID'");
+        $DB->query("SELECT Seeders+100 as Seeders, Leechers+100 as Leechers, Snatched+100 as Snatched FROM torrents WHERE ID ='$TorrentID'");
         $TorrentPeerInfo = $DB->next_record(MYSQLI_ASSOC) ;
 		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 600; 
         $Cache->cache_value('torrent_peers_'.$TorrentID, $TorrentPeerInfo, $CacheTime); 

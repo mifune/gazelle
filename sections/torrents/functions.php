@@ -165,6 +165,9 @@ function get_group_info($GroupID, $Return = true) {
 		$TagDetails=$TorrentCache[2];
         foreach ($TorrentList as &$Torrent) {
             $TorrentPeerInfo = get_peers($Torrent['ID']);
+            $Torrent[3]=$TorrentPeerInfo['Seeders'];
+            $Torrent[4]=$TorrentPeerInfo['Leechers'];
+            $Torrent[5]=$TorrentPeerInfo['Snatched'];
             $Torrent['Seeders']=$TorrentPeerInfo['Seeders'];
             $Torrent['Leechers']=$TorrentPeerInfo['Leechers'];
             $Torrent['Snatched']=$TorrentPeerInfo['Snatched'];
