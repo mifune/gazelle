@@ -354,7 +354,7 @@ foreach($Thread as $Key => $Post){
 	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
-				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true,$GroupPermissionID,true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
+				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true,$GroupPermissionID,true)?> <?=time_diff($AddedTime)?> 
 				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','r<?=$RequestID?>','<?=$Username?>');">[Quote]</a>
 <?if ( ($AuthorID == $LoggedUser['ID'] && ( time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME ) )
                                                                                             || check_perms('site_moderate_forums') ) { ?>				
@@ -363,6 +363,8 @@ if (check_perms('site_admin_forums')){ ?>
                         - <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
 			</span>
 			<span id="bar<?=$PostID?>" style="float:right;">
+                <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report]</a>
+                &nbsp;
 				<a href="#">&uarr;</a>
 			</span>
 		</td>

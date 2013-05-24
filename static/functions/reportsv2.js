@@ -74,7 +74,7 @@ function TakeResolve(reportid) {
 			ErrorBox(reportid, response);
 		} else {
 			if($('#from_delete' + reportid).raw().value > 0) {
-                window.location = location.protocol + '//' + location.host + "//log.php?search=Torrent+"+ $('#from_delete' + reportid).raw().value;
+                window.location = location.protocol + '//' + location.host + "/log.php?search=Torrent+"+ $('#from_delete' + reportid).raw().value;
                 //window.location = location.protocol + '//' + location.host + location.pathname + "?id=" + $('#from_delete' + reportid).raw().value;
 			} else {
 				$('#report' + reportid).remove();

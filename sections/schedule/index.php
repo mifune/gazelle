@@ -470,7 +470,8 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
 	//------------- Remove dead peers ---------------------------------------//
 	sleep(3);
 
-        $DB->query("DELETE FROM xbt_files_users WHERE mtime<unix_timestamp(now()-interval 2 HOUR)");
+    // mifune - changing this to 1 hour instead of 2 - see how it goes...
+        $DB->query("DELETE FROM xbt_files_users WHERE mtime<unix_timestamp(now()-interval 1 HOUR)");
 
 	//------------- Remove dead sessions ---------------------------------------//
 	sleep(3);
