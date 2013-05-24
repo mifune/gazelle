@@ -314,6 +314,7 @@ foreach($NewCategories as $Cat) {
 		list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Results[$GroupID]);
 		$Torrent = $Torrents[$TorrentID];
 		
+        $Review = get_last_review($GroupID);
 		
 		$TagList = explode(' ',str_replace('_','.',$TagList));
 		
@@ -327,20 +328,17 @@ foreach($NewCategories as $Cat) {
 				
 		$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>'; // &amp;torrentid='.$TorrentID.'
 		
-    if ($Torrent['ReportCount'] > 0) {
+        if ($Torrent['ReportCount'] > 0) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
-    }
-		$Icons = torrent_icons($Torrent, $TorrentID, $Torrent['Status'], in_array($GroupID, $Bookmarks));
-		//if($ExtraInfo) {
-		//	$DisplayName.=' - '.$ExtraInfo;
-		//}
-            
-            
+        }
+        
+		$Icons = torrent_icons($Torrent, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
+        
         $NumComments = get_num_comments($GroupID);
         
         $row = $row==='b'?'a':'b';
-        $IsMarkedForDeletion = $Torrent['Status'] == 'Warned' || $Torrent['Status'] == 'Pending';
+        $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 ?>
 		<tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>">
 			<td class="center cats_col">

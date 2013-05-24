@@ -115,6 +115,7 @@ foreach ($TorrentList as $GroupID=>$Group) {
 	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $Image, $NewCategoryID, $UserID, $Username) = array_values($CollageDataList[$GroupID]);
 
+    $Review = get_last_review($GroupID);
         // Handle stats and stuff
 	$Number++;
 	$NumGroups++;
@@ -158,10 +159,10 @@ foreach ($TorrentList as $GroupID=>$Group) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
         }
-        $Icons = torrent_icons($Torrent, $TorrentID, $Torrent['Status'], in_array($GroupID, $Bookmarks));
+        $Icons = torrent_icons($Torrent, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
         
         $row = $row == 'a' ? 'b' : 'a';
-        $IsMarkedForDeletion = $Torrent['Status'] == 'Warned' || $Torrent['Status'] == 'Pending';
+        $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 ?>
 <tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>" id="group_<?=$GroupID?>">
         <!--<td></td>-->

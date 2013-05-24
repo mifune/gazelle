@@ -502,40 +502,39 @@ if(!empty($_REQUEST['action'])) {
 			enforce_login();
 			//authorize(); // who cares if somone fakes this
                   
-                  include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
-                  include(SERVER_ROOT.'/classes/class_text.php');
-                  $Text = new TEXT;
+            include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
+            include(SERVER_ROOT.'/classes/class_text.php');
+            $Text = new TEXT;
                    
-                  $GroupID = (int)$_REQUEST['groupid'];
-                  $ReasonID = (int)$_REQUEST['reasonid'];
+            $GroupID = (int)$_REQUEST['groupid'];
+            $ReasonID = (int)$_REQUEST['reasonid'];
                   
-                  if(is_number($GroupID) && is_number($ReasonID)) {
+            if(is_number($GroupID) && is_number($ReasonID)) {
                         
-                        $DB->query("SELECT Name FROM torrents_group WHERE ID=$GroupID"); 
-                        list($Name) = $DB->next_record();
+                $DB->query("SELECT Name FROM torrents_group WHERE ID=$GroupID"); 
+                list($Name) = $DB->next_record();
                         
-                        if ($ReasonID > 0) { // if using a standard reason get standard message
-                                $DB->query("SELECT Description FROM review_reasons WHERE ID = $ReasonID");
-                                list($Description) = $DB->next_record();
-                        }
-                        $KillTime = get_warning_time();  
-                        // return a preview of the warning message (the first part anyway, the last static part we can add in the page after the textarea used for other reason)
-                        echo $Text->full_format(get_warning_message(true, false, $GroupID, $Name, $Description, $KillTime), true);
-                  }
+                if ($ReasonID > 0) { // if using a standard reason get standard message
+                    $DB->query("SELECT Description FROM review_reasons WHERE ID = $ReasonID");
+                    list($Description) = $DB->next_record();
+                }
+                $KillTime = get_warning_time();  
+                // return a preview of the warning message (the first part anyway, the last static part we can add in the page after the textarea used for other reason)
+                echo $Text->full_format(get_warning_message(true, false, $GroupID, $Name, $Description, $KillTime), true);
+            }
 			break;
-                  
-                  
+            
 		case 'send_okay_message': // when an uploader wants to tell the staff they have fixed their upload
 			enforce_login();      // this sets the status from Warned to Pending
 			authorize(); 
                 
-                  include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
+            include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
                   
-                  if (!empty($_POST['groupid']) && is_number($_POST['groupid'])) {
+            if (!empty($_POST['groupid']) && is_number($_POST['groupid'])) {
                           
-                        $GroupID = (int)$_POST['groupid'];
+                $GroupID = (int)$_POST['groupid'];
                         // get the relevant info for this torrents (latest) review status
-                        $DB->query("SELECT tg.Name, 
+                        /* $DB->query("SELECT tg.Name, 
                                         tr.Status, 
                                         tr.KillTime, 
                                         tr.ReasonID,
@@ -548,18 +547,32 @@ if(!empty($_REQUEST['action'])) {
                                         WHERE tg.ID=$GroupID  
                                         AND (tr.Time IS NULL OR tr.Time=(SELECT MAX(torrents_reviews.Time) 
                                                               FROM torrents_reviews 
-                                                              WHERE torrents_reviews.GroupID=tg.ID))" );
-                        list($Name, $Status, $KillTime, $ReasonID, $Reason, $ConvID, $Description) = $DB->next_record();
+                                                              WHERE torrents_reviews.GroupID=tg.ID))" ); */
+                $DB->query("SELECT tg.Name, 
+                                        tr.Status, 
+                                        tr.KillTime, 
+                                        tr.ReasonID,
+                                        tr.Reason, 
+                                        tr.ConvID,
+                                        rr.Description
+                                        FROM torrents_group AS tg
+                                        LEFT JOIN torrents_reviews AS tr ON tr.GroupID = tg.ID
+                                        LEFT JOIN review_reasons AS rr ON rr.ID = tr.ReasonID
+                                        WHERE tg.ID=$GroupID
+                                        ORDER BY tr.Time DESC
+                                        LIMIT 1"); 
+                           
+                list($Name, $Status, $KillTime, $ReasonID, $Reason, $ConvID, $Description) = $DB->next_record();
                         
-                        if ($Status == 'Warned'){ // if status != Warned then something fishy is going on (or its bugged)
+                if ($Status == 'Warned'){ // if status != Warned then something fishy is going on (or its bugged)
                             // staff are going to see quite a few of these...
 
-                            if ($ConvID>0) {     // !empty($_POST['convid']) && is_number($_POST['convid'])){
+                    if ($ConvID>0) {     // !empty($_POST['convid']) && is_number($_POST['convid'])){
                                 // if there is an existing conversation
                                 //$ConvID = (int)$_POST['convid'];
                                 $PMSetStatus = 'Unanswered';
                                 $NewSubject =  "I have fixed my upload '$Name'";
-                            } else {
+                    } else {
                                 // New conversation
                                 $Subject = "I have fixed my upload '$Name'";
                                 $DB->query("INSERT INTO staff_pm_conversations 
@@ -568,26 +581,25 @@ if(!empty($_REQUEST['action'])) {
                                 $NewSubject = null;
                                 $PMSetStatus = false;
                                 $ConvID = $DB->inserted_id();
-                            }
-                            if($ConvID>0) { // send message to staff
+                    }
+                    if($ConvID>0) { // send message to staff
                                 $Message = get_user_okay_message($GroupID, $Name, $KillTime, $Description?$Description:$Reason);
                                 send_message_reply($ConvID, 0, $LoggedUser['ID'], $Message, $PMSetStatus, false, $NewSubject);
-                                /* $DB->query("INSERT INTO staff_pm_messages
-                                                 (UserID, SentDate, Message, ConvID)
-                                          VALUES (".$LoggedUser['ID'].", '".sqltime()."', '".db_string($Message)."', $ConvID)"); */
+                            
                                 // create new review record
                                 $DB->query("INSERT INTO torrents_reviews (GroupID, ReasonID, UserID, Time, ConvID, Status, Reason, KillTime)
-                                         VALUES ($GroupID, $ReasonID, ".db_string($LoggedUser['ID']).", '".sqltime()."', $ConvID, 'Pending', '".db_string($Reason)."', '".$KillTime."')");
+                                         VALUES ($GroupID, $ReasonID, ".db_string($LoggedUser['ID']).", '".sqltime()."', '$ConvID', 'Pending', '".db_string($Reason)."', '".$KillTime."')");
 
                                 echo $ConvID;   // "<div class=\"messagebar\"><a href=\"staffpm.php?action=viewconv&id=$ConvID\">Message sent to staff</a></div>";   // $ConvID";
-                            }
-                        }
-                        $Cache->delete_value('torrent_group_' . $GroupID);
-                        $Cache->delete_value('torrent_group_light_' . $GroupID);
-                        $Cache->delete_value('torrents_details_' . $GroupID);
-                  }
+                    }
+                }
+                $Cache->delete_value('torrent_review_' . $GroupID);
+                //$Cache->delete_value('torrent_group_' . $GroupID);
+                //$Cache->delete_value('torrent_group_light_' . $GroupID);
+                //$Cache->delete_value('torrents_details_' . $GroupID);
+            }
                 
-                  break;
+            break;
 		
 		case 'set_review_status':   // main functionality for staff marking an upload as Okay/Bad/Fixed/Rejected
 			enforce_login();
@@ -668,20 +680,10 @@ if(!empty($_REQUEST['action'])) {
                                     
                                 }
                                 
-                                /*
-                                if($ConvID){ // possible if a new mark for deletion is made on a warned/pending/Okay(fixed) torrent
-                                    // send message 
-                                    send_message_reply($ConvID, $UserID, $LoggedUser['ID'], 
-                                        get_warning_message(true, true, $GroupID, $Name, $Description?$Description:$Reason, $KillTime, false, display_str($_POST['msg_extra']) ), 'Open');
-                                } else { 
-                                    send_pm($UserID, 0, db_string("Important: Your upload has been marked for deletion!"), 
-                                                    get_warning_message(true, true, $GroupID, $Name, $Description?$Description:$Reason, $KillTime, false, display_str($_POST['msg_extra'])));
-                                }
-                                */
                                 break;
                             case 'Rejected':
                                 // get the review status from the record before the current (pending) one
-                                $DB->query("SELECT 
+                               /* $DB->query("SELECT 
                                                 tr.Status, 
                                                 tr.KillTime, 
                                                 tr.ReasonID,
@@ -694,8 +696,20 @@ if(!empty($_REQUEST['action'])) {
                                                 AND tr.Time=(SELECT MAX(torrents_reviews.Time) 
                                                                       FROM torrents_reviews 
                                                                       WHERE torrents_reviews.GroupID=tr.GroupID
-                                                                      AND torrents_reviews.Status != 'Pending')" );  // tr.Time IS NULL OR 
+                                                                      AND torrents_reviews.Status != 'Pending')" ); */ // tr.Time IS NULL OR 
                                 
+                                $DB->query("SELECT 
+                                                tr.Status, 
+                                                tr.KillTime, 
+                                                tr.ReasonID,
+                                                tr.Reason, 
+                                                rr.Description
+                                           FROM torrents_reviews AS tr 
+                                      LEFT JOIN review_reasons AS rr ON rr.ID = tr.ReasonID
+                                          WHERE tr.GroupID=$GroupID  
+                                            AND tr.Status != 'Pending'
+                                       ORDER BY tr.Time DESC
+                                          LIMIT 1");
                                 // overwrite these to be passed through to new record
                                 list($Status, $KillTime, $ReasonID, $Reason, $Description) = $DB->next_record();
                                 $KillTime = strtotime($KillTime);
@@ -738,9 +752,10 @@ if(!empty($_REQUEST['action'])) {
                         $DB->query("INSERT INTO torrents_reviews (GroupID, ReasonID, UserID, ConvID, Time, Status, Reason, KillTime)
 						 VALUES ($GroupID, $ReasonID, ".db_string($LoggedUser['ID']).", ".($ConvID?$ConvID:"null").", '$Time', '$Status', '".db_string($Reason)."', '".sqltime($KillTime)."')");
 			
-                        $Cache->delete_value('torrent_group_' . $GroupID);
-                        $Cache->delete_value('torrent_group_light_' . $GroupID);
-                        $Cache->delete_value('torrents_details_' . $GroupID);
+                        $Cache->delete_value('torrent_review_' . $GroupID);
+                        //$Cache->delete_value('torrent_group_' . $GroupID);
+                        //$Cache->delete_value('torrent_group_light_' . $GroupID);
+                        //$Cache->delete_value('torrents_details_' . $GroupID);
                         $Cache->delete_value('staff_pm_new_' . $UserID);
                         
                         // logging - 

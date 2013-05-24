@@ -99,14 +99,18 @@ if (empty($TokenTorrents)) {
 	$Cache->cache_value('users_tokens_'.$UserID, $TokenTorrents);
 }
 
-// Start output
-show_header($Title,'comments,status,torrent,bbcode,details,watchlist,jquery,jquery.cookie');
-
 
 list($TorrentID, $FileCount, $Size, $Seeders, $Leechers, $Snatched, $FreeTorrent, $DoubleSeed, $TorrentTime, 
 		$FileList, $FilePath, $UserID, $Username, $LastActive,
-		$BadTags, $BadFolders, $BadFiles, $LastReseedRequest, $LogInDB, $HasFile,
-            $ReviewID, $Status, $ConvID, $StatusTime, $KillTime, $StatusDescription, $StatusUserID, $StatusUsername) = $TorrentList[0];
+		$BadTags, $BadFolders, $BadFiles, $LastReseedRequest, $LogInDB, $HasFile) = $TorrentList[0];
+
+
+$Review = get_last_review($GroupID); // ,
+            //$ReviewID, $Status, $ConvID, $StatusTime, $KillTime, $StatusDescription, $StatusUserID, $StatusUsername
+//error(print_r($Review,true));
+
+// Start output
+show_header($Title,'comments,status,torrent,bbcode,details,watchlist,jquery,jquery.cookie');
 
 $IsUploader =  $UserID == $LoggedUser['ID'];
 $CanEdit = (check_perms('torrents_edit') ||  $IsUploader );
@@ -186,18 +190,18 @@ if(check_perms('torrents_review')){
 }
 
 
-    if ($Status == 'Warned' || $Status == 'Pending') {
+    if ($Review['Status'] == 'Warned' || $Review['Status'] == 'Pending') {
 ?>
 	<div id="warning_status" class="box vertical_space">
 		<div class="redbar warning">
-                <strong>Status:&nbsp;Warned&nbsp; (<?=$StatusDescription?>)</strong>
+                <strong>Status:&nbsp;Warned&nbsp; (<?=$Review['StatusDescription']?>)</strong>
             </div>
-            <div class="pad"><strong>This torrent has been marked for deletion and will be automatically deleted unless the uploader fixes it. </strong><span style="float:right;"><?=time_diff($KillTime)?></span></div>
+            <div class="pad"><strong>This torrent has been marked for deletion and will be automatically deleted unless the uploader fixes it. </strong><span style="float:right;"><?=time_diff($Review['KillTime'])?></span></div>
 <?      if ($UserID == $LoggedUser['ID']) { // if the uploader is looking at the warning message 
-            if ($Status == 'Warned') { ?>
-                <div id="user_message" class="center">If you have fixed this upload make sure you have told the staff: <a class="button greenButton" onclick="Send_Okay_Message(<?=$GroupID?>,<?=($ConvID?$ConvID:0)?>);" title="send staff a message">By clicking here</a></div>
+            if ($Review['Status'] == 'Warned') { ?>
+                <div id="user_message" class="center">If you have fixed this upload make sure you have told the staff: <a class="button greenButton" onclick="Send_Okay_Message(<?=$GroupID?>,<?=($Review['ConvID']?$Review['ConvID']:0)?>);" title="send staff a message">By clicking here</a></div>
 <?          } else {  ?>
-                <div id="user_message" class="center"><div class="messagebar"><a href="staffpm.php?action=viewconv&id=<?=$ConvID?>">You sent a message to staff <?=time_diff($StatusTime)?></a></div></div>
+                <div id="user_message" class="center"><div class="messagebar"><a href="staffpm.php?action=viewconv&id=<?=$Review['ConvID']?>">You sent a message to staff <?=time_diff($Review['Time'])?></a></div></div>
 <?          }
         }
 ?>
@@ -276,9 +280,9 @@ if(check_perms('torrents_review')){
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /> <?=number_format($Seeders)?></td>
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="Leechers" title="Leechers" /> <?=number_format($Leechers)?></td>
                  <?
-                    if ($Status) { // == 'Warned'
+                    if ($Review['Status']) { // == 'Warned'
                         // not sure if we want to display 'okay' status but for the moment its in
-                        echo '<td>'.get_status_icon($Status).'</td>';
+                        echo '<td>'.get_status_icon($Review['Status']).'</td>';
                     }
                  ?>
                             </tr>
@@ -287,7 +291,7 @@ if(check_perms('torrents_review')){
     </div>
     <div  class="linkbox">
         <span id="torrent_buttons"  style="float: left;">
-<?  if (check_perms('torrents_download_override') || !$Status || $Status == 'Okay'  ) { ?>
+<?  if (check_perms('torrents_download_override') || !$Review['Status'] || $Review['Status'] == 'Okay'  ) { ?>
  
             <a href="torrents.php?action=download&amp;id=<?=$TorrentID ?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" class="button blueButton" title="Download">DOWNLOAD TORRENT</a>
 
@@ -318,14 +322,14 @@ if(check_perms('torrents_review')){
 // For staff draw the tools section
 if(check_perms('torrents_review')){
         // get review history
-        if($ReviewID && is_number($ReviewID)) { // if reviewID == null then no history
+        if($Review['ID'] && is_number($Review['ID'])) { // if reviewID == null then no history
             $DB->query("SELECT r.Status, r.Time, r.ConvID,
                                IF(r.ReasonID = 0, r.Reason, rs.Description),
                                r.UserID, um.Username  
                       FROM torrents_reviews AS r 
                       LEFT JOIN users_main AS um ON um.ID=r.UserID
                       LEFT JOIN review_reasons AS rs ON rs.ID=r.ReasonID
-                      WHERE r.GroupID = $GroupID AND r.ID != $ReviewID ORDER BY Time");
+                      WHERE r.GroupID = $GroupID AND r.ID != $Review[ID] ORDER BY Time");
             $NumReviews = $DB->record_count();
         } else $NumReviews = 0;
 ?>
@@ -360,28 +364,28 @@ if(check_perms('torrents_review')){
     } // end show history
 ?>
                 <tr>
-                    <td width="200px"><strong>Current Status:</strong>&nbsp;&nbsp;<?=$Status?"$Status&nbsp;".get_status_icon($Status):'Not set'?></td>
-                    <td><?=$StatusDescription?'<strong>Reason:</strong>&nbsp;&nbsp;'.$StatusDescription:''?>
+                    <td width="200px"><strong>Current Status:</strong>&nbsp;&nbsp;<?=$Review['Status']?"$Review[Status]&nbsp;".get_status_icon($Review['Status']):'Not set'?></td>
+                    <td><?=$Review['StatusDescription']?'<strong>Reason:</strong>&nbsp;&nbsp;'.$Review['StatusDescription']:''?>
                             <? //$ConvID>0?'<span style="float:right;">'.($Status=='Pending'?'(user sent fixed message) &nbsp;&nbsp;':'').'<a href="staffpm.php?action=viewconv&id='.$ConvID.'">'.($Status=='Pending'?'Message sent to staff':"reply sent to $Username").'</a></span>':''?>
 <?
-                         if ($ConvID>0) {
-                             echo '<span style="float:right;">'.($Status=='Pending'?'(user sent fixed message) &nbsp;&nbsp;':'').'<a href="staffpm.php?action=viewconv&id='.$ConvID.'">'.($Status=='Pending'?'Message sent to staff':"reply sent to $Username").'</a></span>';
-                         } elseif ($Status == 'Warned') {
+                         if ($Review['ConvID']>0) {
+                             echo '<span style="float:right;">'.($Review['Status']=='Pending'?'(user sent fixed message) &nbsp;&nbsp;':'').'<a href="staffpm.php?action=viewconv&id='.$Review['ConvID'].'">'.($Review['Status']=='Pending'?'Message sent to staff':"reply sent to $Username").'</a></span>';
+                         } elseif ($Review['Status'] == 'Warned') {
                              echo '<span style="float:right;">(pm sent to '.$Username.')</span>';
                          }
 ?>
                     </td>
-                    <td width="25%"><?=$Status?'<strong>By:</strong>&nbsp;&nbsp;'.format_username($StatusUserID, $StatusUsername).'&nbsp;'.time_diff($StatusTime):'';?></td>
+                    <td width="25%"><?=$Review['Status']?'<strong>By:</strong>&nbsp;&nbsp;'.format_username($Review['StaffID'], $Review['Staffname']).'&nbsp;'.time_diff($Review['Time']):'';?></td>
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:right">
                         <input type="hidden" name="action" value="set_review_status" />
                         <input type="hidden" id="groupid" name="groupid" value="<?=$GroupID?>" />
                         <input type="hidden" id="authkey" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                        <input type="hidden" id="convid" name="convid" value="<?=$ConvID?>" />
+                        <input type="hidden" id="convid" name="convid" value="<?=$Review['ConvID']?>" />
                         <strong id="warn_insert" class="important_text" style="margin-right:20px;"></strong>
-<?              if ( !$Status || $Status == 'Okay' || check_perms('torrents_review_override') ) { // onsubmit="return Validate_Form_Reviews('<?=$Status ')"   ?> 
-                        <select id="reasonid" name="reasonid"  onchange="Select_Reason(<?=($Status == 'Warned' || $Status == 'Pending' || $Status == 'Okay')?'true':'false';?>);" >
+<?              if ( !$Review['Status'] || $Review['Status'] == 'Okay' || check_perms('torrents_review_override') ) { // onsubmit="return Validate_Form_Reviews('<?=$Status ')"   ?> 
+                        <select id="reasonid" name="reasonid"  onchange="Select_Reason(<?=($Review['Status'] == 'Warned' || $Review['Status'] == 'Pending' || $Review['Status'] == 'Okay')?'true':'false';?>);" >
                             <option value="-1" selected="selected">none&nbsp;&nbsp;</option> 
 <? 
                     $DB->query("SELECT ID, Name FROM review_reasons ORDER BY Sort");
@@ -398,13 +402,13 @@ if(check_perms('torrents_review')){
 <?              }          ?>
                     </td>
                     <td>
-<?              if ($Status == 'Pending'){  // || $Status == 'Warned' ?>
+<?              if ($Review['Status'] == 'Pending'){  // || $Review['Status'] == 'Warned' ?>
                         <input type="submit" name="submit" value="Accept Fix" title="Accept the fix this uploader has made" />
                         <input type="submit" name="submit" value="Reject Fix" title="Reject the fix this uploader has made" />
 <?              } else  {  ?>
                         
-                        <input type="submit" name="submit" value="Mark as Okay" <?=($Status=='Okay'||($Status == 'Warned' && !check_perms('torrents_review_override')))?'disabled="disabled" ':''?>title="Mark this torrent as Okay" />
-<?                  if ($Status == 'Warned' && check_perms('torrents_review_override') )  {  ?>
+                        <input type="submit" name="submit" value="Mark as Okay" <?=($Review['Status']=='Okay'||($Review['Status'] == 'Warned' && !check_perms('torrents_review_override')))?'disabled="disabled" ':''?>title="Mark this torrent as Okay" />
+<?                  if ($Review['Status'] == 'Warned' && check_perms('torrents_review_override') )  {  ?>
                         <br/><strong class="important_text" style="margin-left:10px;">override warned status?</strong>
 <?                  }       ?>
 <?              }       ?>

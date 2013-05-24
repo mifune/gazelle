@@ -2162,6 +2162,7 @@ function check_perms($PermissionName, $MinClass = 0) {
     return (isset($LoggedUser['Permissions'][$PermissionName]) && $LoggedUser['Permissions'][$PermissionName] && $LoggedUser['Class'] >= $MinClass) ? true : false;
 }
 
+
 // Function to get data and torrents for an array of GroupIDs.
 // In places where the output from this is merged with sphinx filters, it will be in a different order.
 function get_groups($GroupIDs, $Return = true, $Torrents = true) {
@@ -2173,7 +2174,7 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 	
 	foreach($GroupIDs as $GroupID) {
 		$Data = $Cache->get_value($Key.$GroupID);
-		if(!empty($Data) && (@$Data['ver'] >= 4)) {
+		if(!empty($Data) && (@$Data['ver'] >= 5)) {
 			unset($NotFound[$GroupID]);
 			$Found[$GroupID] = $Data['d'];
 		}
@@ -2198,7 +2199,8 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 		}
 		
 		if ($Torrents) {          
-                        $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
+            /*
+            $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
                                         Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount,
                                         tr.Status, tr.KillTime
                                     FROM torrents AS t 
@@ -2208,16 +2210,26 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
                                             WHERE t.GroupID IN($IDs) AND (tr.Time IS NULL OR tr.Time=(SELECT MAX(torrents_reviews.Time) 
                                             FROM torrents_reviews 
                                             WHERE torrents_reviews.GroupID=t.GroupID))
-                                    ORDER BY GroupID DESC, t.ID");
+                                    ORDER BY GroupID DESC, t.ID"); */
+            
+            $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
+                                        Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount 
+                          FROM torrents AS t 
+                          JOIN users_main AS um ON t.UserID=um.ID
+                     LEFT JOIN (SELECT TorrentID, count(*) as ReportCount FROM reportsv2 
+                                 WHERE Type != 'edited' AND Status != 'Resolved' GROUP BY TorrentID) AS r ON r.TorrentID=t.ID
+                         WHERE t.GroupID IN($IDs) 
+                      ORDER BY GroupID DESC, t.ID");
+            
 			while($Torrent = $DB->next_record(MYSQLI_ASSOC, true)) {
 				$Found[$Torrent['GroupID']]['Torrents'][$Torrent['ID']] = $Torrent;
 		
-				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>4, 'd'=>$Found[$Torrent['GroupID']]), 0);
-				$Cache->cache_value('torrent_group_light_'.$Torrent['GroupID'], array('ver'=>4, 'd'=>$Found[$Torrent['GroupID']]), 0);
+				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
+				$Cache->cache_value('torrent_group_light_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
 			}
 		} else {
 			foreach ($Found as $Group) {
-				$Cache->cache_value('torrent_group_light_'.$Group['ID'], array('ver'=>4, 'd'=>$Found[$Group['ID']]), 0);
+				$Cache->cache_value('torrent_group_light_'.$Group['ID'], array('ver'=>5, 'd'=>$Found[$Group['ID']]), 0);
 			}
 		}
 	}
@@ -2227,6 +2239,32 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 
 		return $Matches;
 	}
+}
+
+
+
+function get_last_review($GroupID){
+	global $DB, $Cache;
+	$LastReview = $Cache->get_value('torrent_review_'.$GroupID);
+	if ($LastReview===false || $LastReview['ver']>1) {  
+        $DB->query("SELECT tr.ID,
+                           tr.Status,
+                           tr.Time, 
+                           tr.KillTime, 
+                           IF(tr.ReasonID = 0, tr.Reason, rr.Description) AS StatusDescription,
+                           tr.ConvID,
+                           tr.UserID AS StaffID,
+                           u.Username AS Staffname 
+                      FROM torrents_reviews AS tr 
+                 LEFT JOIN review_reasons AS rr ON rr.ID = tr.ReasonID
+			     LEFT JOIN users_main AS u ON u.ID=tr.UserID
+                     WHERE tr.GroupID=$GroupID  
+                  ORDER BY tr.Time DESC
+                     LIMIT 1 " ); 
+        $LastReview = array('ver'=>1, 'd'=>$DB->next_record(MYSQLI_ASSOC)) ;
+        $Cache->cache_value('torrent_review_'.$GroupID, $LastReview, 0); 
+    }
+    return $LastReview['d'];
 }
 
 
@@ -2352,7 +2390,7 @@ function get_tags($TagNames) {
     return($TagIDs);
 }
 
-function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $UserID,
+function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID,
     global $DB, $Cache, $LoggedUser, $TorrentUserStatus, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
         //$AddExtra = '';
         $SeedTooltip='';
@@ -2420,7 +2458,7 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
         
         
         //icon_disk_grabbed icon_disk_snatched
-        if (check_perms('torrents_download_override')  || !$MFDStatus ||  $MFDStatus == 'Okay' ) {
+        if ( !$Review ||  $Review['Status'] == 'Okay' || check_perms('torrents_download_override')) {
             
             if ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Currently Seeding Torrent">';
@@ -2451,13 +2489,21 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
                 $Icons .= '<span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
             } elseif (isset($SnatchedTorrents[$TorrentID])) {
-                $Icons .= '<span class="icon icon_disk_snatched" title="Warning: This torrent is marked for deletion"></span>';           
+                $Icons .= '<span class="icon icon_disk_snatched" title="Previously Snatched Torrent"></span>';           
             } elseif (isset($GrabbedTorrents[$TorrentID] )) {
-                $Icons .= '<span class="icon icon_disk_grabbed" title="Warning: This torrent is marked for deletion"></span>'; 
+                $Icons .= '<span class="icon icon_disk_grabbed" title="Previously Grabbed Torrent File"></span>'; 
                 
             } //elseif (empty($TorrentUserStatus[$TorrentID])) {
             
             //}
+        }
+        
+        if ($Review) {
+            if(check_perms('torrents_review')) {
+                $Icons .= get_status_icon_staff($Review['Status'], $Review['Staffname'], $Review['StatusDescription']);
+            } else {
+                $Icons .= get_status_icon($Review['Status']) ;
+            }
         }
         
         /*
@@ -2465,10 +2511,26 @@ function torrent_icons($Data, $TorrentID, $MFDStatus, $IsBookmarked) {  //  $Use
             $Title = "This torrent has ".$Data['ReportCount']." active ".($Data['ReportCount'] > 1 ?'reports' : 'report');
             $AddExtra .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
         } */
-        $Icons = '<span style="float:right">'.$Icons.'</span>';
-        return $Icons;
+        
+        return '<span style="float:right">'.$Icons.'</span>';
  
 }
+
+function get_status_icon_staff($Status, $Staffname, $Reason){
+    if ($Status == 'Warned' || $Status == 'Pending') 
+        return "<span title=\"$Status: [$Reason] by $Staffname\" class=\"icon icon_warning\"></span>";
+    elseif ($Status == 'Okay') 
+        return '<span title="This torrent has been checked by staff ('.$Staffname.') and is okay" class="icon icon_okay"></span>';
+    else return '';
+}
+
+
+function get_status_icon($Status){
+    if ($Status == 'Warned' || $Status == 'Pending') return '<span title="This torrent will be automatically deleted unless the uploader fixes it" class="icon icon_warning"></span>';
+    elseif ($Status == 'Okay') return '<span title="This torrent has been checked by staff and is okay" class="icon icon_okay"></span>';
+    else return '';
+}
+
 
 /*
 function disk_icon($TorrentID, $MFDStatus){

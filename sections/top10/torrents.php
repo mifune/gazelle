@@ -276,11 +276,12 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
     $Bookmarks = all_bookmarks('torrent');
 	foreach ($Details as $Detail) {
 		list($TorrentID,$GroupID,$GroupName, $NewCategoryID, $TorrentTags,
-			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName,,,$Status) = $Detail;
+			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName) = $Detail;
 		// highlight every other row
 		$Rank++;
 		$row = ($Rank % 2 ? 'b' : 'a');
 
+        $Review = get_last_review($GroupID);
 		// generate torrent's title
 		$DisplayName = "<a href='torrents.php?id=$GroupID&amp;torrentid=$TorrentID'  title='View Torrent'>$GroupName</a>";
 		
@@ -298,9 +299,9 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 			$TorrentTags='<br /><div class="tags">'.$TagList.'</div>';
 		}
  
-		$Icons = torrent_icons($Detail, $TorrentID, $Detail['Status'], in_array($GroupID, $Bookmarks));
+		$Icons = torrent_icons($Detail, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
         
-        $IsMarkedForDeletion = $Status == 'Warned' || $Status == 'Pending';
+        $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 		// print row
 ?>
 	<tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>">

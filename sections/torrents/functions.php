@@ -79,7 +79,7 @@ function get_group_info($GroupID, $Return = true) {
 		$TagDetails=$DB->to_array();
         
 		// Fetch the individual torrents
-
+/*
 		$DB->query("
 			SELECT
 			t.ID,
@@ -125,6 +125,39 @@ function get_group_info($GroupID, $Return = true) {
                                                               WHERE torrents_reviews.GroupID=t.GroupID))
 			AND flags != 1
 			GROUP BY t.ID
+			ORDER BY t.ID"); */
+
+		$DB->query("
+			SELECT
+                t.ID,
+                t.FileCount,
+                t.Size,
+                t.Seeders,
+                t.Leechers,
+                t.Snatched,
+                t.FreeTorrent,
+                t.double_seed,
+                t.Time,
+                t.FileList,
+                t.FilePath,
+                t.UserID,
+                um.Username,
+                t.last_action,
+                tbt.TorrentID,
+                tbf.TorrentID,
+                tfi.TorrentID,
+                t.LastReseedRequest,
+                tln.TorrentID AS LogInDB,
+                t.ID AS HasFile 
+                    
+			FROM torrents AS t
+            LEFT JOIN users_main AS um ON um.ID=t.UserID 
+			LEFT JOIN torrents_bad_tags AS tbt ON tbt.TorrentID=t.ID
+			LEFT JOIN torrents_bad_folders AS tbf on tbf.TorrentID=t.ID
+			LEFT JOIN torrents_bad_files AS tfi on tfi.TorrentID=t.ID
+			LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
+			WHERE t.GroupID='".db_string($GroupID)."'  
+			AND flags != 1
 			ORDER BY t.ID");
 
             
@@ -162,20 +195,6 @@ function get_group_info($GroupID, $Return = true) {
 }
 
 
-function get_status_icon_staff($Status, $Staffname, $Reason){
-    if ($Status == 'Warned' || $Status == 'Pending') 
-        return "<span title=\"$Status: [$Reason] by $Staffname\" class=\"icon icon_warning\"></span>";
-    elseif ($Status == 'Okay') 
-        return '<span title="This torrent has been checked by staff ('.$Staffname.') and is okay" class="icon icon_okay"></span>';
-    else return '';
-}
-
-
-function get_status_icon($Status){
-    if ($Status == 'Warned' || $Status == 'Pending') return '<span title="This torrent will be automatically deleted unless the uploader fixes it" class="icon icon_warning"></span>';
-    elseif ($Status == 'Okay') return '<span title="This torrent has been checked by staff and is okay" class="icon icon_okay"></span>';
-    else return '';
-}
 
 //Check if a givin string can be validated as a torrenthash
 function is_valid_torrenthash($Str) {

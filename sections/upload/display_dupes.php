@@ -1,7 +1,9 @@
 <?
 
-//include(SERVER_ROOT.'/sections/bookmarks/functions.php');
+include(SERVER_ROOT.'/sections/bookmarks/functions.php');
  
+$Bookmarks = all_bookmarks('torrent');
+
 //define('MAX_NUM_DUPE_MATCHES', 50);
 
 if (!$INLINE) {  
@@ -64,6 +66,7 @@ if (!$DupeResults || $NumDupes<1) {
 
                 list($TorrentID, $Data) = each($Torrents);
 
+                $Review = get_last_review($GroupID);
 
                 $TagList = explode(' ', str_replace('_', '.', $TagList));
 
@@ -76,10 +79,10 @@ if (!$DupeResults || $NumDupes<1) {
                 $TorrentTags = implode(' ', $TorrentTags);
 
 
-                $AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], false);   // in_array($GroupID, $Bookmarks));
+                $AddExtra = torrent_icons($Data, $TorrentID,$Review, $Bookmarks); 
 
                 $row = ($row == 'a'? 'b' : 'a');
-                $IsMarkedForDeletion = $Data['Status'] == 'Warned' || $Data['Status'] == 'Pending';
+                $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 
  ?> 
                 <tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>">

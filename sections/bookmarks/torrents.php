@@ -96,6 +96,8 @@ foreach ($TorrentList as $GroupID=>$Group) {
 
         list($TorrentID, $Torrent) = each($Torrents);
 
+        $Review = get_last_review($GroupID);
+        
         $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
 
         if(!empty($Torrent['FreeTorrent'])) {
@@ -110,9 +112,9 @@ foreach ($TorrentList as $GroupID=>$Group) {
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
     }
         
-        $AddExtra = torrent_icons($Torrent, $TorrentID, $Torrent['Status'], true );
+        $AddExtra = torrent_icons($Torrent, $TorrentID, $Review, true );
         $row = ($row == 'a'? 'b' : 'a');
-        $IsMarkedForDeletion = $Torrent['Status'] == 'Warned' || $Torrent['Status'] == 'Pending';
+        $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 ?>
     <tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>" id="group_<?=$GroupID?>">
         <td class="center">

@@ -660,6 +660,8 @@ $Bookmarks = all_bookmarks('torrent');
 
         list($TorrentID, $Data) = each($Torrents);
         
+        $Review = get_last_review($GroupID);
+        
         $day = date('j', strtotime($Data['Time'])  - $LoggedUser['TimeOffset']);
         if ($AllTorrents && $LoggedUser['SplitByDays'] && $lastday !== $day ) {
 ?>
@@ -691,10 +693,10 @@ $Bookmarks = all_bookmarks('torrent');
         $SL = ($Data['Seeders'] == 0 ? "<span class=r00>" . number_format($Data['Seeders']) . "</span>" : number_format($Data['Seeders'])) . "/" . number_format($Data['Leechers']);
         $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong><br />{$Data['Username']}<br /><br /><strong>Size:</strong><br />" . get_size($Data['Size']) . "<br /><br /><strong>Snatched:</strong><br />" . number_format($Data['Snatched']) . "<br /><br /><strong>Seeders/Leechers:</strong><br />" . $SL . "</td></tr></table>";
  
-        $AddExtra = torrent_icons($Data, $TorrentID, $Data['Status'], in_array($GroupID, $Bookmarks));
+        $AddExtra = torrent_icons($Data, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
             
         $row = ($row == 'a'? 'b' : 'a');
-        $IsMarkedForDeletion = $Data['Status'] == 'Warned' || $Data['Status'] == 'Pending';
+        $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
         
         $NumComments = get_num_comments($GroupID);
         ?> 
@@ -707,11 +709,6 @@ $Bookmarks = all_bookmarks('torrent');
                     <? //print_torrent_status($TorrentID, $Data['Status']); ?>
 
 <?              
-                if(check_perms('torrents_review')) {
-                    $AddExtra = get_status_icon_staff($Data['Status'], $Data['StatusUsername'], $Data['StatusDescription']) . $AddExtra;
-                } else {
-                    $AddExtra = get_status_icon($Data['Status']) . $AddExtra;
-                }
                 //if (check_perms('torrents_review') && $Data['Status'] == 'Okay') { 
                     //echo  '&nbsp;'.get_status_icon('Okay');
                     //$AddExtra = get_status_icon('Okay') . $AddExtra;

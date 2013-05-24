@@ -1,6 +1,10 @@
 <?
 if(!check_perms('site_torrents_notify')) { error(403); }
 
+include(SERVER_ROOT . '/sections/bookmarks/functions.php');
+
+$Bookmarks = all_bookmarks('torrent');
+
 define('NOTIFICATIONS_PER_PAGE', 50);
 list($Page,$Limit) = page_limit(NOTIFICATIONS_PER_PAGE);
 
@@ -111,6 +115,8 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
 				$Snatched, $Seeders, 
 				$Leechers, $NotificationTime, $FreeTorrent, $DoubleSeed, $LogInDB, $UnRead, $FilterLabel, $FilterLabel) = $Result;
 			
+            $Review = get_last_review($GroupID);
+        
             $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>'; // &amp;torrentid='.$TorrentID.'
 				
 			$TagLinks=array();
@@ -127,12 +133,13 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
 				//$MainTag = $NewCategories[$GroupCategoryID-1]['name'];
 			}
             
-            $Icons = torrent_icons(array('FreeTorrent'=>$FreeTorrent,'double_seed'=>$DoubleSeed), $TorrentID, false, false);
+            $Icons = torrent_icons(array('FreeTorrent'=>$FreeTorrent,'double_seed'=>$DoubleSeed), $TorrentID, $Review, $Bookmarks);
 
+            $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 		// print row
           $row = $row == 'a' ? 'b' : 'a';
 ?>
-          <tr class="torrent row<?=$row?>" id="torrent<?=$TorrentID?>">
+          <tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>" id="torrent<?=$TorrentID?>">
                 <td style="text-align: center"><input type="checkbox" value="<?=$TorrentID?>" id="clear_<?=$TorrentID?>" /></td>
                 <td class="center cats_cols">
                 <div title="<?=$NewCategories[$GroupCategoryID]['tag']?>"><img src="<?='static/common/caticons/'.$NewCategories[$GroupCategoryID]['image']?>" /></div>
