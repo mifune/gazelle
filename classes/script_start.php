@@ -2266,22 +2266,37 @@ function get_peers($TorrentID) {
 function get_last_review($GroupID){
 	global $DB, $Cache;
 	$LastReview = $Cache->get_value('torrent_review_'.$GroupID);
-	if ($LastReview===false || $LastReview['ver']>1) {  
+	if ($LastReview===false || $LastReview['ver']>2) {  
         $DB->query("SELECT tr.ID,
                            tr.Status,
                            tr.Time, 
                            tr.KillTime, 
                            IF(tr.ReasonID = 0, tr.Reason, rr.Description) AS StatusDescription,
                            tr.ConvID,
-                           tr.UserID AS StaffID,
-                           u.Username AS Staffname 
+                           tr.UserID AS UserID,
+                           u.Username AS Username 
                       FROM torrents_reviews AS tr 
                  LEFT JOIN review_reasons AS rr ON rr.ID = tr.ReasonID
 			     LEFT JOIN users_main AS u ON u.ID=tr.UserID
                      WHERE tr.GroupID=$GroupID  
                   ORDER BY tr.Time DESC
                      LIMIT 1 " ); 
-        $LastReview = array('ver'=>1, 'd'=>$DB->next_record(MYSQLI_ASSOC)) ;
+        $LastReviewRow = $DB->next_record(MYSQLI_ASSOC);
+        if($LastReviewRow['Status']!='Pending'){ // if last review log is not from a user
+            $LastReviewRow['StaffID']=$LastReviewRow['UserID'];
+            $LastReviewRow['Staffname']=$LastReviewRow['Username'];
+        } else {
+            $DB->query("SELECT tr.UserID AS StaffID, u.Username AS Staffname 
+                          FROM torrents_reviews AS tr
+                     LEFT JOIN users_main AS u ON u.ID=tr.UserID 
+                     WHERE tr.GroupID=$GroupID AND tr.Status!='Pending'
+                  ORDER BY tr.Time DESC
+                     LIMIT 1 ");
+            $LastStaffReview = $DB->next_record(MYSQLI_ASSOC);
+            $LastReviewRow['StaffID']=$LastStaffReview['StaffID'];
+            $LastReviewRow['Staffname']=$LastStaffReview['Staffname'];
+        }
+        $LastReview = array('ver'=>2, 'd'=>$LastReviewRow) ;
         $Cache->cache_value('torrent_review_'.$GroupID, $LastReview, 0); 
     }
     return $LastReview['d'];
