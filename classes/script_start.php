@@ -2493,7 +2493,7 @@ function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID
         
         
         //icon_disk_grabbed icon_disk_snatched
-        if ( !$Review ||  $Review['Status'] == 'Okay' || check_perms('torrents_download_override')) {
+        if ( !$Review || !$Review['Status'] ||  $Review['Status'] == 'Okay' || check_perms('torrents_download_override')) {
             
             if ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Currently Seeding Torrent">';
