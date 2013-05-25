@@ -197,6 +197,10 @@ class TEXT {
         ':shoot:' => 'shoot.gif',
         ':shoot2:' => 'shoot2.gif',
         
+        
+        ':jail:' => 'jail.gif',
+        ':jailmad:' => 'jail_mad.gif',
+        
         //----------------------------
         //----------------------------
         ':sing:' => 'singing.gif',
@@ -1784,7 +1788,7 @@ class TEXT {
       // they will not get that benefit
      */
 
-    function display_bbcode_assistant($textarea, $AllowAdvancedTags, $start_num_smilies = 0, $load_increment = 120, $load_increment_first = 30) {
+    function display_bbcode_assistant($textarea, $AllowAdvancedTags, $start_num_smilies = 0, $load_increment = 240, $load_increment_first = 30) {
         global $LoggedUser;
         if ($load_increment_first == -1) {
             $load_increment_first = $load_increment;
