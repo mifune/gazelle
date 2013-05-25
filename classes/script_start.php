@@ -2266,7 +2266,7 @@ function get_peers($TorrentID) {
 function get_last_review($GroupID){
 	global $DB, $Cache;
 	$LastReview = $Cache->get_value('torrent_review_'.$GroupID);
-	if ($LastReview===false || $LastReview['ver']>2) {  
+	if ($LastReview===false || $LastReview['ver']<2) {  
         $DB->query("SELECT tr.ID,
                            tr.Status,
                            tr.Time, 

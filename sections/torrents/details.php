@@ -375,7 +375,7 @@ if(check_perms('torrents_review')){
                          }
 ?>
                     </td>
-                    <td width="25%"><?=$Review['Status']?'<strong>By:</strong>&nbsp;&nbsp;'.format_username($Review['StaffID'], $Review['Staffname']).'&nbsp;'.time_diff($Review['Time']):'';?></td>
+                    <td width="25%"><?=$Review['Status']?'<strong>By:</strong>&nbsp;&nbsp;'.format_username($Review['UserID'], $Review['Username']).'&nbsp;'.time_diff($Review['Time']):'';?></td>
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:right">
