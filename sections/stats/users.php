@@ -140,12 +140,12 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
     }
 	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
-
+/*
 //Timeline generation
 if (!list($Labels,$InFlow,$OutFlow,$Max) = $Cache->get_value('users_timeline')) {
 	$DB->query("SELECT DATE_FORMAT(JoinDate,'%b \\'%y') AS Month, COUNT(UserID) FROM users_info GROUP BY Month ORDER BY JoinDate DESC LIMIT 1, 12");
 	$TimelineIn = array_reverse($DB->to_array());
-	$DB->query("SELECT DATE_FORMAT(BanDate,'%b \\'%y') AS Month, COUNT(UserID) FROM users_info GROUP BY Month ORDER BY BanDate DESC LIMIT 1, 12");
+	$DB->query("SELECT DATE_FORMAT(BanDate,'%b \\'%y') AS Month, COUNT(UserID) FROM users_info WHERE BanDate!='0000-00-00 00:00:00' GROUP BY Month ORDER BY BanDate DESC LIMIT 1, 12");
 	$TimelineOut = array_reverse($DB->to_array());
 	foreach($TimelineIn as $Month) {
 		list($Label,$Amount) = $Month;
@@ -171,35 +171,229 @@ if (!list($Labels,$InFlow,$OutFlow,$Max) = $Cache->get_value('users_timeline')) 
 		$OutFlow[] = number_format(($Amount/$Max)*100,4);
 	}
 	$Cache->cache_value('users_timeline',array($Labels,$InFlow,$OutFlow,$Max),mktime(0,0,0,date('n')+1,2)); //Tested: fine for dec -> jan
+} */
+
+
+if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
+    
+    $start = date('Y-m-d H:i:s', strtotime( "$_POST[year1]-$_POST[month1]-$_POST[day1]" )  );
+    $end = date('Y-m-d H:i:s', strtotime( "$_POST[year2]-$_POST[month2]-$_POST[day2]" )  ); 
+   // error("$start --> $end");
+    if($start===false) error("Error in start time input");
+    if($end===false) error("Error in end time input");
+    if (strtotime($start)<strtotime("2011-02-01")) {
+        $start = "2011-02-01 00:00:00";
+        $_POST['year1']=2011; $_POST['month1']=02; $_POST['day1']=01;
+    }
+    if (strtotime($end)>time()) $end = sqltime();
+    if ($start>=$end) error("Start date ($start) cannot be after end date ($end)");
+    
+    $DB->query("SELECT ((CAST(DATE_FORMAT(JoinDate, '%Y') AS UNSIGNED) * 1000) + CAST(DATE_FORMAT(JoinDate, '%j') AS UNSIGNED)) AS YearDay, 
+                       DATE_FORMAT(JoinDate, '%d %b %y') AS Label, Count(UserID) As Users 
+                  FROM users_info 
+                 WHERE JoinDate BETWEEN '$start' AND '$end'
+              GROUP BY Label 
+              ORDER BY JoinDate DESC
+                 LIMIT 365");
+    $TimelineIn = $DB->to_array('YearDay');
+    
+    $DB->query("SELECT ((CAST(DATE_FORMAT(BanDate, '%Y') AS UNSIGNED) * 1000) + CAST(DATE_FORMAT(BanDate, '%j') AS UNSIGNED)) AS YearDay, 
+                       DATE_FORMAT(BanDate, '%d %b %y') AS Label, Count(UserID) As Users 
+                  FROM users_info 
+                 WHERE BanDate != '0000-00-00 00:00:00'
+                   AND BanDate BETWEEN '$start' AND '$end' 
+              GROUP BY Label 
+              ORDER BY BanDate DESC
+                 LIMIT 365");
+    $TimelineOut = $DB->to_array('YearDay');
+    
+	$UsersTimeline = array();
+	foreach($TimelineIn as $day) {
+		list($Key, $Label, $UsersIn) = $day;
+        $UsersOut = $TimelineOut["$Key"][2];
+        if(!$UsersOut) $UsersOut = 0;
+		$UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
+	}
+	foreach($TimelineOut as $day) {
+		list($Key, $Label, $UsersOut) = $day;
+        if(!isset($UsersTimeline["$Key"])) {
+            $UsersTimeline["$Key"] = array($Label, 0, $UsersOut);
+        }
+	} 
+    $title = "$_POST[year1]-$_POST[month1]-$_POST[day1] to $_POST[year2]-$_POST[month2]-$_POST[day2]"; 
+    ksort($UsersTimeline); 
 }
+
+if (!$UsersTimeline) {
+    $UsersTimeline = $Cache->get_value('users_timeline');
+    $title = "last 365 days";
+}
+if ($UsersTimeline === false) {
+ 
+    $title = "last 365 days";
+    $DB->query("SELECT (CAST(DATE_FORMAT(JoinDate, '%Y') AS UNSIGNED) * 1000) + CAST(DATE_FORMAT(JoinDate, '%j') AS UNSIGNED) AS YearDay, 
+                       DATE_FORMAT(JoinDate, '%d %b %y') AS Label, Count(UserID) As Users 
+                  FROM users_info 
+                 WHERE JoinDate < (NOW() - INTERVAL 1 DAY)
+              GROUP BY Label 
+              ORDER BY JoinDate DESC
+                 LIMIT 365");
+    $TimelineIn = $DB->to_array('YearDay');
+    
+    $DB->query("SELECT (CAST(DATE_FORMAT(BanDate, '%Y') AS UNSIGNED) * 1000) + CAST(DATE_FORMAT(BanDate, '%j') AS UNSIGNED) AS YearDay, 
+                       DATE_FORMAT(BanDate, '%d %b %y') AS Label, Count(UserID) As Users 
+                  FROM users_info 
+                 WHERE BanDate != '0000-00-00 00:00:00' AND BanDate < (NOW() - INTERVAL 1 DAY)
+              GROUP BY Label 
+              ORDER BY BanDate DESC
+                 LIMIT 365");
+    $TimelineOut = $DB->to_array('YearDay');
+    
+	$UsersTimeline = array();
+	foreach($TimelineIn as $day) {
+		list($Key, $Label, $UsersIn) = $day;
+        $UsersOut = $TimelineOut["$Key"][2];
+        if(!$UsersOut) $UsersOut = 0;
+		$UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
+	}
+	foreach($TimelineOut as $day) {
+		list($Key, $Label, $UsersOut) = $day;
+        if(!isset($UsersTimeline["$Key"])) {
+            $UsersTimeline["$Key"] = array($Label, 0, $UsersOut);
+        }
+	}
+    ksort($UsersTimeline);
+    $Cache->cache_value('users_timeline',$UsersTimeline, 3600*12 ); 
+}
+
+$startrow=0;
+$endrow=0;
+$maxrows = count($UsersTimeline)-1;
+
+if (count($UsersTimeline)>0) {
+ 
+    $endrow= $maxrows;
+    $cols = "cols: [{id: 'date', label: 'Date', type: 'string'},
+                    {id: 'users', label: 'New Registrations', type: 'number'},
+                    {id: 'disabled', label: 'Disabled Users', type: 'number'}] ";
+     
+    $rows = array();        
+    //reset($SiteStats);
+    foreach ($UsersTimeline as $data)  {  
+        list($Label, $UsersIn, $UsersOut) = $data;
+        $rows[] = " {c:[{v: '$Label'}, {v: $UsersIn}, {v: $UsersOut}]} ";
+    }
+    $rows[] = " {c:[{v: '$Label'}, {v: 0}, {v: 0}]} "; // stupid google charts
+    $data = " { $cols, rows: [" . implode(",", $rows) . "] }"; 
+}
+
+
 //End timeline generation
  
-show_header('Detailed User Statistics');
+show_header('User Statistics', 'charts,jquery');
 
 ?>
 <div class="thin">
+    <h2>User graphs</h2>
+	<div class="linkbox">
+		<strong><a href="stats.php?action=users">[User graphs]</a></strong>
+		<a href="stats.php?action=site">[Site stats]</a>
+		<a href="stats.php?action=torrents">[Torrent stats]</a>
+	</div>
+    <br/>
     <div class="head">User Flow</div>
-    <div class="box pad center">
-          <img src="http://chart.apis.google.com/chart?cht=lc&chs=880x160&chco=000D99,99000D&chg=0,-1,1,1&chxt=y,x&chxs=0,h&chxl=1:|<?=implode('|',$Labels)?>&chxr=0,0,<?=$Max?>&chd=t:<?=implode(',',$InFlow)?>|<?=implode(',',$OutFlow)?>&chls=2,4,0&chdl=New+Registrations|Disabled+Users&amp;chf=bg,s,FFFFFF00" />
-    </div>
-    <br />
+    <table class="">
+        <tr><td class="box pad center">
+<?
+    if ($data) { ?> 
+        <h1>User Flow</h1>
+        <span style="position:relative;left:0px;"><?=$title?></span>
+        <div id="chart_div"></div>
+        <div style="margin:10px auto 10px">
+        <input class="chart_button" type="button" value="|<" onclick="gstart(1200)" title="start" />
+        <input class="chart_button" type="button" value="<<" onclick="prev(2,1200)" title="back" />
+        <input class="chart_button" type="button" value="<" onclick="prev(0.9,800)" title="back" />&nbsp;&nbsp;
+        <input class="chart_button" type="button" value="▽" onclick="zoomout()" title="zoom out" />
+        <input class="chart_button" type="button" value="△" onclick="zoomin()" title="zoom in" />&nbsp;&nbsp;
+        <input class="chart_button" type="button" value=">" onclick="next(0.9,800)" title="forward" />
+        <input class="chart_button" type="button" value=">>" onclick="next(2,1200)" title="forward" />
+        <input class="chart_button" type="button" value=">|" onclick="gend(1200)" title="end" />
+        </div>
+        <script type="text/javascript">
+            var startrow = <?=$startrow?>;
+            var endrow = <?=$endrow?>;
+            var chartdata = <?=$data?>; 
+            Load_Userstats();
+        </script>
+<?
+        if (check_perms('site_debug')) {  ?>      
+            <span style="float:left">
+                <a href="#debuginfo" onclick="$('#databox').toggle(); this.innerHTML=(this.innerHTML=='DEBUG: (Hide chart data)'?'DEBUG: (View chart data)':'DEBUG: (Hide chart data)'); return false;">DEBUG: (View chart data)</a>
+            </span>&nbsp;
+            
+            <div id="databox" class="box pad hidden">
+            <?=$data?>
+            </div>
+<?      }  ?>
+<?
+    } else { ?>
+        <p>No site data found</p>
+<?  }  ?>
+        </td></tr>
+        
+<?
+    if (check_perms('site_stats_advanced')) {
+        if (isset($_POST['year1'])){
+            $start = array ($_POST['year1'],$_POST['month1'],$_POST['day1']);
+            $end = array ($_POST['year2'],$_POST['month2'],$_POST['day2']);
+        } else {
+            //$start = array (2011,02,01);
+            $start =  date('Y-m-d', time() - (3600*24*365));
+            $start = explode('-', $start);
+            $end =  date('Y-m-d');
+            $end = explode('-', $end);
+        }
+?>      
+        <tr><td class="colhead">view options</td></tr>
+        <tr><td class="box pad center">
+            <form method="post" action="">
+                <input type="text" style="width:30px" title="day" name="day1" value="<?=$start[2]?>" />
+                <input type="text" style="width:30px" title="month" name="month1"  value="<?=$start[1]?>" />
+                <input type="text" style="width:50px" title="year" name="year1"  value="<?=$start[0]?>" />
+                &nbsp;&nbsp;To&nbsp;&nbsp;
+                <input type="text" style="width:30px" title="day" name="day2"  value="<?=$end[2]?>" />
+                <input type="text" style="width:30px" title="month" name="month2"  value="<?=$end[1]?>" />
+                <input type="text" style="width:50px" title="year" name="year2"  value="<?=$end[0]?>" />
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="submit" name="view" value="View history" />
+            </form> 
+        </td></tr>
+<?  }  ?>
+        
+    </table>
+    <br/><br/>
+     
     <div class="head">User Classes</div>
     <div class="box pad center">
+        <h1>User Classes</h1>
           <img src="<?=$ClassDistribution?>" />
     </div>
     <br />
     <div class="head">User Platforms</div>
     <div class="box pad center">
+        <h1>User Platforms</h1>
           <img src="<?=$PlatformDistribution?>" />
     </div>
     <br />
     <div class="head">User Browsers</div>
     <div class="box pad center">
+        <h1>User Browsers</h1>
           <img src="<?=$BrowserDistribution?>" />
     </div>
     <br />
     <div class="head">User Clients</div>
     <div class="box pad center">
+        <h1>User Clients</h1>
         <div class=" ">
         [<a onclick="$('#clientdist1').hide(); $('#clientdist2').hide(); $('#clientdist3').show(); return false;" href="#" >clients</a>]&nbsp;&nbsp;&nbsp;
         [<a onclick="$('#clientdist1').hide(); $('#clientdist3').hide(); $('#clientdist2').show(); return false;" href="#" >major version</a>]&nbsp;&nbsp;&nbsp;
@@ -215,6 +409,7 @@ show_header('Detailed User Statistics');
     <br />
     <div class="head">Geographical Distribution Map</div>
     <div class="box center"> 
+        <h1>Geographical Distribution Map</h1>
           <br />
           <img src="http://chart.apis.google.com/chart?cht=map:fixed=-55,-180,73,180&chs=720x360&chd=t:<?=implode(',',$Rank)?>&chco=FFFFFF,EDEDED,1F0066&chld=<?=implode('|',$Countries)?>&chf=bg,s,CCD6FF" />
           <br /><br />

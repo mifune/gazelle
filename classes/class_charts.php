@@ -93,7 +93,7 @@ class AREA_GRAPH extends GOOGLE_CHARTS {
 
 class PIE_CHART extends GOOGLE_CHARTS {
 	public function __construct ($Width, $Height, $Options=array()) {
-		$Type = (isset($this->Options['3D']))?'p3':'p';
+		$Type = (isset($Options['3D']))?'p3':'p';
 		parent::__construct($Type, $Width, $Height, $Options);
 	}
 

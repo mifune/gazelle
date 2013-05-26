@@ -159,7 +159,12 @@ for($i = 0; $i < $Limit; $i++) {
 			<ul class="stats nobullet">
                 
 <?      if (check_perms('site_view_stats')) { ?>
-				<li class="center"> [<a href="stats.php?action=users">User Graphs</a>] &nbsp; [<a href="stats.php?action=site">Site History</a>]</li>
+				<li class="center">
+                    [<a href="stats.php?action=users">Users</a>] &nbsp;[<a href="stats.php?action=site">Site History</a>]
+<?          if (check_perms('site_stats_advanced')) { ?>
+                    &nbsp;[<a href="stats.php?action=torrents">Torrents</a>]
+<?          }   ?>
+                </li>
 <?      }
 
         if (USER_LIMIT>0) { ?>

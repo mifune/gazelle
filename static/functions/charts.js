@@ -6,9 +6,10 @@ var data;
 var chart;
 var options; 
 var maxrows;
-var zoom;
 
-function Start_Google(){
+//============================================================================================
+
+function Load_Sitestats(){
     google.load("visualization", "1", {packages:["corechart"]});
     google.setOnLoadCallback(Start_Sitestats);
 }
@@ -16,11 +17,13 @@ function Start_Google(){
 function Start_Sitestats(){
     data = new google.visualization.DataTable(chartdata);
     chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    var startat = endrow-180;
+    if(startat<startrow) startat=startrow;
     options = {
             title:'start',
             height:700,
             chartArea:{left:80,top:20,width:"82%",height:630},
-            vAxes:[{gridlines:{color: '#bbb', count: 21}}],
+            vAxes:[{gridlines:{color: '#bbb', count: -1}}],
             series:[{color: 'blue', visibleInLegend: true},
                     {color: 'orange', visibleInLegend: true}, 
                     {color: 'green', visibleInLegend: true}, 
@@ -30,12 +33,77 @@ function Start_Sitestats(){
                 duration: 2000,
                 easing: 'linear'
             }, 
-            hAxis:{viewWindow: {min:startrow, max:endrow},slantedText:false,maxTextLines:1,maxAlternation:1}
+            hAxis:{viewWindow: {min:startat, max:endrow},slantedText:false,maxTextLines:1,maxAlternation:1}
         }; 
     maxrows = data.getNumberOfRows() -1;
-    zoom=0;
     drawChart();
 }
+
+//============================================================================================
+function Load_Userstats(){
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(Start_Userstats);
+}
+
+function Start_Userstats(){
+    data = new google.visualization.DataTable(chartdata);
+    chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+    var startat = endrow-60;
+    if(startat<startrow) startat=startrow;
+    options = {
+            title:'start',
+            height:600,
+            chartArea:{left:60,top:80,width:"90%",height:500},
+            vAxes:[{gridlines:{color: '#bbb', count: -1}}],
+            series:[{color: 'blue', visibleInLegend: true}, 
+                    {color: 'red', visibleInLegend: true}],
+            tooltip:{ showColorCode: true},
+            legend:{position: 'top',alignment:'center'},
+            animation:{
+                duration: 2000,
+                easing: 'linear'
+            }, 
+            hAxis:{viewWindow: {min:startat, max:endrow},slantedText:false,maxTextLines:1,maxAlternation:1}
+        }; 
+    maxrows = data.getNumberOfRows() -1;
+    drawChart();
+}
+
+//============================================================================================
+
+
+function Load_Torrentstats(){
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(Start_Torrentstats);
+}
+
+
+function Start_Torrentstats(){
+    data = new google.visualization.DataTable(chartdata);
+    chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+    var startat = endrow-28;
+    if(startat<startrow) startat=startrow;
+    options = {
+            title:'start',
+            height:280,
+            chartArea:{left:80,top:20,width:"82%",height:230},
+            vAxes:[{gridlines:{color: '#bbb', count: -1}},{baseline: 0}],
+            series:[{color: 'blue', visibleInLegend: false}],
+            tooltip:{ showColorCode: true},
+            animation:{
+                duration: 2000,
+                easing: 'linear'
+            }, 
+            isStacked: true, 
+            hAxis:{viewWindow: {min:startat, max:endrow},slantedText:false,maxTextLines:1,maxAlternation:1}
+        }; 
+    maxrows = data.getNumberOfRows() -1;
+    drawChart();
+}
+ 
+
+//============================================================================================
+
 
 
 function drawChart() {
@@ -47,7 +115,7 @@ function zoomout(){
     options.animation.duration = 1000;
     var range = options.hAxis.viewWindow.max-options.hAxis.viewWindow.min+1;
     //if(range>maxrows) range = maxrows;
-    range /= 2; 
+    range = parseInt(range/2); 
     var shift = range;
     if (options.hAxis.viewWindow.min - range < 0) shift = options.hAxis.viewWindow.min;
     options.hAxis.viewWindow.min -= shift;
