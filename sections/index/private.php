@@ -404,6 +404,7 @@ foreach ($News as $NewsItem) {
                         <em>For older news posts, <a href="forums.php?action=viewforum&amp;forumid=19">click here</a></em>
                 </div> -->
 	</div>
+    <div class="clear"></div>
 </div>
 <?
 show_footer(array('disclaimer'=>true));

@@ -143,5 +143,6 @@ if (check_perms('admin_update_geoip')) {
     }   ?>
 		</table>
 	</div>
+    <div class="clear"></div>
 </div>
 <? show_footer(); ?>
