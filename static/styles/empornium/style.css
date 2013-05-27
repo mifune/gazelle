@@ -148,7 +148,7 @@ ul.thin li { margin:0px 0px; padding:0px; }
     margin: 0px auto 0px auto;
     padding: 0.6em 0.6em 30px;
     border: 1px solid #98AAB1;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 #footer {
@@ -2490,3 +2490,40 @@ a#nav_leeching {
 }
 
  
+div.autoresults {
+    display:inline-block;
+    position: relative;
+    vertical-align: top;
+}
+
+div.autoresults ul {
+    list-style: none;
+    display: block; 
+    position: absolute;
+    background-color:white;
+    color: #333;
+    border: 1px solid #777;
+    border-radius: 4px;  
+    -moz-border-radius: 4px; 
+    -webkit-border-radius: 4px;  
+    z-index: 10;
+    visibility: hidden;
+    font-size: 14px;
+}
+div.autoresults ul li {
+    margin: 0px;
+    text-align: left;
+    padding: 0px 8px 0px 8px;
+}
+div.autoresults ul li.highlight {
+    font-weight: normal;
+    background-color: #888;
+    color: white;
+    text-decoration: none;
+} 
+div.autoresults ul li span.num {
+    color:#aaa;
+}
+div.autoresults ul li.highlight span.num { 
+    color: white; 
+} 

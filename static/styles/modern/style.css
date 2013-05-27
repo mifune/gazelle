@@ -190,7 +190,7 @@ ul.thin li { margin:0px 0px; padding:0px; }
     background-color: #003875;
     margin: 40px auto 0px auto;
     border: 1px solid #0054b0;
-    overflow: hidden;
+    /* overflow: hidden; */
     padding: 0px 0px 35px;
     
     -moz-border-radius: 14px 14px 0 0;
@@ -778,10 +778,10 @@ input.hidden {
 }  */
 
 .thin > h2 {
-    margin: 10px -4% 20px; 
+    margin: 10px -2% 20px; 
 }
 .thin > h2:first-child {
-    margin: 0px -4% 20px;
+    margin: 0px -2% 20px;
     -moz-border-radius: 12px 12px 0 0;
     -webkit-border-top-left-radius: 12px;
     -webkit-border-top-right-radius: 12px;
@@ -3069,5 +3069,51 @@ a#nav_leeching {
 }
 
  
-  
-  
+/*
+div.autoresults ul li a {
+    margin: 0px; 
+    white-space:nowrap;
+}
+div.autoresults ul li a:hover {
+    background-color: #0d245a;
+    color: white;
+    text-decoration: none;
+} */
+ 
+div.autoresults {
+    display:inline-block;
+    position: relative;
+    vertical-align: top;
+}
+   
+div.autoresults ul {
+    list-style: none;
+    display: block; 
+    position: absolute;
+    background-color:white;
+    color: #333;
+    border: 1px solid #777;
+    z-index: 10;
+    visibility: hidden;
+    font-size: 14px;
+    border-radius: 4px;  
+    -moz-border-radius: 4px; 
+    -webkit-border-radius: 4px;  
+}
+div.autoresults ul li {
+    margin: 0px;
+    text-align: left;
+    padding: 0px 8px 0px 8px;
+}
+div.autoresults ul li.highlight {
+    font-weight: normal;
+    background-color: #888;
+    color: white;
+    text-decoration: none;
+} 
+div.autoresults ul li span.num {
+    color:#aaa;
+}
+div.autoresults ul li.highlight span.num { 
+    color: white; 
+} 

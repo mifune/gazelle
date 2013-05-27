@@ -17,6 +17,16 @@ function js_pages($Action, $TorrentID, $NumResults, $CurrentPage) {
 if(!empty($_REQUEST['action'])) {
 	switch($_REQUEST['action']){
         
+        case 'autocomplete':
+            
+            include(SERVER_ROOT . '/sections/torrents/autocomplete_tags.php'); 
+            break;
+        
+        case 'tags':
+            
+            include(SERVER_ROOT . '/sections/torrents/tags.php'); 
+            break;
+        
         case 'dupe_check':
             enforce_login();
 			//authorize(); 

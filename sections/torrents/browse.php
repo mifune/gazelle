@@ -372,7 +372,7 @@ if (!empty($Results['notfound'])) {
 
 $Results = $Results['matches'];
 
-show_header('Browse Torrents', 'browse,status,overlib,jquery,jquery.cookie');
+show_header('Browse Torrents', 'browse,status,overlib,jquery,jquery.cookie,bbcode,tag_autocomplete,autocomplete');
 
 // List of pages  
 $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);	
@@ -532,28 +532,38 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                             <? } ?>
                         </td>
                     </tr>
-                <? } ?>
-                <? if ($AdvancedSearch) { ?>                    
+                <? } ?>              
                 <tr>                    
                     <td class="label" style="width:140px" title="Search Tags">Tags:</td>
                     <td colspan="3">
-                        <input type="text" size="40" id="tags" name="taglist" class="inputtext" title="Supports full boolean search" value="<?= str_replace('_', '.', form('taglist', true)) ?>" />&nbsp;					
+                <? if ($AdvancedSearch) { ?>      
+                      
+                  <!--     <input type="text" size="40" id="tags" name="taglist" class="inputtext" title="Supports full boolean search" value="<?= str_replace('_', '.', form('taglist', true)) ?>" />&nbsp; -->
                     
-                       <!-- <input style="float:right" type="submit" value="Filter Torrents" /> -->
-                    </td>
-                </tr>
+                        <textarea id="tags" name="taglist" cols="50" rows="1" class="inputtext" onkeyup="resize('tags');"  title="Supports full boolean search" ><?= str_replace('_', '.', form('taglist', true)) ?></textarea>&nbsp;
+           
                 <? } else { // BASIC SEARCH ?>
-                <tr>                    
-                    <td class="label" style="width:140px" title="Search Tags">Tags:</td>
-                    <td colspan="3">
+                 
                         <input type="text" size="40" id="tags" name="taglist" class="inputtext" title="Use 'Any' or 'All' option to determine whether search is AND or OR" value="<?= str_replace('_', '.', form('taglist', true)) ?>" />&nbsp;					
                         <input type="radio" name="tags_type" id="tags_type0" value="0" <? selected('tags_type', 0, 'checked') ?> /><label for="tags_type0"> Any</label>&nbsp;&nbsp;
-                        <input type="radio" name="tags_type" id="tags_type1" value="1"  <? selected('tags_type', 1, 'checked') ?> /><label for="tags_type1"> All</label>
-                    
-                       <!-- <input style="float:right" type="submit" value="Filter Torrents" /> -->
+                        <input type="radio" name="tags_type" id="tags_type1" value="1"  <? selected('tags_type', 1, 'checked') ?> /><label for="tags_type1"> All</label>&nbsp;&nbsp;
+         
+                <? } ?>
+                <? if (check_perms('site_debug')) { ?>  
+                        <div class="autoresults">
+                            <input type="text" id="torrentssearch" value="search tags"
+                                        onfocus="if (this.value == 'search tags') this.value='';"
+                                        onblur="if (this.value == '') this.value='search tags';"
+                                        onkeyup="return autocomp.keyup(event);" 
+                                        onkeydown="return autocomp.keydown(event);"
+                                        autocomplete="off"
+                                        title="enter text to search for tags, click (or enter) to select a tag from the drop-down" />
+                            <ul id="torrentscomplete"></ul>
+                        </div>
+                <? } ?>
                     </td>
                 </tr>
-                <? } ?>
+        </div>
             </table>
             <div>
                 <span style="float:left;margin-left:80%;"><a href="#" onclick="$('#taglist').toggle(); if(this.innerHTML=='(View Tags)'){this.innerHTML='(Hide Tags)';} else {this.innerHTML='(View Tags)';}; return false;"><?= (empty($LoggedUser['ShowTags'])) ? '(View Tags)' : '(Hide Tags)' ?></a></span>
@@ -564,9 +574,9 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                     <?
                     $GenreTags = $Cache->get_value('genre_tags');
                     if (!$GenreTags) {
-                        $DB->query("SELECT Name FROM tags WHERE TagType='genre' ORDER BY Uses DESC, Name LIMIT 42");
+                        $DB->query("(SELECT Name FROM tags WHERE TagType='genre' ORDER BY Uses DESC LIMIT 42) ORDER BY Name");
                         $GenreTags = $DB->collect('Name');
-                        $Cache->cache_value('genre_tags', $GenreTags, 3600 * 6);
+                        $Cache->cache_value('genre_tags', $GenreTags, 3600 * 24);
                     }
 
                     $x = 0;
