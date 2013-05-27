@@ -254,7 +254,6 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                break;
         }
         
-        //$LoggedUser['Credits'] -= $Cost;
 
         if($UpdateSetOther){
             $SET = implode(', ', $UpdateSetOther);

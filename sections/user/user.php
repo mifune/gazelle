@@ -1007,7 +1007,7 @@ if ($Enabled == '1' && !$OwnProfile) {
                      
 	foreach($ShopItems as $BonusItem) {
             list($ItemID, $Title, $Description, $Action, $Value, $Cost) = $BonusItem;
-            $CanBuy = is_float((float)$LoggedUser['Credits']) ? $LoggedUser['Credits'] >= $Cost: false;
+            $CanBuy = is_float((float)$LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
             //echo $Title;
             if ($Action=='givegb') $Title = str_replace ('other', $Username, $Title);
             else $Title .= " to $Username";

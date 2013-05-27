@@ -462,7 +462,7 @@ if ($FreeTorrent == '0' && $IsUploader) {
             
             if ( $Size < get_bytes($Value.'gb') ) continue; // skip over the items for smaller
                     
-            $CanBuy = is_float((float)$LoggedUser['Credits']) ? $LoggedUser['Credits'] >= $Cost: false;
+            $CanBuy = is_float((float)$LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
             
             $Row = ($Row == 'a') ? 'b' : 'a';
 ?> 

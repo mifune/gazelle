@@ -60,7 +60,7 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                 $CanBuy = is_float((float)$LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
                 $BGClass= ($CanBuy?' itembuy' :' itemnotbuy');
                 if ($IsBuyGB && $LoggedUser['BytesDownloaded'] < get_bytes($Value.'gb') ) {
-                    $DescExtra = "<br/>(WARNING: will only remove ".get_size($LoggedUser['BytesDownloaded']) .")"; // get_size(get_bytes($Value.'gb') - 
+                    $DescExtra = "<br/>(WARNING: will only remove ".get_size($LoggedUser['BytesDownloaded']) .")";  
                 }
                 if($IsBadge ) {
                     if ($LastBadge==$Badge) {

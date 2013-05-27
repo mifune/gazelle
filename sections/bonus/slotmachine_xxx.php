@@ -56,7 +56,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                     <td class="noborder center"><input type="button" value="Plays" onclick="Change_NumBets()" /><br/><input id="numbets" type="text" size="1" value="3" disabled="disabled"/></td>
                     <td class="noborder center" style="width:50%;"><h3 id="result" style="color:blue;font-size:2.4em"></h3></td>
                     <td class="label">Credits:</td>
-                    <td class="noborder"><span style="float:right;color:#333;font-size: large" id="winnings"><?=number_format($LoggedUser['Credits'])?></span></td>
+                    <td class="noborder"><span style="float:right;color:#333;font-size: large" id="winnings"><?=number_format($LoggedUser['TotalCredits'])?></span></td>
                 </tr>
             </table>
         </div>
