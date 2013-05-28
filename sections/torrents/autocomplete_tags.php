@@ -20,7 +20,8 @@ if($Data===false || !isset($Data['ver']) || $Data['ver'] < 1) {
     while(list($tag, $num) = $DB->next_record(MYSQLI_NUM)) {
         $Data[] = array($tag, "$tag &nbsp;<span class=\"num\">($num)</span>");   
     }
-    $Cache->cache_value('tag_search_'.$term, array( 'ver'=>1, 'd'=>$Data ), 3600*24); 
+    $Data = array( 'ver'=>1, 'd'=>$Data );
+    $Cache->cache_value('tag_search_'.$term, $Data, 3600*24); 
 }
 
 echo json_encode(array($term, $Data['d']));
