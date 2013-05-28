@@ -2528,9 +2528,7 @@ div.autoresults ul li.highlight span.num {
 table.border {
     border: 1px solid #dde; 
 }
-table.border td {
-  /*  border: 1px solid #dde; */
-}
+ 
 
 table.noborder td, .torrent td, .torrent_table td {
     border:none;

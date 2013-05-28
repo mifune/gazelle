@@ -322,11 +322,30 @@ echo $Val->GenerateJS('userform');
                     <input type="checkbox" name="disablelatesttopics" id="disablelatesttopics" onclick="SetLatestTopicsInterface();"
                                 <? if (!empty($SiteOptions['DisableLatestTopics'])) { ?>checked="checked"<? } ?> />
 					<label for="disablelatesttopics">Disable latest forum topics</label>
-                    <br/>
-					<input type="checkbox" name="showgames" id="showgames" <? 
-                        if (!empty($SiteOptions['ShowGames'])) { ?>checked="checked"<? };
-                        if (!empty($SiteOptions['DisableLatestTopics'])) { ?>disabled="disabled"<? }    ?> />
-					<label for="showgames">show forum games in latest forum topics</label>
+                    <?  // okay lets get the actual names of the excluded forums...
+                        if ( is_array($ExcludeForums)){ 
+                            $ExcludedForumNames = $Cache->get_value('excluded_forum_names');
+                            if($ExcludedForumNames===false) {
+                                $DB->query("SELECT Name FROM forums WHERE ID IN (". implode(",", $ExcludeForums) .")"); 
+                                $ExclForumNames = $DB->collect('Name');
+                                $ExcludedForumNames = count($ExclForumNames)>1?'forums ':'forum ';
+                                $LastFName = array_pop($ExclForumNames);
+                                if (count($ExclForumNames)>0){
+                                    $ExcludedForumNames .= implode(", ", $ExclForumNames) . " and $LastFName";
+                                } else {
+                                    $ExcludedForumNames .= $LastFName;
+                                }
+                                $Cache->cache_value('excluded_forum_names', $ExcludedForumNames, 3600*24);
+                            }
+                    ?>
+                            <br/>
+                            <input type="checkbox" name="showgames" id="showgames" <? 
+                                if (!empty($SiteOptions['ShowGames'])) { ?>checked="checked"<? };
+                                if (!empty($SiteOptions['DisableLatestTopics'])) { ?>disabled="disabled"<? }    ?> />
+                            <label for="showgames">show <?=$ExcludedForumNames?> in latest forum topics</label>
+                    <?  
+                        }
+                    ?>
 				</td>
 			</tr>
 			<tr>
