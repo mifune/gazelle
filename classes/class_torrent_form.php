@@ -113,7 +113,8 @@ class TORRENT_FORM {
                         <input id="file" type="text" size="70" disabled="disabled" value="<?=display_str($this->Torrent['tempfilename'])?>" />
                         <br/>[already loaded file]
 <?                  } else {    ?>
-                        <input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: 1mb]
+                        <input type="hidden" name="MAX_FILE_SIZE" value="<?=MAX_FILE_SIZE_BYTES?>" /> 
+                        <input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: <?=strtolower(get_size(MAX_FILE_SIZE_BYTES))?>]
 <?                  }           ?>
 				</td>
                 </tr>

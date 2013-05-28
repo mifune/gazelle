@@ -174,32 +174,15 @@ function user_dupes_table($UserID, $Username) {
 				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID ) 
                 ORDER BY  UserID, IP  
                 LIMIT 50"); 
-    
-	$DB->query(" SELECT e.UserID AS UserID, x.IP, 'tracker', 'account' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
-				 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID!= $UserID AND x.uid = $UserID
-                 GROUP BY x.uid
-                UNION
-                 SELECT x2.uid AS UserID, x.IP, 'tracker', 'tracker' FROM xbt_snatched AS x JOIN xbt_snatched AS x2 ON x.IP=x2.IP 
-				 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND x2.uid!= $UserID AND x.uid = $UserID
-                 GROUP BY x.uid
-                UNION
-                 SELECT x.uid AS UserID, x.IP, 'account', 'tracker' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
-				 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID = $UserID AND x.uid != $UserID
-                 GROUP BY x.uid
-                UNION
-                 SELECT e1.UserID AS UserID, e1.IP, 'account', 'account' FROM users_history_ips AS e1 JOIN users_history_ips AS e ON e1.IP=e.IP 
-				 WHERE e1.IP != '127.0.0.1' AND e1.IP !='' AND e.UserID = $UserID AND e1.UserID != $UserID  
-                ORDER BY  UserID, IP   "); */
-    
-    
-    
-    
-	$DB->query("SELECT um.UserID AS UserID, um.IP 
-                  FROM users_history_ips AS um 
-                  JOIN users_history_ips AS me ON um.IP=me.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND me.UserID = $UserID AND um.UserID != $UserID 
+     */
+     
+	$DB->query("SELECT uh.UserID AS UserID, uh.IP 
+                  FROM users_history_ips AS uh 
+                  JOIN users_history_ips AS me ON uh.IP=me.IP 
+				 WHERE uh.IP != '127.0.0.1' AND uh.IP !='' AND me.UserID = $UserID AND uh.UserID != $UserID 
+              GROUP BY UserID, IP
               ORDER BY UserID, IP  
-                LIMIT 50"); 
+                 LIMIT 50"); 
     
     
     $IPDupeCount = $DB->record_count();

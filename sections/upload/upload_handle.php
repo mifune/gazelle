@@ -6,7 +6,7 @@
 // the data to the database and the torrent to the disk.						//
 //******************************************************************************//
 
-ini_set('upload_max_filesize', 2097152);
+ini_set('upload_max_filesize', MAX_FILE_SIZE_BYTES);
 ini_set('max_file_uploads', 100);
 require(SERVER_ROOT . '/classes/class_torrent.php');
 include(SERVER_ROOT . '/classes/class_validate.php');
