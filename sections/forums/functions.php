@@ -120,6 +120,12 @@ function update_latest_topics() {
         global $LoggedUser, $Classes, $Cache, $DB, $ExcludeForums;
 
         foreach($Classes as $Class) {
+            $Cache->delete_value('latest_topics_'.$Class['ID']);
+            $Cache->delete_value('latest_topics_nogames_'.$Class['ID']);
+        }
+        
+        /*
+        foreach($Classes as $Class) {
             $Level = $Class['Level'];
             $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
                         INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
@@ -146,7 +152,7 @@ function update_latest_topics() {
                 $LatestTopics = $DB->to_array();
                 $Cache->cache_value('latest_topics_nogames_'.$Class['ID'], $LatestTopics);
             }
-        }
+        } */
 }
 
 function print_forums_select($Forums, $ForumCats, $SelectedForumID=false, $ElementID = '') {
