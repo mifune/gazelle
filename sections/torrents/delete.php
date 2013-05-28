@@ -1,6 +1,7 @@
 <?
 $TorrentID = $_GET['torrentid'];
-if (!$TorrentID || !is_number($TorrentID)) { error(404); }
+if (!$TorrentID || !is_number($TorrentID)) error(404);
+
 
 $DB->query("SELECT t.UserID, t.Time, COUNT(x.uid) FROM torrents AS t LEFT JOIN xbt_snatched AS x ON x.fid=t.ID WHERE t.ID=".$TorrentID." GROUP BY t.UserID");
 if($DB->record_count() < 1) {
@@ -11,6 +12,8 @@ list($UserID, $Time, $Snatches) = $DB->next_record();
 if ($LoggedUser['ID']!=$UserID && !check_perms('torrents_delete')) {
 	error(403);
 }
+if($LoggedUser['DisableUpload'] || !check_perms('site_upload')) error('You can no longer delete this torrent as your upload rights have been disabled');
+ 
 
 if(isset($_SESSION['logged_user']['multi_delete']) && $_SESSION['logged_user']['multi_delete']>=3 && !check_perms('torrents_delete_fast')) {
 	error('You have recently deleted 3 torrents, please contact a staff member if you need to delete more.');
