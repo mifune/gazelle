@@ -1028,6 +1028,12 @@ table.boxstat a, table.boxstat a:visited {
     margin-left: 4px;
 }
 
+.sicon {
+    display:inline-block;
+    width:12px;
+    height:12px;
+    margin-right: 4px;
+}
 
 .icon_disk_none {
     background: url('images/disk.png') no-repeat center center;

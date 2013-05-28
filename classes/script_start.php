@@ -708,13 +708,14 @@ function get_latest_forum_topics($PermissionID, $ExcludeGames = true) {
                     INNER JOIN users_main AS um ON um.ID=fp.AuthorID
                     WHERE f.MinClassRead<='$Level' $ANDWHERE
                     ORDER BY AddedTime DESC
-                    LIMIT 6");
+                    LIMIT 5");
         $LatestTopics = $DB->to_array();
         $Cache->cache_value('latest_topics_'.$cachekey, $LatestTopics);
     }
     return $LatestTopics;
 }
 
+ 
 function print_latest_forum_topics() {
     global $LoggedUser;
     if (empty($LoggedUser['DisableLatestTopics'])) {    
@@ -723,12 +724,40 @@ function print_latest_forum_topics() {
         echo '<div class="head latest_topics">Latest forum topics</div>';
         echo '<div class="box pad latest_topics">';
         foreach($LatestTopics as $Key=>$Value) {
-            echo '<span class="sicon unread"></span><a href="forums.php?action=viewthread&threadid='.$Value['ThreadID']."&postid=".$Value['PostID']."#post".$Value['PostID'].'"><strong>'.$Value['Title']."</strong></a> by ".$Value['Username']." (".time_diff($Value['AddedTime'], 1,true,false,0).")&nbsp;";
+            echo '<span class="sicon unread"></span><a href="forums.php?action=viewthread&threadid='.$Value['ThreadID']."&postid=".$Value['PostID']."#post".$Value['PostID'].'"><strong>'.$Value['Title']."</strong></a> by ".$Value['Username']." (".time_diff($Value['AddedTime'], 1,true,false,0).")&nbsp;&nbsp;";
         }
         echo "</div>";
     }
 }
 
+/*
+function print_latest_forum_topics() {
+    global $LoggedUser;
+    if (empty($LoggedUser['DisableLatestTopics'])) {    
+        $LatestTopics = get_latest_forum_topics($LoggedUser['PermissionID'], !$LoggedUser['ShowGames'] );
+
+        echo '<div class="head latest_topics">Latest forum topics</div>'; 
+        echo '<table class="box latest_topics">';
+        $num=count($LatestTopics);
+        $halfnum=ceil($num/2);
+        //for($i=0;$i<ceil($num/2);$i++){
+        for($i=0; $i<$halfnum; $i++){
+            
+            $Value = $LatestTopics[$i];
+            echo '<tr><td><span class="sicon unread"></span><a href="forums.php?action=viewthread&threadid='.$Value['ThreadID']."&postid=".$Value['PostID']."#post".$Value['PostID'].'"><strong>'.$Value['Title']."</strong></a> by ".$Value['Username']." (".time_diff($Value['AddedTime'], 1,true,false,0).")&nbsp;</td>";
+            
+            if($i+$halfnum < $num) {
+                $Value = $LatestTopics[$i+$halfnum];
+                echo '<td><span class="sicon unread"></span><a href="forums.php?action=viewthread&threadid='.$Value['ThreadID']."&postid=".$Value['PostID']."#post".$Value['PostID'].'"><strong>'.$Value['Title']."</strong></a> by ".$Value['Username']." (".time_diff($Value['AddedTime'], 1,true,false,0).")&nbsp;</td>";
+            } else {
+                echo '<td>&nbsp;</td>';
+            }
+            echo '</tr>';
+        }
+   
+        echo "</table>";
+    }
+} */
 
 
 

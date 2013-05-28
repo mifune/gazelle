@@ -33,7 +33,8 @@ function clicked(value) {
  */
 "use strict";
 var autocomp = {
-	id: "",
+	id_prefix: "",
+	section: "",
 	value: "",
 	href: null,
 	tag: null,
@@ -42,11 +43,12 @@ var autocomp = {
 	list: null,
 	pos: -1,
 	cache: [],
-	start: function (id) {
-		this.id = id;
-		this.cache[id] = ["",[],[],[]];
-		this.input = document.getElementById(id + "search");
-		this.list = document.getElementById(id + "complete");
+	start: function (section, id_prefix) {
+		this.section = section;
+		this.id_prefix = id_prefix;
+		this.cache[id_prefix] = ["",[],[],[]];
+		this.input = document.getElementById(id_prefix + "search");
+		this.list = document.getElementById(id_prefix + "complete");
 		listener.set(document.body,'click',function(){
 			autocomp.value = autocomp.input.value;
 			autocomp.end();
@@ -68,11 +70,18 @@ var autocomp = {
 			case 8: //backspace
 				this.tag = null;
 				this.list.style.visibility = 'hidden';
-				this.timer = setTimeout("autocomp.get('" + escape(this.input.value) + "');",500);
+                if( this.input.value.length>0 )
+                    this.timer = setTimeout("autocomp.get('" + escape(this.input.value) + "');",500); 
 				break;
 			case 38: //up
+				this.highlight('up');
+				if(this.pos !== -1) {
+					this.tag = this.list.children[this.pos].tag;
+					this.input.value = this.tag;    // this.list.children[this.pos].textContent || this.list.children[this.pos].value;
+				}
+				break;
 			case 40: //down
-				this.highlight(key);
+				this.highlight('down');
 				if(this.pos !== -1) {
 					this.tag = this.list.children[this.pos].tag;
 					this.input.value = this.tag;    // this.list.children[this.pos].textContent || this.list.children[this.pos].value;
@@ -124,13 +133,14 @@ var autocomp = {
 		}
 
 		//Change position
-		if (change === 40) {
-			++this.pos;
-		} else if (change === 38) {
-			--this.pos;
-		} else {
-			this.pos = change;
-		}
+        if( change == 'down') ++this.pos;
+		else if (change == 'up') --this.pos;
+		else this.pos = parseInt(change);
+        /*
+		if (change === 40) ++this.pos;
+		else if (change === 38) --this.pos;
+		else this.pos = change; */
+		 
 
 		//Wrap arounds
 		if (this.pos >= this.list.children.length) {
@@ -150,24 +160,25 @@ var autocomp = {
 		this.pos = -1;
 		this.value = unescape(value);
 
-		if (typeof this.cache[this.id+value] === 'object') {
-			this.display(this.cache[this.id+value]);
+		if (typeof this.cache[this.id_prefix+value] === 'object') {
+            //this.cache[this.id+value].unshift(new Array('cache','cache!!')); // test caching
+			this.display(this.cache[this.id_prefix+value]);
 			return;
 		}
 
-		ajax.get(this.id+'.php?action=autocomplete&name='+this.input.value,function(jstr){
+		ajax.get(this.section+'.php?action=autocomplete&name='+this.input.value,function(jstr){
 			var data = json.decode(jstr);
-			autocomp.cache[autocomp.id+data[0]] = data;
-			autocomp.display(data);
+			autocomp.cache[autocomp.id_prefix+data[0]] = data[1];
+			autocomp.display(data[1]);
 		});
 	},
 	display: function (data) {
 		var i,il,li;
 		this.list.innerHTML = '';
-		for (i=0,il=data[1].length;i<il;++i) {
+		for (i=0,il=data.length;i<il;++i) {
 			li = document.createElement('li');
-            li.tag =  data[1][i][0];
-			li.innerHTML = data[1][i][1];
+            li.tag =  data[i][0];
+			li.innerHTML = data[i][1];
 			li.i = i;
 			listener.set(li,'mouseover',function(){
 				autocomp.highlight(this.i);
@@ -179,10 +190,8 @@ var autocomp = {
 		}
 		if (i > 0) {
 			this.list.style.visibility = 'visible';
-			this.list.parent.style.visibility = 'visible';
 		} else {
 			this.list.style.visibility = 'hidden';
-			this.list.parent.style.visibility = 'hidden';
 		}
 	}
 };
