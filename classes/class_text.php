@@ -1210,7 +1210,7 @@ class TEXT {
                                 $InlineStyle .= 'margin: 0px auto;';
                                 break;
                         }
-                    } elseif ($AllowNoBorder && in_array($att, array('nb', 'noborder'))) {
+                    } elseif ($AllowNoBorder && in_array($att, array('nball', 'nb', 'noborder'))) { //  'nball', 
                         $InlineStyle .= 'border:none;';
                     } elseif ($att != 'nball') {
                         return FALSE;

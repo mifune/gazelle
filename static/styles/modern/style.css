@@ -1255,19 +1255,11 @@ table.wid740 {
 tr#recentuploads td{
     background-color:white;
 }
-table.border {
-    border: 1px solid #dde; 
-}
-table.border td {
-  /*  border: 1px solid #dde; */
-}
+
 table.staff {
   /*  border-left: 1px solid #dde;
     border-right: 1px solid #dde; */
     border: 1px solid #dde;
-}
-table.noborder td, .torrent td, .torrent_table td {
-    border:none;
 }
 
 #staff table {
@@ -3117,3 +3109,13 @@ div.autoresults ul li span.num {
 div.autoresults ul li.highlight span.num { 
     color: white; 
 } 
+table.border {
+    border: 1px solid #dde; 
+}
+table.border td {
+  /*  border: 1px solid #dde; */
+}
+
+table.noborder td, .torrent td, .torrent_table td {
+    border:none;
+}
