@@ -549,7 +549,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                         <input type="radio" name="tags_type" id="tags_type1" value="1"  <? selected('tags_type', 1, 'checked') ?> /><label for="tags_type1"> All</label>&nbsp;&nbsp;
          
                 <? } ?>
-                <? if (check_perms('site_debug')) { ?>  
+                
                         <div class="autoresults">
                             <input type="text" id="torrentssearch" value="search tags"
                                         onfocus="if (this.value == 'search tags') this.value='';"
@@ -557,10 +557,10 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                                         onkeyup="return autocomp.keyup(event);" 
                                         onkeydown="return autocomp.keydown(event);"
                                         autocomplete="off"
-                                        title="enter text to search for tags, click (or enter) to select a tag from the drop-down" />
+                                        title="enter text to search for tags, click (or enter) to select a tag from the drop-down (BETA)" />
                             <ul id="torrentscomplete"></ul>
                         </div>
-                <? } ?>
+                 
                     </td>
                 </tr>
         </div>
