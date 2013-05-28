@@ -143,8 +143,8 @@ class TORRENT_FORM {
 
 	
 
-	function simple_form($OfficialTags = '') {
-            global $Text, $LoggedUser; 
+	function simple_form() {
+            global $Text, $DB, $Cache, $LoggedUser; 
 		$Torrent = $this->Torrent; 
 ?>		 
 <?		if ($this->NewTorrent) {  ?>
@@ -154,24 +154,57 @@ class TORRENT_FORM {
 					<input type="text" id="title" name="title" class="long" value="<?=display_str($Torrent['Title']) ?>" />
 				</td>
 			</tr>
+<?
+                $taginfo = get_article('tagrulesinline');
+                //if($taginfo) echo $Text->full_format($taginfo, true); 
+                if ($taginfo) {
+?>
+                <tr class="uploadbody">
+                    <td class="label"></td>
+                    <td><?=$Text->full_format($taginfo, true)?></td>
+                </tr>
+<?
+                }
+?>
 			<tr class="uploadbody">
 				<td class="label">Tags</td>
 				<td>
-               <?
-                $taginfo = get_article('tagrulesinline');
-                if($taginfo) echo $Text->full_format($taginfo, true); 
-                ?>
-                    <div id="tagtext"></div>
-<?              if($OfficialTags) { ?>
-					<select id="genre_tags" name="genre_tags" onchange="add_tag();return false;" style="vertical-align: top" <?=$this->Disabled?>>
-						<option>---</option>
-<?                  foreach(display_array($OfficialTags) as $Tag) { ?>
-						<option value="<?=$Tag ?>"><?=$Tag ?></option>
-<?                  }   ?>
-					</select>
-<?              } 
-                ?>  <!--style="height:1.4em;"-->  
+                    <div>  
+                        search tags: 
+                        <div class="autoresults">
+                            <input type="text" id="torrentssearch" value="search tags" 
+                                            onfocus="if (this.value == 'search tags') this.value='';"
+                                            onblur="if (this.value == '') this.value='search tags';"
+                                            onkeyup="return autocomp.keyup(event);" 
+                                            onkeydown="return autocomp.keydown(event);"
+                                            autocomplete="off"
+                                            title="enter text to search for tags, click (or enter) to select a tag from the drop-down (BETA)" />
+                            <ul id="torrentscomplete"></ul>
+                         </div>
+<?              
+                $GenreTags = $Cache->get_value('genre_tags_upload');
+                if (!$GenreTags) {
+                    //$DB->query("SELECT Name FROM tags WHERE TagType='genre' ORDER BY Name");
+                    $DB->query("(SELECT Name, Uses FROM tags WHERE TagType='genre' ORDER BY Uses DESC LIMIT 80) ORDER BY Name");
+                    $GenreTags = $DB->to_array();  // $DB->collect('Name');
+                    $Cache->cache_value('genre_tags_upload', $GenreTags, 3600 * 24);
+                }
+
+                if($GenreTags) { ?>
+                        &nbsp; popular tags:
+                        <select id="genre_tags" name="genre_tags" title="select popular tags from the drop down"
+                                onchange="add_tag();return false;"  <?=$this->Disabled?>>
+                            <option>---</option>
+<?                          foreach($GenreTags as $Tag) { ?>
+                                <option value="<?=$Tag['Name']?>"><?="$Tag[Name] ($Tag[Uses])"?></option>
+<?                          }   ?>
+                        </select> 
+<?              }  ?>  <!--style="height:1.4em;"-->  
+                        &nbsp;&nbsp;
+                        <div style="display:inline-block" id="tagtext"></div>
+                    </div>
                     <textarea id="tags" name="tags" class="medium" rows="3" <?=$this->Disabled?> ><?=display_str($Torrent['TagList']) ?></textarea>
+                    
                     <br />
                 </td>
 			</tr> 

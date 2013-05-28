@@ -12,7 +12,7 @@
 //include(SERVER_ROOT.'/sections/upload/functions.php'); 
         
 ini_set('max_file_uploads', '100');
-show_header('Upload', 'upload,bbcode');
+show_header('Upload', 'upload,bbcode,autocomplete,tag_autocomplete');
 
 if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']) && check_perms('use_templates') ) {
     /* -------  Get template ------- */
@@ -106,12 +106,6 @@ if (!isset($Text)) {
     $Text = new TEXT;
 }
 
-$GenreTags = $Cache->get_value('genre_tags_upload');
-if (!$GenreTags) {
-    $DB->query("SELECT Name FROM tags WHERE TagType='genre' ORDER BY Name");
-    $GenreTags = $DB->collect('Name');
-    $Cache->cache_value('genre_tags_upload', $GenreTags, 3600 * 6);
-}
 
 /* -------  Draw a box with do_not_upload list  -------   */
 $DNU = $Cache->get_value('do_not_upload_list');
@@ -295,7 +289,7 @@ foreach ($Whitelist as $ImageHost) {
 
 /* -------  Draw upload torrent form  ------- */
 $TorrentForm->head();
-$TorrentForm->simple_form($GenreTags);
+$TorrentForm->simple_form();
 $TorrentForm->foot(); 
 ?>
 </div>

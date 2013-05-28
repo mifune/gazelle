@@ -94,7 +94,8 @@ var autocomp = {
 				return false;
 			default:
 				this.tag = null;
-				this.timer = setTimeout("autocomp.get('" + escape(this.input.value) + "');",300);
+                if( this.input.value.length>0 )
+                    this.timer = setTimeout("autocomp.get('" + escape(this.input.value) + "');",300);
 				return true;
 		}
 		return false;
@@ -178,7 +179,7 @@ var autocomp = {
 		for (i=0,il=data.length;i<il;++i) {
 			li = document.createElement('li');
             li.tag =  data[i][0];
-			li.innerHTML = data[i][1];
+			li.innerHTML = data[i][1];  // + "&nbsp;&nbsp;";
 			li.i = i;
 			listener.set(li,'mouseover',function(){
 				autocomp.highlight(this.i);

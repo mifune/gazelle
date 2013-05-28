@@ -3102,6 +3102,7 @@ div.autoresults ul li {
     margin: 0px;
     text-align: left;
     padding: 0px 8px 0px 8px;
+    white-space:nowrap;
 }
 div.autoresults ul li.highlight {
     font-weight: normal;
