@@ -1153,6 +1153,40 @@ function cut_string($Str, $Length, $Hard=0, $ShowDots=1) {
     }
 }
 
+/**
+ * Highlight all instances of string 'term' in string 'text'
+ *
+ * @param $hlterm string The string to highlight; the actual html used is: '<span atyle="color: $color">$hlterm</span>'
+ *
+ * @param $text string, which result's page we want if no page is specified
+ * 
+ * @param $color string Optional, which color to use to highlight the term (can be any valid css color)
+ * If this parameter is not specified, defaults to red
+ *
+ * @return string The text with 'term' highlighted
+ */
+function highlight_text_color($hlterm, $text, $color = 'red'){
+    
+    return str_replace($hlterm, "<span style=\"color: $color;\">$hlterm</span>", $text); 
+}
+
+/**
+ * Highlight all instances of string 'term' in string 'text'
+ *
+ * @param $hlterm string The string to highlight; the actual html used is: '<span class="$css">$hlterm</span>'
+ *
+ * @param $text string, which result's page we want if no page is specified
+ * 
+ * @param $css string Optional, which css class to use to highlight the term 
+ * If this parameter is not specified, defaults to search_highlight
+ *
+ * @return string The text with 'term' highlighted
+ */
+function highlight_text_css($hlterm, $text, $css = 'search_highlight'){
+    
+    return str_replace($hlterm, "<span class=\"$css\">$hlterm</span>", $text); 
+}
+
 function get_ratio_color($Ratio) {
     if ($Ratio < 0.1) {
         return 'r00';

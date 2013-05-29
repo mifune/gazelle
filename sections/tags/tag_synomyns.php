@@ -90,8 +90,7 @@ for ($i = 0; $i < $TagCount / 3; $i++) {
 <?  }   
     if($SnID){ // only finish if something was in list ?> 
             </table></div>
-<?  }    ?> 
-	</form>
+<?  }    ?>  
     </div>
 </div>
 <?

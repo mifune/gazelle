@@ -1316,7 +1316,7 @@ input.shopbutton.itembuy:hover {
 
 #articles tr.colhead, #forums tr.colhead, #top10 tr.colhead, #torrents tr.colhead , #staff tr.colhead, #collage tr.colhead, 
     #staffpm tr.colhead, #staffpms tr.colhead, #tools tr.colhead , #userhistory tr.colhead, #user tr.colhead, #reports tr.colhead, 
-    #requests tr.colhead , #upload tr.colhead  { 
+    #requests tr.colhead , #upload tr.colhead, #tags tr.colhead  { 
     background-image: none;
     background-color: #d3e3f3;
     font-weight: bold; 
@@ -1327,7 +1327,7 @@ input.shopbutton.itembuy:hover {
 }
 #articles tr.colhead a, #forums tr.colhead a, #top10 tr.colhead a, #torrents tr.colhead a, #staff tr.colhead a, #collage tr.colhead a, 
     #staffpm tr.colhead a, #staffpms tr.colhead a, #tools tr.colhead a, #userhistory tr.colhead a, #user tr.colhead a, #reports tr.colhead a, 
-    #requests tr.colhead a, #upload tr.colhead a { 
+    #requests tr.colhead a, #upload tr.colhead a, #tags tr.colhead a { 
     font-weight: bold; 
     color: #888;
 }
@@ -3126,3 +3126,48 @@ table.border {
 table.noborder td, .torrent td, .torrent_table td {
     border:none;
 }
+
+
+
+.tag_results {
+    display:inline-block;
+    width:49%;
+    vertical-align: top;
+}
+
+.tag_results:first-child {
+    display:inline-block;
+    width:50%;
+    vertical-align: top;
+}
+
+.tag_results td:first-child {
+    padding-left:20px;
+}
+
+.tagtype {
+    font-size: 0.7em;
+    vertical-align: top;
+}
+
+.synonyms {
+    background-color: #f8fbfd; /* #eff3f6; */
+    padding: 1px 5px;
+    color: #777;
+}
+
+.plusmn {
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+    font-weight: bold;
+    float:right;
+    cursor:pointer;
+}
+
+.votes {
+    color:#999;
+}
+
+.search_highlight {
+    color:#FF0066;
+}
+

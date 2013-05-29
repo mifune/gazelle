@@ -2,7 +2,7 @@
 addDOMLoadEvent(Start_Tags);
 
 function Start_Tags() {
-    autocomp.start('torrents','torrents');  
+    autocomp.start('tags','torrents');  
     resize('tags'); 
 }
 
