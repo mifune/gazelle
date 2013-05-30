@@ -40,8 +40,8 @@ if(!empty($_REQUEST['action'])) {
             $Tor = new TORRENT($Contents, true); // New TORRENT object
             
             list($TotalSize, $FileList) = $Tor->file_list();
- 
-            $DupeResults = check_size_dupes($FileList, $GroupID);
+            $UniqueResults=0;
+            $DupeResults = check_size_dupes($FileList, $UniqueResults, $GroupID);
             
             include(SERVER_ROOT . '/sections/upload/display_dupes.php'); 
              

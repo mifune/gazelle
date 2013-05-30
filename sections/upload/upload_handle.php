@@ -231,7 +231,8 @@ if ($Err) { // Show the upload form, with the data the user entered
 
 //if (check_perms('torrents_delete')){ // for testing on live site
 // do dupe check & return to upload page if detected
-$DupeResults = check_size_dupes($FileList);
+$UniqueResults=0;
+$DupeResults = check_size_dupes($FileList, $UniqueResults);
 
 if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
 
@@ -593,6 +594,7 @@ update_hash($GroupID);
 //--------------- possible dupe - send staff a pm ---------------------------------------//
     
 if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning...
+    $NumDupes = count($DupeResults);
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
     $Message = "[table][tr][th]Name[/th][th]duped file?[/th][/tr]";
     foreach ($DupeResults as $ID => $dupedata) {
@@ -609,7 +611,7 @@ if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning..
     }
     $Message .= "[/table]";
     $Message = db_string("Possible dupe was uploaded:[br][size=2][b][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username][/b][/size]
-[br]{$Message}[br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
+[br]{$Message}[br]($UniqueResults files with matches, $NumDupes possible matches overall)[br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
    
 	$DB->query("INSERT INTO staff_pm_conversations 
 				 (Subject, Status, Level, UserID, Date)

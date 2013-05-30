@@ -16,7 +16,7 @@ if (!$INLINE) {
 if (!$DupeResults) $NumDupes =0;
 else $NumDupes=count($DupeResults);
 ?>
-    <div class="head"><?if($NumDupes>0)echo $NumDupes?> Possible dupe<?if($NumDupes>1)echo 's'?><?if($NumDupes>=50)echo " (only displaying first 50 matches)";?></div>
+    <div class="head"><?if($NumDupes>0)echo $NumDupes?> Possible dupe<?if($NumDupes>1)echo 's'?><?if($NumDupes>=500)echo " (only displaying first 500 matches)";?></div>
 <?
 if (!$DupeResults || $NumDupes<1) {
     ?>
@@ -125,6 +125,7 @@ if (!$DupeResults || $NumDupes<1) {
         }
         ?>
     </table>
+    <br/><?=$UniqueResults?> files with matches, <?=$NumDupes?> possible matches overall)
     <?
 }
 

@@ -65,6 +65,7 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
 
 $CachedDupeResults = $Cache->get_value("dupeip_users_{$BanReason}_{$Weeks}_$OrderBy{$OrderWay}_$Page");
 if($CachedDupeResults===false) {
+    /*
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
                        n.ID as new_id, 
                        n.JoinDate as joindate, 
@@ -86,7 +87,33 @@ if($CachedDupeResults===false) {
                             ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
               ORDER BY $OrderBy $OrderWay
                  LIMIT $Limit ;");
-
+                 */
+    
+    
+    $DB->query("SELECT SQL_CALC_FOUND_ROWS
+                       n.ID as new_id, 
+                       n.JoinDate as joindate, 
+                       b.IP as IP, 
+                       b.ID as b_id, 
+                       b.BanDate as bandate, 
+                       n.Username as new_name, 
+                       b.Username as b_name
+                  FROM (SELECT bu.ID, bu.Username, bi.BanDate, uh.IP
+                        FROM users_info as bi 
+                        JOIN users_main as bu ON bi.UserID=bu.ID
+                        JOIN users_history_ips AS uh ON uh.UserID=bi.UserID
+                        WHERE bu.Enabled='2' AND bi.Banreason='$BanReason' AND bi.BanDate > (NOW() - INTERVAL $Weeks WEEK)
+                           ) AS b
+                  JOIN (SELECT nu.ID, nu.Username, ni.JoinDate, nh.IP
+                        FROM users_info as ni 
+                        JOIN users_main as nu ON ni.UserID=nu.ID 
+                        JOIN users_history_ips AS nh ON nh.UserID=ni.UserID
+                        WHERE nu.Enabled='1'  
+                            ) AS n
+                            ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
+              ORDER BY $OrderBy $OrderWay
+                 LIMIT $Limit ;");
+    
     $DupeRecords = $DB->to_array();
     $DB->query("SELECT FOUND_ROWS()");
     list($NumResults) = $DB->next_record();

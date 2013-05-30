@@ -1,6 +1,6 @@
 <?
 
-function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
+function check_size_dupes($TorrentFilelist, &$UniqueResults, $ExcludeID=0) {
     global $SS, $ExcludeBytesDupeCheck, $Image_FileTypes;
     
     $SS->limit(0, 10, 10);
@@ -10,6 +10,8 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     //$SS->set_filter_range('size', 0, 1024, true);
     
     $AllResults=array();
+    $UniqueResults = 0;
+    
     //$Queries=array();
     foreach ($TorrentFilelist as $File) {
         list($Size, $Name) = $File;
@@ -36,6 +38,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
         $Results = $SS->search($Query, '', 0, array(), '', '');
         $Num = $SS->TotalResults;
         if ($Num>0){ 
+            $UniqueResults++;
             // These ones were not found in the cache, run SQL
             if (!empty($Results['notfound'])) {
 
@@ -61,13 +64,12 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             }
             $AllResults = array_merge($AllResults, $Results['matches']);
             //$AllResults += $Results['matches'] ;  
-            if (count($AllResults)>=50) break;
+            if (count($AllResults)>=500) break;
         }
     }
  
     if(count($AllResults)<1) return false;
-    return $AllResults;
-     
+    return $AllResults ;
 }
 
 
