@@ -10,7 +10,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     //$SS->set_filter_range('size', 0, 1024, true);
     
     $AllResults=array();
-    $UniqueResults = 0;
+    $UniqueResults = 10;
     
     //$Queries=array();
     foreach ($TorrentFilelist as $File) {
@@ -37,8 +37,8 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
 
         $Results = $SS->search($Query, '', 0, array(), '', '');
         $Num = $SS->TotalResults;
-        if ($Num>0){ 
-            $UniqueResults++;
+        if ($Num>0){
+            $UniqueResults=$UniqueResults+1;
             // These ones were not found in the cache, run SQL
             if (!empty($Results['notfound'])) {
 

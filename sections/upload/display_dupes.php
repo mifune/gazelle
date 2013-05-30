@@ -126,7 +126,7 @@ if (!$DupeResults || $NumDupes<1) {
         }
         ?>
     </table>
-    <br/><?=$UniqueResults?> files with matches, <?=$NumDupes?> possible matches overall)
+    <br/><?=$UniqueResults?> files with matches, <?=$NumDupes?> possible matches overall
     </div>
     <?
 }
