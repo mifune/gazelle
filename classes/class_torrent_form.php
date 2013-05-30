@@ -41,7 +41,7 @@ class TORRENT_FORM {
 
 
 	function head() {
-		global $LoggedUser,$DupeResults;
+		global $LoggedUser,$UniqueResults,$DupeResults;
 ?>
 <a id="uploadform"></a>
 
