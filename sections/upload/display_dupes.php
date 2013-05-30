@@ -24,6 +24,7 @@ if (!$DupeResults || $NumDupes<1) {
     <?
 } else {
     ?>
+    <div class="box pad">
     <table class="torrent_table grouping" id="torrent_table">
         <tr class="colhead">
             <td class="small cats_col"></td>
@@ -126,6 +127,7 @@ if (!$DupeResults || $NumDupes<1) {
         ?>
     </table>
     <br/><?=$UniqueResults?> files with matches, <?=$NumDupes?> possible matches overall)
+    </div>
     <?
 }
 
