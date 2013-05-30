@@ -1633,9 +1633,9 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     $str = '<a href="user.php?id=' . $UserID . '">' . $Username . '</a>';
     if($DropDown && $LoggedUser['ID']!==$UserID){
         $ddlist = '<li><a href="user.php?id='.$UserID.'" title="View '.$Username.'\'s profile">View profile</a></li>';
-        //if($Classes[$Class]['Level']>=STAFF_LEVEL){
-        //    $ddlist .= '<li><a href="staff.php?show=1" title="Start a staff conversation">Message Staff</a></li>';
-        //}
+        if(check_perms('users_mod')) {      //  $Classes[$Class]['Level']>=STAFF_LEVEL){
+            $ddlist .= '<li><a href="staffpm.php?action=compose&amp;toid='.$UserID.'" title="Start a Staff Conversation with '.$Username.'">Staff Message</a></li>';
+        }
         $ddlist .= '<li><a href="inbox.php?action=compose&amp;to='.$UserID.'" title="Send a Private Message to '.$Username.'">Send PM</a></li>';
             
         $Friends = $Cache->get_value('user_friends_'.$LoggedUser['ID']);

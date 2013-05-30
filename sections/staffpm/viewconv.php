@@ -126,14 +126,9 @@ if ($ConvID = (int)$_GET['id']) {
 	if ($IsFLS && $Status != 'Resolved') {
 ?>
 		<div id="common_answers" class="hidden">
-			<div class="box vertical_space">
-				<div class="head">
-					<strong>Preview</strong>
-				</div>
-				<div id="common_answers_body" class="body">Select an answer from the dropdown to view it.</div>
-			</div>
-			<br />
-			<div class="center">
+            <div class="head"> <strong>Common Answers</strong></div>
+            <div class="box pad center">
+                
 				<select id="common_answers_select" onChange="UpdateMessage();">
 					<option id="first_common_response">Select a message</option>
 <?
@@ -146,6 +141,8 @@ if ($ConvID = (int)$_GET['id']) {
 				</select>
 				<input type="button" value="Set message" onClick="SetMessage();" />
 				<input type="button" value="Create new / Edit" onClick="location.href='staffpm.php?action=responses&convid=<?=$ConvID?>'" />
+                <br/><br/>
+                <div id="common_answers_body" class="body box">Select an answer from the dropdown to view it.</div> 
 			</div>
 		</div>
 <?	}
@@ -175,11 +172,12 @@ if ($ConvID = (int)$_GET['id']) {
 					<input type="hidden" name="action" value="takepost" />
 					<input type="hidden" name="convid" value="<?=$ConvID?>" id="convid" />
 <?              if ($Status != 'Resolved') {    ?>
-                       <? $Text->display_bbcode_assistant("quickpost", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
-					<textarea id="quickpost" name="message" class="long" rows="10"></textarea> 
-                              <br />
+                    <div id="quickpost">
+                       <? $Text->display_bbcode_assistant("message", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+					<textarea id="message" name="message" class="long" rows="10"></textarea> 
+                    </div><br />
 					<input type="button" id="previewbtn" value="Preview" style="margin-right: 40px;" onclick="PreviewMessage();" />
-<?              }   ?>
+<?              }   ?>   
 <?
 	// Assign to
 	if ($IsStaff) {

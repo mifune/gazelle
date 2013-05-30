@@ -841,10 +841,6 @@ p.min_padding {
 }
 
 
-.scrollbox {
-    max-height:400px;
-    overflow: auto;
-}
 
 #details_top {
     margin-bottom: 10px;
@@ -2421,6 +2417,12 @@ img.win.flash {
 
 .greyButton {
 	background: #bbb;
+}
+
+
+.scrollbox {
+    max-height:400px;
+    overflow: auto;
 }
 
 #active_drive { 

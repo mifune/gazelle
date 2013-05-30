@@ -163,7 +163,7 @@ $DB->query('SELECT FOUND_ROWS()');
 list($Results) = $DB->next_record();
 $PageLinks=get_pages($Page,$Results,REPORTS_PER_PAGE,11);
 
-show_header('Reports V2!', 'reportsv2,bbcode');
+show_header('Reports V2!', 'reportsv2,bbcode,inbox,reports,jquery');
 include('header.php');
 
 ?>
@@ -236,7 +236,7 @@ if(count($Reports) == 0) {
                         
 		?>	
 			<div id="report<?=$ReportID?>" class="reports">
-				<form id="report_form<?=$ReportID?>" action="reports.php" method="post">
+				<form id="report_form<?=$ReportID?>" action="reportsv2.php" method="post">
 					<? 
 						/*
 						* Some of these are for takeresolve, namely the ones that aren't inputs, some for the javascript.			
@@ -543,6 +543,109 @@ if(count($Reports) == 0) {
 								| <input type="button" id="submit_<?=$ReportID?>" value="Resolve Report" onclick="TakeResolve(<?=$ReportID?>);" title="Resolve Report (carry out whatever actions are set)" />
 							</td>
 						</tr>
+                             <?
+                             
+                // get the conversations
+                $Conversations = array();
+                $DB->query("SELECT rc.ConvID, pm.UserID, um.Username, 
+                                (CASE WHEN UserID='$ReporterID' THEN 'Reporter' 
+                                      WHEN UserID='$UploaderID' THEN 'Offender'
+                                      ELSE 'other' 
+                                 END) AS ConvType, pm.Date
+                                FROM reportsv2_conversations AS rc 
+                                JOIN staff_pm_conversations AS pm ON pm.ID=rc.ConvID
+                                LEFT JOIN users_main AS um ON um.ID=pm.UserID
+                            WHERE ReportID=" . $ReportID . "
+                                ORDER BY pm.Date ASC");
+                $Conversations = $DB->to_array();
+                
+                if (count($Conversations)>0) { 
+                ?>
+                    <tr class="rowa">
+                        <td colspan="5" style="border-right: none">
+                            <? 
+                            foreach ($Conversations as $Conv) {  // if conv has already been started just provide a link to it
+                                list($cID, $cUserID, $cUsername, $cType, $cDate)=$Conv;
+                                ?>
+                                <div style="text-align: right;">
+                                    <em>(<?=  time_diff($cDate)?>)</em> &nbsp;view existing conversation with <a href="user.php?id=<?= $cUserID ?>"><?= $cUsername ?></a> (<?=$cType?>) about this report: &nbsp;&nbsp
+                                    <a href="staffpm.php?action=viewconv&id=<?= $cID ?>" target="_blank">[View Message]</a> &nbsp;
+                                </div>
+                                <? 
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                <?
+                }
+                             ?>
+                        <tr>
+                            <td colspan="4">
+                                
+                                <span style="float:right;">
+                                    Start staff conversation with <select name="toid" id="pm_type<?=$ReportID?>">
+                                        <option value="<?=$UploaderID?>"><?=$UploaderName?> (Uploader)</option>
+									<option value="<?=$ReporterID?>"><?=$ReporterName?> (Reporter)</option>
+								</select> about this report: &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="#report<?= $ReportID ?>" onClick="Open_Compose_Message(<?="'$ReportID'"?>)">[Compose Message]</a>
+                                </span>    
+                                
+								
+                                <br class="clear" />
+                                <div id="compose<?= $ReportID ?>" class="hide">
+                                    <div id="preview<?= $ReportID ?>" class="hidden"></div>
+                                    <div id="common_answers<?= $ReportID ?>" class="hidden">
+                                        <div class="box vertical_space">
+                                            <div class="head">
+                                                <strong>Preview</strong>
+                                            </div>
+                                            <div id="common_answers_body<?= $ReportID ?>" class="body">Select an answer from the dropdown to view it.</div>
+                                        </div>
+                                        <br />
+                                        <div class="center">
+                                            <select id="common_answers_select<?= $ReportID ?>" onChange="Update_Message(<?= $ReportID ?>);">
+                                                <option id="first_common_response<?= $ReportID ?>">Select a message</option>
+                                                <?
+                                                // List common responses
+                                                $DB->query("SELECT ID, Name FROM staff_pm_responses");
+                                                while (list($ID, $Name) = $DB->next_record()) {
+                                                    ?>
+                                                    <option value="<?= $ID ?>"><?= $Name ?></option>
+                                                <? } ?>
+                                            </select>
+                                            <input type="button" value="Set message" onClick="Set_Message(<?=$ReportID?>);" />
+                                            <input type="button" value="Create new / Edit" onClick="location.href='staffpm.php?action=responses&convid=<?= $ConvID ?>'" />
+                                        </div>
+                                    </div>
+                                    <!--<form action="reports.php" method="post" id="messageform<?= $ReportID ?>">-->
+                                        <div id="quickpost<?= $ReportID ?>">  
+                                            <!-- <input type="hidden" name="reportid" value="<?= $ReportID ?>" /> 
+                                            <input type="hidden" name="username" value="<?= $Username ?>" />
+                                            <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" /> -->
+                                            <input type="hidden" name="action" value="takepost" />
+                                            <input type="hidden" name="prependtitle" value="Staff PM - " />
+
+                                            <label for="subject"><h3>Subject</h3></label>
+                                            <input class="long" type="text" name="subject" id="subject<?= $ReportID ?>" value="<?= display_str($Subject) ?>" />
+                                            <br />
+
+                                            <label for="message"><h3>Message</h3></label>
+                                            <? $Text->display_bbcode_assistant("message$ReportID"); ?>
+                                            <textarea rows="6" class="long" name="message" id="message<?= $ReportID ?>"><?= display_str($Message) ?></textarea>
+                                            <br />
+
+                                        </div>
+                                        <input type="button" value="Hide" onClick="jQuery('#compose<?= $ReportID ?>').toggle();return false;" />
+                                     
+                                        <input type="button" id="previewbtn<?= $ReportID ?>" value="Preview" onclick="Inbox_Preview(<?= "'$ReportID'" ?>);" /> 
+
+                                        <input type="button" value="Common answers" onClick="$('#common_answers<?= $ReportID ?>').toggle();" />
+                                        <input type="submit" value="Send message to selected user" />
+
+                                    <!--</form>-->
+                                </div>
+                            </td>
+                        </tr>
 			<?
 				} else {
 			?>
@@ -576,8 +679,10 @@ if(count($Reports) == 0) {
 								<input id="grab<?=$ReportID?>" type="button" value="Grab!" onclick="Grab(<?=$ReportID?>);" />
 							</td>
 						</tr>
-			<?	}
-			}
+			<?	}   ?>
+                   
+                        
+<?          }
 			?>
 					</table>
 				</form>

@@ -1,6 +1,13 @@
 
+function change_pmto(reportid) {
+	
+    var val = $('#pm_type'+reportid).raw().options[$('#pm_type'+reportid).raw().selectedIndex].innerHTML;
+    //alert(val);
+    $('#submit_pm'+reportid).raw().value = "Send message to "+val;
+}
+
 function Set_Message(appendid) {
-      if (appendid == undefined ) appendid = '';
+    if (appendid == undefined ) appendid = '';
 	var id = document.getElementById('common_answers_select'+appendid).value;
 
 	ajax.get("staffpm.php?action=get_response&plain=1&id=" + id, function (data) {
@@ -12,7 +19,7 @@ function Set_Message(appendid) {
 }
 
 function Update_Message(appendid) {
-      if (appendid == undefined ) appendid = '';
+    if (appendid == undefined ) appendid = '';
 	var id = document.getElementById('common_answers_select'+appendid).value;
 
 	ajax.get("staffpm.php?action=get_response&plain=0&id=" + id, function (data) {
@@ -23,7 +30,7 @@ function Update_Message(appendid) {
 
 function Open_Compose_Message(reportid){
     
-    jQuery('#compose'+reportid).slideToggle('slow');
+    jQuery('#compose'+reportid).slideToggle('fast');
     
     CursorToEnd($('#message'+reportid).raw());
   

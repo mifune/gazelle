@@ -190,6 +190,9 @@ show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
 <?  if (!$OwnProfile) { ?>
 		[<a href="inbox.php?action=compose&amp;to=<?=$UserID?>" title="Send a Private Message to <?=$Username?>">Send PM</a>]
 <? 	
+        if (check_perms('users_mod')) {  ?>
+        [<a href="staffpm.php?action=compose&amp;toid=<?=$UserID?>" title="Start a Staff Conversation with <?=$Username?>">Staff Message</a>] 
+<?      }
         $DB->query("SELECT Type FROM friends WHERE UserID='$LoggedUser[ID]' AND FriendID='$UserID'");
         if($DB->record_count() > 0) list($FType)=$DB->next_record();
     

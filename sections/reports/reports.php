@@ -54,8 +54,7 @@ $Reports = $DB->query("SELECT SQL_CALC_FOUND_ROWS
 		r.ReportedTime, 
 		r.Reason, 
 		r.Status,
-            r.Comment,
-            r.ConvID
+            r.Comment
 	FROM reports AS r 
 		JOIN users_main AS um ON r.UserID=um.ID 
 	WHERE " . $Where . " 
@@ -86,10 +85,10 @@ $DB->set_query_id($Reports);
         ?>
     </div>
     <?
-    while (list($ReportID, $SnitchID, $SnitchName, $ThingID, $Short, $ReportedTime, $Reason, $Status, $Comment, $ConvID) = $DB->next_record()) {
+    while (list($ReportID, $SnitchID, $SnitchName, $ThingID, $Short, $ReportedTime, $Reason, $Status, $Comment) = $DB->next_record()) {
         $Type = $Types[$Short];
         $Reference = "reports.php?id=" . $ReportID . "#report" . $ReportID;
-
+        
         switch ($Short) {
             case "user" :
                 $DB->query("SELECT Username FROM users_main WHERE ID=" . $ThingID);
@@ -243,6 +242,8 @@ $DB->set_query_id($Reports);
                 }
                 break;
         }
+        
+        
         ?>
 
         <div id="report<?= $ReportID ?>">
@@ -286,22 +287,51 @@ $DB->set_query_id($Reports);
                         <? } ?>
                     </tr>
                 </form>
-                <? if ($Status != "Resolved" || $ConvID) { ?>
+                <? 
+                // get the conversations
+                $Conversations = array();
+                $DB->query("SELECT rc.ConvID, pm.UserID, um.Username, 
+                                (CASE WHEN UserID='$SnitchID' THEN 'Reporter' 
+                                      WHEN UserID='$UserID' THEN 'Offender'
+                                      ELSE 'other' 
+                                 END) AS ConvType, pm.Date
+                                FROM reports_conversations AS rc 
+                                JOIN staff_pm_conversations AS pm ON pm.ID=rc.ConvID
+                                LEFT JOIN users_main AS um ON um.ID=pm.UserID
+                            WHERE ReportID=" . $ReportID . "
+                                ORDER BY pm.Date ASC");
+                $Conversations = $DB->to_array();
+                
+                if (count($Conversations)>0) { 
+                ?>
                     <tr class="rowa">
                         <td colspan="3" style="border-right: none">
                             <? 
-                            if ($ConvID) {  // if conv has already been started just provide a link to it
+                            foreach ($Conversations as $Conv) {  // if conv has already been started just provide a link to it
+                                list($cID, $cUserID, $cUsername, $cType, $cDate)=$Conv;
+                                ?>
+                                <div style="text-align: right;">
+                                    <em>(<?=  time_diff($cDate)?>)</em> &nbsp;view existing conversation with <a href="user.php?id=<?= $cUserID ?>"><?= $cUsername ?></a> (<?=$cType?>) about this report: &nbsp;&nbsp
+                                    <a href="staffpm.php?action=viewconv&id=<?= $cID ?>" target="_blank">[View Message]</a> &nbsp;
+                                </div>
+                                <? 
+                            }
                             ?>
+                        </td>
+                    </tr>
+                <?
+                }
+                if ($Status != "Resolved") { ?>
+                    <tr class="rowa">
+                        <td colspan="3" style="border-right: none">
+                            
+                            <form action="reports.php" method="post" id="messageform<?= $ReportID ?>">
                                 <span style="float:right;">
-                                    View staff conversation with <a href="user.php?id=<?= $UserID ?>"><?= $Username ?></a> about this report: &nbsp;&nbsp;&nbsp;&nbsp;
-                              <!--   <input type="submit" name="action" value="Create Message" /> -->
-                                    <a href="staffpm.php?action=viewconv&id=<?= $ConvID ?>" target="_blank">[View Message]</a>
-                                </span>
-                            <? 
-                            } else {        // inline form for composing new (staff initiated) staff conversation
-                            ?>
-                                <span style="float:right;">
-                                    Start staff conversation with <a href="user.php?id=<?= $UserID ?>"><?= $Username ?></a> about this report: &nbsp;&nbsp;&nbsp;&nbsp;
+                                    Start new staff conversation with 
+                                    <select name="toid" id="pm_type<?=$ReportID?>" onchange="change_pmto(<?=$ReportID?>);" >
+                                        <option value="<?= $UserID ?>"><?=$Username?> (Offender)</option>
+                                        <option value="<?= $SnitchID ?>"><?=$SnitchName?> (Reporter)</option>
+                                    </select> about this report: &nbsp;&nbsp;&nbsp;&nbsp;
                                     <a href="#report<?= $ReportID ?>" onClick="Open_Compose_Message(<?="'$ReportID'"?>)">[Compose Message]</a>
                                 </span>    
                                 <br class="clear" />
@@ -330,10 +360,10 @@ $DB->set_query_id($Reports);
                                             <input type="button" value="Create new / Edit" onClick="location.href='staffpm.php?action=responses&convid=<?= $ConvID ?>'" />
                                         </div>
                                     </div>
-                                    <form action="reports.php" method="post" id="messageform<?= $ReportID ?>">
+                                    
                                         <div id="quickpost<?= $ReportID ?>">  
                                             <input type="hidden" name="reportid" value="<?= $ReportID ?>" />
-                                            <input type="hidden" name="toid" value="<?= $UserID ?>" />
+                                            <!--<input type="hidden" name="toid" value="<?= $UserID ?>" />-->
                                             <input type="hidden" name="username" value="<?= $Username ?>" />
                                             <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" />
                                             <input type="hidden" name="action" value="takepost" />
@@ -359,11 +389,11 @@ $DB->set_query_id($Reports);
                                         <input type="button" id="previewbtn<?= $ReportID ?>" value="Preview" onclick="Inbox_Preview(<?= "'$ReportID'" ?>);" /> 
 
                                         <input type="button" value="Common answers" onClick="$('#common_answers<?= $ReportID ?>').toggle();" />
-                                        <input type="submit" value="Send message to <?= $Username ?>" />
+                                        <input id="submit_pm<?=$ReportID?>" type="submit" value="Send message to selected user" />
 
-                                    </form>
-                                </div>
-                            <? } ?>
+                                    </div>
+                            </form>
+                            
                         </td>
                     </tr>
                 <? } ?>

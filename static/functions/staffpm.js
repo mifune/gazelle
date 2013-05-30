@@ -2,8 +2,8 @@ function SetMessage() {
 	var id = document.getElementById('common_answers_select').value;
 
 	ajax.get("?action=get_response&plain=1&id=" + id, function (data) {
-		if ( $('#quickpost').raw().value != '') data = "\n"+data+"\n";
-            insert(data, 'quickpost')
+		if ( $('#message').raw().value != '') data = "\n"+data+"\n";
+        insert(data, 'message');
 		$('#common_answers').hide();
 	});
 }
@@ -143,7 +143,7 @@ function PreviewResponse(id) {
 function PreviewMessage() {
 	if ($('#preview').has_class('hidden')) {
 		var ToPost = [];
-		ToPost['message'] = document.getElementById('quickpost').value;
+		ToPost['message'] = document.getElementById('message').value;
 		ajax.post('?action=preview', ToPost, function (data) {
 			document.getElementById('preview').innerHTML = data;
 			$('#preview').toggle();
