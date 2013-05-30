@@ -231,8 +231,7 @@ if ($Err) { // Show the upload form, with the data the user entered
 
 //if (check_perms('torrents_delete')){ // for testing on live site
 // do dupe check & return to upload page if detected
-$UniqueResults=0;
-$DupeResults = check_size_dupes($FileList, &$UniqueResults);
+list($UniqueResults, $DupeResults) = check_size_dupes($FileList);
 
 if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
 

@@ -1,6 +1,6 @@
 <?
 
-function check_size_dupes($TorrentFilelist, &$UniqueResults, $ExcludeID=0) {
+function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     global $SS, $ExcludeBytesDupeCheck, $Image_FileTypes;
     
     $SS->limit(0, 10, 10);
@@ -68,8 +68,8 @@ function check_size_dupes($TorrentFilelist, &$UniqueResults, $ExcludeID=0) {
         }
     }
  
-    if(count($AllResults)<1) return false;
-    return $AllResults ;
+    if(count($AllResults)<1) return array(0, false);
+    return array($UniqueResults, $AllResults) ;
 }
 
 
