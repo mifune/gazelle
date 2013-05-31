@@ -231,9 +231,9 @@ if ($Err) { // Show the upload form, with the data the user entered
 
 //if (check_perms('torrents_delete')){ // for testing on live site
 // do dupe check & return to upload page if detected
-list($UniqueResults, $DupeResults) = check_size_dupes($FileList);
+$DupeResults = check_size_dupes($FileList);
 
-if(empty($_POST['ignoredupes']) && $DupeResults) { // Show the upload form, with the data the user entered
+if(empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // Show the upload form, with the data the user entered
 
     //******************************************************************************//
     //--------------- Temp store torrent file -------------------------------------------//
@@ -592,11 +592,14 @@ update_hash($GroupID);
 //******************************************************************************//
 //--------------- possible dupe - send staff a pm ---------------------------------------//
     
-if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning...
-    $NumDupes = count($DupeResults);
+if(!empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // means uploader has ignored dupe warning...
+    $NumDupes = count($DupeResults['DupeResults']);
+    $UniqueResults = $DupeResults['UniqueMatches'];
+    $NumChecked = $DupeResults['NumChecked'];
+    
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
     $Message = "[table][tr][th]Name[/th][th]duped file?[/th][/tr]";
-    foreach ($DupeResults as $ID => $dupedata) {
+    foreach ($DupeResults['DupeResults'] as $ID => $dupedata) {
         if(isset($dupedata['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
  
             $Message .= "[tr][td]This could match many files because it is $dupedata[excluded][br]Please make sure you have searched carefully to ensure this is not a dupe.";
@@ -610,7 +613,7 @@ if(!empty($_POST['ignoredupes'])) { // means uploader has ignored dupe warning..
     }
     $Message .= "[/table]";
     $Message = db_string("Possible dupe was uploaded:[br][size=2][b][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username][/b][/size]
-[br]{$Message}[br]($UniqueResults files with matches, $NumDupes possible matches overall)[br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
+[br]{$Message}[br][br]($UniqueResults/$NumChecked files with matches, $NumDupes possible matches overall)[br][br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
    
 	$DB->query("INSERT INTO staff_pm_conversations 
 				 (Subject, Status, Level, UserID, Date)

@@ -67,9 +67,9 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             if (count($AllResults)>=500) break;
         }
     }
- 
-    if(count($AllResults)<1) return array(0, false);
-    return array($UniqueResults, $AllResults) ;
+    $NumFiles = count($TorrentFilelist);
+    if(count($AllResults)<1) return array('UniqueMatches'=>0, 'NumChecked'=>$NumFiles, 'DupeResults'=>false);
+    return array('UniqueMatches'=>$UniqueResults, 'NumChecked'=>$NumFiles, 'DupeResults'=>$AllResults) ;
 }
 
 

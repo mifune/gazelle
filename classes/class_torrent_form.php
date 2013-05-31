@@ -41,7 +41,7 @@ class TORRENT_FORM {
 
 
 	function head() {
-		global $LoggedUser,$UniqueResults,$DupeResults;
+		global $LoggedUser,$DupeResults;
 ?>
 <a id="uploadform"></a>
 
@@ -60,10 +60,12 @@ class TORRENT_FORM {
 	</div>
 	<form action="" enctype="multipart/form-data" method="post" id="upload_table" onsubmit="$('#post').raw().disabled = 'disabled'">
       <?
-    if (is_array($DupeResults)) {
+    if (is_array($DupeResults) && $DupeResults['DupeResults']) {
         $INLINE = true;
-		$DupeTitle = $this->Torrent['Title']; 
-		$SearchTags = $this->Torrent['TagList']; 
+		//$DupeTitle = $this->Torrent['Title']; 
+		//$SearchTags = $this->Torrent['TagList']; 
+        $DupeResults['Title'] = $this->Torrent['Title'];
+        $DupeResults['SearchTags'] = $this->Torrent['TagList'];
         include(SERVER_ROOT . '/sections/upload/display_dupes.php');
       ?>
         <div class="box pad shadow center rowa"> 

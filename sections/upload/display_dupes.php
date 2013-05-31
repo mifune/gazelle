@@ -6,6 +6,15 @@ $Bookmarks = all_bookmarks('torrent');
 
 //define('MAX_NUM_DUPE_MATCHES', 50);
 
+$UniqueResults = $DupeResults['UniqueMatches'];
+$NumChecked = $DupeResults['NumChecked'];
+$DupeTitle = $DupeResults['Title'];
+$SearchTags = $DupeResults['SearchTags'];
+$DupeResults = $DupeResults['DupeResults'];
+
+if (!$DupeResults) $NumDupes =0;
+else $NumDupes=count($DupeResults);
+
 if (!$INLINE) {  
     show_header("Dupe check for $DupeTitle");
     ?>
@@ -13,8 +22,7 @@ if (!$INLINE) {
         <h2>Dupe check for <?=$DupeTitle?></h2> 
     <?   
 }
-if (!$DupeResults) $NumDupes =0;
-else $NumDupes=count($DupeResults);
+
 ?>
     <div class="head"><?if($NumDupes>0)echo $NumDupes?> Possible dupe<?if($NumDupes>1)echo 's'?><?if($NumDupes>=500)echo " (only displaying first 500 matches)";?></div>
 <?
@@ -126,7 +134,7 @@ if (!$DupeResults || $NumDupes<1) {
         }
         ?>
     </table>
-    <br/><?=$UniqueResults?> files with matches, <?=$NumDupes?> possible matches overall
+    <br/><?="$UniqueResults/$NumChecked"?> files with matches, <?=$NumDupes?> possible matches overall
     </div>
     <?
 }

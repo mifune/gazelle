@@ -41,7 +41,9 @@ if(!empty($_REQUEST['action'])) {
             
             list($TotalSize, $FileList) = $Tor->file_list();
             
-            list($UniqueResults, $DupeResults)  = check_size_dupes($FileList, $GroupID);
+            $DupeResults  = check_size_dupes($FileList, $GroupID);
+            $DupeResults['SearchTags'] = $SearchTags;
+            $DupeResults['Title'] = $DupeTitle;
             
             include(SERVER_ROOT . '/sections/upload/display_dupes.php'); 
              
