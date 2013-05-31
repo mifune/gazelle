@@ -38,7 +38,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
         $Results = $SS->search($Query, '', 0, array(), '', '');
         $Num = $SS->TotalResults;
         if ($Num>0){
-            $UniqueResults++;
+            //$UniqueResults++;
             // These ones were not found in the cache, run SQL
             if (!empty($Results['notfound'])) {
 
@@ -62,9 +62,12 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
                 if ( $tdata['ID']==$ExcludeID ) unset($Results['matches'][$ID]);
                 else $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
             }
-            $AllResults = array_merge($AllResults, $Results['matches']);
-            //$AllResults += $Results['matches'] ;  
-            if (count($AllResults)>=500) break;
+            if (count($Results['matches'])>0) {
+                $UniqueResults++;
+                $AllResults = array_merge($AllResults, $Results['matches']);
+                //$AllResults += $Results['matches'] ;  
+                if (count($AllResults)>=500) break;
+            }
         }
     }
     $NumFiles = count($TorrentFilelist);
