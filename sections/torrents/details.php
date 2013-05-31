@@ -761,12 +761,12 @@ if (count($FilledRequests) > 0) {
                         } */
                         if ($Seeders == 0 || $lasttimesinceactive >= 86400) { // 24 hrs  ?>
                                 <strong>Last active: <?=time_diff($LastActive);?></strong>
-<?                      } elseif ( $lasttimesinceactive >= 3600) { ?>
+<?                      } elseif ( $lasttimesinceactive >= 3600 * 3) { ?>
                                 Last active: <?=time_diff($LastActive);?>
 <?                      }
                         if (time()-strtotime($LastReseedRequest)< 259200 ) {  //= 3 days  | 432000= 5 days  ?>
                                 <em>re-seed was requested (<?=time_diff($LastReseedRequest);?>)</em>
-<?                      } elseif ( ($Snatched > 2 || $Snatched > $Seeders) ) {  //  && $lasttimesinceactive >= 86400 ?>
+<?                      } elseif ( ($Snatched > 2 || $Snatched > $Seeders) && $lasttimesinceactive >= 86400 ) {  //   ?>
                                 <a href="torrents.php?action=reseed&amp;torrentid=<?=$TorrentID?>&amp;groupid=<?=$GroupID?>" title="request a reseed from the <?=$Snatched?> users who have snatched this torrent"> [Request re-seed] </a>
 <?                      } /* elseif ( ($Snatched > 2 || $Snatched > $Seeders) && $LastActive != '0000-00-00 00:00:00' && $lasttimesinceactive >= 86400 ) { ?>
                                 <a href="torrents.php?action=reseed&amp;torrentid=<?=$TorrentID?>&amp;groupid=<?=$GroupID?>" title="request a reseed from the <?=$Snatched?> users who have snatched this torrent"> [Request re-seed] </a>
