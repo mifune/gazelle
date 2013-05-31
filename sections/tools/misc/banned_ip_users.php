@@ -23,10 +23,10 @@ function header_link($SortKey, $DefaultWay = "desc") {
     return "tools.php?action=banned_ip_users&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
 if (empty($_GET['order_way']) || $_GET['order_way'] == 'asc') {
-    $OrderWay = 'asc'; // For header links
+    $OrderWay = 'desc'; // For header links
 } else {
-    $_GET['order_way'] = 'desc';
-    $OrderWay = 'desc';
+    $_GET['order_way'] = 'asc';
+    $OrderWay = 'asc';
 }
  
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('new_id', 'new_name', 'joindate', 'IP', 'b_id', 'b_name', 'bandate' ))) {
