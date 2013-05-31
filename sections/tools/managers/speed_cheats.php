@@ -275,23 +275,8 @@ $Pages=get_pages($Page,$NumResults,25,9);
                     
                     $PeerIDs = explode('|', $PeerIDs);
                     $IPs = explode('|', $IPs);
+ 
                     /*
-                    $DB->query(" SELECT e.UserID AS UserID, x.IP, 'tracker', 'account' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
-                                 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID!= $UserID AND x.uid = $UserID
-                                 GROUP BY x.uid
-                                UNION
-                                 SELECT x2.uid AS UserID, x.IP, 'tracker', 'tracker' FROM xbt_snatched AS x JOIN xbt_snatched AS x2 ON x.IP=x2.IP 
-                                 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND x2.uid!= $UserID AND x.uid = $UserID
-                                 GROUP BY x.uid
-                                UNION
-                                 SELECT x.uid AS UserID, x.IP, 'account', 'tracker' FROM xbt_snatched AS x JOIN users_history_ips AS e ON x.IP=e.IP 
-                                 WHERE x.IP != '127.0.0.1' AND x.IP !='' AND e.UserID = $UserID AND x.uid != $UserID
-                                 GROUP BY x.uid
-                                UNION
-                                 SELECT e1.UserID AS UserID, e1.IP, 'account', 'account' FROM users_history_ips AS e1 JOIN users_history_ips AS e ON e1.IP=e.IP 
-                                 WHERE e1.IP != '127.0.0.1' AND e1.IP !='' AND e.UserID = $UserID AND e1.UserID != $UserID  
-                                ORDER BY  UserID, IP   "); */
-                    
 	$DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
 				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
@@ -304,7 +289,16 @@ $Pages=get_pages($Page,$NumResults,25,9);
                  (SELECT um.UserID AS UserID, um.IP, 'history', 'history' FROM users_history_ips AS um JOIN users_history_ips AS e ON um.IP=e.IP 
 				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID)
                 ORDER BY  UserID, IP 
-                LIMIT 20");
+                LIMIT 20"); */
+                    
+                    $DB->query("SELECT uh.UserID AS UserID, uh.IP 
+                                  FROM users_history_ips AS uh 
+                                  JOIN users_history_ips AS me ON uh.IP=me.IP 
+                                 WHERE uh.IP != '127.0.0.1' AND uh.IP !='' AND me.UserID = $UserID AND uh.UserID != $UserID 
+                              GROUP BY UserID, IP
+                              ORDER BY UserID, IP  
+                                 LIMIT 50"); 
+    
                     $IPDupeCount = $DB->record_count();
                     $IPDupes = $DB->to_array();
                     
@@ -386,23 +380,12 @@ $Pages=get_pages($Page,$NumResults,25,9);
 <?
             $i = 0;
             foreach($IPDupes AS $IPDupe) {
-                list($EUserID, $IP, $EType1, $EType2) = $IPDupe;
+                list($EUserID, $IP) = $IPDupe;  // , $EType1, $EType2
                 $i++;
                 $DupeInfo = user_info($EUserID);
 ?> 
             <tr>
-                <!--<td>
-                    <a href="?action=speed_records&viewspeed=0&userid=<?=$EUserID?>" title="View records for just <?=$DupeInfo['Username']?>"><img src="static/common/symbols/view.png" alt="view" /></a> 
-                    <div style="display:inline-block">
-                <?  if (!array_key_exists($EUserID, $Watchlist)) {   
-?>                      <a onclick="watchlist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to watchlist"><img src="static/common/symbols/watchedred.png" alt="view" /></a><br/><?
-                    }
-                    if (!array_key_exists($EUserID, $Excludelist)) {   
-?>                      <a onclick="excludelist_add('<?=$EUserID?>',true);return false;" href="#" title="Add <?=$DupeInfo['Username']?> to exclude list"><img src="static/common/symbols/watchedgreen.png" alt="view" /></a><?
-                    } ?>    
-                    </div>
-                    <a onclick="remove_records('<?=$EUserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$DupeInfo['Username']?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
-                </td>-->
+           
                 <td align="center">
                     <?=format_username($EUserID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
                 </td>
@@ -410,7 +393,8 @@ $Pages=get_pages($Page,$NumResults,25,9);
                     <?=display_ip($IP, $DupeInfo['ipcc'])?>
                 </td>
                 <td align="left">
-                    <?="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
+                    <?="$Username's history <-> $DupeInfo[Username]'s history"?>
+                    <?//="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
                 </td>
                 <td>
 <?

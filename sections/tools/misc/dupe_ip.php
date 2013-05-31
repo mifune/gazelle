@@ -18,7 +18,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
 
     return "tools.php?action=dupe_ips&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
-if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
+if (empty($_GET['order_way']) || $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
 } else {
     $_GET['order_way'] = 'desc';
@@ -38,12 +38,13 @@ list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
 $RS = $DB->query("SELECT 
                     SQL_CALC_FOUND_ROWS
-                    Count(UserID) as NumUsers,
-                    IP,
-                    Max(StartTime) as StartTime,
-                    Max(EndTime) as EndTime
-                  FROM users_history_ips 
-                  GROUP BY IP
+                    Count(DISTINCT h.UserID) as NumUsers,
+                    h.IP as IP,
+                    Max(h.StartTime) as StartTime,
+                    Max(h.EndTime) as EndTime
+                  FROM users_history_ips AS h
+                  JOIN users_main AS m ON m.ID=h.UserID
+                  GROUP BY h.IP
                   HAVING NumUsers>1
                   ORDER BY $OrderBy $OrderWay
                   LIMIT $Limit ");

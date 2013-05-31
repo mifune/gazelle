@@ -22,7 +22,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
 
     return "tools.php?action=banned_ip_users&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
-if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
+if (empty($_GET['order_way']) || $_GET['order_way'] == 'asc') {
     $OrderWay = 'asc'; // For header links
 } else {
     $_GET['order_way'] = 'desc';
@@ -65,7 +65,7 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
 
 $CachedDupeResults = $Cache->get_value("dupeip_users_{$BanReason}_{$Weeks}_$OrderBy{$OrderWay}_$Page");
 if($CachedDupeResults===false) {
-    /*
+    
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
                        n.ID as new_id, 
                        n.JoinDate as joindate, 
@@ -87,9 +87,8 @@ if($CachedDupeResults===false) {
                             ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
               ORDER BY $OrderBy $OrderWay
                  LIMIT $Limit ;");
-                 */
-    
-    
+                 
+    /*      // until we convert IP's to actual numbers not strings this fucks up the live server
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
                        n.ID as new_id, 
                        n.JoinDate as joindate, 
@@ -113,6 +112,7 @@ if($CachedDupeResults===false) {
                             ON n.IP=b.IP AND n.ID!=b.ID AND n.JoinDate>b.BanDate
               ORDER BY $OrderBy $OrderWay
                  LIMIT $Limit ;");
+    */
     
     $DupeRecords = $DB->to_array();
     $DB->query("SELECT FOUND_ROWS()");
