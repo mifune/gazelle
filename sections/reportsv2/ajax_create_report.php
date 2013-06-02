@@ -44,7 +44,7 @@ if(!isset($_POST['type'])) {
 $ExtraID = $_POST['otherid'];
 
 if(!empty($_POST['usercomment'])) {  
-	$Extra = db_string($_POST['usercomment']);
+	$Extra = db_string(urldecode($_POST['usercomment']));
 } elseif(!empty($_POST['extra'])) { 
 	$Extra = db_string($_POST['extra']);
 } else { 
