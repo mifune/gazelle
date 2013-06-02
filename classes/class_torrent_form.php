@@ -41,7 +41,7 @@ class TORRENT_FORM {
 
 
 	function head() {
-		global $LoggedUser,$DupeResults;
+		global $Text, $LoggedUser,$DupeResults;
 ?>
 <a id="uploadform"></a>
 
@@ -59,25 +59,36 @@ class TORRENT_FORM {
             <div id="contentpreview" style="text-align:left;"></div>  
 	</div>
 	<form action="" enctype="multipart/form-data" method="post" id="upload_table" onsubmit="$('#post').raw().disabled = 'disabled'">
-      <?
-    if (is_array($DupeResults) && $DupeResults['DupeResults']) {
-        $INLINE = true;
-		//$DupeTitle = $this->Torrent['Title']; 
-		//$SearchTags = $this->Torrent['TagList']; 
-        $DupeResults['Title'] = $this->Torrent['Title'];
-        $DupeResults['SearchTags'] = $this->Torrent['TagList'];
-        include(SERVER_ROOT . '/sections/upload/display_dupes.php');
-      ?>
-        <div class="box pad shadow center rowa"> 
-            If you have checked and are certain these are not dupes check this box to ignore the dupe check 
-            <div style="margin-top:6px"><strong style="font-size:1.2em;">Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1"<? 
-                                            if (isset($this->Torrent['IgnoreDupes']) && $this->Torrent['IgnoreDupes']==1) {
-                                                echo ' checked="checked"'; }   ?> /> </div>
-        </div>
+<?
+    if (is_array($DupeResults)) { // && $DupeResults['DupeResults']) {
+        
+        if($DupeResults['DupeResults']) {
+            $INLINE = true;
+            //$DupeTitle = $this->Torrent['Title']; 
+            //$SearchTags = $this->Torrent['TagList']; 
+            $DupeResults['Title'] = $this->Torrent['Title'];
+            $DupeResults['SearchTags'] = $this->Torrent['TagList'];
+            include(SERVER_ROOT . '/sections/upload/display_dupes.php');
+?>
+            <div class="box pad shadow center rowa"> 
+                If you have checked and are certain these are not dupes check this box to ignore the dupe check 
+                <div style="margin-top:6px"><strong style="font-size:1.2em;">Skip Dupe Check:</strong> <input type="checkbox" name="ignoredupes" value="1"<? 
+                                                if (isset($this->Torrent['IgnoreDupes']) && $this->Torrent['IgnoreDupes']==1) {
+                                                    echo ' checked="checked"'; }   ?> /> </div>
+            </div>
+<?
+        } else {
+?>
+            <div class="box pad shadow center rowa"> 
+                Checked <?=$DupeResults['NumChecked']?> file<?=($DupeResults['NumChecked']>1?'s':'')?>.<br/>There are no exact size dupes in this torrent file <?=$Text->full_format(":gjob:", true)?>
+            </div>
+<?
+        }
+?>
         <br/>
-      <?
+<?
     }
-      ?>
+?>
 		<div>
 			<input type="hidden" name="submit" value="true" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
@@ -116,7 +127,11 @@ class TORRENT_FORM {
                         <br/>[already loaded file]
 <?                  } else {    ?>
                         <input type="hidden" name="MAX_FILE_SIZE" value="<?=MAX_FILE_SIZE_BYTES?>" /> 
-                        <input id="file" type="file" name="file_input" size="70" /><br/>[max .torrent filesize: <?=strtolower(get_size(MAX_FILE_SIZE_BYTES))?>]
+                        <input id="file" type="file" name="file_input" size="70" />
+                        <span style="float:right">
+                            <input type="submit" title="to just do a dupecheck you can select a torrent file and click" value="check for dupes" />
+                        </span>
+                        <br/>[max .torrent filesize: <?=strtolower(get_size(MAX_FILE_SIZE_BYTES))?>]
 <?                  }           ?>
 				</td>
                 </tr>

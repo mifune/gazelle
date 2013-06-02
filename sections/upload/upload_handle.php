@@ -290,7 +290,9 @@ $FilePath = $Tor->Val['info']->Val['files'] ? db_string($Tor->Val['info']->Val['
 
 if (!isset($_POST['title']) || $_POST['title']=='') {
     if ($FilePath) $_POST['title'] = $FilePath;
-    else if (isset($TmpFileList[0])) $_POST['title'] = $TmpFileList[0];
+    else if (isset($TmpFileList[0])) {
+        $_POST['title'] = preg_replace('/\{\{\{([^\{]*)\}\}\}/i', '', $TmpFileList[0]);
+    }
     $Properties['Title'] = $_POST['title'];
 }
 
