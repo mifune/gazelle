@@ -157,8 +157,16 @@ if (!$Err && ($_POST['cur_pass'] || $_POST['new_pass_1'] || $_POST['new_pass_2']
 	}
 }
 
-if($LoggedUser['DisableAvatar'] && $_POST['avatar'] != $U['Avatar']) {
-	$Err = "Your avatar rights have been removed.";
+if (!$Err && ($UserID == $LoggedUser['ID'])) {
+    if($LoggedUser['DisableAvatar'] && $_POST['avatar'] != $U['Avatar']) {
+        $Err = "Your avatar rights have been removed.";
+    }
+    if($LoggedUser['DisableSignature'] && $_POST['signature'] != $U['Signature']) {
+        $Err = "Your signature rights have been removed.";
+    }
+    if($LoggedUser['DisableTorrentSig'] && $_POST['torrentsignature'] != $U['TorrentSignature']) {
+        $Err = "Your torrent signature rights have been removed.";
+    }
 }
 
 if ($Err) {

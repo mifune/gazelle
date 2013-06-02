@@ -972,6 +972,18 @@ CREATE TABLE IF NOT EXISTS `reports` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reports_conversations`
+--
+
+CREATE TABLE IF NOT EXISTS `reports_conversations` (
+  `ReportID` int(11) NOT NULL,
+  `ConvID` int(11) NOT NULL,
+  PRIMARY KEY (`ReportID`,`ConvID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellstruktur `reportsv2`
 --
 
@@ -998,6 +1010,18 @@ CREATE TABLE IF NOT EXISTS `reportsv2` (
   KEY `TorrentID` (`TorrentID`),
   KEY `ResolverID` (`ResolverID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reportsv2_conversations`
+--
+
+CREATE TABLE IF NOT EXISTS `reportsv2_conversations` (
+  `ReportID` int(11) NOT NULL,
+  `ConvID` int(11) NOT NULL,
+  PRIMARY KEY (`ReportID`,`ConvID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 

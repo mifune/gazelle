@@ -80,6 +80,8 @@ $DisablePM = (isset($_POST['DisablePM']))? 1 : 0;
 $DisableIRC = (isset($_POST['DisableIRC']))? 1 : 0;
 $DisableRequests = (isset($_POST['DisableRequests']))? 1 : 0;
 $DisableLeech = (isset($_POST['DisableLeech'])) ? 0 : 1;
+$DisableSig = (isset($_POST['DisableSignature']))? 1 : 0;
+$DisableTorrentSig = (isset($_POST['DisableTorrentSig']))? 1 : 0;
 
 $RestrictedForums = db_string(trim($_POST['RestrictedForums']));
 $PermittedForums = db_string(trim($_POST['PermittedForums']));
@@ -138,6 +140,8 @@ $DB->query("SELECT
 	DisableUpload,
 	DisablePM,
 	DisableIRC,
+	DisableSignature,
+	DisableTorrentSig,
 	m.RequiredRatio,
 	m.FLTokens,
         m.personal_freeleech,
@@ -648,6 +652,24 @@ if ($DisableRequests!=$Cur['DisableRequests'] && check_perms('users_disable_any'
 	$HeavyUpdates['DisableRequests']=$DisableRequests;
 	if (!empty($UserReason)) {
 		send_pm($UserID, 0, db_string('Your request privileges have been disabled'),db_string("Your request privileges have been disabled. The reason given was: $UserReason."));
+	}
+}
+
+if ($DisableSig!=$Cur['DisableSig'] && check_perms('users_disable_any')) {
+	$UpdateSet[]="DisableSig='$DisableSig'";
+	$EditSummary[]="Signature priviliges status changed";
+	$HeavyUpdates['DisableSig']=$DisableSig;
+	if (!empty($UserReason)) {
+		send_pm($UserID, 0, db_string('Your Signature privileges have been disabled'),db_string("Your Signature privileges have been disabled. The reason given was: $UserReason."));
+	}
+}
+
+if ($DisableTorrentSig!=$Cur['DisableTorrentSig'] && check_perms('users_disable_any')) {
+	$UpdateSet[]="DisableTorrentSig='$DisableTorrentSig'";
+	$EditSummary[]="Torrent Signature priviliges status changed";
+	$HeavyUpdates['DisableTorrentSig']=$DisableTorrentSig;
+	if (!empty($UserReason)) {
+		send_pm($UserID, 0, db_string('Your Torrent Signature privileges have been disabled'),db_string("Your Torrent Signature privileges have been disabled. The reason given was: $UserReason."));
 	}
 }
 

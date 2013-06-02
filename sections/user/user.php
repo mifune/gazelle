@@ -57,6 +57,8 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
 		i.DisablePM,
 		i.DisableIRC,
 		i.DisableRequests,
+		i.DisableSignature,
+		i.DisableTorrentSig,
 		i.HideCountryChanges,
 		m.FLTokens,
                 m.personal_freeleech,
@@ -86,7 +88,7 @@ if(check_perms('users_mod')) { // Person viewing is a staff member
               $GroupPermID, $Enabled, $Paranoia, $Invites, $DisableLeech, $Visible, $JoinDate, $Info, $Avatar, $Country, 
               $AdminComment, $Donor, $Warned, $SupportFor, $RestrictedForums, $PermittedForums, $InviterID, $InviterName, $ForumPosts, 
               $RatioWatchEnds, $RatioWatchDownload, $SuppressConnPrompt, $DisableAvatar, $DisableInvites, $DisablePosting, $DisableForums, $DisableTagging, 
-              $DisableUpload, $DisablePM, $DisableIRC, $DisableRequests, $DisableCountry, $FLTokens, $PersonalFreeLeech, $CommentHash,
+              $DisableUpload, $DisablePM, $DisableIRC, $DisableRequests, $DisableSig, $DisableTorrentSig, $DisableCountry, $FLTokens, $PersonalFreeLeech, $CommentHash,
               $BonusCredits,$BonusLog,$MaxAvatarWidth, $MaxAvatarHeight, $SeedHistory, $SeedHoursTotal, $SeedHoursDaily, $CreditsDaily, $flag, $BanReason) = $DB->next_record(MYSQLI_NUM, array(14));
 
 } else { // Person viewing is a normal user
@@ -1917,9 +1919,13 @@ if (check_perms('users_mod', $Class)) {
 					<br />
 					<input type="checkbox" title="Disable user ability to upload torrents" name="DisableUpload" id="DisableUpload"<? if ($DisableUpload==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to upload torrents" for="DisableUpload">Upload</label> |
 					<input type="checkbox" title="Disable user ability to leech on the tracker" name="DisableLeech" id="DisableLeech"<? if ($DisableLeech==0) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to leech on the tracker" for="DisableLeech">Leech</label> |
-					<input type="checkbox" title="Disable user ability to send private messages" name="DisablePM" id="DisablePM"<? if ($DisablePM==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to send private messages" for="DisablePM">PM</label> <!-- | -->
+					<input type="checkbox" title="Disable user ability to send private messages" name="DisablePM" id="DisablePM"<? if ($DisablePM==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to send private messages" for="DisablePM">PM</label> |  
 					<!-- <input type="checkbox" name="DisableIRC" id="DisableIRC"<? if ($DisableIRC==1) { ?>checked="checked"<? } ?> /> <label for="DisableIRC">IRC</label> -->
-				</td>
+				
+                    <input type="checkbox" title="Disable user ability to change their signature" name="DisableSignature" id="DisableSignature"<? if ($DisableSig==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to change their signature" for="DisableSignature">Signature</label> | 
+					<input type="checkbox" title="Disable user ability to change their torrent signature" name="DisableTorrentSig" id="DisableTorrentSig" <? if ($DisableTorrentSig==1) { ?>checked="checked"<? } ?> /> <label title="Disable user ability to change their torrent signature" for="DisableTorrentSig">Torrent Signature</label> 
+					
+                </td> 
 			</tr>
 			<tr>
 				<td class="label">Hacked:</td>
