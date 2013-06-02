@@ -656,9 +656,9 @@ if ($DisableRequests!=$Cur['DisableRequests'] && check_perms('users_disable_any'
 }
 
 if ($DisableSig!=$Cur['DisableSig'] && check_perms('users_disable_any')) {
-	$UpdateSet[]="DisableSig='$DisableSig'";
+	$UpdateSet[]="DisableSignature='$DisableSig'";
 	$EditSummary[]="Signature priviliges status changed";
-	$HeavyUpdates['DisableSig']=$DisableSig;
+	$HeavyUpdates['DisableSignature']=$DisableSig;
 	if (!empty($UserReason)) {
 		send_pm($UserID, 0, db_string('Your Signature privileges have been disabled'),db_string("Your Signature privileges have been disabled. The reason given was: $UserReason."));
 	}
