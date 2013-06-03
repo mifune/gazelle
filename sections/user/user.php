@@ -676,11 +676,11 @@ list($NumTagVotes) = $DB->next_record();
    if (check_paranoia_here('tags')) { ?>
 				<li>Tags added: <span title="Tags on other uploaders torrents added"><?=$NumOthersTags?></span> 
                                 <span title="Tags on own torrents added (<?=($NumOthersTags+$NumOwnTags)?> total)">(+<?=$NumOwnTags?>) </span> 
-                                [<a href="userhistory.php?action=tag_history&amp;type=added&amp;userid=<?=$UserID?>" title="View all tags added by <?=$LoggedUser['Username']?>">View</a>]
+                                [<a href="userhistory.php?action=tag_history&amp;type=added&amp;userid=<?=$UserID?>" title="View all tags added by <?=$Username?>">View</a>]
                 </li>
                 <li>Tags voted on: <span title="Tags on other uploaders torrents voted for"><?=$NumVotesOthers?></span> 
                                 <span title="Tags on own torrents voted for (<?=($NumVotesOwn+$NumVotesOthers)?> total)">(+<?=$NumVotesOwn?>)</span>
-                                [<a href="userhistory.php?action=tag_history&amp;type=votes&amp;userid=<?=$UserID?>" title="View all tags voted on by <?=$LoggedUser['Username']?>">View</a>]
+                                [<a href="userhistory.php?action=tag_history&amp;type=votes&amp;userid=<?=$UserID?>" title="View all tags voted on by <?=$Username?>">View</a>]
                 </li>
 <?  } elseif (check_paranoia_here('tags+')) { ?>
                 <li>Tags added: <span title="Tags on other uploaders torrents added"><?=$NumOthersTags?></span> 
@@ -693,24 +693,24 @@ list($NumTagVotes) = $DB->next_record();
  //} // end if $_GET['tags'] hack
 
 ?>
-				<li>Forum Posts: <?=number_format($ForumPosts)?> [<a href="userhistory.php?action=posts&amp;userid=<?=$UserID?>" title="View all forum posts by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Forum Posts: <?=number_format($ForumPosts)?> [<a href="userhistory.php?action=posts&amp;userid=<?=$UserID?>" title="View all forum posts by <?=$Username?>">View</a>]</li>
 <? if (check_paranoia_here('torrentcomments')) { ?>
-				<li>Torrent Comments: <?=number_format($NumComments)?> [<a href="comments.php?id=<?=$UserID?>" title="View all torrent comments by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Torrent Comments: <?=number_format($NumComments)?> [<a href="comments.php?id=<?=$UserID?>" title="View all torrent comments by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here('torrentcomments+')) { ?>
 				<li>Torrent Comments: <?=number_format($NumComments)?></li>
 <? } ?>
 <? if (check_paranoia_here('collages')) { ?>
-				<li>Collages started: <?=number_format($NumCollages)?> [<a href="collages.php?userid=<?=$UserID?>" title="View all collages started by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Collages started: <?=number_format($NumCollages)?> [<a href="collages.php?userid=<?=$UserID?>" title="View all collages started by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here('collages+')) { ?>
 				<li>Collages started: <?=number_format($NumCollages)?></li>
 <? } ?>
 <? if (check_paranoia_here('collagecontribs')) { ?>
-				<li>Collages contributed to: <?=number_format($NumCollageContribs)?> [<a href="collages.php?userid=<?=$UserID?>&amp;contrib=1" title="View all collages added to by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Collages contributed to: <?=number_format($NumCollageContribs)?> [<a href="collages.php?userid=<?=$UserID?>&amp;contrib=1" title="View all collages added to by <?=$Username?>">View</a>]</li>
 <? } elseif(check_paranoia_here('collagecontribs+')) { ?>
 				<li>Collages contributed to: <?=number_format($NumCollageContribs)?></li>
 <? } ?>
 <? if (check_paranoia_here('requestsfilled_list')) { ?>
-				<li>Requests filled: <?=number_format($RequestsFilled)?> for <?=get_size($TotalBounty)?> [<a href="requests.php?type=filled&amp;userid=<?=$UserID?>" title="View all requests filled by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Requests filled: <?=number_format($RequestsFilled)?> for <?=get_size($TotalBounty)?> [<a href="requests.php?type=filled&amp;userid=<?=$UserID?>" title="View all requests filled by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here(array('requestsfilled_count', 'requestsfilled_bounty'))) { ?>
 				<li>Requests filled: <?=number_format($RequestsFilled)?> for <?=get_size($TotalBounty)?></li>
 <? } elseif (check_paranoia_here('requestsfilled_count')) { ?>
@@ -719,7 +719,7 @@ list($NumTagVotes) = $DB->next_record();
 				<li>Requests filled: <?=get_size($TotalBounty)?> collected</li>
 <? } ?>
 <? if (check_paranoia_here('requestsvoted_list')) { ?>
-				<li>Requests voted: <?=number_format($RequestsVoted)?> for <?=get_size($TotalSpent)?> [<a href="requests.php?type=voted&amp;userid=<?=$UserID?>" title="View all requests added to by <?=$LoggedUser['Username']?>">View</a>]</li>
+				<li>Requests voted: <?=number_format($RequestsVoted)?> for <?=get_size($TotalSpent)?> [<a href="requests.php?type=voted&amp;userid=<?=$UserID?>" title="View all requests added to by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here(array('requestsvoted_count', 'requestsvoted_bounty'))) { ?>
 				<li>Requests voted: <?=number_format($RequestsVoted)?> for <?=get_size($TotalSpent)?></li>
 <? } elseif (check_paranoia_here('requestsvoted_count')) { ?>
@@ -728,7 +728,7 @@ list($NumTagVotes) = $DB->next_record();
 				<li>Requests voted: <?=get_size($TotalSpent)?> spent</li>
 <? } ?>
 <? if (check_paranoia_here('uploads')) { ?>
-				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View all uploads by <?=$LoggedUser['Username']?>">View</a>]
+				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View all uploads by <?=$Username?>">View</a>]
             <?  if($OwnProfile || check_perms('zip_downloader')) { ?> 
                     [<a href="torrents.php?action=redownload&amp;type=uploads&amp;userid=<?=$UserID?>" title="Download all uploaded torrents in a zip" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
             <?  } ?>
