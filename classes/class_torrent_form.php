@@ -257,22 +257,21 @@ class TORRENT_FORM {
 ?> 
 	 
 <?		 
-			if(check_perms('torrents_freeleech')) {
+        if(check_perms('torrents_freeleech')) {
 ?>
 			<tr id="freetorrent" class="uploadbody">
 				<td class="label">Freeleech</td>
 				<td>
 					<select name="freeleech">
-<?	$FL = array("Normal", "Free");    //, "Neutral");
-	foreach($FL as $Key => $Name) { ?>	
-						<option value="<?=$Key?>" <?=($Key == $Torrent['FreeTorrent'] ? ' selected="selected"' : '')?>><?=$Name?></option>
-<?	} ?>
+<?          $FL = array("Normal", "Free");    //, "Neutral");  // neutral works in the tracker we just dont use it...
+            foreach($FL as $Key => $Name) {     ?>	
+						<option value="<?=$Key?>" <?=($Key == $Torrent['FreeLeech'] ? ' selected="selected"' : '')?>><?=$Name?></option>
+<?          }       ?>
 					</select>
 				</td>
 			</tr>
 <?
-			}
-		 
+        }
 ?>
 			<tr>
 				<td colspan="2" style="text-align: center;">

@@ -43,6 +43,7 @@ $Properties['Image'] = $_POST['image'];
 $Properties['GroupDescription'] = $_POST['desc'];
 $Properties['TemplateFooter'] = $_POST['templatefooter'];
 $Properties['IgnoreDupes'] = $_POST['ignoredupes'];
+$Properties['FreeLeech'] = ($_POST['freeleech']=='1' && check_perms('torrents_freeleech'))?'1':'0';
 
 //$Properties['GroupID'] = $_POST['groupid'];
 $RequestID = $_POST['requestid'];
@@ -55,43 +56,6 @@ $CheckStamp = "";
 $HideDNU = true;
 $HideWL = true;
 
-
-/*
-$Validate->SetFields('tags', '1', 'string', 'You must enter at least one tag.', array('maxlength' => 10000, 'minlength' => 2));
-$whitelist_regex = get_whitelist_regex();
-$Validate->SetFields('image', '0', 'image', 'The image URL you entered was not valid.', array('regex' => $whitelist_regex, 'maxlength' => 255, 'minlength' => 12));
-$Validate->SetFields('desc', '1', 'desc', 'Description', array('regex' => $whitelist_regex, 'minimages'=>1, 'maxlength' => 1000000, 'minlength' => 20));
-$Validate->SetFields('category', '1', 'inarray', 'Please select a category.', array('inarray' => array_keys($NewCategories)));
-$Validate->SetFields('rules', '1', 'require', 'Your torrent must abide by the rules.');
-
-$Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
-
-
-$File = $_FILES['file_input']; // This is our torrent file
-$TorrentName = $File['tmp_name'];
-$FileName = $File['name'];
-
-if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)){
-        $Err = "There are errors in your bbcode (unclosed tags)";
-}
-
-if(!$Err ){ // if we already have an error lets report what we have (much friendlier for fixing your presentation in the upload page as the fileinfo does not carry back)
-    if (!is_uploaded_file($TorrentName) || !filesize($TorrentName)) {
-        $Err = 'No torrent file uploaded, or file is empty.';
-    } else if (substr(strtolower($File['name']), strlen($File['name']) - strlen(".torrent")) !== ".torrent") {
-        $Err = "You seem to have put something other than a torrent file into the upload field. (" . $File['name'] . ").";
-    }
-}
-
-    
-$HideDNU = true;
-$HideWL = true;
-
-if ($Err) { // Show the upload form, with the data the user entered
-    include(SERVER_ROOT . '/sections/upload/upload.php');
-    die();
-}
-*/
 
 
 
@@ -468,10 +432,10 @@ if($MaxGroupID>=$GroupID) $GroupID = $MaxGroupID+1;
     
  
 // Use this section to control freeleeches
-if ($TotalSize < AUTO_FREELEECH_SIZE ) {        // (20*1024*1024*1024)){
-    $Properties['FreeTorrent']='0';
-} else {
+if ($Properties['FreeLeech']==='1' || $TotalSize >= AUTO_FREELEECH_SIZE) {        // (20*1024*1024*1024)){
     $Properties['FreeTorrent']='1';
+} else {
+    $Properties['FreeTorrent']='0';
 }
 
 
