@@ -1554,6 +1554,11 @@ function is_utf8($Str) {
     );
 }
 
+function str_plural($Str, $Num) {
+    if ($Num===1) return "$Num $Str";
+    else return "$Num {$Str}s";
+}
+
 // Escape an entire array for output
 // $Escape is either true, false, or a list of array keys to not escape
 function display_array($Array, $Escape = array()) {

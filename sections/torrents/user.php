@@ -285,7 +285,7 @@ foreach($NewCategories as $Cat) {
 	</div>
 <?	} else { ?>
 	<div class="linkbox"><?=$Pages?></div>
-	<div class="head">Torrents</div>
+	<div class="head"><?=str_plural('Torrent',$TorrentCount)?></div>
 	<table class="torrent_table">
 		<tr class="colhead">
 			<td></td>
