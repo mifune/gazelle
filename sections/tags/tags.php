@@ -142,7 +142,7 @@ show_header('Tags');
         
         if(!$WHERE1 && !$WHERE2 && $Page==1) { // lets cache front page results for a few hours
                 
-            $CacheResults = $Cache->get_value("tagslist_$OrderBy_$OrderWay");
+            $CacheResults = $Cache->get_value("tagslist_{$OrderBy}_$OrderWay");
             
             if($CacheResults===false) { 
                 
@@ -176,7 +176,7 @@ show_header('Tags');
                     }
                 }
 
-                $Cache->cache_value("tagslist_$OrderBy_$OrderWay", array($NumAllTags, $Tags), 3600*12);
+                $Cache->cache_value("tagslist_{$OrderBy}_$OrderWay", array($NumAllTags, $Tags), 3600*12);
                 
             } else {
                 
