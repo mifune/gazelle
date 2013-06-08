@@ -666,7 +666,7 @@ class TEXT {
                         <br/>ie.<br/><span style=\"font-weight:bold\">[b]</span> [i] your text <span style=\"font-weight:bold\">[/b] </span>[/i] <span style=\"color:red\">(wrong)</span> - <em>tags must be nested, when they overlap like this it throws an error</em>
                         <br/><span style=\"font-weight:bold\">[b]</span> [i] your text [/i] <span style=\"font-weight:bold\">[/b]</span> <span style=\"color:green\">(correct)</span> - <em>properly nested tags</em></div><div class=\"head\">Your post</div><div class=\"box pad\">
                         <div class=\"box\"><div class=\"post_content\">$preview</div></div><br/>
-                        <div style=\"font-style:italic;text-align:center;cursor:pointer;\"><a onclick=\"window.history.go(-1);\">click here or use the back button in your browser to return to your message</div>");
+                        <div style=\"font-style:italic;text-align:center;cursor:pointer;\"><a onclick=\"window.history.go(-1);\">click here or use the back button in your browser to return to your message</a></div>");
             }
             return false;
         }
