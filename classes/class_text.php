@@ -36,7 +36,6 @@ class TEXT {
         'i' => 0, 
         's' => 0, 
         '*' => 0, 
-        'artist' => 0, 
         'user' => 0, 
         'n' => 0, 
         'inlineurl' => 0, 
@@ -54,7 +53,12 @@ class TEXT {
         'hide' => 1, 
         'plain' => 0, 
         'important' => 0, 
-        'torrent' => 0
+        'torrent' => 0,
+        'rank' => 1, 
+        'tip' => 1, 
+        'imgnm' => 1, 
+        'imgalt' => 1, 
+        'article' =>1
     );
     
     private $Smileys = array(
@@ -592,13 +596,20 @@ class TEXT {
 
         $Str = display_str($Str);
 
-        $Str = str_replace('  ', ' &nbsp;', $Str);
+        $Str = str_replace('  ', '&nbsp;&nbsp;', $Str);
         //Inline links
-        $Str = preg_replace('/\[video\=/i', '[vid=', $Str);
-        $Str = preg_replace('/\[thumb\]/i', '[thu]', $Str);
-        $Str = preg_replace('/\[banner\]/i', '[ban]', $Str);
+        //$Str = preg_replace('/\[video\=/i', '[vid=', $Str);
+        //$Str = preg_replace('/\[thumb\]/i', '[thu]', $Str);
+        //$Str = preg_replace('/\[banner\]/i', '[ban]', $Str);
+        $Str = preg_replace('/\[bg\=/i', '[bgg=', $Str);
+        //$Str = preg_replace('/\[bg\]/i', '[bgg]', $Str);
+        $Str = preg_replace('/\[td\=/i', '[tdd=', $Str);
+        //$Str = preg_replace('/\[td\]/i', '[tdd]', $Str);
+        $Str = preg_replace('/\[tr\=/i', '[trr=', $Str);
+        $Str = preg_replace('/\[th\=/i', '[thh=', $Str);
 
-        $URLPrefix = '(\[url\]|\[url\=|\[vid\=|\[img\=|\[img\]|\[thu\]|\[ban\])';
+        $URLPrefix = '(\[url\]|\[url\=|\[vide|\[img\=|\[img\]|\[thum|\[bann|\[h5v\]|\[h5v\=|\[bgg\=|\[tdd\=|\[trr\=|\[tabl|\[imgn|\[imga)';  // |\[h5v\]   |\[h5v\=
+        //$URLPrefix = '(\[url\]|\[url\=|\[vid\=|\[img\=|\[img\]|\[thu\]|\[ban\]|\[h5v\]|\[h5v\=|\[bgg\=|\[tabl)';  // |\[h5v\]   |\[h5v\=
         $Str = preg_replace('/' . $URLPrefix . '\s+/i', '$1', $Str);
         $Str = preg_replace('/(?<!' . $URLPrefix . ')http(s)?:\/\//i', '$1[inlineurl]http$2://', $Str);
         // For anonym.to and archive.org links, remove any [inlineurl] in the middle of the link
@@ -609,15 +620,32 @@ class TEXT {
         $Str = preg_replace('/\=\=\=([^=].*)\=\=\=/i', '[inlinesize=5]$1[/inlinesize]', $Str);
         $Str = preg_replace('/\=\=([^=].*)\=\=/i', '[inlinesize=7]$1[/inlinesize]', $Str);
 
-        $Str = preg_replace('/\[vid\=/i', '[video=', $Str);
-        $Str = preg_replace('/\[thu\]/i', '[thumb]', $Str);
-        $Str = preg_replace('/\[ban\]/i', '[banner]', $Str);
+        //$Str = preg_replace('/\[vid\=/i', '[video=', $Str);
+        //$Str = preg_replace('/\[thu\]/i', '[thumb]', $Str);
+        //$Str = preg_replace('/\[ban\]/i', '[banner]', $Str);
+        //$Str = preg_replace('/\[bgg\]/i', '[bg]', $Str);
+        $Str = preg_replace('/\[bgg\=/i', '[bg=', $Str);
+        $Str = preg_replace('/\[tdd\=/i', '[td=', $Str);
+        $Str = preg_replace('/\[trr\=/i', '[tr=', $Str);
+        $Str = preg_replace('/\[thh\=/i', '[th=', $Str);
 
         $Str = $this->parse($Str);
 
         $HTML = $this->to_html($Str);
 
         $HTML = nl2br($HTML);
+        
+        /*
+        if($this->ShowErrors) {
+            $offset=0;
+            //$nextbr = stripos($HTML, "<br />", $offset);
+            while(($nextbr=stripos($HTML, "<br />", $offset))!==false) {
+                $offset = $nextbr+6;
+                $text = '<span class="errornum">'.$nextbr.'</span>';
+                $HTML = substr_replace($HTML, $text, $offset, 0);
+                $offset += strlen($text);
+            }
+        } */
         return $HTML;
     }
 
@@ -634,7 +662,11 @@ class TEXT {
         if ($this->has_errors()) {
             if ($ErrorOut) {
                 $bbErrors = implode('<br/>', $this->get_errors());
-                error("There are errors in your bbcode (unclosed tags)<br/><br/>$bbErrors<br/><div class=\"box\"><div class=\"post_content\">$preview</div></div>");
+                error("There are errors in your bbcode (unclosed tags)<br/><br/>$bbErrors<br/>If the tag(s) highlighted do actually have a closing tag then you probably have overlapping tags
+                        <br/>ie.<br/><span style=\"font-weight:bold\">[b]</span> [i] your text <span style=\"font-weight:bold\">[/b] </span>[/i] <span style=\"color:red\">(wrong)</span> - <em>tags must be nested, when they overlap like this it throws an error</em>
+                        <br/><span style=\"font-weight:bold\">[b]</span> [i] your text [/i] <span style=\"font-weight:bold\">[/b]</span> <span style=\"color:green\">(correct)</span> - <em>properly nested tags</em></div><div class=\"head\">Your post</div><div class=\"box pad\">
+                        <div class=\"box\"><div class=\"post_content\">$preview</div></div><br/>
+                        <div style=\"font-style:italic;text-align:center;cursor:pointer;\"><a onclick=\"window.history.go(-1);\">click here or use the back button in your browser to return to your message</div>");
             }
             return false;
         }
@@ -680,6 +712,9 @@ class TEXT {
         $remove[] = '/\[align.*?\]/i';
         $remove[] = '/\[\/align\]/i';
 
+        $remove[] = '/\[article.*?\]/i';
+        $remove[] = '/\[\/article\]/i';
+        
         $remove[] = '/\[audio\].*?\[\/audio\]/i';
 
         $remove[] = '/\[b\]/i';
@@ -730,6 +765,8 @@ class TEXT {
         $remove[] = '/\[\/i\]/i';
 
         $remove[] = '/\[img.*?\].*?\[\/img\]/i';
+        $remove[] = '/\[imgalt.*?\].*?\[\/imgalt\]/i';
+        $remove[] = '/\[imgnm.*?\].*?\[\/imgnm\]/i';
 
         $remove[] = '/\[important\]/i';
         $remove[] = '/\[\/important\]/i';
@@ -755,10 +792,11 @@ class TEXT {
         $remove[] = '/\[quote\]/i';
         $remove[] = '/\[\/quote\]/i';
 
+        $remove[] = '/\[rank.*?\]/i';
+        $remove[] = '/\[\/rank\]/i';
+
         $remove[] = '/\[s\]/i';
         $remove[] = '/\[\/s\]/i';
-
-        $remove[] = '/\[screens\]/i';
 
         $remove[] = '/\[size.*?\]/i';
         $remove[] = '/\[\/size\]/i';
@@ -777,6 +815,9 @@ class TEXT {
         $remove[] = '/\[\/td\]/i';
 
         $remove[] = '/\[tex\].*?\[\/tex\]/i';
+        
+        $remove[] = '/\[tip.*?\]/i';
+        $remove[] = '/\[\/tip\]/i';
 
         $remove[] = '/\[thumb\].*?\[\/thumb\]/i';
 
@@ -1019,10 +1060,19 @@ class TEXT {
                             $closetaglength = 0;
                         } else {
                             // lets try and deal with badly formed bbcode in a better way
-                            $this->Errors[] = "unclosed [$TagName] at character index= $i";
+                            $istart = max(  $TagPos- 20, 0 );
+                            $iend = min( $i + 20, $Len );
+                            $errnum = count($this->Errors); // &nbsp; <a class="error" href="#err'.$errnum.'">goto error</a>
+                    
+                            $postlink = '<a class="postlink error" href="#err'.$errnum.'" title="scroll to error"><span class="postlink"></span></a>';
+                                    
+                            $this->Errors[] = "<span class=\"quote_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
+                                    .'<code class="error">'.$Tag[0][0].'</code>'. substr($Str, $i, $iend - $i) .'... </blockquote>';
+                     
                             if ($this->ShowErrors) {
                                 $Block = "[$TagName]";
                                 $TagName = 'error';
+                                $Attrib = $errnum;
                             } else {
                                 $TagName = 'ignore'; // tells the parser to skip this empty tag
                             }
@@ -1052,7 +1102,7 @@ class TEXT {
 
                 $i = $CloseTag + $closetaglength; // 5d) Move the pointer past the end of the [/close] tag. 
             }
-
+            
             // 6) Depending on what type of tag we're dealing with, create an array with the attribute and block.
             switch ($TagName) {
                 case 'h5v': // html5 video tag
@@ -1093,7 +1143,6 @@ class TEXT {
                     $Array[$ArrayPos] = array('Type' => 'inlineurl', 'Attr' => $Block, 'Val' => '');
                     break;
                 case 'url':
-                    $Array[$ArrayPos] = array('Type' => 'img', 'Attr' => $Attrib, 'Val' => $Block);
                     if (empty($Attrib)) { // [url]http://...[/url] - always set URL to attribute
                         $Array[$ArrayPos] = array('Type' => 'url', 'Attr' => $Block, 'Val' => '');
                     } else {
@@ -1103,12 +1152,21 @@ class TEXT {
                 case 'quote':
                     $Array[$ArrayPos] = array('Type' => 'quote', 'Attr' => $Attrib, 'Val' => $this->parse($Block));
                     break;
+                
+                case 'imgnm':
+                    $Array[$ArrayPos] = array('Type' => 'imgnm',  'Attr' => $Attrib, 'Val' => $Block);
+                    break;
+                case 'imgalt':
+                    $Array[$ArrayPos] = array('Type' => 'imgalt', 'Attr' => $Attrib, 'Val' => $Block);
+                    break;
+                
                 case 'img':
                 case 'image':
                     if (empty($Block)) {
                         $Block = $Attrib;
+                        $Attrib = '';
                     }
-                    $Array[$ArrayPos] = array('Type' => 'img', 'Val' => $Block);
+                    $Array[$ArrayPos] = array('Type' => 'img', 'Attr' => $Attrib, 'Val' => $Block);
                     break;
                 case 'banner':
                 case 'thumb':
@@ -1128,9 +1186,7 @@ class TEXT {
                 case 'user':
                     $Array[$ArrayPos] = array('Type' => 'user', 'Val' => $Block);
                     break;
-                case 'artist':
-                    $Array[$ArrayPos] = array('Type' => 'artist', 'Val' => $Block);
-                    break;
+                
                 case 'torrent':
                     $Array[$ArrayPos] = array('Type' => 'torrent', 'Val' => $Block);
                     break;
@@ -1169,7 +1225,7 @@ class TEXT {
                     $ArrayPos--;
                     break; // n serves only to disrupt bbcode (backwards compatibility - use [pre])
                 case 'error':  // not a tag but can be used internally
-                    $Array[$ArrayPos] = array('Type' => 'error', 'Val' => $Block);
+                    $Array[$ArrayPos] = array('Type' => 'error', 'Attr' => $Attrib, 'Val' => $Block);
                     break;
                 default:
                     if ($WikiLink == true) {
@@ -1190,20 +1246,60 @@ class TEXT {
         return $Array;
     }
 
-    function is_color_attrib(&$Attrib) {
-        global $ClassNames;
-        static $ColorAttribs;  //static $ReplaceVals; static $ReplaceCols;
+    
+    
+    function get_allowed_colors() {
+        static $ColorAttribs; 
         if (!$ColorAttribs) { // only define it once per page  
-            $ColorAttribs = array('orange', 'aqua', 'aquamarine', 'magenta', 'darkmagenta', 'slategrey', 'pink', 'hotpink', 'black', 'wheat', 'midnightblue', 'forestgreen', 'blue', 'lightblue', 'fuchsia', 'lightgreen', 'green', 'grey', 'lightgrey', 'lime', 'maroon', 'navy', 'olive', 'khaki', 'darkkhaki', 'gold', 'goldenrod', 'darkgoldenrod', 'purple', 'violet', 'red', 'crimson', 'firebrick', 'gainsboro', 'silver', 'teal', 'linen', 'aliceblue', 'lavender', 'white', 'whitesmoke', 'lightyellow', 'yellow');
-            //$ReplaceVals = array('goodperv','modperv','apprentice','sextremeperv','perv','smutpeddler','emplegend', 'admin','sysop');
-            //$ReplaceCols = array('#3c3','#000','#92a5c2','orange','#4ec89b','#00f', '#cfb53b' , '#606','#8b0000');
+            /* $ColorAttribs = array('orange', 'aqua', 'aquamarine', 'magenta', 'darkmagenta', 'slategrey', 'pink', 'hotpink', 
+                'black', 'wheat', 'midnightblue', 'forestgreen', 'blue', 'lightblue', 'fuchsia', 'lightgreen', 'green', 
+                'grey', 'lightgrey', 'lime', 'maroon', 'navy', 'olive', 'khaki', 'darkkhaki', 'gold', 'goldenrod', 'darkgoldenrod', 
+                'purple', 'violet', 'red', 'crimson', 'firebrick', 'gainsboro', 'silver', 'teal', 'linen', 'aliceblue', 'lavender', 
+                'white', 'whitesmoke', 'lightyellow', 'yellow'); */
+            // now with more colors!
+            $ColorAttribs = array( 'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet',
+                'brown','burlywood','cadetblue','chartreuse','chocolate','coral','cornflowerblue','cornsilk','crimson','cyan','darkblue','darkcyan','darkgoldenrod',
+                'darkgray','darkgreen','darkgrey','darkkhaki','darkmagenta','darkolivegreen','darkorange','darkorchid','darkred','darksalmon','darkseagreen','darkslateblue',
+                'darkslategray','darkslategrey','darkturquoise','darkviolet','deeppink','deepskyblue','dimgray','dimgrey','dodgerblue','firebrick','floralwhite','forestgreen',
+                'fuchsia','gainsboro','ghostwhite','gold','goldenrod','gray','grey','green','greenyellow','honeydew','hotpink','indianred','indigo','ivory','khaki','lavender',
+                'lavenderblush','lawngreen','lemonchiffon','lightblue','lightcoral','lightcyan','lightgoldenrodyellow','lightgray','lightgreen','lightgrey','lightpink',
+                'lightsalmon','lightseagreen','lightskyblue','lightslategray','lightslategrey','lightsteelblue','lightyellow','lime','limegreen','linen','magenta','maroon',
+                'mediumaquamarine','mediumblue','mediumorchid','mediumpurple','mediumseagreen','mediumslateblue','mediumspringgreen','mediumturquoise','mediumvioletred',
+                'midnightblue','mintcream','mistyrose','moccasin','navajowhite','navy','oldlace','olive','olivedrab','orange','orangered','orchid','palegoldenrod','palegreen',
+                'paleturquoise','palevioletred','papayawhip','peachpuff','peru','pink','plum','powderblue','purple','red','rosybrown','royalblue','saddlebrown','salmon',
+                'sandybrown','seagreen','seashell','sienna','silver','skyblue','slateblue','slategray','slategrey','snow','springgreen','steelblue','tan','teal','thistle',
+                'tomato','turquoise','violet','wheat','white','whitesmoke','yellow','yellowgreen' );
         }
-        //$Attrib = str_replace($ReplaceVals, $ReplaceCols, $Attrib);
-        if (isset($ClassNames[$Attrib]['Color']))
-            $Attrib = '#' . $ClassNames[$Attrib]['Color'];
-
-        return (in_array($Attrib, $ColorAttribs) || preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Attrib));
+        return $ColorAttribs;
     }
+
+    function is_color_attrib(&$Attrib) {
+        global $ClassNames;  
+         
+        // convert class names to class colors
+        if (isset($ClassNames[$Attrib]['Color'])) $Attrib = '#' . $ClassNames[$Attrib]['Color'];
+        // if in format #rgb hex then return as is
+        if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Attrib)) return true;
+        
+        // check and capture #rgba format
+        if (preg_match('/^#(?|([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})|([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1}))$/', $Attrib, $matches) ) {
+            // capture #rgba hex and convert into rgba(r,g,b,a) format (from base 16 to base 10 0->255)
+            for($i=1;$i<4;$i++){
+                if (strlen($matches[$i])==1) $matches[$i] = "$matches[$i]$matches[$i]";
+                $matches[$i] = base_convert($matches[$i], 16, 10);
+            }
+            if (strlen($matches[4])==1) $matches[4] = "$matches[4]$matches[4]";
+            // alpha channel is in 0->1.0 range not 0->255 (!)
+            $matches[4] = number_format( base_convert($matches[4], 16, 10) /255 , 2);
+            // attribute is in rgb(r,g,b,a) format for alpha channel
+            $Attrib = "rgba($matches[1],$matches[2],$matches[3],$matches[4])"; 
+            return true;
+        }
+         
+        // if not in #rgb or #rgba format then check for allowed colors
+        return in_array($Attrib, $this->get_allowed_colors());
+    }
+    
 
     
     function extract_attributes($Attrib, $MaxNumber=-1) {
@@ -1232,7 +1328,7 @@ class TEXT {
     }
     
     
-    function get_css_attributes($Attrib, $AllowMargin = true, $AllowColor = true, $AllowWidth = true, $AllowNoBorder = true) {
+    function get_css_attributes($Attrib, $AllowMargin=true, $AllowColor=true, $AllowWidth=true, $AllowNoBorder=true, $AllowImage=true) {
         $InlineStyle = '';
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
@@ -1241,14 +1337,19 @@ class TEXT {
                 foreach ($attributes as $att) {
                     if ($AllowColor && $this->is_color_attrib($att)) {
                         $InlineStyle .= 'background-color:' . $att . ';';
+                        
+                    } elseif ($AllowImage && $this->valid_url($att) ) {
+                        $InlineStyle .= "background-image: url(".$att.");";
+                        //$InlineStyle .= "background: url('$att') no-repeat center center;";
+                        
                     } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
-                        if ((int) $matches[1] > 920)
-                            $matches[1] = '920';
+                        if ((int) $matches[1] > 920) $matches[1] = '920';
                         $InlineStyle .= 'width:' . $matches[1] . 'px;';
+                        
                     } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})%?$/', $att, $matches)) {
-                        if ((int) $matches[1] > 100)
-                            $matches[1] = '100';
+                        if ((int) $matches[1] > 100) $matches[1] = '100';
                         $InlineStyle .= 'width:' . $matches[1] . '%;';
+                        
                     } elseif ($AllowMargin && in_array($att, array('left', 'center', 'right'))) {
                         switch ($att) {
                             case 'left':
@@ -1264,17 +1365,37 @@ class TEXT {
                         }
                     } elseif ($AllowNoBorder && in_array($att, array('nball', 'nb', 'noborder'))) { //  'nball', 
                         $InlineStyle .= 'border:none;';
-                    } elseif ($att != 'nball') {
-                        return FALSE;
-                    }
+                        
+                    } elseif ($AllowMargin && in_array($att, array('nopad'))) { 
+                        $InlineStyle .= 'padding:0px;';
+                        
+                    } //elseif (!in_array($att, array('nopad', 'nball')) ) {
+                       // return FALSE;
+                    //}
                 }
                 $InlineStyle .= '"';
             }
         }
         return $InlineStyle;
     }
+    
+    function get_css_classes($Attrib, $MatchClasses) {
+        if ($Attrib == '') return '';
+        $classes='';
+        foreach($MatchClasses as $class){
+            if ( is_array($class)) {
+                $class_match = $class[0];
+                $class_replace = $class[1];
+            } else {
+                $class_match = $class;
+                $class_replace = $class;
+            }
+            if (stripos($Attrib, $class_match) !== FALSE) $classes .= " $class_replace";
+        }
+        return $classes;
+    }
 
-    function remove_text_between_tags(&$Array, $MatchTagRegex = false) {
+    function remove_text_between_tags($Array, $MatchTagRegex = false) {
         $count = count($Array);
         for ($i = 0; $i <= $count; $i++) {
             if (is_string($Array[$i])) {
@@ -1283,6 +1404,7 @@ class TEXT {
                 $Array[$i] = '';
             }
         }
+        return $Array;
     }
 
     function get_size_attributes($Attrib) {
@@ -1291,10 +1413,8 @@ class TEXT {
         }
         if (preg_match('/([0-9]{2,4})\,([0-9]{2,4})/', $Attrib, $matches)) {
             if (count($matches) < 3) {
-                if (!$matches[1])
-                    $matches[1] = 640;
-                if (!$matches[2])
-                    $matches[2] = 385;
+                if (!$matches[1]) $matches[1] = 640;
+                if (!$matches[2]) $matches[2] = 385;
             }
             return ' width="' . $matches[1] . '" height="' . $matches[2] . '" ';
         }
@@ -1315,6 +1435,22 @@ class TEXT {
                 continue;
             }
             switch ($Block['Type']) {
+                case 'article': // link to article 
+                 
+    //if (preg_match('/^#[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+$|^\/[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+\.php[a-zA-Z0-9\?\-\_.,%\@~&=:;()+*\^$!#|]*$/', $Block['Attr'])) {
+                   
+                    if (!empty($Block['Attr']) && preg_match('/^[a-z0-9\-\_.()\@&]+$/', strtolower($Block['Attr'])))
+                        $Str.='<a class="bbcode article" href="articles.php?topic=' .strtolower($Block['Attr']). '">' . $this->to_html($Block['Val']) . '</a>';
+                        //$Str.='<span class="bbcode tooltip" title="' .display_str($Block['Attr']) . '">' . $this->to_html($Block['Val']) . '</span>';
+                    else
+                        $Str.='[article='. $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/article]';
+                    break;
+                case 'tip': // a tooltip
+                    if (!empty($Block['Attr']))
+                        $Str.='<span class="bbcode tooltip" title="' .display_str($Block['Attr']) . '">' . $this->to_html($Block['Val']) . '</span>';
+                    else
+                        $Str.='[tip='. $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/tip]';
+                    break;
                 case 'quote':
                     $this->NoImg++; // No images inside quote tags
                     if (!empty($Block['Attr'])) {
@@ -1346,7 +1482,8 @@ class TEXT {
                     $this->NoImg--;
                     break;
                 case 'error': // used internally to display bbcode errors in preview
-                    $Str.="<blink><code class=\"error\" title=\"You have an unclosed $Block[Val] tag in your bbCode!\">$Block[Val]</code></blink>";
+                    // haha, a legitimate use of the blink tag (!)
+                    $Str.="<a id=\"err$Block[Attr]\"></a><blink><code class=\"error\" title=\"You have an unclosed $Block[Val] tag in your bbCode!\">$Block[Val]</code></blink>";
                     break;
                 case 'you':
                     if ($this->Advanced)
@@ -1365,20 +1502,20 @@ class TEXT {
                     break;
                 case 'h5v':
                     // html5 video tag
-                    // note: as a non attribute the link has been auto-formatted as [inlinelink]link.url 
                     $Attributes= $this->extract_attributes($Block['Attr'], 920);
                     
-                    if ( ($Block['Attr'] != '' && count($Attributes)==0) || strpos($Block['Val'], '[inlineurl]') === FALSE ) {
-                        //$Str.= print_r($Attributes,true).'[br]';
+                    if ( ($Block['Attr'] != '' && count($Attributes)==0) || $Block['Val'] == '' ) {
                         $Str.='[h5v' . ($Block['Attr'] != ''?'='. $Block['Attr']:'')  . ']' . $this->to_html($Block['Val']) . '[/h5v]';
-                    } else {
-                        $dimensions = '';
+                    } else  {
+                        $parameters = '';
                         if (isset($Attributes['number']) && count($Attributes['number']) >= 2) {
-                            $dimensions = ' width="'.$Attributes['number'][0].'" height="'.$Attributes['number'][1].'" ';
+                            $parameters = ' width="'.$Attributes['number'][0].'" height="'.$Attributes['number'][1].'" ';
                         }
-
+                        if (isset($Attributes['url']) && count($Attributes['url']) >= 1) {
+                            $parameters .= ' poster="'.$Attributes['url'][0].'" ';
+                        }
                         $Sources = explode(',', $Block['Val']);
-                        $Str .= '<video '.$dimensions.' controls>';     // src="'.str_replace('[inlineurl]', '', $Block['Val']).'">';
+                        $Str .= '<video '.$parameters.' controls>';     // src="'.str_replace('[inlineurl]', '', $Block['Val']).'">';
                         foreach( $Sources as $Source) {
                             $lastdot = strripos($Source, '.');
                             $mime = substr($Source, $lastdot+1);
@@ -1432,10 +1569,8 @@ class TEXT {
                             }
                             $Str.='<a href="' . $LocalURL . '">' . $Block['Val'] . '</a>';
                         } else {
-                            if (!$LoggedUser['NotForceLinks'])
-                                $target = 'target="_blank"';
-                            if (!preg_match(INTERNAL_URLS_REGEX, $Block['Attr']))
-                                $anonto = 'http://anonym.to/?';
+                            if (!$LoggedUser['NotForceLinks']) $target = 'target="_blank"';
+                            if (!preg_match(INTERNAL_URLS_REGEX, $Block['Attr'])) $anonto = 'http://anonym.to/?';
                             $Str.='<a rel="noreferrer" ' . $target . ' href="' . $anonto . $Block['Attr'] . '">' . $Block['Val'] . '</a>';
                         }
                     }
@@ -1460,28 +1595,24 @@ class TEXT {
                     break;
 
                 case 'table':
-                    //$InlineStyle = $this->Advanced ? $this->get_css_attributes($Block['Attr']) : FALSE; 
                     $InlineStyle = $this->get_css_attributes($Block['Attr']);
                     if ($InlineStyle === FALSE) {
                         $Str.='[' . $Block['Type'] . '=' . $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/' . $Block['Type'] . ']';
                     } else {
-                        $this->remove_text_between_tags($Block['Val'], "/^tr$/");
-                        $tableclass = "bbcode";
-                        if ($Block['Attr'] != '' && stripos($Block['Attr'], 'nball') !== FALSE)
-                            $tableclass .= ' noborder';
-                        $Str.='<table class="' . $tableclass . '"' . $InlineStyle . '><tbody>' . $this->to_html($Block['Val']) . '</tbody></table>';
+                        $Block['Val'] = $this->remove_text_between_tags($Block['Val'], "/^tr$/");
+                        $tableclass = $this->get_css_classes($Block['Attr'], array(array('nball','noborder'),'nopad','vat','vam','vab'));
+                        $Str.='<table class="bbcode' . $tableclass . '"' . $InlineStyle . '><tbody>' . $this->to_html($Block['Val']) . '</tbody></table>';
                     }
                     break;
                 case 'tr':
-
-                    //$InlineStyle = $this->Advanced ? $this->get_css_attributes($Block['Attr'], false, true, false, true) : FALSE;
                     $InlineStyle = $this->get_css_attributes($Block['Attr'], false, true, false, true);
 
                     if ($InlineStyle === FALSE) {
                         $Str.='[' . $Block['Type'] . '=' . $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/' . $Block['Type'] . ']';
                     } else {
-                        $this->remove_text_between_tags($Block['Val'], "/^th$|^td$/");
-                        $Str.='<' . $Block['Type'] . ' class="bbcode"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</' . $Block['Type'] . '>';
+                        $Block['Val'] = $this->remove_text_between_tags($Block['Val'], "/^th$|^td$/");
+                        $tableclass = $this->get_css_classes($Block['Attr'], array( 'nopad'));
+                        $Str.='<' . $Block['Type'] . ' class="bbcode'.$tableclass.'"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</' . $Block['Type'] . '>';
                     }
                     break;
                 case 'th':
@@ -1489,15 +1620,20 @@ class TEXT {
                     $InlineStyle = $this->get_css_attributes($Block['Attr'], false);
                     if ($InlineStyle === FALSE) {
                         $Str.='[' . $Block['Type'] . '=' . $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/' . $Block['Type'] . ']';
-                    } else
-                        $Str.='<' . $Block['Type'] . ' class="bbcode"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</' . $Block['Type'] . '>';
+                    } else {
+                        $tableclass = $this->get_css_classes($Block['Attr'], array( 'nopad','vat','vam','vab'));
+                        $Str.='<'. $Block['Type'] .' class="bbcode'.$tableclass.'"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</' . $Block['Type'] . '>';
+                    }
                     break;
+                    
                 case 'bg':
                     $InlineStyle = $this->get_css_attributes($Block['Attr'], true, true, true, false);
                     if (!$InlineStyle || $InlineStyle == '') {
                         $Str.='[bg=' . $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/bg]';
-                    } else
-                        $Str.='<div class="bbcode"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</div>';
+                    } else {
+                        $tableclass = $this->get_css_classes($Block['Attr'], array( 'nopad'));
+                        $Str.='<div class="bbcode'.$tableclass.'"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</div>';
+                    }
                     break;
 
                 case 'cast':
@@ -1599,6 +1735,13 @@ class TEXT {
                         $Str.='<span style="color:' . $Block['Attr'] . '">' . $this->to_html($Block['Val']) . '</span>';
                     }
                     break;
+                case 'rank':
+                    if (!$this->is_color_attrib($Block['Attr'])) {
+                        $Str.='[rank=' . $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/rank]';
+                    } else {
+                        $Str.='<span style="font-weight:bold;color:' . $Block['Attr'] . ';">' . $this->to_html($Block['Val']) . '</span>';
+                    }
+                    break;
                 case 'inlinesize':
                 case 'size':
                     $ValidAttribs = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
@@ -1618,16 +1761,24 @@ class TEXT {
                     break;
 
                 case 'img':
+                case 'imgnm':
+                case 'imgalt':
                 case 'banner':
-                    if ($this->NoImg > 0 && $this->valid_url($Block['Val'])) {
+                    $Block['Val'] = str_replace('[inlineurl]', '', $Block['Val']);
+                    if (!$this->valid_url($Block['Val'])) {
+                        $Str.="[$Block[Type]". ( $Block['Attr'] ? '='.$Block['Attr'] : '' ). "]$Block[Val][/$Block[Type]]";
+                        break;
+                    }
+                    if ($this->NoImg > 0) {
                         $Str.='<a rel="noreferrer" target="_blank" href="' . $Block['Val'] . '">' . $Block['Val'] . '</a> (image)';
                         break;
                     }
-                    if (!$this->valid_url($Block['Val'])) {
-                        $Str.="[$Block[Type]]" . $Block['Val'] . "[/$Block[Type]]";
-                    } else {
-                        $Str.='<img class="scale_image" onclick="lightbox.init(this,500);" alt="' . $Block['Val'] . '" src="' . $Block['Val'] . '" />';
-                    }
+                    $cssclass = "";
+                    if ($Block['Type'] == 'imgnm' ) $cssclass .= ' nopad';
+                    if ($Block['Attr'] != '' && ($Block['Type'] == 'imgnm' || $Block['Type'] == 'imgalt') ) $alttext = $Block['Attr'];
+                    else $alttext = $Block['Val'];
+                    $Str.='<img class="scale_image'.$cssclass.'" onclick="lightbox.init(this,500);" alt="'.$alttext.'" src="'.$Block['Val'].'" />';
+                    
                     break;
                 case 'thumb':
                     if ($this->NoImg > 0 && $this->valid_url($Block['Val'])) {
@@ -1770,16 +1921,28 @@ class TEXT {
                 case 'mcom':
                 case 'anchor':
                 case '#':
+                case 'rank':
+                case 'tip':
+                case 'bg':
+                case 'table':
+                case 'td':
                     $Str.=$this->raw_text($Block['Val']);
+                    break;
+                case 'tr':
+                    $Str.=$this->raw_text($Block['Val'])."\n";
+                    break;
+                case 'br':
+                    $Str.= "\n";
                     break;
                 case 'tex': //since this will never strip cleanly, just remove it
                     break;
-                case 'artist':
                 case 'user':
                 case 'pre':
                 case 'code':
                 case 'audio':
                 case 'img':
+                case 'imgalt':
+                case 'imgnm':
                     $Str.=$Block['Val'];
                     break;
                 case 'list':
@@ -1812,6 +1975,8 @@ class TEXT {
                         $Str.=$Block['Attr'];
                     }
 
+                    break;
+                default:
                     break;
             }
         }

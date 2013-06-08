@@ -19,6 +19,8 @@ switch($_REQUEST['action']) {
 		if(is_number($_POST['articleid'])){
                 authorize();
                 $TopicID = strtolower($_POST['topicid']);
+                if(!$TopicID) error("You must enter a topicid for this article");
+                if (!preg_match('/^[a-z0-9\-\_.()\@&]+$/', $TopicID)) error("Invalid characters in topicID ($TopicID); allowed: a-z 0-9 -_.()@&");
                 $DB->query("SELECT Count(*) as c FROM articles WHERE TopicID='".db_string($TopicID)."' AND ID<>'".db_string($_POST['articleid'])."'");
                 list($Count) = $DB->next_record();
                 if ($Count > 0) {

@@ -1588,6 +1588,46 @@ function check_tag_input($str){
     return preg_match('/[^a-z0-9.-]/', $str)==0;
 }
 
+
+function get_tag_synonym($Tag, $Sanitise = true){
+        global $Cache, $DB;
+
+        if ($Sanitise) $Tag = sanitize_tag($Tag);
+
+        // Lanz: yeah the caching was a bit too much here imo.
+        $DB->query("SELECT t.Name 
+                    FROM tag_synomyns AS ts JOIN tags as t ON t.ID = ts.TagID 
+                    WHERE Synomyn LIKE '".db_string($Tag)."'");
+        if ($DB->record_count() > 0) { // should only ever be one but...
+            list($TagName) = $DB->next_record();       
+            return $TagName;
+        } else {
+            return $Tag; 
+        }
+}
+
+
+/**
+ * Return whether $Tag is a valid tag - more than 2** char long and not a stupid word
+ * (** unless is 'hd','dp','bj','ts','sd','69','mf','3d','hj','bi')
+ * 
+ * @param string $Tag The prospective tag to be evaluated
+ * @return Boolean representing whether the tag is valid format (not banned)
+ */
+function is_valid_tag($Tag){
+    static $Good2charTags;
+    $len = strlen($Tag);
+    if ( $len < 2 || $len > 32) return false;
+    if ( $len == 2 ) {  
+        if(!$Good2charTags) $Good2charTags = array('hd','dp','bj','ts','sd','69','mf','3d','hj','bi','tv','dv','da');
+        if ( !in_array($Tag, $Good2charTags) ) return false;
+    }
+    return true;
+}
+
+
+
+
 // Generate a random string
 function make_secret($Length = 32) {
     $Secret = '';

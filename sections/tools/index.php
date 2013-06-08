@@ -448,13 +448,17 @@ switch ($_REQUEST['action']) {
         if (!check_perms('admin_manage_articles')) {
             error(403);
         }
-        $DB->query("SELECT Count(*) as c FROM articles WHERE TopicID='" . db_string($_POST['topicid']) . "'");
+        $TopicID = strtolower($_POST['topicid']);
+        if(!$TopicID) error("You must enter a topicid for this article");
+        if (!preg_match('/^[a-z0-9\-\_.()\@&]+$/', $TopicID)) error("Invalid characters in topicID ($TopicID); allowed: a-z 0-9 -_.()@&");
+        
+        $DB->query("SELECT Count(*) as c FROM articles WHERE TopicID='" . db_string($TopicID) . "'");
         list($Count) = $DB->next_record();
         if ($Count > 0) {
             error('The topic ID must be unique for the article');
         }
         $DB->query("INSERT INTO articles (Category, SubCat, TopicID, Title, Description, Body, Time, MinClass) 
-                    VALUES ('" . (int) $_POST['category'] . "', '" . (int) $_POST['subcat'] . "', '" . db_string($_POST['topicid']) . "', '" . db_string($_POST['title']) . "', '" . db_string($_POST['description']) . "', '" . db_string($_POST['body']) . "', '" . sqltime() . "','" . db_string($_POST['level']) . "')");
+                    VALUES ('" . (int) $_POST['category'] . "', '" . (int) $_POST['subcat'] . "', '" . db_string($TopicID) . "', '" . db_string($_POST['title']) . "', '" . db_string($_POST['description']) . "', '" . db_string($_POST['body']) . "', '" . sqltime() . "','" . db_string($_POST['level']) . "')");
         $NewID = $DB->inserted_id();
         $Cache->delete_value("articles_$_POST[category]");
         $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);

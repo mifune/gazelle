@@ -1825,7 +1825,7 @@ table.forum_post {
     margin: 0px 0px 20px;
 }
 
-table.forum_post td {
+table.forum_post td, td.bbcode {
     border: 1px solid #dcdde4;
 }
 
@@ -2175,7 +2175,7 @@ span.quote_label:before {
 code.error {
     display:inline-block;
     color: #c00;
-    font-size: larger;
+    font-size: 2em;
     font-weight: bolder;
     padding:1px 0px;
 }
@@ -2915,3 +2915,63 @@ table.noborder td, .torrent td, .torrent_table td {
     color:#FF0066;
 }
 
+.nopad {
+    margin:0px;
+    padding:0px;
+}
+.nopad .scale_image {
+    margin:0px;
+    padding:0px;
+}
+.nopad td {
+    margin:0px;
+    padding:0px;
+}
+
+
+table.vat td {
+    vertical-align: top;
+}
+table.vam td  {
+    vertical-align: middle;
+}
+table.vab td  {
+    vertical-align: bottom;
+}
+
+td.bbcode.vat {
+    vertical-align: top;
+}
+td.bbcode.vam  {
+    vertical-align: middle;
+}
+td.bbcode.vab  {
+    vertical-align: bottom;
+}
+
+
+blockquote.bbcode.error {
+    border: 2px solid #c00;
+    padding: 5px 10px;
+}
+blockquote.bbcode.error code.error {
+    font-size: 1.2em;
+}
+/*
+code.error {
+    display:inline-block;
+    color: #c00;
+    font-size: 2em;
+    font-weight: bolder;
+    padding:5px 10px;
+    margin:0px;
+}
+div.error {
+    display:inline-block;
+    background-color: rgba(230,230,230,0.2);
+    border: 13px solid rgba(230,0,0,0.4);
+    border-radius:5px;
+    padding:0px;
+    margin:-16px -15px;
+}
+  */

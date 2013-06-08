@@ -12,7 +12,7 @@ show_header('Sandbox', 'bbcode');
 ?>
 <div class="thin">
     <h2>Sandbox</h2>
-    
+        
 	<div class="head"></div>
 	<form action="" method="post" id="messageform">
             <div class="box pad">
