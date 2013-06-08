@@ -95,7 +95,7 @@ show_header('Tags');
         $Pages=get_pages($Page,$NumAllTags,RESULTS_PER_PAGE,9);
 
 ?>
-        <div class="head">Tag & Synonym Search</div>
+        <div class="head">Tag Search</div>
         <table class="box pad ">
             <form method="get" action="tags.php">
                 <tr class="">
