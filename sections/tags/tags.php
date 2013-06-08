@@ -38,6 +38,7 @@ $Searchtext_esc = db_string($Searchtext);
 if($Searchtext) { 
     $WHERE = array();
     $title = "search results";
+    $_GET['search_type']='tags';
     if($_GET['search_type']=='both' || $_GET['search_type']=='tags') $WHERE[] = "t.Name LIKE '%$Searchtext_esc%'";
     if($_GET['search_type']=='both' || $_GET['search_type']=='syns') $WHERE[] = "x.SynText LIKE '%$Searchtext_esc%'";
     if(count($WHERE)>0) $WHERE = "WHERE ".  implode(' OR ', $WHERE);
@@ -55,6 +56,7 @@ show_header('Tags');
 <?
         list($Page,$Limit) = page_limit(RESULTS_PER_PAGE);
     
+        /*
         $DB->query("SELECT SQL_CALC_FOUND_ROWS
                            t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
                            x.Synonyms as Synonyms, x.SynText,
@@ -68,8 +70,20 @@ show_header('Tags');
                     $WHERE 
                   GROUP BY t.ID
                   ORDER BY $OrderBy $OrderWay
-                     LIMIT $Limit");
+                     LIMIT $Limit"); */
    
+        $DB->query("SELECT SQL_CALC_FOUND_ROWS
+                           t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
+                            SUM(tt.PositiveVotes-1) AS PosVotes,
+                            SUM(tt.NegativeVotes-1) AS NegVotes,
+                            SUM(tt.PositiveVotes-1)-SUM(tt.NegativeVotes-1) As Votes
+                      FROM tags AS t
+                      JOIN torrents_tags AS tt ON tt.TagID=t.ID
+                    $WHERE 
+                  GROUP BY t.ID
+                  ORDER BY $OrderBy $OrderWay
+                     LIMIT $Limit");
+        
         $Tags = $DB->to_array(false, MYSQLI_NUM) ;
                 
             
@@ -89,12 +103,13 @@ show_header('Tags');
                     <td width="60%">
                         <input name="searchtags" type="text" class="long" value="<?=htmlentities($Searchtext)?>" />
                     </td>
+                    <!--
                     <td class="nobr">
                         <input name="search_type" value="tags" type="radio" <?if($_GET['search_type']=='tags')echo 'checked="checked"'?> />Tags &nbsp;&nbsp;
                         <input name="search_type" value="syns" type="radio" <?if($_GET['search_type']=='syns')echo 'checked="checked"'?> />Synonyms &nbsp;&nbsp;
                         <input name="search_type" value="both" type="radio" <?if(!isset($_GET['search_type']) || $_GET['search_type']=='both')echo 'checked="checked"'?> />Both &nbsp;&nbsp;
                         
-                    </td>
+                    </td>-->
                     <td width="10%">
                         <input type="submit" value="Search" />
                     </td>
@@ -115,7 +130,7 @@ show_header('Tags');
                     <td><a href="<?=header_link('Tag') ?>">Tag</a> <a class="tagtype" href="<?=header_link('TagType') ?>">(*official)</a></td>
                     <td class="center"><a href="<?=header_link('Uses') ?>">Uses</a></td> 
                     <td class="center" colspan="2"><a href="<?=header_link('Votes') ?>">Votes</a></td> 
-                    <td class="center"><a href="<?=header_link('Synonyms') ?>">Synonyms</a></td> 
+                    <td class="center"><a href="<?=header_link('Synonyms') ?>"></a></td> 
                 </tr>
 <? 
             //foreach($Tags as $TagItem) {
@@ -124,14 +139,15 @@ show_header('Tags');
             
             for ($i = 0; $i < $NumTags ; $i++) {
                  
-                list($Tag, $Uses, $TagType, $NumSyns, $Synonyms, $PosVotes, $NegVotes) = $Tags[$i]; 
+                //list($Tag, $Uses, $TagType, $NumSyns, $Synonyms, $PosVotes, $NegVotes) = $Tags[$i]; 
+                list($Tag, $Uses, $TagType, $PosVotes, $NegVotes) = $Tags[$i]; 
                 
                 if($Searchtext){
-                    $TagShow = highlight_text_css($Searchtext, $Tag);    // str_replace($Searchtext, '<span class="red">'.$Searchtext.'</span>', $Tag);
-                    $SynonymsShow = highlight_text_css($Searchtext, $Synonyms);    // str_replace($Searchtext, '<span class="red">'.$Searchtext.'</span>', $Synonyms);
+                    $TagShow = highlight_text_css($Searchtext, $Tag);    
+                    //$SynonymsShow = highlight_text_css($Searchtext, $Synonyms);     
                 } else {
                     $TagShow = $Tag;
-                    $SynonymsShow = $Synonyms;
+                    //$SynonymsShow = $Synonyms;
                 }
                 $row = $row == 'b'?'a':'b';
 ?> 
@@ -166,7 +182,7 @@ show_header('Tags');
                     <td><a href="<?=header_link('Tag') ?>">Tag</a> <a class="tagtype" href="<?=header_link('TagType') ?>">(*official)</a></td>
                     <td class="center"><a href="<?=header_link('Uses') ?>">Uses</a></td> 
                     <td class="center"  colspan="2"><a href="<?=header_link('Votes') ?>">Votes</a></td> 
-                    <td class="center"><a href="<?=header_link('Synonyms') ?>">Synonyms</a></td> 
+                    <td class="center"><a href="<?=header_link('Synonyms') ?>"></a></td> 
                 </tr>
 <?
                     }   ?> 
