@@ -262,10 +262,14 @@ if(count($Reports) == 0) {
 								<!--<div style="text-align: right;">was reported by <a href="user.php?id=<?=$ReporterID?>"><?=$ReporterName?></a> <?=time_diff($ReportedTime)?> for the reason: <strong><?=$ReportType['title']?></strong></div>-->
 			<?	if(!$GroupID) { ?>
 								<a href="log.php?search=Torrent+<?=$TorrentID?>"><?=$TorrentID?></a> (Deleted)
-			<?  } else {?>
-								<?=$LinkName?>
+			<?  } else {
+                                $PeerInfo = get_peers($TorrentID);
+                                //$Torrent[5]=$PeerInfo['Snatched'];
+								echo $LinkName; ?>
 								<a href="torrents.php?action=download&amp;id=<?=$TorrentID?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" title="Download">[DL]</a>
 								uploaded by <a href="user.php?id=<?=$UploaderID?>"><?=$UploaderName?></a> <?=time_diff($Time)?>
+                                &nbsp;[ <span title="Seeders"><?=$PeerInfo['Seeders']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="seeders" title="seeders" /></span> | <span title="Leechers"><?=$PeerInfo['Leechers']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="leechers" title="leechers" /></span> ]
+                                &nbsp;[<a href="torrents.php?action=dupe_check&amp;id=<?=$GroupID ?>" target="_blank" title="Check for exact matches in filesize">Dupe check</a>]
 								<br />
 			<?	if($Status != 'Resolved') {
 				
@@ -393,6 +397,7 @@ if(count($Reports) == 0) {
 									<?=$ExtraLinkName?>
 									<a href="torrents.php?action=download&amp;id=<?=$ExtraID?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" title="Download">[DL]</a>
                                     uploaded by <a href="user.php?id=<?=$ExtraUploaderID?>"><?=$ExtraUploaderName?></a>  <?=time_diff($ExtraTime)?> [<a title="Close this report and create a new dupe report with this torrent as the reported one" href="#" onclick="Switch(<?=$ReportID?>, <?=$ReporterID?>, '<?=urlencode($UserComment)?>', <?=$TorrentID?>, <?=$ExtraID?>); return false;">Switch</a>]
+                                    [<a href="torrents.php?action=dupe_check&amp;id=<?=$ExtraID ?>" target="_blank" title="Check for exact matches in filesize">Dupe check</a>]
 				<?
 							$First = false;
 						}

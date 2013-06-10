@@ -13,6 +13,10 @@
 
 authorize();
 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+
+
 if(!is_number($_POST['torrentid'])) {
 	error(0);
 } else {
@@ -34,7 +38,7 @@ if(!isset($_POST['type'])) {
 foreach($ReportType['report_fields'] as $Field => $Value) {
 	if($Value == '1') {
 		if(empty($_POST[$Field])) {
-			$Err = "You are missing a required field (".$Field.") for a ".$ReportType['title']." report.";
+			error("You are missing a required field (".$Field.") for a ".$ReportType['title']." report.");
 		}
 	}
 }
@@ -42,12 +46,13 @@ foreach($ReportType['report_fields'] as $Field => $Value) {
 if(!empty($_POST['sitelink'])) {
 	if(preg_match_all('/((https?:\/\/)?([a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.)?'.NONSSL_SITE_URL.'\/torrents.php\?(id=[0-9]+\&)?id=([0-9]+))/is', $_POST['sitelink'], $Matches)) {
 		
-        $ExtraIDs = implode(' ', $Matches[6]);
+        $ExtraIDs = $Matches[6];
+        //$ExtraIDs = implode(' ', $Matches[6]);
 		if(in_array($TorrentID, $Matches[6])) {
-			$Err = "The extra permalinks you gave included the link to the torrent you're reporting!";
+			error("The extra torrent links you gave included the link to the torrent you're reporting!");
 		}
 	} else {
-		$Err = "Permalink was incorrect, should look like http://".NONSSL_SITE_URL."/torrents.php?id=12345";
+		error("Extra Torrent link was incorrect, should look like http://".NONSSL_SITE_URL."/torrents.php?id=12345");
 	}
 } else {
 	$ExtraIDs = "";
@@ -59,7 +64,7 @@ if(!empty($_POST['link'])) {
 	if(preg_match_all('/(https?:\/\/)?[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*(:[0-9]{2,5})?(\/(\S)+)?/is', $_POST['link'], $Matches)) {
 		$Links = implode(' ', $Matches[0]);
 	} else {
-		$Err = "The extra links you provided weren't links...";
+		error("The extra links you provided weren't links...");
 	}
 } else {
 	$Links = "";
@@ -69,7 +74,7 @@ if(!empty($_POST['image'])) {
 	if(preg_match("/^(".IMAGE_REGEX.")( ".IMAGE_REGEX.")*$/is", trim($_POST['image']), $Matches)) {
 		$Images = $Matches[0];
 	} else {
-		$Err = "The extra image links you provided weren't links to images...";
+		error("The extra image links you provided weren't links to images...");
 	}
 } else {
 	$Images = "";
@@ -79,7 +84,7 @@ if(!empty($_POST['track'])) {
 	if(preg_match('/([0-9]+( [0-9]+)*)|All/is', $_POST['track'], $Matches)) {
 		$Tracks = $Matches[0];
 	} else {
-		$Err = "Tracks should be given in a space seperated list of numbers (No other characters)";
+		error("Tracks should be given in a space seperated list of numbers (No other characters)");
 	}
 } else {
 	$Tracks = "";
@@ -88,13 +93,31 @@ if(!empty($_POST['track'])) {
 if(!empty($_POST['extra'])) {
 	$Extra = db_string($_POST['extra']);
 } else {
-	$Err = "As useful as blank reports are, could you be a tiny bit more helpful? (Leave a comment)";
+	error("As useful as blank reports are, could you be a tiny bit more helpful? (Leave a comment)");
 }
 
 $DB->query("SELECT ID FROM torrents WHERE ID=".$TorrentID);
 if($DB->record_count() < 1) {
-	$Err = "A torrent with that ID doesn't exist!";
+	error("A torrent with that ID doesn't exist!");
 }
+
+if($Type=='dupe') {
+    if(!$ExtraIDs) error("You must include a link to a duped torrent!");
+    foreach($ExtraIDs as $DupeID) {
+        if(!is_number($DupeID)) error("Cannot parse your links for duped torrents!"); // should be weeded out by regex above but keep here in case of changes etc
+        $DB->query("SELECT Time FROM torrents WHERE ID=".$DupeID);
+        if($DB->record_count() < 1) error("The duped torrent with ID=$DupeID doesn't exist!"); 
+        list($TimeStamp) = $DB->next_record();
+        if (time_ago($TimeStamp) > 24*3600*EXCLUDE_DUPES_AFTER_DAYS) {
+            $PeerInfo = get_peers($DupeID);
+            if($PeerInfo['Seeders']< EXCLUDE_DUPES_SEEDS) {
+                error($Text->full_format("Because the duped torrent [torrent]{$DupeID}[/torrent] has less than ".EXCLUDE_DUPES_SEEDS." seeders and is over "
+                . time_diff(time()+ (EXCLUDE_DUPES_AFTER_DAYS*24*3600),1,false,false,0)." old it is okay to dupe it![br]Thanks for the thought though :smile1:"));
+            }
+        }
+    }
+}
+if($ExtraIDs) $ExtraIDs = implode(' ', $ExtraIDs);
 
 if(!empty($Err)) {
 	error($Err);

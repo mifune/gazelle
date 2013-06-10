@@ -2625,3 +2625,62 @@ blockquote.bbcode.error {
 blockquote.bbcode.error code.error {
     font-size: 1.2em;
 }
+
+
+.tag_header {
+    padding: 7px 5px 0px 5px;
+    text-align: center;
+}
+  
+.button_sort {
+    display: inline-block;
+    border: 1px solid #7BA3C1;
+    border-radius: 3px;
+    background-color: #eff3f6;
+    text-align: center;
+    font-style: normal;
+    width: 40px;
+    margin:auto;
+    cursor:pointer;
+}
+
+.button_sort.sort_select {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+}
+.button_sort.sort_select a {
+    color: white;
+}
+
+.button_sort a, .button_sort a:visited {
+    color: #0261A3;
+}
+.button_sort:hover {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+    
+}
+.button_sort:hover a {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+    
+}
+
+.button_sort a:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.tag_header div {
+    margin-bottom:4px;
+}
+
+.tag_header div:before {
+    font-size: 0.8em;
+    content: "sort by";
+    margin-right: 3px;
+} 
+

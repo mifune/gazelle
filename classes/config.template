@@ -157,6 +157,8 @@ define('CLIENT_GRAPH_OTHER_PERCENT', 0.5);
 $ExcludeBytesDupeCheck = array ( 734015488=>'a standard cd size', 1065353216=>'a standard vob size',  1073739776 => 'a standard vob size' );
 
 define('MAX_FILE_SIZE_BYTES', 2097152); // the max filesize (enforced in client side and server side using this value)
+define('EXCLUDE_DUPES_AFTER_DAYS', 183); // files older than this might be dupeable
+define('EXCLUDE_DUPES_SEEDS', 5); // if a file has this+ seeds it cannot be duped
 //
 //Captcha fonts should be located in /classes/fonts
 $CaptchaFonts=array('ARIBLK.TTF','IMPACT.TTF','TREBUC.TTF','TREBUCBD.TTF','TREBUCBI.TTF','TREBUCIT.TTF','VERDANA.TTF','VERDANAB.TTF','VERDANAI.TTF','VERDANAZ.TTF');
