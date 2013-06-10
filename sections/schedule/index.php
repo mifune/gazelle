@@ -318,7 +318,7 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
             
             $DB->query("INSERT INTO site_stats_history ( TimeAdded, Users, Torrents, Seeders, Leechers )
                                  VALUES ('".sqltime()."','$UserCount','$TorrentCount','$SeederCount','$LeecherCount')");
-            $DB->delete_value('site_stats');
+            $Cache->delete_value('site_stats');
       }
 
 	$DB->query("SELECT COUNT(ID) FROM users_main WHERE Enabled='1' AND LastAccess>'".time_minus(3600*24)."'");
