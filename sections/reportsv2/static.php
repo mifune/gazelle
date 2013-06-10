@@ -145,7 +145,8 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
 			t.Time,
 			t.Size,
 			t.UserID AS UploaderID,
-			uploader.Username
+			uploader.Username,
+            t.FileCount
 			FROM reportsv2 AS r
 			LEFT JOIN torrents AS t ON t.ID=r.TorrentID
 			LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID
@@ -201,7 +202,7 @@ if(count($Reports) == 0) {
 		
 		list($ReportID, $ReporterID, $ReporterName, $TorrentID, $Type, $UserComment, $ResolverID, $ResolverName, $Status, $ReportedTime, $LastChangeTime, 
 			$ModComment, $Tracks, $Images, $ExtraIDs, $Links, $LogMessage, $GroupName, $GroupID, $Time, 
-			$Size, $UploaderID, $UploaderName) = display_array($Report, array("ModComment"));
+			$Size, $UploaderID, $UploaderName, $Filecount) = display_array($Report, array("ModComment"));
 		
 		if(!$GroupID && $Status != "Resolved") {
 			//Torrent already deleted
@@ -268,7 +269,7 @@ if(count($Reports) == 0) {
 								echo $LinkName; ?>
 								<a href="torrents.php?action=download&amp;id=<?=$TorrentID?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" title="Download">[DL]</a>
 								uploaded by <a href="user.php?id=<?=$UploaderID?>"><?=$UploaderName?></a> <?=time_diff($Time)?>
-                                &nbsp;[ <span title="Seeders"><?=$PeerInfo['Seeders']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="seeders" title="seeders" /></span> | <span title="Leechers"><?=$PeerInfo['Leechers']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="leechers" title="leechers" /></span> ]
+                                &nbsp;(<?=str_plural('file',$Filecount)?>)&nbsp;[ <span title="Seeders"><?=$PeerInfo['Seeders']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="seeders" title="seeders" /></span> | <span title="Leechers"><?=$PeerInfo['Leechers']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="leechers" title="leechers" /></span> ]
                                 &nbsp;[<a href="torrents.php?action=dupe_check&amp;id=<?=$GroupID ?>" target="_blank" title="Check for exact matches in filesize">Dupe check</a>]
 								<br />
 			<?	if($Status != 'Resolved') {
@@ -380,7 +381,8 @@ if(count($Reports) == 0) {
 									t.Time,
 									t.Size,
 									t.UserID AS UploaderID,
-									uploader.Username
+									uploader.Username,
+                                    t.FileCount
 									FROM torrents AS t
 									LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID
 									LEFT JOIN users_main AS uploader ON uploader.ID=t.UserID
@@ -388,7 +390,7 @@ if(count($Reports) == 0) {
 									GROUP BY tg.ID");
 						
 						list($ExtraGroupName, $ExtraGroupID, $ExtraTime, 
-							$ExtraSize, $ExtraUploaderID, $ExtraUploaderName) = display_array($DB->next_record());
+							$ExtraSize, $ExtraUploaderID, $ExtraUploaderName, $ExtraFilecount) = display_array($DB->next_record());
 						
 						if($ExtraGroupName) {
                             $ExtraLinkName = "<a href='torrents.php?id=$ExtraGroupID'>$ExtraGroupName</a> (". get_size($ExtraSize).")"; // number_format($ExtraSize/(1024*1024), 2)." MB)";
@@ -398,7 +400,7 @@ if(count($Reports) == 0) {
                             echo $ExtraLinkName;            ?>
 							<a href="torrents.php?action=download&amp;id=<?=$ExtraID?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" title="Download">[DL]</a>
                             uploaded by <a href="user.php?id=<?=$ExtraUploaderID?>"><?=$ExtraUploaderName?></a>  <?=time_diff($ExtraTime)?> [<a title="Close this report and create a new dupe report with this torrent as the reported one" href="#" onclick="Switch(<?=$ReportID?>, <?=$ReporterID?>, '<?=urlencode($UserComment)?>', <?=$TorrentID?>, <?=$ExtraID?>); return false;">Switch</a>]
-                            &nbsp;[ <span title="Seeders"><?=$PeerInfo['Seeders']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="seeders" title="seeders" /></span> | <span title="Leechers"><?=$PeerInfo['Leechers']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="leechers" title="leechers" /></span> ]
+                            &nbsp;(<?=str_plural('file',$ExtraFilecount)?>)&nbsp;[ <span title="Seeders"><?=$PeerInfo['Seeders']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="seeders" title="seeders" /></span> | <span title="Leechers"><?=$PeerInfo['Leechers']?> <img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="leechers" title="leechers" /></span> ]
                             &nbsp;[<a href="torrents.php?action=dupe_check&amp;id=<?=$ExtraID ?>" target="_blank" title="Check for exact matches in filesize">Dupe check</a>]
 				<?
 							$First = false;
