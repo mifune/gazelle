@@ -1,13 +1,13 @@
 <?
 
-show_header('Tag Synonyms');
+show_header('Synonyms');
 ?>
 <div class="thin">
-    <h2>Tag Synonyms</h2>
+    <h2>Synonyms</h2>
 
 	<div class="linkbox">
-		<a href="tags.php">[Tags Listings & Search]</a>
-		<a style="font-weight: bold" href="tags.php?action=synonyms">[Synonyms Lists]</a>
+		<a href="tags.php">[Tags & Search]</a>
+		<a style="font-weight: bold" href="tags.php?action=synonyms">[Synonyms]</a>
 	</div>
     
     <div class="tagtable">

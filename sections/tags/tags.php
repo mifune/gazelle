@@ -37,11 +37,11 @@ if( empty($_GET['search_type']) || !in_array($_GET['search_type'], array('tags',
 show_header('Tags');
 ?>
 <div class="thin">
-    <h2>Tag Listings</h2>
+    <h2>Tags</h2>
 
 	<div class="linkbox">
-		<a style="font-weight: bold" href="tags.php">[Tags Listings & Search]</a>
-		<a href="tags.php?action=synonyms">[Synonyms Lists]</a>
+		<a style="font-weight: bold" href="tags.php">[Tags & Search]</a>
+		<a href="tags.php?action=synonyms">[Synonyms]</a>
 	</div>
     
     <div class="">

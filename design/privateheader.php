@@ -345,15 +345,16 @@ if(check_perms('admin_reports')) {
 		<ul>
 			<li id="nav_index"><a href="index.php">Home</a></li>
 			<li id="nav_torrents"><a href="torrents.php">Torrents</a></li>
+			<li id="nav_torrents"><a href="tags.php">Tags</a></li>
 			<li id="nav_requests"><a href="requests.php">Requests</a></li>
-                                <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
-			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+            <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
 		</ul>
 		<ul>
+			<li id="nav_forums"><a href="forums.php">Forums</a></li>
 			<li id="nav_irc"><a href="chat.php">Chat</a></li>
 			<li id="nav_top10"><a href="top10.php">Top10</a></li>
 			<li id="nav_rules"><a href="articles.php?topic=rules">Rules</a></li>
-                  <li id="nav_help"><a href="articles.php?topic=tutorials">Help</a></li>
+            <li id="nav_help"><a href="articles.php?topic=tutorials">Help</a></li>
 			<li id="nav_staff"><a href="staff.php">Staff</a></li>
             
                               <!--  <li id="nav_logs" class="normal"><a href="log.php">Logs</a></li> -->
