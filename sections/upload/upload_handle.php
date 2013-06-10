@@ -273,7 +273,7 @@ if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($L
         $Err = "There are errors in your bbcode (unclosed tags)";
 }
 
-if ($Err) { // Show the upload form, with the data the user entered
+if ($Err || isset($_POST['checkonly'])) { // Show the upload form, with the data the user entered
     //******************************************************************************//
     //--------------- Temp store torrent file -------------------------------------------//
     if(!$Properties['tempfileid']) {
