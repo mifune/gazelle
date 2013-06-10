@@ -32,6 +32,7 @@ function get_group_info($GroupID, $Return = true) {
                 tt.TagID,
                 tt.UserID,
                 um1.Username,
+                tags.Uses,
                 tt.PositiveVotes,
                 tt.NegativeVotes,
                 GROUP_CONCAT(ttv.UserID SEPARATOR '|'),
@@ -172,14 +173,36 @@ function get_group_requests_filled($TorrentID) {
 
 
 // tag sorting functions
-function sort_score($X, $Y){
-	return($Y['score'] - $X['score']);
+function sort_uses_desc($X, $Y){
+	return($Y['uses'] - $X['uses']);
 }
-function sort_added($X, $Y){
+function sort_score_desc($X, $Y){
+    if ($Y['score'] == $X['score'])
+        return ($Y['uses'] - $X['uses']);
+    else
+        return($Y['score'] - $X['score']);
+}
+function sort_added_desc($X, $Y){
 	return($X['id'] - $Y['id']);
 }
-function sort_az($X, $Y){
+function sort_az_desc($X, $Y){
 	return( strcmp($X['name'], $Y['name']) );
+}
+
+function sort_uses_asc($X, $Y){
+	return($X['uses'] - $Y['uses']);
+}
+function sort_score_asc($X, $Y){
+    if ($Y['score'] == $X['score'])
+        return ($X['uses'] - $Y['uses']);
+    else
+        return($X['score'] - $Y['score']);
+}
+function sort_added_asc($X, $Y){
+	return($Y['id'] - $X['id']);
+}
+function sort_az_asc($X, $Y){
+	return( strcmp($Y['name'], $X['name']) );
 }
 
 
@@ -189,7 +212,7 @@ function sort_az($X, $Y){
  * @param int $GroupID The group id of the torrent
  * @return the html for the taglist
  */
-function get_taglist_html($GroupID, $tagsort) {
+function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
     global $LoggedUser;
     
     $TorrentCache = get_group_info($GroupID, true);
@@ -200,12 +223,12 @@ function get_taglist_html($GroupID, $tagsort) {
     // Group details - get tag details
     //list(, , , , , , $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
  
-    if(!$tagsort || !in_array($tagsort, array('score','az','added'))) $tagsort = 'score';
+    if(!$tagsort || !in_array($tagsort, array('uses','score','az','added'))) $tagsort = 'uses';
 
     $Tags = array();
     if ($TorrentTags != '') {
         foreach ($TorrentTags as $TagKey => $TagDetails) {
-            list($TagName, $TagID, $TagUserID, $TagUsername, $TagPositiveVotes, $TagNegativeVotes, 
+            list($TagName, $TagID, $TagUserID, $TagUsername, $TagUses, $TagPositiveVotes, $TagNegativeVotes, 
                     $TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TagDetails;
 
             $Tags[$TagKey]['name'] = $TagName;
@@ -213,55 +236,33 @@ function get_taglist_html($GroupID, $tagsort) {
             $Tags[$TagKey]['id']= $TagID;
             $Tags[$TagKey]['userid']= $TagUserID;
             $Tags[$TagKey]['username']= $TagUsername;
+            $Tags[$TagKey]['uses']= $TagUses;
 
             $TagVoteUsernames = explode('|',$TagVoteUsernames);
             $TagVoteWays = explode('|',$TagVoteWays);
-            $VoteMsgs=array( "added by $TagUsername");
+            $VoteMsgs=array();
+            $VoteMsgs[]= "$TagName (" . str_plural('use' , $TagUses).')';
+            $VoteMsgs[]= "added by $TagUsername";
             foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
                 if (!$TagVoteUsername) continue;
                 $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
             }
             $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs) ;
         }
-
-        uasort($Tags, "sort_$tagsort");
+        if($order!='desc') $order = 'asc';
+        uasort($Tags, "sort_{$tagsort}_$order");
     }
-/*
-    $Tags = array();
-    if ($TorrentTags != '') {
-          $TorrentTags=explode('|',$TorrentTags);
-          $TorrentTagIDs=explode('|',$TorrentTagIDs);
-          $TorrentTagUserIDs=explode('|',$TorrentTagUserIDs);
-          $TagPositiveVotes=explode('|',$TagPositiveVotes);
-          $TagNegativeVotes=explode('|',$TagNegativeVotes);
 
-          foreach ($TorrentTags as $TagKey => $TagName) {
-                $Tags[$TagKey]['name'] = $TagName;
-                $Tags[$TagKey]['score'] = ($TagPositiveVotes[$TagKey] - $TagNegativeVotes[$TagKey]);
-                $Tags[$TagKey]['id']=$TorrentTagIDs[$TagKey];
-                $Tags[$TagKey]['userid']=$TorrentTagUserIDs[$TagKey];
-                
-                list($TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TorrentTagVotes[$Tags[$TagKey]['id']];
-                $TagVoteUsernames = explode('|',$TagVoteUsernames);
-                $TagVoteWays = explode('|',$TagVoteWays);
-                $VoteMsgs=array();
-                foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
-                    $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
-                }
-                $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
-          }
-          uasort($Tags, "sort_$tagsort");
-    }
- */
     // grab authorID from torrent details
     list(, , , , , , , , , , , $UserID) = $TorrentList[0];
     $IsUploader =  $UserID == $LoggedUser['ID']; 
-
-    ob_start();
-        ?>
+/*
                                 <li style="font-size:1.1em;">
                                     Please vote for tags based <a href="articles.php?topic=tag" target="_blank"><strong class="important_text">only</strong></a> on their appropriateness for this upload.
-                                </li>
+                                </li> */
+    
+    ob_start();
+        ?>
         <?
             foreach($Tags as $TagKey=>$Tag) {
 

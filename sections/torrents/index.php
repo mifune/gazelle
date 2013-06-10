@@ -17,7 +17,21 @@ function js_pages($Action, $TorrentID, $NumResults, $CurrentPage) {
 if(!empty($_REQUEST['action'])) {
 	switch($_REQUEST['action']){
         
-        
+        case 'resort_tags':
+            authorize();
+
+            header('Content-Type: application/json; charset=utf-8');
+ 
+            include(SERVER_ROOT . '/sections/torrents/functions.php');
+ 
+            $GroupID = $_POST['groupid'];
+            if (!is_number($GroupID) || !$GroupID) error(0, true);
+            
+            echo json_encode(array(get_taglist_html($GroupID, $_POST['tagsort'], $_POST['order'])));
+            
+            break;
+            
+            
         case 'dupe_check':
             enforce_login();
 			//authorize(); 

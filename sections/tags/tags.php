@@ -31,65 +31,8 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Tag', 'Uses'
     $OrderBy = $_GET['order_by'];
 }
 
-if( empty($_GET['search_type']) || !in_array($_GET['search_type'], array('tags', 'syns', 'both')) ) 
-        $_GET['search_type']='tags';
-
-
-/*
-        list($Page,$Limit) = page_limit(RESULTS_PER_PAGE);
-
-        $DB->query("SELECT SQL_CALC_FOUND_ROWS
-                           t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
-                            SUM(tt.PositiveVotes-1) AS PosVotes,
-                            SUM(tt.NegativeVotes-1) AS NegVotes,
-                            SUM(tt.PositiveVotes-1)-SUM(tt.NegativeVotes-1) As Votes, t.ID as TagID
-                      FROM tags AS t
-                      JOIN torrents_tags AS tt ON tt.TagID=t.ID
-                    $WHERE 
-                  GROUP BY t.ID
-                  ORDER BY $OrderBy $OrderWay
-                     LIMIT $Limit");
-        
-        $Tags = $DB->to_array('TagID', MYSQLI_ASSOC) ;
-        $TagIDs = $DB->collect('TagID');
-        $TagIDs = implode(',', $TagIDs);
-        
-        $DB->query("SELECT FOUND_ROWS()");
-        list($NumAllTags) = $DB->next_record();
-
-        $title = "$NumAllTags $title";
-            
-        //$Pages=get_pages($Page,$NumAllTags,RESULTS_PER_PAGE,9);
-        
-        
-        if($NumAllTags>0 ) {
-            // get the syns for the tag results
-            $DB->query("SELECT Count(ID) as Synonyms , GROUP_CONCAT( Synomyn  SEPARATOR ', ' ) as SynText, TagID 
-                          FROM tag_synomyns
-                         WHERE TagID IN ( $TagIDs )
-                      GROUP BY TagID ");
-            $Syns = $DB->to_array('TagID', MYSQLI_ASSOC) ;
-            foreach($Tags as $tID=>$TagInfo) {
-                if(isset($Syns[$tID])) $Tags[$tID] = array_merge($Syns[$tID], $TagInfo);
-            }
-        } 
-        
-        error(print_r( ($Tags) ,true));
-
-$Searchtext = trim($_REQUEST['searchtags']);
-$Searchtext_esc = db_string($Searchtext);
-
-if($Searchtext) { 
-    $WHERE = array();
-    $title = "search results";
-    $_GET['search_type']='tags';
-    if($_GET['search_type']=='both' || $_GET['search_type']=='tags') $WHERE[] = "t.Name LIKE '%$Searchtext_esc%'";
-    if($_GET['search_type']=='both' || $_GET['search_type']=='syns') $WHERE[] = "x.SynText LIKE '%$Searchtext_esc%'";
-    if(count($WHERE)>0) $WHERE = "WHERE ".  implode(' OR ', $WHERE);
-} else {
-    $title = "tags";
-    $WHERE  = ""; 
-}  */
+if( empty($_GET['search_type']) || !in_array($_GET['search_type'], array('tags', 'syns', 'both')) )  $_GET['search_type']='tags';
+ 
 
 show_header('Tags');
 ?>
@@ -124,7 +67,7 @@ show_header('Tags');
             $WHERE1=''; $WHERE2=''; 
         }
 
-        /*
+        /*  // too joiny... needs refactoring into separate queries 
         $DB->query("SELECT SQL_CALC_FOUND_ROWS
                            t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
                            x.Synonyms as Synonyms, x.SynText,
@@ -189,9 +132,8 @@ show_header('Tags');
             $NumAllTags=false;
 
             if($WHERE2  == "" || $_GET['search_type']=='tags') {
+                
                 if($WHERE1) $WHERE1 = "WHERE $WHERE1";
-
-
                 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                                        t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
                                         SUM(tt.PositiveVotes-1) AS PosVotes,
@@ -219,23 +161,22 @@ show_header('Tags');
                           GROUP BY t.ID
                           ORDER BY $OrderBy $OrderWay
                              LIMIT $Limit");
-            } else {
-
+            } else {   //  $_GET['search_type']=='both'
+                // cannot get an accurate distinct row count using UNION (DISTINCT) and SQL_CALC_FOUND_ROWS ...
+                // so we will get the accurate count first then get the union'ed (limited) results 
                 $DB->query("SELECT Count(DISTINCT t.ID)
                               FROM tags AS t
                          LEFT JOIN tag_synomyns AS s ON s.TagID=t.ID
                              WHERE $WHERE1 OR $WHERE2 ");
                 list($NumAllTags) = $DB->next_record();
-
-
-                if($WHERE1) $WHERE1 = "WHERE $WHERE1";
+                // now get the union of tags and synonyms (performs way faster than doing a (left)joined single version)
                 $DB->query("(SELECT t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType, 
                                     SUM(tt.PositiveVotes-1) AS PosVotes,
                                     SUM(tt.NegativeVotes-1) AS NegVotes,
                                     SUM(tt.PositiveVotes-1)-SUM(tt.NegativeVotes-1) As Votes, t.ID as TagID
                               FROM tags AS t
                               JOIN torrents_tags AS tt ON tt.TagID=t.ID
-                            $WHERE1 
+                             WHERE $WHERE1 
                           GROUP BY t.ID
                           ORDER BY $OrderBy $OrderWay)
                         UNION
@@ -358,7 +299,7 @@ show_header('Tags');
                         $hiddencss = '';
                         $hideicon = '[-]';
                     }    ?>
-                      <span class="plusmn"><a onclick="$('#syns_<?=$i?>').toggle(); this.innerHTML=(this.innerHTML=='[-]'?'[+]':'[-]'); return false;"><?=$hideicon?></a></span>
+                      <span class="plusmn"><a title="click to show synonyms for this tag" onclick="$('#syns_<?=$i?>').toggle(); this.innerHTML=(this.innerHTML=='[-]'?'[+]':'[-]'); return false;"><?=$hideicon?></a></span>
 <?               } else $hiddencss = 'hidden ';       ?>
                     </td> 
                 </tr> 

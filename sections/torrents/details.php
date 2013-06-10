@@ -32,14 +32,14 @@ $AltName=$GroupName; // Goes in the alt text of the image
 $Title=$GroupName; // goes in <title>
 //$Body = $Text->full_format($Body);
 
-$tagsort = isset($_GET['tsort'])?$_GET['tsort']:'score';
-if(!in_array($tagsort, array('score','az','added'))) $tagsort = 'score';
+$tagsort = isset($_GET['tsort'])?$_GET['tsort']:'uses';
+if(!in_array($tagsort, array('uses','score','az','added'))) $tagsort = 'uses';
 
 
 $Tags = array();
 if ($TorrentTags != '') {
 	foreach ($TorrentTags as $TagKey => $TagDetails) {
-        list($TagName, $TagID, $TagUserID, $TagUsername, $TagPositiveVotes, $TagNegativeVotes, 
+        list($TagName, $TagID, $TagUserID, $TagUsername, $TagUses, $TagPositiveVotes, $TagNegativeVotes, 
                 $TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TagDetails;
         
 		$Tags[$TagKey]['name'] = $TagName;
@@ -47,10 +47,13 @@ if ($TorrentTags != '') {
 		$Tags[$TagKey]['id']= $TagID;
 		$Tags[$TagKey]['userid']= $TagUserID;
 		$Tags[$TagKey]['username']= $TagUsername;
+        $Tags[$TagKey]['uses']= $TagUses;
         
         $TagVoteUsernames = explode('|',$TagVoteUsernames);
         $TagVoteWays = explode('|',$TagVoteWays);
-        $VoteMsgs=array( "added by $TagUsername");
+            $VoteMsgs=array();
+            $VoteMsgs[]= "$TagName (" . str_plural('use' , $TagUses).')';
+            $VoteMsgs[]= "added by $TagUsername";
         foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
             if (!$TagVoteUsername) continue;
             $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
@@ -58,7 +61,7 @@ if ($TorrentTags != '') {
         $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
     }
     
-	uasort($Tags, "sort_$tagsort");
+	uasort($Tags, "sort_{$tagsort}_desc");
 }
 
 /*
@@ -89,7 +92,7 @@ if ($TorrentTags != '') {
 } */
 //advance tagsort for link
 if($tagsort=='score') $tagsort2='az';
-else if($tagsort=='az') $tagsort2='added';
+else if($tagsort=='az') $tagsort2='uses';
 else $tagsort2='score';
 
 $TokenTorrents = $Cache->get_value('users_tokens_'.$UserID);
@@ -110,7 +113,7 @@ $Review = get_last_review($GroupID); // ,
 //error(print_r($Review,true));
 
 // Start output
-show_header($Title,'comments,status,torrent,bbcode,details,watchlist,jquery,jquery.cookie');
+show_header($Title,'comments,status,torrent,bbcode,details,watchlist,jquery,jquery.cookie');  // ,tag_autocomplete,autocomplete
 
 $IsUploader =  $UserID == $LoggedUser['ID'];
 $CanEdit = (check_perms('torrents_edit') ||  $IsUploader );
@@ -524,22 +527,27 @@ if ($FreeTorrent == '0' && $IsUploader) {
 ?>
             <a id="tags"></a>
             <div class="head">
-                <strong><a href="torrents.php?id=<?=$GroupID?>&tsort=<?=$tagsort2?>" title="change sort order of tags to <?=$tagsort2?>">Tags</a></strong>
-                
+                <strong>Tags</strong>
                 <span style="float:right;margin-left:5px;"><a href="#" id="tagtoggle" onclick="TagBox_Toggle(); return false;">(Hide)</a></span>
                 <span style="float:right;font-size:0.8em;">
-                    <a href="torrents.php?action=tag_synonyms" target="_blank">synonyms</a> | <a href="articles.php?topic=tag" target="_blank">Tagging rules</a>
+                    <a href="tags.php" target="_blank">tags</a> | <a href="articles.php?topic=tag" target="_blank">rules</a>
                 </span>
             </div>
-        <div id="tag_container" class="box box_tags">			
+            <div id="tag_container" class="box box_tags">
+                <div class="tag_header">
+                    <div>
+                        <span id="sort_uses" class="button_sort sort_select"><a onclick="Resort_Tags(<?="$GroupID, 'uses'"?>);" title="change sort order of tags to total uses">uses</a></span>
+                        <span id="sort_score" class="button_sort"><a onclick="Resort_Tags(<?="$GroupID, 'score'"?>);" title="change sort order of tags to total score">score</a></span>
+                        <span id="sort_az" class="button_sort"><a onclick="Resort_Tags(<?="$GroupID, 'az'"?>);" title="change sort order of tags to total az">az</a></span>
+                        <!--<span id="sort_added" class="button_sort"><a onclick="Resort_Tags(<?="$GroupID, 'added'"?>);" title="change sort order of tags to total added">date</a></span>-->
+                    </div>
+                    Please vote for tags based <a href="articles.php?topic=tag" target="_blank"><strong class="important_text">only</strong></a> on their appropriateness for this upload.
+                </div>
                 <div class="tag_inner">
 <?
 if(count($Tags) > 0) {
 ?>
                           <ul id="torrent_tags" class="stats nobullet">
-                                <li class="tag_warning">
-                                    Please vote for tags based <a href="articles.php?topic=tag" target="_blank"><strong class="important_text">only</strong></a> on their appropriateness for this upload.
-                                </li>  
         <?
                 
             foreach($Tags as $TagKey=>$Tag) {

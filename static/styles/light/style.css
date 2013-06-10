@@ -2685,6 +2685,9 @@ table.noborder td, .noborder {
     float:right;
     cursor:pointer;
 }
+.plusmn a:hover{
+    text-decoration: none;
+}
 
 .votes {
     color:#999;

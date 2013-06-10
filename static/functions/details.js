@@ -1,27 +1,51 @@
 
 
 function Add_Tag(){
-        // now as an ajax call... better user feedback
-        if ( $('#tagname').raw().value =='') return false;
-        ajax.post('torrents.php?action=add_tag', 'form_addtag', function (response) { 
+    // now as an ajax call... better user feedback
+    if ( $('#tagname').raw().value =='') return false;
+    ajax.post('torrents.php?action=add_tag', 'form_addtag', function (response) { 
             display_tag_response(response);
-            
-        });
-        $('#tagname').raw().value ='';
-        return false;
+    });
+    $('#tagname').raw().value ='';
+    return false;
 }
 
 function Del_Tag(tagid, groupid, tagsort){
     
-	  var ToPost = [];
-	  ToPost['tagid'] = tagid; 
-	  ToPost['groupid'] = groupid;  
-	  ToPost['tagsort'] = tagsort;  
-	  ToPost['auth'] = authkey; 
-        ajax.post('torrents.php?action=delete_tag', ToPost, function (response) { 
-            display_tag_response(response); 
-        });
-        return false;
+    var ToPost = [];
+    ToPost['tagid'] = tagid; 
+    ToPost['groupid'] = groupid;  
+    ToPost['tagsort'] = tagsort;  
+    ToPost['auth'] = authkey; 
+    ajax.post('torrents.php?action=delete_tag', ToPost, function (response) { 
+        display_tag_response(response); 
+    });
+    return false;
+}
+
+var sort_order = 'desc';
+function Resort_Tags(groupid, tagsort) {
+    sort_order = (sort_order=='desc')?'asc':'desc';
+    var ToPost = [];
+    ToPost['groupid'] = groupid;  
+	ToPost['tagsort'] = tagsort;  
+	ToPost['order'] = sort_order;  
+	ToPost['auth'] = authkey; 
+    ajax.post('torrents.php?action=resort_tags', ToPost, function (response) { 
+        var x = json.decode(response);  
+        if ( is_array(x)){
+            $('#torrent_tags').html(x[0]);
+            var sort_types = new Array("uses","score","az","added");
+            var i=0;
+            for (i=0;i<4;i++) {
+                if( sort_types[i]==tagsort) $('#sort_' + sort_types[i]).add_class("sort_select");
+                else $('#sort_' + sort_types[i]).remove_class("sort_select");
+            }
+        } else { 
+            alert('unforseen error :('); 
+        }
+    });
+    return false;
 }
 
 function display_tag_response(response){

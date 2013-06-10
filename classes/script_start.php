@@ -1555,7 +1555,7 @@ function is_utf8($Str) {
 }
 
 function str_plural($Str, $Num) {
-    if ($Num===1) return "$Num $Str";
+    if ($Num==1) return "$Num $Str";
     else return "$Num {$Str}s";
 }
 
