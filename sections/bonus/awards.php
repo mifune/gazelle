@@ -67,6 +67,7 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
 		</div>
 <?	}  ?>
 	</div>
+    <div class="clear"></div>
 </div>
 
 <?
