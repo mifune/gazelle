@@ -1476,7 +1476,10 @@ class TEXT {
                                 }
                             }
                         }
-                        $Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong> wrote: ' . $postlink . '</span>';
+                        //$Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong> wrote: ' . $postlink . '</span>';
+                        $Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong>: ' . $postlink . '</span>';
+                    } else {
+                         $Str.= '<span class="quote_label"><strong>quote</strong>:</span>';
                     }
                     $Str.='<blockquote class="bbcode">' . $this->to_html($Block['Val']) . '</blockquote>';
                     $this->NoImg--;
@@ -1769,7 +1772,8 @@ class TEXT {
                         $Str.="[$Block[Type]". ( $Block['Attr'] ? '='.$Block['Attr'] : '' ). "]$Block[Val][/$Block[Type]]";
                         break;
                     }
-                    if ($this->NoImg > 0) {
+                    $LocalURL = $this->local_url($Block['Val']);
+                    if (!$LocalURL && $this->NoImg > 0) {
                         $Str.='<a rel="noreferrer" target="_blank" href="' . $Block['Val'] . '">' . $Block['Val'] . '</a> (image)';
                         break;
                     }

@@ -10,6 +10,8 @@ if(!empty($LoggedUser['DisableRequests'])) {
 	error('Your request privileges have been removed.');
 }
 
+if(!check_perms('users_mod')) error("The requests section is closed while we clean up a mess created by a cheater.<br/>We apologise for the inconvenience, the requests section will reopen asap.");
+
 if(!isset($_REQUEST['action'])) {
 	include(SERVER_ROOT.'/sections/requests/requests.php');
 } else {

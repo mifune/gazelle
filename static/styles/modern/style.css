@@ -2127,40 +2127,81 @@ a.postlink {
 }
 span.quote_label {
   /*  text-align:left; */
-    float:left; 
     font-size: 8pt;
+/*  
+    float:left; 
     margin-left:10px;
-    margin-bottom: 0px;
+    margin-bottom: 0px */
+    margin: 5px 5px 0px 5px;
     position: relative;
+    border-top: 1px solid #98AAB1;
+    border-left: 1px solid #98AAB1;
+    border-right: 1px solid #98AAB1;
+    border-bottom: none;
+    display:block;  
+    padding: 5px 10px 8px;
+    background-color: white;
+    color: #222;
+    
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+    border-radius: 10px 10px 0px 0px;
+    
 }
 blockquote {
-    margin: 6px 5px 5px;
+    margin: 5px 5px;
     padding: 10px;
-/*  border: 1px solid #98AAB1;  */
-    border: 1px dashed #98AAB1;
+/*  border: 1px dashed #98AAB1; */
+    border: 1px solid #98AAB1;  
 }
+   
 blockquote.bbcode {
+    margin: 0px 5px 5px;
     clear:both;
     background-color: #f4f4f4;
-    color: #333;
+    color: #444;
     text-align: left;
-/*  border-radius: 3px;
+    /*
+    color: #333;
+    border-radius: 3px;
 	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-    box-shadow: 0 1px 0 #fff inset,0 2px 0 rgba(0,0,90,0.12),0 -2px 0 rgba(255,255,255,0.66) inset; */
+	-webkit-border-radius: 3px; */
+    -moz-border-radius: 0px 0px 3px 3px;
+    -webkit-border-top-left-radius: 0px;
+    -webkit-border-top-right-radius: 0px;
+    -webkit-border-bottom-left-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+    border-radius: 0px 0px 3px 3px;
+    box-shadow: 0 1px 0 #fff inset,0 1px 0 rgba(0,0,90,0.12),0 -2px 0 rgba(255,255,255,0.33) inset; 
 }
-/*
+
 span.quote_label:before {
+    /*
     content: "";
     display: inline-block;
     position: absolute;
     width: 12px;
     height: 12px;
-    top: 15px;
+    top: 16px;
     left: 6px;
     border: none;
     border-top: 1px solid #98AAB1;
+    border-left: 1px solid #98AAB1;  */
+    
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 22px;
+    left: 16px;
+    border: none;
+    border-top: 1px solid #98AAB1;
     border-left: 1px solid #98AAB1;
+    
     -webkit-box-shadow: 0 1px white inset,1px 0 white inset;
     box-shadow: 0 1px white inset,1px 0 white inset;
     background: #f4f4f4;
@@ -2170,7 +2211,7 @@ span.quote_label:before {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
     z-index: 0;
-} */
+} 
 
 code.error {
     display:inline-block;
