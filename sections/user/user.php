@@ -1219,18 +1219,10 @@ if (check_paranoia_here('requestsvoted_list')) {
             <div id="requestsdiv" class="">
 				<table cellpadding="6" cellspacing="1" border="0" class="shadow" width="100%">
 					<tr class="colhead">
-						<td style="width:48%;">
-							<strong>Request Name</strong>
-						</td>
-						<td>
-							<strong>Vote</strong>
-						</td>
-						<td>
-							<strong>Bounty</strong>
-						</td>
-						<td>
-							<strong>Added</strong>
-						</td>
+						<td style="width:48%;"><strong>Request Name</strong></td>
+						<td><strong>Votes</strong></td>
+						<td><strong>Bounty</strong></td>
+						<td><strong>Added</strong></td>
 					</tr>
 <?
 		foreach($Requests as $Request) {
@@ -1252,25 +1244,26 @@ if (check_paranoia_here('requestsvoted_list')) {
 					<tr class="row<?=$Row?>">
 						<td>
 							<?=$FullName?>
-                                                        <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
+<?              if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 							<div class="tags">
-                                                        <? } ?>
 <?			
-			$Tags = $Request['Tags'];
-			$TagList = array();
-			foreach($Tags as $TagID => $TagName) {
-				$TagList[] = "<a href='requests.php?tags=".$TagName."'>".display_str($TagName)."</a>";
-			}
-			$TagList = implode(' ', $TagList);
+                    $Tags = $Request['Tags'];
+                    $TagList = array();
+                    foreach($Tags as $TagID => $TagName) {
+                        $TagList[] = "<a href='requests.php?tags=".$TagName."'>".display_str($TagName)."</a>";
+                    }
+                    $TagList = implode(' ', $TagList);
+
+                    echo $TagList;
 ?>
-								<?=$TagList?>
 							</div>
+<?              } ?>
 						</td>
 						<td>
 							<span id="vote_count_<?=$RequestID?>"><?=$Votes?></span>
 <?		  	if(check_perms('site_vote')){ ?>
 							<input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-							&nbsp;&nbsp; <a href="javascript:Vote(0, <?=$RequestID?>)"><strong>(+)</strong></a>
+							&nbsp;&nbsp; <a href="javascript:VotePromptMB(<?=$RequestID?>)"><strong>(+)</strong></a>
 <?			} ?> 
 						</td>
 						<td>

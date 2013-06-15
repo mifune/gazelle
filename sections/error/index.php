@@ -48,7 +48,7 @@ if(!empty($_GET['e']) && in_array($_GET['e'],$Errors)) {
 	<div class="thin">
 		<div class="head"><?=$Title?></div>
 		<div class="box pad">
-			<p><?=$Description?></p>
+			<?=$Description?>
 		</div>
 	</div>
 <?

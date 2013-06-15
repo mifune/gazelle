@@ -54,7 +54,7 @@ if($NewRequest) {
 
 // Validate
 if(empty($_POST['category'])) {
-	error(0);
+	error("You forgot to enter a category!");
 }
 
 $CategoryID = $_POST['category'];
@@ -89,6 +89,12 @@ if($NewRequest) {
 	}
 }
 
+if(empty($_POST['description'])) {
+	$Err = "You forgot to enter any description!";
+} else {
+	$Description = trim($_POST['description']);
+}
+
 if(empty($_POST['image'])) {
 	$Image = "";
 } else {
@@ -96,19 +102,7 @@ if(empty($_POST['image'])) {
       $Result = validate_imageurl($_POST['image'], 12, 255, get_whitelist_regex());
       if($Result!==TRUE) $Err = $Result;
       else $Image = trim($_POST['image']);
-      
-    /*
-	if(preg_match("/".IMAGE_REGEX."/", trim($_POST['image'])) > 0) {
-			$Image = trim($_POST['image']);
-	} else {
-		$Err = display_str($_POST['image'])." does not appear to be a valid link to an image.";
-	} */
-}
-
-if(empty($_POST['description'])) {
-	$Err = "You forgot to enter any description!";
-} else {
-	$Description = trim($_POST['description']);
+       
 }
 
 
@@ -171,27 +165,6 @@ foreach ($Tags as $Tag) {
 $Tags = $TagsAdded;
 
 
-/*
-$Tags = cleanup_tags($Tags);
-$Tags = array_unique(explode(' ', $Tags));
-foreach($Tags as $Index => $Tag) {
-	$Tag = sanitize_tag($Tag);
-	$Tags[$Index] = $Tag; //For announce
-	
-	$DB->query("INSERT INTO tags 
-					(Name, UserID)
-				VALUES 
-					('".$Tag."', ".$LoggedUser['ID'].") 
-				ON DUPLICATE KEY UPDATE Uses=Uses+1");
-	
-	$TagID = $DB->inserted_id();
-	
-	$DB->query("INSERT IGNORE INTO requests_tags
-					(TagID, RequestID)
-				VALUES 
-					(".$TagID.", ".$RequestID.")");
-}  */
-
 if($NewRequest) {
 	//Remove the bounty and create the vote
 	$DB->query("INSERT INTO requests_votes 
@@ -202,6 +175,8 @@ if($NewRequest) {
 	$DB->query("UPDATE users_main SET Uploaded = (Uploaded - ".$Bytes.") WHERE ID = ".$LoggedUser['ID']);
 	$Cache->delete_value('user_stats_'.$LoggedUser['ID']);
 
+    write_user_log($LoggedUser['ID'], "Removed -". get_size($Bytes). " for new request [url=/requests.php?action=view&id={$RequestID}]{$Title}[/url] with ". get_size($Bytes). " bounty.");
+    
 	
     $Announce = "'".$Title."' - http://".NONSSL_SITE_URL."/requests.php?action=view&id=".$RequestID." - ".implode(" ", $Tags);
         

@@ -664,7 +664,7 @@ class TEXT {
                 $bbErrors = implode('<br/>', $this->get_errors());
                 error("There are errors in your bbcode (unclosed tags)<br/><br/>$bbErrors<br/>If the tag(s) highlighted do actually have a closing tag then you probably have overlapping tags
                         <br/>ie.<br/><span style=\"font-weight:bold\">[b]</span> [i] your text <span style=\"font-weight:bold\">[/b] </span>[/i] <span style=\"color:red\">(wrong)</span> - <em>tags must be nested, when they overlap like this it throws an error</em>
-                        <br/><span style=\"font-weight:bold\">[b]</span> [i] your text [/i] <span style=\"font-weight:bold\">[/b]</span> <span style=\"color:green\">(correct)</span> - <em>properly nested tags</em></div><div class=\"head\">Your post</div><div class=\"box pad\">
+                        <br/><span style=\"font-weight:bold\">[b]</span> [i] your text [/i] <span style=\"font-weight:bold\">[/b]</span> <span style=\"color:green\">(correct)</span> - <em>properly nested tags</em></div><br/><div class=\"head\">Your post</div><div class=\"box pad\">
                         <div class=\"box\"><div class=\"post_content\">$preview</div></div><br/>
                         <div style=\"font-style:italic;text-align:center;cursor:pointer;\"><a onclick=\"window.history.go(-1);\">click here or use the back button in your browser to return to your message</a></div>");
             }
@@ -1066,7 +1066,10 @@ class TEXT {
                     
                             $postlink = '<a class="postlink error" href="#err'.$errnum.'" title="scroll to error"><span class="postlink"></span></a>';
                                     
-                            $this->Errors[] = "<span class=\"quote_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
+                            //$this->Errors[] = "<span class=\"quote_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
+                            //        .'<code class="error">'.$Tag[0][0].'</code>'. substr($Str, $i, $iend - $i) .'... </blockquote>';
+                     
+                            $this->Errors[] = "<span class=\"error_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
                                     .'<code class="error">'.$Tag[0][0].'</code>'. substr($Str, $i, $iend - $i) .'... </blockquote>';
                      
                             if ($this->ShowErrors) {
@@ -1479,7 +1482,7 @@ class TEXT {
                         //$Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong> wrote: ' . $postlink . '</span>';
                         $Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong>: ' . $postlink . '</span>';
                     } else {
-                         $Str.= '<span class="quote_label"><strong>quote</strong>:</span>';
+                         // $Str.= '<span class="quote_label"><strong>quote</strong>:</span>';
                     }
                     $Str.='<blockquote class="bbcode">' . $this->to_html($Block['Val']) . '</blockquote>';
                     $this->NoImg--;

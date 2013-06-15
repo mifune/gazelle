@@ -2126,13 +2126,8 @@ a.postlink {
     display:inline-block;
 }
 span.quote_label {
-  /*  text-align:left; */
     font-size: 8pt;
-/*  
-    float:left; 
-    margin-left:10px;
-    margin-bottom: 0px */
-    margin: 5px 5px 0px 5px;
+    margin: 5px 5px -5px 5px;
     position: relative;
     border-top: 1px solid #98AAB1;
     border-left: 1px solid #98AAB1;
@@ -2149,8 +2144,21 @@ span.quote_label {
     -webkit-border-bottom-left-radius: 0px;
     -webkit-border-bottom-right-radius: 0px;
     border-radius: 10px 10px 0px 0px;
-    
 }
+
+span.error_label {
+    font-size: 10pt;
+    border:none;
+}
+
+blockquote.bbcode.error {
+    border: 2px solid #c00;
+    padding: 5px 10px;
+}
+blockquote.bbcode.error code.error {
+    font-size: 1.2em;
+}
+
 blockquote {
     margin: 5px 5px;
     padding: 10px;
@@ -2159,7 +2167,7 @@ blockquote {
 }
    
 blockquote.bbcode {
-    margin: 0px 5px 5px;
+    margin: 5px 5px 5px;
     clear:both;
     background-color: #f4f4f4;
     color: #444;
@@ -2169,27 +2177,16 @@ blockquote.bbcode {
     border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px; */
-    -moz-border-radius: 0px 0px 3px 3px;
-    -webkit-border-top-left-radius: 0px;
-    -webkit-border-top-right-radius: 0px;
+    -moz-border-radius: 1px 1px 3px 3px;
+    -webkit-border-top-left-radius: 1px;
+    -webkit-border-top-right-radius: 1px;
     -webkit-border-bottom-left-radius: 3px;
     -webkit-border-bottom-right-radius: 3px;
-    border-radius: 0px 0px 3px 3px;
+    border-radius: 1px 1px 3px 3px;
     box-shadow: 0 1px 0 #fff inset,0 1px 0 rgba(0,0,90,0.12),0 -2px 0 rgba(255,255,255,0.33) inset; 
 }
 
 span.quote_label:before {
-    /*
-    content: "";
-    display: inline-block;
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    top: 16px;
-    left: 6px;
-    border: none;
-    border-top: 1px solid #98AAB1;
-    border-left: 1px solid #98AAB1;  */
     
     content: "";
     display: inline-block;
@@ -2994,13 +2991,6 @@ td.bbcode.vab  {
 }
 
 
-blockquote.bbcode.error {
-    border: 2px solid #c00;
-    padding: 5px 10px;
-}
-blockquote.bbcode.error code.error {
-    font-size: 1.2em;
-}
 /*
 code.error {
     display:inline-block;

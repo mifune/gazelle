@@ -36,4 +36,54 @@ function get_votes_array($RequestID) {
 	}
 	return $RequestVotes;
 }
+
+
+function get_votes_html($RequestVotes){
+    global $LoggedUser;
+    
+    ob_start();
+    
+    $VoteCount = count($RequestVotes['Voters']);
+    
+    $VoteMax = ($VoteCount < 10 ? $VoteCount : 10);
+	$ViewerVote = false;
+	for($i = 0; $i < $VoteMax; $i++) { 
+		$User = array_shift($RequestVotes['Voters']);
+		$Boldify = false;
+		if ($User['UserID'] == $LoggedUser['ID']) {
+			$ViewerVote = true;
+			$Boldify = true;
+		}
+?>
+				<tr>
+					<td>
+						<a href="user.php?id=<?=$User['UserID']?>"><?=$Boldify?'<strong>':''?><?=display_str($User['Username'])?><?=$Boldify?'</strong>':''?></a>
+					</td>
+					<td>
+						<?=$Boldify?'<strong>':''?><?=get_size($User['Bounty'])?><?=$Boldify?'</strong>':''?>
+					</td>
+				</tr>
+<?	} 
+	reset($RequestVotes['Voters']);
+	if (!$ViewerVote) {
+		foreach ($RequestVotes['Voters'] as $User) {
+			if ($User['UserID'] == $LoggedUser['ID']) { ?>
+				<tr>
+					<td>
+						<a href="user.php?id=<?=$User['UserID']?>"><strong><?=display_str($User['Username'])?></strong></a>
+					</td>
+					<td>
+						<strong><?=get_size($User['Bounty'])?></strong>
+					</td>
+				</tr>
+<?			}
+		}
+	}
+    
+    $html = ob_get_contents(); 
+    ob_end_clean();
+
+    return $html;
+}
+
 ?>

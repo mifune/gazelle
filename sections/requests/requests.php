@@ -414,12 +414,12 @@ foreach($NewCategories as $Cat) {
 <?  	 	if(!$IsFilled && check_perms('site_vote')){ ?>
 					<input type="hidden" id="requestid_<?=$RequestID?>" name="requestid" value="<?=$RequestID?>" />
 					<input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-					&nbsp;&nbsp; <a href="javascript:Vote(0, <?=$RequestID?>)"><strong>(+)</strong></a>
-				</form>
+					&nbsp;&nbsp; <a href="javascript:VotePromptMB(<?=$RequestID?>)"><strong>(+)</strong></a>
 <?  		} ?> 
+				</form>
 			</td>
 			<td class="nobr">
-				<?=get_size($RequestVotes['TotalBounty'])?>
+                <span id="bounty_<?=$RequestID?>"><?=get_size($RequestVotes['TotalBounty'])?></span>
 			</td>
 			<td>
 <?   		if($IsFilled){ ?>

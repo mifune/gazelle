@@ -483,11 +483,17 @@ function user_peers($UserID) {
 }
 
 
+/**
+ * update a users site_options field with a new value
+ * 
+ * @param int $UserID 
+ * @param int $NewOptions options to overwrite in format array('OptionName' => $Value, 'OptionName' => $Value)
+ */
 function update_site_options($UserID, $NewOptions) {
     if (!is_number($UserID)) {
         error(0);
     }
-    if (empty($NewOptions)) {
+    if (empty($NewOptions) || !is_array($NewOptions)) {
         return false;
     }
     global $DB, $Cache, $LoggedUser;

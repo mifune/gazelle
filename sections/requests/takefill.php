@@ -71,13 +71,8 @@ if(time_ago($UploadTime) < 3600 && $UploaderID != $FillerID && !check_perms('sit
 
 
 
-$DB->query("SELECT
-		Title,
-		UserID,
-		TorrentID,
-		CategoryID
-	FROM requests
-	WHERE ID = ".$RequestID);
+$DB->query("SELECT Title, UserID, TorrentID, CategoryID
+              FROM requests WHERE ID = ".$RequestID);
 list($Title, $RequesterID, $OldTorrentID, $RequestCategoryID) = $DB->next_record();
 
 
@@ -118,6 +113,8 @@ $DB->query("UPDATE users_main
 			SET Uploaded = (Uploaded + ".$RequestVotes['TotalBounty'].") 
 			WHERE ID = ".$FillerID);
 
+write_user_log($FillerID, "Added +". get_size($RequestVotes['TotalBounty']). " for filling [url=/requests.php?action=view&id={$RequestID}]Request $RequestID ({$Title})[/url] ");
+    
 
 
 $Cache->delete_value('user_stats_'.$FillerID);

@@ -42,6 +42,7 @@ $DisplayLink = $Title;
 
 //Votes time
 $RequestVotes = get_votes_array($RequestID);
+//error(print_r($RequestVotes,true));
 $VoteCount = count($RequestVotes['Voters']);
 //$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0)));
 $UserCanEdit = (!$IsFilled && $LoggedUser['ID'] == $RequestorID && $VoteCount < 2);
@@ -103,8 +104,13 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 			</ul>
 		</div><br/>
         <div class="head"><strong>Top Contributors</strong></div> 
-		<table class="box box_votes">
-<?	$VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
+		<table class="box box_votes" id="request_votes">
+<?	
+
+    echo get_votes_html($RequestVotes);
+    
+    /*
+    $VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
 	$ViewerVote = false;
 	for($i = 0; $i < $VoteMax; $i++) { 
 		$User = array_shift($RequestVotes['Voters']);
@@ -138,6 +144,8 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 <?			}
 		}
 	}
+    */
+    
 ?>
         </table><br/>
 	</div>
@@ -147,18 +155,11 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
             <div class="head">Request</div>
 		<table> 
 			<tr>
-				<td class="label"> 
-                        <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
-                            <img style="float:right" src="<?= $CatImg ?>" />  </td>
+				<td class="label">
+                    <img style="float:right" src="<?=( 'static/common/caticons/' . $NewCategories[$CategoryID]['image'])?>" />
+                </td>
 				<td style="font-size: 1.2em;text-align:center;font-weight:bold;">
-                        <?=$DisplayLink?>
-                    <!--<div class=""  style="float:left;padding-top:0.8em;">
-                        <?=$DisplayLink?>
-                    </div> 
-                    <div class="center cats_col"  style="float:right;margin-right:10px;border-bottom:none;border-right:none;">
-                        <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
-                        <div title="<?= $NewCategories[$CategoryID]['tag'] ?>"><img src="<?= $CatImg ?>" /></div>
-                    </div> -->
+                    <?=$DisplayLink?>
                 </td>
 			</tr>
 			<tr id="bounty">
@@ -193,10 +194,10 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 				<td class="label">Votes</td>
 				<td>
 					<span id="votecount"><?=$VoteCount?></span> 
-<?	if($CanVote) { ?>
-					&nbsp;<a href="javascript:Vote(0)"><strong>(+)</strong></a>
+<?	/* if($CanVote) { ?>
+					&nbsp;<a href="javascript:VotePromptMB(0)"><strong>(+)</strong></a>
 					<strong>Costs <?=get_size($MinimumVote, 0)?></strong>
-<?	} ?> 
+<?	} */ ?> 
 				</td>
 			</tr>
 <?	if($CanVote) { ?>
@@ -214,10 +215,7 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 			</tr>
 			<tr>
 				<td class="label">Post vote information</td>
-				<td> 
-                <?
-                    //$tot_bounty = $RequestVotes['TotalBounty'];
-                ?>
+				<td>
 					<form action="requests.php" method="get" id="request_form">
 						<input type="hidden" name="action" value="vote" />
 						<input type="hidden" id="requestid" name="id" value="<?=$RequestID?>" />
@@ -230,7 +228,7 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 						If you add the entered <strong><span id="new_bounty">0.00 MB</span></strong> of bounty, your new stats will be: <br/>
 						Uploaded: <span id="new_uploaded"><?=get_size($LoggedUser['BytesUploaded'])?></span>
 						Ratio: <span id="new_ratio"><?=ratio($LoggedUser['BytesUploaded'],$LoggedUser['BytesDownloaded'])?></span>
-						<input type="button" id="button" value="Vote!" disabled="disabled" onclick="Vote();"/> 
+						<input type="button" id="button_vote" value="Vote!" disabled="disabled" onclick="Vote();"/> 
 					</form>
 				</td>
 			</tr>

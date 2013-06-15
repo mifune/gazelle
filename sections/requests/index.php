@@ -60,9 +60,9 @@ if(!isset($_REQUEST['action'])) {
 			
 			$RequestID = $_POST['requestid'];
 			if(!$RequestID) { error(404); }
-		
-                  flood_check('requests_comments');
-                  
+            
+            flood_check('requests_comments');
+            
 			$DB->query("SELECT CEIL((SELECT COUNT(ID)+1 FROM requests_comments AS rc WHERE rc.RequestID='".$RequestID."')/".TORRENT_COMMENTS_PER_PAGE.") AS Pages");
 			list($Pages) = $DB->next_record();
 		
@@ -86,7 +86,7 @@ if(!isset($_REQUEST['action'])) {
 			$Cache->increment('request_comments_'.$RequestID);
 			
 			header('Location: requests.php?action=view&id='.$RequestID.'&page='.$Pages."#post$PostID");
-		break;
+            break;
 		
 		case 'get_post':
 			enforce_login();

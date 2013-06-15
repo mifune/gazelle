@@ -223,13 +223,13 @@ if (!empty($Properties))
 				</tr>
 				<tr>
 					<td colspan="2" class="center">
-						<input type="submit" id="button" value="Create request" />
+						<input type="submit" id="button_vote" value="Create request" />
 					</td>
 				</tr>
 <?	} else { ?>		
 				<tr>
 					<td colspan="2" class="center">
-						<input type="submit" id="button" value="Edit request" />
+						<input type="submit" id="button_vote" value="Edit request" />
 					</td>
 				</tr>
 <?	} ?>
