@@ -262,11 +262,12 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
                                 </li> */
     
     ob_start();
-        ?>
-        <?
+?>
+                <ul class="stats nobullet">
+    
+<?
             foreach($Tags as $TagKey=>$Tag) {
-
-        ?>
+?>
                                 <li id="tlist<?=$Tag['id']?>">
                                       <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;" title="<?=$Tag['votes']?>"><?=display_str($Tag['name'])?></a>
                                       <div style="float:right; display:block; letter-spacing: -1px;">
@@ -294,9 +295,11 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
                                       </div>
                                       <br style="clear:both" />
                                 </li>
-        <?
+<?
             }
-  
+?>
+                </ul>
+<?
     $html = ob_get_contents(); 
     ob_end_clean();
 

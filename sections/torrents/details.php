@@ -536,6 +536,7 @@ if ($FreeTorrent == '0' && $IsUploader) {
             <div id="tag_container" class="box box_tags">
                 <div class="tag_header">
                     <div>
+                        <input type="hidden" id="sort_groupid" value="<?=$GroupID?>" />
                         <span id="sort_uses" class="button_sort sort_select"><a onclick="Resort_Tags(<?="$GroupID, 'uses'"?>);" title="change sort order of tags to total uses">uses</a></span>
                         <span id="sort_score" class="button_sort"><a onclick="Resort_Tags(<?="$GroupID, 'score'"?>);" title="change sort order of tags to total score">score</a></span>
                         <span id="sort_az" class="button_sort"><a onclick="Resort_Tags(<?="$GroupID, 'az'"?>);" title="change sort order of tags to total az">az</a></span>
@@ -543,13 +544,14 @@ if ($FreeTorrent == '0' && $IsUploader) {
                     </div>
                     Please vote for tags based <a href="articles.php?topic=tag" target="_blank"><strong class="important_text">only</strong></a> on their appropriateness for this upload.
                 </div>
-                <div class="tag_inner">
+                <div id="torrent_tags" class="tag_inner">
 <?
-if(count($Tags) > 0) {
+//if(count($Tags) > 0) {
+ /*
 ?>
-                          <ul id="torrent_tags" class="stats nobullet">
+                          <ul class="stats nobullet">
         <?
-                
+               
             foreach($Tags as $TagKey=>$Tag) {
 
         ?>
@@ -571,8 +573,7 @@ if(count($Tags) > 0) {
         <?		if(check_perms('users_warn')){ ?>
                                       <a title="Tag '<?=$Tag['name']?>' added by <?=$Tag['username']?>" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
         <?		} ?>
-        <?		if(check_perms('site_delete_tag') ) { // || ($IsUploader && $LoggedUser['ID']==$Tag['userid']) 
-                                  /*    <a title="Delete tag '<?=$Tag['name']?>'" href="torrents.php?action=delete_tag&amp;groupid=<?=$GroupID?>&amp;tagid=<?=$Tag['id']?>&amp;auth=<?=$LoggedUser['AuthKey']?>" style="font-family: monospace;">[X]</a> */
+        <?		if(check_perms('site_delete_tag') ) { // || ($IsUploader && $LoggedUser['ID']==$Tag['userid'])  
                                    ?>
                                    <a title="Delete tag '<?=$Tag['name']?>'" href="#tags"  onclick="return Del_Tag(<?="'{$Tag['id']}',$GroupID,'$tagsort'"?>)"   style="font-family: monospace;">[X]</a>
         <?		} else { ?>
@@ -582,11 +583,12 @@ if(count($Tags) > 0) {
                                       <br style="clear:both" />
                                 </li>
         <?
-            }
+            }   
         ?>
                           </ul>
-<?
-} else {
+<?   */
+//} else {
+if(count($Tags) == 0) {
 ?>
 			Please add a tag for this torrent!
 <?

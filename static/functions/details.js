@@ -23,24 +23,34 @@ function Del_Tag(tagid, groupid, tagsort){
     return false;
 }
 
+var sort_types = new Array("uses","score","az","added");
+var sort_type = 'uses';
 var sort_order = 'desc';
-function Resort_Tags(groupid, tagsort) {
-    sort_order = (sort_order=='desc')?'asc':'desc';
+function Resort_Tags(groupid, tagsort, order) {
+    if (!in_array(tagsort, sort_types, false)) tagsort = 'uses'
+    sort_type = tagsort;
+	if(order == undefined || (order!='asc' && order!='desc')) {
+        //alert(order);
+        sort_order = (sort_order=='desc')?'asc':'desc';
+        //alert(sort_order);
+    } else {
+        sort_order = order;
+    }
     var ToPost = [];
     ToPost['groupid'] = groupid;  
-	ToPost['tagsort'] = tagsort;  
+	ToPost['tagsort'] = sort_type;  
 	ToPost['order'] = sort_order;  
 	ToPost['auth'] = authkey; 
     ajax.post('torrents.php?action=resort_tags', ToPost, function (response) { 
         var x = json.decode(response);  
         if ( is_array(x)){
             $('#torrent_tags').html(x[0]);
-            var sort_types = new Array("uses","score","az","added");
             var i=0;
             for (i=0;i<4;i++) {
-                if( sort_types[i]==tagsort) $('#sort_' + sort_types[i]).add_class("sort_select");
+                if( sort_types[i]==sort_type) $('#sort_' + sort_types[i]).add_class("sort_select");
                 else $('#sort_' + sort_types[i]).remove_class("sort_select");
             }
+            Write_Tagsort_Cookie();
         } else { 
             alert('unforseen error :('); 
         }
@@ -270,6 +280,19 @@ function Get_Cookie() {
 }
 
 
+function Write_Tagsort_Cookie() {
+    jQuery.cookie('tagsort', json.encode([sort_type, sort_order]));
+}
+
+function Load_Tagsort_Cookie()  {
+	if(jQuery.cookie('tagsort') == undefined) {
+		jQuery.cookie('tagsort', json.encode(['uses', 'desc']));
+	}
+	var state = json.decode( jQuery.cookie('tagsort') );
+    Resort_Tags( $('#sort_groupid').raw().value , state[0], state[1]);
+}
+
+
 function Load_Details_Cookie()  {
  
 	// the div that will be hidden/shown
@@ -413,5 +436,6 @@ function show_reported(TorrentID){
 
             
 addDOMLoadEvent(Load_Details_Cookie);
+addDOMLoadEvent(Load_Tagsort_Cookie);
 
 
