@@ -90,7 +90,8 @@ foreach ($Forums as $Forum) {
 	<table class="forum_index">
 		<tr class="colhead">
 			<td style="width:2%;"></td>
-			<td style="width:25%;">Forum</td>
+			<td style="width:30%;" >Forum</td>
+			<!--<td style="width:25%;" ></td>-->
 			<td>Last Post</td>
 			<td style="text-align: center;width:7%;">Topics</td>
 			<td style="text-align: center;width:7%;">Posts</td>
@@ -113,9 +114,12 @@ foreach ($Forums as $Forum) {
 		<td class="<?=$Read?>" title="<?=ucfirst($Read)?>"></td>
 		<td>
 			<h4 class="min_padding">
-				<a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>" title="<?=display_str($ForumDescription)?>"><?=display_str($ForumName)?></a>
+				<a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>" title="<?=$ForumDescription?>"><?=display_str($ForumName)?></a>
 			</h4>
 		</td>
+		<!--<td style="">
+            <span class="forum_desc" style="font-style: italic"><?=$ForumDescription?></span>
+        </td>-->
 <? if ($NumPosts == 0) { ?>
 		<td colspan="3">
 			There are no topics here<?=($MinCreate<=$LoggedUser['Class']) ? ', <a href="forums.php?action=new&amp;forumid='.$ForumID.'">'.'create one'.'</a>' : ''?>.

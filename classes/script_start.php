@@ -96,7 +96,7 @@ $Debug->set_flag('start user handling');
 // Get permissions
 list($Classes, $ClassLevels, $ClassNames) = $Cache->get_value('classes');
 if (!$Classes || !$ClassLevels) {
-    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName FROM permissions ORDER BY IsUserClass, Level"); //WHERE IsUserClass='1' 
+    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName, IsUserClass FROM permissions ORDER BY IsUserClass, Level"); //WHERE IsUserClass='1' 
     $Classes = $DB->to_array('ID');
     $ClassLevels = $DB->to_array('Level');
     $ClassNames = $DB->to_array('ShortName');
