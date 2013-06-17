@@ -90,6 +90,8 @@ if(count($Downloads)) {
 require(SERVER_ROOT.'/classes/class_torrent.php');
 require(SERVER_ROOT.'/classes/class_zip.php');
 $Zip = new ZIP(file_string($CollageName));
+$Zip->unlimit(); // mifune: lets see if this solves the download problems with super large zips
+
 foreach($Downloads as $Download) {
 	list($GroupID, $TorrentID, $Album, $Size) = $Download;
 	$TotalSize += $Size;
