@@ -46,11 +46,10 @@ if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']
         }
     }
     if ($Properties) {
-        //list($Properties) = $Template;
         // only the uploader can use this to prefill (if not a public template)
         if ($Properties['Public']==0 && $Properties['UserID'] != $LoggedUser['ID']) {
             unset($Properties); 
-        } 
+        }
     }
     
 } elseif (empty($Properties) && !empty($_GET['groupid']) && is_number($_GET['groupid'])) {
@@ -236,7 +235,7 @@ foreach ($Whitelist as $ImageHost) {
 <?
     if (check_perms('use_templates')) {
         //include(SERVER_ROOT.'/sections/upload/functions.php'); 
-        $Templates = get_templates($LoggedUser['ID']);
+        //$Templates = get_templates($LoggedUser['ID']);
         
         $CanDelAny = check_perms('delete_any_template')?'1':'0';
 ?>
@@ -246,15 +245,22 @@ foreach ($Whitelist as $ImageHost) {
                 <div style="margin:5px auto 10px;" class="nobr center">
                     <label for="template">select template: </label>
                     <div id="template_container" style="display: inline-block">
+<?
+                        echo get_templatelist_html($LoggedUser['ID'], $TemplateID);
+
+                        /*
+                        ?>
                     <select id="template" name="template" onchange="SelectTemplate(<?=$CanDelAny?>);" title="Select a template (*=public)">
                         <option value="0">---</option>
-    <? foreach ($Templates as $template) {
-        list($tID, $tName,$tPublic,$tAuthorname) = $template; 
-        if ($tPublic==1) $tName .= " (by $tAuthorname)*"
-        ?>
+<?
+                foreach ($Templates as $template) {
+                    list($tID, $tName,$tPublic,$tAuthorname) = $template; 
+                    if ($tPublic==1) $tName .= " (by $tAuthorname)*"
+?>
                             <option value="<?=$tID?>"<? if($TemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
-    <? } ?>
-                    </select>
+<?              }                   ?>
+                    </select>  */  ?>
+                        
                     </div>
                     <input type="submit" name="fill" id="fill" value="fill from" disabled="disabled" title="Fill the upload form from selected template" />
                     <!--<input type="submit" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />-->

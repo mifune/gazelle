@@ -76,7 +76,7 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
 }
 
 
-
+/*
 function get_templates($UserID) {
     global $DB, $Cache;
     
@@ -110,8 +110,49 @@ function get_templates($UserID) {
                         $Cache->cache_value('templates_public', $PublicTemplates, 96400);
     }
     return array_merge($UserTemplates, $PublicTemplates);
+} */
+
+
+
+function get_templates_private($UserID) {
+    global $DB, $Cache;
+    
+    $UserTemplates = $Cache->get_value('templates_ids_' . $UserID);
+    if ($UserTemplates === FALSE) {
+                        $DB->query("SELECT 
+                                    t.ID,
+                                    t.Name,
+                                    t.Public,
+                                    u.Username
+                               FROM upload_templates as t
+                          LEFT JOIN users_main AS u ON u.ID=t.UserID
+                              WHERE t.UserID='$UserID' 
+                                AND Public='0'
+                           ORDER BY Name");
+                        $UserTemplates = $DB->to_array();
+                        $Cache->cache_value('templates_ids_' . $UserID, $UserTemplates, 96400);
+    }
+    return $UserTemplates;
 }
 
+function get_templates_public() {
+    global $DB, $Cache;
+    $PublicTemplates = $Cache->get_value('templates_public');
+    if ($PublicTemplates === FALSE) {
+                        $DB->query("SELECT 
+                                    t.ID,
+                                    t.Name,
+                                    t.Public,
+                                    u.Username
+                               FROM upload_templates as t
+                          LEFT JOIN users_main AS u ON u.ID=t.UserID
+                              WHERE Public='1'
+                           ORDER BY Name");
+                        $PublicTemplates = $DB->to_array();
+                        $Cache->cache_value('templates_public', $PublicTemplates, 96400);
+    }
+    return $PublicTemplates;
+}
 
 /**
  * Returns the inner list elements of the tag table for a torrent
@@ -124,18 +165,30 @@ function get_templatelist_html($UserID, $SelectedTemplateID =0) {
     
     ob_start();
  
-    $Templates = get_templates($UserID);
+    $TemplatesPrivate = get_templates_private($UserID);
+    $TemplatesPublic = get_templates_public();
 ?>
                     
         <select id="template" name="template" onchange="SelectTemplate(<?=(check_perms('delete_any_template')?'1':'0')?>);" title="Select a template (*=public)">
-                <option value="0" <? if($SelectedTemplateID==0) echo ' selected="selected"' ?>>---</option>
-    <?  
-            foreach ($Templates as $template) {
+            <option class="indent" value="0" <? if($SelectedTemplateID==0) echo ' selected="selected"' ?>>---</option>
+            <optgroup label="private templates">
+<?  
+            foreach ($TemplatesPrivate as $template) {
                 list($tID, $tName,$tPublic,$tAuthorname) = $template; 
                 if ($tPublic==1) $tName .= " (by $tAuthorname)*"
 ?>
-                <option value="<?=$tID?>"<? if($SelectedTemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
-<?          } ?>
+                <option class="indent" value="<?=$tID?>"<? if($SelectedTemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
+<?          }         ?>
+            </optgroup>
+            <optgroup label="public templates">
+<?
+            foreach ($TemplatesPublic as $template) {
+                list($tID, $tName,$tPublic,$tAuthorname) = $template; 
+                if ($tPublic==1) $tName .= " (by $tAuthorname)"
+?>
+                <option class="indent" value="<?=$tID?>"<? if($SelectedTemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
+<?          }           ?>
+            </optgroup>
         </select>
 <?                
     $html = ob_get_contents(); 

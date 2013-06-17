@@ -2798,3 +2798,6 @@ blockquote.bbcode.error code.error {
     margin-right: 3px;
 } 
 
+.indent {
+    margin-left: 20px;
+}
