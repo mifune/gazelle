@@ -58,9 +58,9 @@ show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.
 <?  if($CanEdit) { ?> 
 		<a href="requests.php?action=edit&amp;id=<?=$RequestID?>">[Edit]</a>
 <?  }
-    if($CanEdit) {     // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
+    if(check_perms('site_moderate_requests') ) {  // $CanEdit   // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
 		<a href="requests.php?action=delete&amp;id=<?=$RequestID?>">[Delete]</a>
-<?  } 
+<?  }
  	if(has_bookmarked('request', $RequestID)) { ?>
 		<a href="#" id="bookmarklink_request_<?=$RequestID?>" onclick="Unbookmark('request', <?=$RequestID?>,'[Bookmark]');return false;">[Remove bookmark]</a>
 <?	} else { ?>

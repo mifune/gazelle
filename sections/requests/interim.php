@@ -14,7 +14,7 @@ if($Action == 'unfill') {
 		error(403); 
 	}
 } elseif($Action == "delete") {
-	if($LoggedUser['ID'] != $RequestorID && !check_perms('site_moderate_requests')) { 
+	if(!check_perms('site_moderate_requests')) {    // $LoggedUser['ID'] != $RequestorID && 
 		error(403); 
 	}
 }
