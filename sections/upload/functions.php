@@ -171,24 +171,31 @@ function get_templatelist_html($UserID, $SelectedTemplateID =0) {
                     
         <select id="template" name="template" onchange="SelectTemplate(<?=(check_perms('delete_any_template')?'1':'0')?>);" title="Select a template (*=public)">
             <option class="indent" value="0" <? if($SelectedTemplateID==0) echo ' selected="selected"' ?>>---</option>
+<?
+        if(count($TemplatesPrivate)>0) {
+?>
             <optgroup label="private templates">
 <?  
             foreach ($TemplatesPrivate as $template) {
                 list($tID, $tName,$tPublic,$tAuthorname) = $template; 
-                if ($tPublic==1) $tName .= " (by $tAuthorname)*"
 ?>
                 <option class="indent" value="<?=$tID?>"<? if($SelectedTemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
 <?          }         ?>
             </optgroup>
+<?
+        }
+        if(count($TemplatesPublic)>0) {
+?>
             <optgroup label="public templates">
 <?
             foreach ($TemplatesPublic as $template) {
                 list($tID, $tName,$tPublic,$tAuthorname) = $template; 
-                if ($tPublic==1) $tName .= " (by $tAuthorname)"
+                if ($tPublic==1) $tName .= " (by $tAuthorname)*"
 ?>
                 <option class="indent" value="<?=$tID?>"<? if($SelectedTemplateID==$tID) echo ' selected="selected"' ?>><?=$tName?></option>
 <?          }           ?>
             </optgroup>
+<?      }         ?>
         </select>
 <?                
     $html = ob_get_contents(); 

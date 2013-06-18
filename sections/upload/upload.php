@@ -265,7 +265,7 @@ foreach ($Whitelist as $ImageHost) {
                     <input type="submit" name="fill" id="fill" value="fill from" disabled="disabled" title="Fill the upload form from selected template" />
                     <!--<input type="submit" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />-->
                     <input type="button" onclick="DeleteTemplate(<?=$CanDelAny?>);" name="delete" id="delete" value="delete" disabled="disabled" title="Delete selected template" />
-                    <input type="button" onclick="OverwriteTemplate(<?=$CanDelAny?>,<?=$tPublic?>);" name="save" id="save" value="save over" disabled="disabled" title="Save current form as selected template (overwrites data in this template)" />
+                    <input type="button" onclick="OverwriteTemplate(<?=$CanDelAny?>);" name="save" id="save" value="save over" disabled="disabled" title="Save current form as selected template (overwrites data in this template)" />
                 </div>
                 <div style="margin:10px auto 5px;" class="nobr center">
                     

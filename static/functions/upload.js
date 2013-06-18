@@ -23,14 +23,10 @@ function SynchInterface(){
 }
 
 function SelectTemplate(can_delete_any){ // a proper check is done in the backend.. the param is just for the interface
-    $('#fill').disable($('#template').raw().value==0);
-    
-    $('#delete').disable($('#template').raw().value==0 || 
-            (can_delete_any!='1' && EndsWith($('#template').raw().options[$('#template').raw().selectedIndex].text, ')*')));
-    
-    $('#save').disable($('#template').raw().value==0 || 
-            (can_delete_any!='1' && EndsWith($('#template').raw().options[$('#template').raw().selectedIndex].text, ')*')));
-    
+    $('#fill').disable($('#template').raw().selectedIndex==0);
+    var can_delete = can_delete_any=='1' || !EndsWith($('#template').raw().options[$('#template').raw().selectedIndex].text, ')*');
+    $('#delete').disable($('#template').raw().selectedIndex==0 || !can_delete);
+    $('#save').disable($('#template').raw().selectedIndex==0 || !can_delete);
     return false;
 }
 
@@ -68,14 +64,14 @@ function DeleteTemplate(can_delete_any){
 
 
 
-function OverwriteTemplate(can_delete_any, is_public){
+function OverwriteTemplate(can_delete_any){
       
-    var TemplateID = $('#template').raw().options[$('#template').raw().selectedIndex].value; 
+    var TemplateID = $('#template').raw().options[$('#template').raw().selectedIndex].value;
     if(TemplateID==0) return false;
     
     if(!confirm("This will overwrite the selected template '" + $('#template').raw().options[$('#template').raw().selectedIndex].text + "'\nAre you sure you want to proceed?"))return false;
     
-    return SaveTemplate(can_delete_any, is_public, '', TemplateID);
+    return SaveTemplate(can_delete_any, 0, '', TemplateID);
 }
 
 function AddTemplate(can_delete_any, is_public){
