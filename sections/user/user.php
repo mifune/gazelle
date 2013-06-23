@@ -1513,6 +1513,7 @@ if (check_perms('users_mod', $Class)) {
 					<select name="Class">
 <?
 		foreach ($ClassLevels as $CurClass) {
+            if ($CurClass['IsUserClass']!='1') continue;
 			if (check_perms('users_promote_below', $Class) && $CurClass['ID']>=$LoggedUser['Class']) { break; }
 			if ($CurClass['ID']>$LoggedUser['Class']) { break; }
 			if ($Class===$CurClass['Level']) { $Selected='selected="selected"'; } else { $Selected=""; }
