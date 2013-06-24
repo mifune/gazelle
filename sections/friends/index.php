@@ -1,5 +1,5 @@
 <?
-$P = db_array($_POST);
+$P = db_array($_REQUEST);
 enforce_login();
 if(!empty($_REQUEST['friendid']) && !is_number($_REQUEST['friendid'])) {
 	error(404);
@@ -11,6 +11,7 @@ if(!empty($_REQUEST['action'])) {
 			include(SERVER_ROOT.'/sections/friends/add.php');
 			break;
 		case 'Defriend':
+		case 'Unblock':
 			authorize();
 			include(SERVER_ROOT.'/sections/friends/remove.php');
 			break;

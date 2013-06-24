@@ -31,6 +31,8 @@ if(($UserInfo = $Cache->get_value('user_info_'.$UserID)) === FALSE) {
 		m.Username,
 		m.Enabled,
 		m.Title,
+              m.PermissionID,
+              m.CustomPermissions,
 		i.Avatar,
 		i.Donor,
 		i.Warned
@@ -41,9 +43,9 @@ if(($UserInfo = $Cache->get_value('user_info_'.$UserID)) === FALSE) {
 	if($DB->record_count() == 0){ // If user doesn't exist
 		error(404);
 	}
-	list($Username, $Enabled, $Title, $Avatar, $Donor, $Warned) = $DB->next_record();
+	list($Username, $Enabled, $Title, $PermissionID, $CustomPermissions, $Avatar, $Donor, $Warned) = $DB->next_record(MYSQLI_BOTH,array('CustomPermissions'));
 } else {
-	extract(array_intersect_key($UserInfo, array_flip(array('Username', 'Enabled', 'Title', 'Avatar', 'Donor', 'Warned'))));
+	extract(array_intersect_key($UserInfo, array_flip(array('Username', 'Enabled', 'Title', 'PermissionID', 'CustomPermissions', 'Avatar', 'Donor', 'Warned'))));
 }
 
 if(check_perms('site_proxy_images') && !empty($Avatar)) {
@@ -56,6 +58,10 @@ if($LoggedUser['CustomForums']) {
 	unset($LoggedUser['CustomForums']['']);
 	$RestrictedForums = implode("','", array_keys($LoggedUser['CustomForums'], 0));
 }
+
+$UserPermissions = get_permissions($PermissionID);
+$PermissionsInfo = get_permissions_for_user($UserID, $CustomPermissions, $UserPermissions);
+
 $ViewingOwn = ($UserID == $LoggedUser['ID']);
 $ShowUnread = ($ViewingOwn && (!isset($_GET['showunread']) || !!$_GET['showunread']));
 $ShowGrouped = ($ViewingOwn && (!isset($_GET['group']) || !!$_GET['group']));
@@ -229,7 +235,8 @@ if($ViewingOwn) {
 		}
 	}
 ?>
-			<a href="userhistory.php?action=subscriptions">Go to subscriptions</a>
+			<a href="userhistory.php?action=subscriptions">Go to subscriptions</a>&nbsp;&nbsp;&nbsp;
+			<a href="comments.php">Go to comment history</a>
 <?
 }
 
@@ -254,7 +261,7 @@ if(empty($Results)) {
 	while(list($PostID, $AddedTime, $Body, $EditedUserID, $EditedTime, $EditedUsername, $TopicID, $ThreadTitle, $LastPostID, $LastRead, $Locked, $Sticky) = $DB->next_record()){
 ?>
 	<table class='forum_post vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>' id='post<?=$PostID ?>'>
-		<tr class='colhead_dark'>
+		<tr class='smallhead'>
 			<td  colspan="2">
 				<span style="float:left;">
 					<?=time_diff($AddedTime) ?>
@@ -262,7 +269,7 @@ if(empty($Results)) {
 <?
 		if($ViewingOwn) {
 			if ((!$Locked  || $Sticky) && (!$LastRead || $LastRead < $LastPostID)) { ?> 
-					<span style="color: red;">(New!)</span>
+					<span class="newstatus">(New!)</span>
 <?
 			}
 ?>
@@ -294,25 +301,26 @@ if(empty($Results)) {
 			if(empty($HeavyInfo['DisableAvatars'])) {
 ?>
 			<td class='avatar' valign="top">
-<?
-				if($Avatar) {
-?>
-				<img src='<?=$Avatar?>' width='150' style="max-height:400px;" alt="<?=$Username?>'s avatar" />
-<?
-				} 
-?>
+
+	<? if ($Avatar) {   ?>
+			<img src="<?=$Avatar?>" class="avatar" style="<?=get_avatar_css($UserPermissions['MaxAvatarWidth'], $UserPermissions['MaxAvatarHeight'])?>" alt="<?=$Username ?>'s avatar" />
+	<? } else { ?>
+			<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
+	<?
+         }
+	?>
 			</td>
 <?
 			}
 ?>
 			<td class='body' valign="top">
 				<div id="content<?=$PostID?>">
-					<?=$Text->full_format($Body)?>
+					<?=$Text->full_format($Body, isset($PermissionsInfo['site_advanced_tags']) &&  $PermissionsInfo['site_advanced_tags'] );?>
 <?			if($EditedUserID) { ?>       
 					<br />
 					<br />
 <?				if(check_perms('site_moderate_forums')) { ?>
-					<a href="#content<?=$PostID?>" onclick="LoadEdit(<?=$PostID?>, 1)">&laquo;</a>
+					<a href="#content<?=$PostID?>" onclick="LoadEdit('forums', <?=$PostID?>, 1)">&laquo;</a>
 <? 				} ?>		   
 					Last edited by
 					<?=format_username($EditedUserID, $EditedUsername) ?> <?=time_diff($EditedTime,2,true,true)?>

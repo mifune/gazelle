@@ -1,5 +1,10 @@
 <?
 if ($Message = db_string($_POST['message'])) {
+    
+      include(SERVER_ROOT.'/classes/class_text.php');
+      $Text = new TEXT;
+      $Text->validate_bbcode($_POST['message'],  get_permissions_advtags($LoggedUser['ID']));
+      
 	if ($Subject = db_string($_POST['subject'])) {
 		// New staff pm conversation
 		$Level = db_string($_POST['level']);
@@ -19,7 +24,7 @@ if ($Message = db_string($_POST['message'])) {
 				(".$LoggedUser['ID'].", '".sqltime()."', '$Message', $ConvID)"
 		);
 		
-		header('Location: staffpm.php');
+		header('Location: staffpm.php?action=user_inbox');
 		
 	} elseif ($ConvID = (int)$_POST['convid']) {
 		// Check if conversation belongs to user
@@ -39,7 +44,9 @@ if ($Message = db_string($_POST['message'])) {
 			if ($IsFLS) {
 				// FLS/Staff
 				$DB->query("UPDATE staff_pm_conversations SET Date='".sqltime()."', Unread=true, Status='Open' WHERE ID=$ConvID");
-				$Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']);
+				//$Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']);
+				//$Cache->delete_value('num_staff_pms_open_'.$LoggedUser['ID']);
+				//$Cache->delete_value('num_staff_pms_my_'.$LoggedUser['ID']);
 			} else {
 				// User
 				$DB->query("UPDATE staff_pm_conversations SET Date='".sqltime()."', Unread=true, Status='Unanswered' WHERE ID=$ConvID");

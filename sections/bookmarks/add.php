@@ -27,22 +27,15 @@ if($DB->record_count() == 0) {
 		$Cache->delete_value('bookmarks_torrent_'.$LoggedUser['ID'].'_full');
 		$GroupID = $_GET['id'];
 		
-		$DB->query("SELECT Name, Year, WikiBody, TagList FROM torrents_group WHERE ID = '$GroupID'");
-		list($GroupTitle, $Year, $Body, $TagList) = $DB->next_record();
+		$DB->query("SELECT Name, Body, TagList FROM torrents_group WHERE ID = '$GroupID'");
+		list($GroupTitle, $Body, $TagList) = $DB->next_record();
 		$TagList = str_replace('_','.',$TagList);
 		
-		$DB->query("SELECT ID, Format, Encoding, HasLog, HasCue, LogScore, Media, Scene, FreeTorrent, UserID FROM torrents WHERE GroupID = '$GroupID'");
+		$DB->query("SELECT ID, FreeTorrent, UserID FROM torrents WHERE GroupID = '$GroupID'");
 		// RSS feed stuff
 		while ($Torrent = $DB->next_record()) {
 			$Title = $GroupTitle;
-			list($TorrentID, $Format, $Bitrate, $HasLog, $HasCue, $LogScore, $Media, $Scene, $Freeleech, $UploaderID) = $Torrent;
-			$Title .= " [".$Year."] - ";
-			$Title .= $Format." / ".$Bitrate;
-			if ($HasLog == "'1'") { $Title .= " / Log"; }
-			if ($HasLog) { $Title .= " / ".$LogScore.'%'; }
-			if ($HasCue == "'1'") { $Title .= " / Cue"; }
-			$Title .= " / ".trim($Media);
-			if ($Scene == "1") { $Title .= " / Scene"; }
+			list($TorrentID, $Freeleech, $UploaderID) = $Torrent;
 			if ($Freeleech == "1") { $Title .= " / Freeleech!"; }
 			if ($Freeleech == "2") { $Title .= " / Neutral leech!"; }
 	

@@ -31,9 +31,6 @@ switch($_REQUEST['action']) {
 			case 'torrents':
 				require(SERVER_ROOT.'/sections/bookmarks/torrents.php');
 				break;
-			case 'artists':
-				require(SERVER_ROOT.'/sections/bookmarks/artists.php');
-				break;
 			case 'collages':
 				$_GET['bookmarks'] = 1;
 				require(SERVER_ROOT.'/sections/collages/browse.php');

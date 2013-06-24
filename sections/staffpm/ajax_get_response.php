@@ -26,7 +26,7 @@ if ($ID = (int)$_GET['id']) {
 	} else {
 		include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 		$Text = new TEXT;
-		echo $Text->full_format($Message);
+		echo $Text->full_format($Message, true);
 	}
 	
 } else {

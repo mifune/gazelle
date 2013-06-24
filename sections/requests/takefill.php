@@ -11,7 +11,7 @@ authorize();
 
 //VALIDATION
 if(!empty($_GET['torrentid']) && is_number($_GET['torrentid'])) {
-	$TorrentID = $_GET['torrentid'];
+	$TorID = $_GET['torrentid'];
 } else {
 	if(empty($_POST['link'])) {
 		$Err = "You forgot to supply a link to the filling torrent";
@@ -20,7 +20,7 @@ if(!empty($_GET['torrentid']) && is_number($_GET['torrentid'])) {
 		if(preg_match("/".TORRENT_REGEX."/i", $Link, $Matches) < 1) {
 			$Err = "Your link didn't seem to be a valid torrent link";
 		} else {
-			$TorrentID = $Matches[0];
+			$GroupID = $Matches[3];
 		}
 	}
 	
@@ -28,35 +28,29 @@ if(!empty($_GET['torrentid']) && is_number($_GET['torrentid'])) {
 		error($Err);
 	}
 	
-	preg_match("/torrentid=([0-9]+)/i", $Link, $Matches);
-	$TorrentID = $Matches[1];
-	if(!$TorrentID || !is_number($TorrentID)) {
+	if(!$GroupID || !is_number($GroupID)) {
 		error(404);
 	}
 }
 
+$Where = $TorID ? "t.ID = $TorrentID" : "tg.ID = $GroupID";
+
 //Torrent exists, check it's applicable
-$DB->query("SELECT t.UserID,
-				t.Time,
-				tg.ReleaseType,
-				t.Encoding,
-				t.Format,
-				t.Media, 
-				t.HasLog, 
-				t.HasCue, 
-				t.LogScore,
-				tg.CategoryID,
-				IF(t.Remastered = '1', t.RemasterCatalogueNumber, tg.CatalogueNumber)
-			FROM torrents AS t
-				LEFT JOIN torrents_group AS tg ON t.GroupID=tg.ID
-			WHERE t.ID = ".$TorrentID." 
-			LIMIT 1");
+$DB->query("SELECT 
+                    t.ID,
+                    t.UserID,
+                    t.Time,
+                    tg.NewCategoryID				
+            FROM torrents AS t
+                    LEFT JOIN torrents_group AS tg ON t.GroupID=tg.ID
+            WHERE $Where 
+            LIMIT 1");
 
 
 if($DB->record_count() < 1) {
 	error(404);
 }
-list($UploaderID, $UploadTime, $TorrentReleaseType, $Bitrate, $Format, $Media, $HasLog, $HasCue, $LogScore, $TorrentCategoryID, $TorrentCatalogueNumber) = $DB->next_record();
+list($TorrentID, $UploaderID, $UploadTime, $TorrentCategoryID) = $DB->next_record();
 
 $FillerID = $LoggedUser['ID'];
 $FillerUsername = $LoggedUser['Username'];
@@ -77,90 +71,23 @@ if(time_ago($UploadTime) < 3600 && $UploaderID != $FillerID && !check_perms('sit
 
 
 
-$DB->query("SELECT
-		Title,
-		UserID,
-		TorrentID,
-		CategoryID,
-		ReleaseType,
-		CatalogueNumber,
-		BitrateList,
-		FormatList,
-		MediaList,
-		LogCue
-	FROM requests
-	WHERE ID = ".$RequestID);
-list($Title, $RequesterID, $OldTorrentID, $RequestCategoryID, $RequestReleaseType, $RequestCatalogueNumber, $BitrateList, $FormatList, $MediaList, $LogCue) = $DB->next_record();
+$DB->query("SELECT Title, UserID, TorrentID, CategoryID
+              FROM requests WHERE ID = ".$RequestID);
+list($Title, $RequesterID, $OldTorrentID, $RequestCategoryID) = $DB->next_record();
 
 
 if(!empty($OldTorrentID)) {
 	$Err = "This request has already been filled";
 }
+/*  // mifune: removing category match
 if($RequestCategoryID != 0 && $TorrentCategoryID != $RequestCategoryID) {
 	$Err = "This torrent is of a different category than the request";
-}
-
-$CategoryName = $Categories[$RequestCategoryID - 1];
-
-if($CategoryName == "Music") {
-	//Commenting out as it's causing some issues with some users being unable to fill, unsure what it is, etc
-	/*if($RequestCatalogueNumber) {
-		if($TorrentCatalogueNumber != $RequestCatalogueNumber) {
-			$Err = "This request requires the catalogue number ".$RequestCatalogueNumber;
-		}
-	}*/
-
-	//WEB has no ripping log.  Ditto Vinyl - Actually ditto everything but CD
-	//$WEBOverride   = ((strpos($MediaList, "WEB") !== false) && $Media == "WEB");
-	//$VinylOverride = ((strpos($MediaList, "Vinyl") !== false) && $Media == "Vinyl");
-	//if($Format == "FLAC" && $LogCue && !$WEBOverride && !$VinylOverride) {
-	if($Format == "FLAC" && $LogCue && $Media == 'CD') {
-		if(strpos($LogCue, "Log") && !$HasLog) {
-			$Err = "This request requires a log";
-		}
-
-		/*
-		 * Removed due to rule 2.2.15.6 rendering some requests unfillable
-		 */
-
-		//if(strpos($LogCue, "Cue") && !$HasCue) {
-		//	$Err = "This request requires a cue";
-		//}
-		 
-		if(strpos($LogCue, "%")) {
-			preg_match("/\d+/", $LogCue, $Matches);
-			if((int) $LogScore < (int) $Matches[0]) {
-				$Err = "This torrent's log score is too low";
-			}
-		}
-	}
-
-	if ($BitrateList === "Other") {
-		if ($Bitrate === "Lossless" || $Bitrate === "APS (VBR)" || $Bitrate === "V2 (VBR)" || $Bitrate === "V1 (VBR)" || $Bitrate === "256" || $Bitrate === "APX (VBR)" || $Bitrate === "V0 (VBR)" || $Bitrate === "q8.x (VBR)" || $Bitrate === "320" || $Bitrate === "24bit Lossless")
-			$Err = $Bitrate." is not allowed bitrate for this request";
-	} else if($BitrateList && $BitrateList != "Any") {
-		if(strpos($BitrateList, $Bitrate) === false) {
-			$Err = $Bitrate." is not an allowed bitrate for this request";
-		}
-	}
-	if($FormatList && $FormatList != "Any") {
-		if(strpos($FormatList, $Format) === false) {
-			$Err = $Format." is not an allowed format for this request";
-		}
-	}
-	if($MediaList && $MediaList != "Any") {
-		if(strpos($MediaList, $Media) === false) {
-			$Err = $Media." is not allowed media for this request";
-		}
-	}
-}
+} */
 
 // Fill request
 if(!empty($Err)) {
 	error($Err);
 }
-
-
 
 //We're all good! Fill!
 $DB->query("UPDATE requests SET
@@ -169,19 +96,13 @@ $DB->query("UPDATE requests SET
 				TimeFilled = '".sqltime()."'
 			WHERE ID = ".$RequestID);	
 
-if($CategoryName == "Music") {
-	$ArtistForm = get_request_artists($RequestID);
-	$ArtistName = display_artists($ArtistForm, false, true);
-	$FullName = $ArtistName.$Title;
-} else {
-	$FullName = $Title;
-}
+$FullName = $Title;
 
 $DB->query("SELECT UserID FROM requests_votes WHERE RequestID = ".$RequestID);
 $UserIDs = $DB->to_array();
 foreach ($UserIDs as $User) {
 	list($VoterID) = $User;
-	send_pm($VoterID, 0, db_string("The request '".$FullName."' has been filled"), db_string("One of your requests - [url=http://".NONSSL_SITE_URL."/requests.php?action=view&id=".$RequestID."]".$FullName."[/url] - has been filled. You can view it at [url]http://".NONSSL_SITE_URL."/torrents.php?torrentid=".$TorrentID), '');
+	send_pm($VoterID, 0, db_string("The request '".$FullName."' has been filled"), db_string("One of your requests - [url=/requests.php?action=view&id=".$RequestID."]".$FullName."[/url] - has been filled. You can view it at [url=/torrents.php?torrentid=".$TorrentID."]http://".NONSSL_SITE_URL."/torrents.php?torrentid=".$TorrentID."[/url]"), '');
 }
 
 $RequestVotes = get_votes_array($RequestID);
@@ -192,20 +113,15 @@ $DB->query("UPDATE users_main
 			SET Uploaded = (Uploaded + ".$RequestVotes['TotalBounty'].") 
 			WHERE ID = ".$FillerID);
 
+write_user_log($FillerID, "Added +". get_size($RequestVotes['TotalBounty']). " for filling [url=/requests.php?action=view&id={$RequestID}]Request $RequestID ({$Title})[/url] ");
+    
 
 
 $Cache->delete_value('user_stats_'.$FillerID);
 $Cache->delete_value('request_'.$RequestID);
+$Cache->delete_value('requests_torrent_'.$TorrentID);
 if ($GroupID) {
 	$Cache->delete_value('requests_group_'.$GroupID);
-}
-
-
-
-$DB->query("SELECT ArtistID FROM requests_artists WHERE RequestID = ".$RequestID);
-$ArtistIDs = $DB->to_array();
-foreach($ArtistIDs as $ArtistID) {
-	$Cache->delete_value('artists_requests_'.$ArtistID);
 }
 
 $SS->UpdateAttributes('requests', array('torrentid','fillerid'), array($RequestID => array((int)$TorrentID,(int)$FillerID)));

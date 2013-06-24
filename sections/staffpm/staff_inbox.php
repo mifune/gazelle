@@ -1,17 +1,16 @@
 <?
+include(SERVER_ROOT.'/sections/staffpm/functions.php');
 
 show_header('Staff Inbox');
 
 $View = display_str($_GET['view']);
 $UserLevel = $LoggedUser['Class'];
 
+list($NumMy, $NumUnanswered, $NumOpen) = get_num_staff_pms($LoggedUser['ID'], $UserLevel);
+
 // Setup for current view mode
 $SortStr = "IF(AssignedToUser = ".$LoggedUser['ID'].",0,1) ASC, ";
 switch ($View) {
-	case 'unanswered':
-		$ViewString = "Unanswered";
-		$WhereCondition = "WHERE (Level <= $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
-		break;
 	case 'open':
 		$ViewString = "All open";
 		$WhereCondition = "WHERE (Level <= $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status IN ('Open', 'Unanswered')";
@@ -26,19 +25,10 @@ switch ($View) {
 		$ViewString = "My unanswered";
 		$WhereCondition = "WHERE (Level = $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
 		break;
+	case 'unanswered':
 	default:
-		if ($UserLevel >= 700) {
-			$ViewString = "My unanswered";
-			$WhereCondition = "WHERE ((Level >= ".max($Classes[MOD]['Level'],700)." AND Level <= $UserLevel) OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
-		} elseif ($UserLevel == 650) {
-			// Forum Mods
-			$ViewString = "My Unanswered";
-			$WhereCondition = "WHERE (Level = $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
-		} else {
-			// FLS
-			$ViewString = "Unanswered";
-			$WhereCondition = "WHERE (Level <= $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
-		}
+		$ViewString = "All unanswered";
+		$WhereCondition = "WHERE (Level <= $UserLevel OR AssignedToUser='".$LoggedUser['ID']."') AND Status='Unanswered'";
 		break;
 }
 
@@ -58,7 +48,7 @@ $StaffPMs = $DB->query("
 		ResolverID
 	FROM staff_pm_conversations
 	$WhereCondition
-	ORDER BY $SortStr Level DESC, Date DESC
+	ORDER BY $SortStr Status DESC, Date DESC
 	LIMIT $Limit
 ");
 
@@ -79,18 +69,19 @@ $Row = 'a';
 // Start page
 ?>
 <div class="thin">
-	<h2><?=$ViewString?> Staff PMs</h2>
 	<div class="linkbox">
-<? 	if ($IsStaff) {
-?>		<a href="staffpm.php">[My unanswered]</a>
+<? 	if ($IsStaff) { ?>
+		[ &nbsp;<a href="staffpm.php?view=my">My unanswered<?=$NumMy>0?" ($NumMy)":''?></a>&nbsp; ] &nbsp; 
 <? 	} ?>
-		<a href="staffpm.php?view=unanswered">[All unanswered]</a>
-		<a href="staffpm.php?view=open">[Open]</a>
-		<a href="staffpm.php?view=resolved">[Resolved]</a>
+		[ &nbsp;<a href="staffpm.php?view=unanswered">All unanswered<?=$NumUnanswered>0?" ($NumUnanswered)":''?></a>&nbsp; ] &nbsp; 
+		[ &nbsp;<a href="staffpm.php?view=open">Open<?=$NumOpen>0?" ($NumOpen)":''?></a>&nbsp; ] &nbsp; 
+		[ &nbsp;<a href="staffpm.php?view=resolved">Resolved</a>&nbsp; ] &nbsp; 
+		[ &nbsp;<a href="staffpm.php?action=responses">Common Answers</a>&nbsp; ]
 		<br />
 		<br />
 		<?=$Pages?>
 	</div>
+	<div class="head"><?=$ViewString?> Staff PMs</div>    
 	<div class="box pad" id="inbox">
 <?
 
@@ -105,7 +96,7 @@ if ($DB->record_count() == 0) {
 	if ($ViewString != 'Resolved' && $IsStaff) {
 		// Open multiresolve form
 ?>
-		<form method="post" action="staffpm.php" id="messageform">
+		<form method="post" action="staffpm.php" id="messageform" onsubmit="return anyChecks('messageform')">
 			<input type="hidden" name="action" value="multiresolve" />
 			<input type="hidden" name="view" value="<?=strtolower($View)?>" />
 <?
@@ -118,13 +109,15 @@ if ($DB->record_count() == 0) {
 <? 				if ($ViewString != 'Resolved' && $IsStaff) { ?>
 					<td width="10"><input type="checkbox" onclick="toggleChecks('messageform',this)" /></td>
 <? 				} ?>
-					<td width="50%">Subject</td>
-					<td>Sender</td>
-					<td>Date</td>
-					<td>Assigned to</td>
+					<td>Subject</td>
+					<td width="20%">User</td>
+					<td width="18%">Date</td>
+					<td width="18%">Assigned to</td>
 <?				if ($ViewString == 'Resolved') { ?>
-					<td>Resolved by</td>
-<?				} ?>
+					<td width="18%">Resolved by</td>
+<?				} else { ?>
+                              <td width="8%">Status</td>
+<?				}  ?>
 				</tr>
 <?
 
@@ -168,6 +161,8 @@ if ($DB->record_count() == 0) {
 					<td><?=$Assigned?></td>
 <?				if ($ViewString == 'Resolved') { ?>
 					<td><?=$ResolverStr?></td>
+<?				} else { ?>
+                              <td><?=$Status?></td>
 <?				} ?>
 				</tr>
 <?

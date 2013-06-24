@@ -9,10 +9,10 @@ if(empty($_POST['reportid']) && !is_number($_POST['reportid'])) {
 	error(403);
 }
 
-$ReportID = $_POST['reportid'];
+$ReportID = (int)$_POST['reportid'];
 
-$DB->query("SELECT Type FROM reports WHERE ID = ".$ReportID);
-list($Type) = $DB->next_record();
+$DB->query("SELECT Type, ConvID FROM reports WHERE ID = ".$ReportID);
+list($Type,$ConvID) = $DB->next_record();
 if(!check_perms('admin_reports')) {
 	if(check_perms('site_moderate_forums')) {
 		if(!in_array($Type, array('collages_comment', 'post', 'requests_comment', 'thread', 'torrents_comment'))) {
@@ -25,12 +25,23 @@ if(!check_perms('admin_reports')) {
 	}
 }
 
+$Comment = sqltime()." - Resolved by {$LoggedUser['Username']}";
+if (isset($_POST['comment'])) $Comment .= " - {$_POST['comment']}";
+$Comment=db_string($Comment);
+
 $DB->query("UPDATE reports 
 			SET Status='Resolved',
 				ResolvedTime='".sqltime()."',
-				ResolverID='".$LoggedUser['ID']."'
+				ResolverID='{$LoggedUser['ID']}',
+				Comment=CONCAT_WS( '\n', Comment, '$Comment')
 			WHERE ID='".db_string($ReportID)."'");
 
+                        
+if ($ConvID && $ConvID>0){
+    $DB->query("UPDATE staff_pm_conversations SET Status='Resolved', ResolverID=".$LoggedUser['ID']." WHERE ID=$ConvID");
+    $Cache->delete_value('staff_pm_new_'.$LoggedUser['ID']);
+    $Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']); 
+}
 
 $Channels = array();
 
@@ -53,6 +64,8 @@ foreach($Channels as $Channel) {
 }
 
 $Cache->delete_value('num_other_reports');
+
+
 
 header('Location: reports.php');
 ?>

@@ -10,55 +10,10 @@ include(SERVER_ROOT.'/sections/forums/functions.php');
 
 // Replace the old hard-coded forum categories
 unset($ForumCats);
-$ForumCats = $Cache->get_value('forums_categories');
-if ($ForumCats === false) {
-	$DB->query("SELECT ID, Name FROM forums_categories");
-	$ForumCats = array();
-	while (list($ID, $Name) =  $DB->next_record()) {
-		$ForumCats[$ID] = $Name;
-	}
-	$Cache->cache_value('forums_categories', $ForumCats, 0); //Inf cache.
-}
-
+$ForumCats = get_forum_cats(); 
 //This variable contains all our lovely forum data
-if(!$Forums = $Cache->get_value('forums_list')) {
-	$DB->query("SELECT
-		f.ID,
-		f.CategoryID,
-		f.Name,
-		f.Description,
-		f.MinClassRead,
-		f.MinClassWrite,
-		f.MinClassCreate,
-		f.NumTopics,
-		f.NumPosts,
-		f.LastPostID,
-		f.LastPostAuthorID,
-		um.Username,
-		f.LastPostTopicID,
-		f.LastPostTime,
-		COUNT(sr.ThreadID) AS SpecificRules,
-		t.Title,
-		t.IsLocked,
-		t.IsSticky
-		FROM forums AS f
-		JOIN forums_categories AS fc ON fc.ID = f.CategoryID
-		LEFT JOIN forums_topics as t ON t.ID = f.LastPostTopicID
-		LEFT JOIN users_main AS um ON um.ID=f.LastPostAuthorID
-		LEFT JOIN forums_specific_rules AS sr ON sr.ForumID = f.ID
-		GROUP BY f.ID
-		ORDER BY fc.Sort, fc.Name, f.CategoryID, f.Sort");
-	$Forums = $DB->to_array('ID', MYSQLI_ASSOC, false);
-	foreach($Forums as $ForumID => $Forum) {
-		if(count($Forum['SpecificRules'])) {
-			$DB->query("SELECT ThreadID FROM forums_specific_rules WHERE ForumID = ".$ForumID);
-			$ThreadIDs = $DB->collect('ThreadID');
-			$Forums[$ForumID]['SpecificRules'] = $ThreadIDs;
-		}
-	}
-	unset($ForumID, $Forum);
-	$Cache->cache_value('forums_list', $Forums, 0); //Inf cache.
-}
+$Forums = get_forums_info();
+ 
 
 if(!empty($_POST['action'])){
 	switch ($_POST['action']) {
@@ -71,6 +26,9 @@ if(!empty($_POST['action'])){
 		case 'mod_thread':
 			require(SERVER_ROOT.'/sections/forums/mod_thread.php');
 			break;
+        case 'trash_post':
+			require(SERVER_ROOT.'/sections/forums/trash.php');
+			break;
 		case 'poll_mod':
 			require(SERVER_ROOT.'/sections/forums/poll_mod.php');
 			break;
@@ -82,6 +40,9 @@ if(!empty($_POST['action'])){
 	}
 } elseif(!empty($_GET['action'])) {
 	switch ($_GET['action']) {
+		case 'unread': 
+			require(SERVER_ROOT.'/sections/forums/unread_posts.php');
+			break;
 		case 'viewforum':
 			// Page that lists all the topics in a forum
 			require(SERVER_ROOT.'/sections/forums/forum.php');

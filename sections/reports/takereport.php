@@ -1,8 +1,12 @@
 <?
 authorize();
 
-if(empty($_POST['id']) || !is_number($_POST['id']) || empty($_POST['type']) || ($_POST['type'] != "request_update" && empty($_POST['reason']))) {
-	error(404);
+if(empty($_POST['id']) || !is_number($_POST['id']) || empty($_POST['type']) ) {
+	error(0);
+}
+    
+if ($_POST['type'] != "request_update" && empty($_POST['reason'])) {
+	error("You must enter a reason for your report");
 }
 
 include(SERVER_ROOT.'/sections/reports/array.php');
@@ -14,17 +18,14 @@ $Short = $_POST['type'];
 $Type = $Types[$Short]; 
 $ID = $_POST['id'];
 if($Short == "request_update") {
-	if(empty($_POST['year']) || !is_number($_POST['year'])) {
-		error('Year must be specified.');
-		header('Location: reports.php?action=report&type=request_update&id='.$ID);
-		die();
-	}
-	$Reason  = "[b]Year[/b]: ".$_POST['year'].".\n\n";
-	$Reason .= "[b]Release Type[/b]: ".((empty($_POST['releasetype']) || !is_number($_POST['releasetype']) || $_POST['releasetype'] == 0)) ? 'Not given' : $ReleaseTypes[$_POST['releasetype']]."\n\n";
 	$Reason .= "[b]Additional Comments[/b]: ".$_POST['comment'];
 } else {
 	$Reason = $_POST['reason'];
 }
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+$Text->validate_bbcode($Reason,  get_permissions_advtags($LoggedUser['ID']));
+
 
 switch($Short) {
 	case "request" :

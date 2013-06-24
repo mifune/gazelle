@@ -20,7 +20,6 @@
 //   requestsfilled_bounty: the bounty thus earned
 //   requestsfilled_list: the actual list of requests the user has filled
 // requestsvoted_...: similar
-// artistsadded: the number of artists the user has added
 // torrentcomments: the list of comments the user has added to torrents
 //   +
 // collages: the list of collages the user has created
@@ -28,6 +27,9 @@
 // collagecontribs: the list of collages the user has contributed to
 //   +
 // invitedcount: the number of users this user has directly invited
+
+
+define('PARANOIA_MSG','This users privacy (paranoia) settings mean you cannot view this page.');
 
 /**
  * Return whether currently logged in user can see $Property on a user with $Paranoia, $UserClass and (optionally) $UserID
@@ -39,7 +41,6 @@
  * @param $UserID Optional. The user ID of the person being viewed
  * @return Boolean representing whether the current user can see through the paranoia setting
  */
-
 function check_paranoia($Property, $Paranoia, $UserClass, $UserID = false) {
 	global $LoggedUser, $Classes;
 	if(check_perms('users_override_paranoia', $UserClass)) {
@@ -75,8 +76,8 @@ function check_paranoia($Property, $Paranoia, $UserClass, $UserID = false) {
 				$May = $May || check_perms('site_view_torrent_snatchlist', $UserClass);
 				break;
 			case 'uploads': case 'uploads+':
-			case 'seeding': case 'seeding+':
 			case 'leeching': case 'leeching+':
+			case 'seeding' : case 'seeding+':
 				$May = $May || check_perms('users_view_seedleech', $UserClass);
 				break;
 			case 'invitedcount':

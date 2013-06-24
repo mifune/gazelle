@@ -49,7 +49,7 @@ for ($i = 0; $i < $Limit; $i++) {
 		'blogId' => (int) $BlogID,
 		'author' => $Author,
 		'title' => $Title,
-		'body' => $Text->full_format($Body),
+		'body' => $Text->full_format($Body,true),
 		'blogTime' => $BlogTime,
 		'threadId' => (int) $ThreadID
 	);
@@ -66,7 +66,7 @@ foreach ($News as $NewsItem) {
 	$JsonAnnouncements[] = array(
 		'newsId' => (int) $NewsID,
 		'title' => $Title,
-		'body' => $Text->full_format($Body),
+		'body' => $Text->full_format($Body,true),
 		'newsTime' => $NewsTime
 	);
 	

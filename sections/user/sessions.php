@@ -86,6 +86,7 @@ show_header($Username.' &gt; Sessions');
                 </table>
         </div>
 </div>
-
+<?
 show_footer();
+
 ?>

@@ -3,102 +3,128 @@
 authorize();
 
 include(SERVER_ROOT.'/classes/class_text.php');
+include(SERVER_ROOT . '/classes/class_validate.php');
+include(SERVER_ROOT . '/sections/torrents/functions.php');
+
 $Text = new TEXT;
+$Validate = new VALIDATE;
 
 // Quick SQL injection check
 if(!$_REQUEST['groupid'] || !is_number($_REQUEST['groupid'])) {
 	error(404);
 }
 // End injection check
+$GroupID = (int)$_REQUEST['groupid'];
 
-if(!check_perms('site_edit_wiki')) { error(403); }
-
-// Variables for database input
-$UserID = $LoggedUser['ID'];
-$GroupID = $_REQUEST['groupid'];
-
-// Get information for the group log
-$DB->query("SELECT VanityHouse FROM torrents_group WHERE ID = '$GroupID'");
-if (!(list($OldVH) = $DB->next_record())) {
-	error(404);
+//check user has permission to edit
+$CanEdit = check_perms('torrents_edit');
+if(!$CanEdit) { 
+    $DB->query("SELECT UserID FROM torrents WHERE GroupID='$GroupID'");
+    list($AuthorID) = $DB->next_record();
+    $CanEdit = $AuthorID == $LoggedUser['ID'];
 }
 
-if(!empty($_GET['action']) && $_GET['action'] == 'revert') { // if we're reverting to a previous revision
-	$RevisionID=$_GET['revisionid'];
-	if(!is_number($RevisionID)) { error(0); }
-} else { // with edit, the variables are passed with POST
-	$Body = $_POST['body'];
-	$Image = $_POST['image'];
-	$ReleaseType = (int)$_POST['releasetype'];
-	if ( $_POST['vanity_house'] && check_perms('torrents_edit_vanityhouse') ) {
-		$VanityHouse = ( isset($_POST['vanity_house']) ? 1 : 0 );
-	} else {
-		$VanityHouse = 0;
-	}
+    //check user has permission to edit
+if(!$CanEdit) { error(403); }
 
-	if($GroupInfo = $Cache->get_value('torrents_details_'.$GroupID)) {
-		$GroupCategoryID = $GroupInfo[0][0]['CategoryID'];
-	} else {
-		$DB->query("SELECT CategoryID FROM torrents_group WHERE ID='$GroupID'");
-		list($GroupCategoryID) = $DB->next_record();
-	}
-	if($GroupCategoryID == 1 && !isset($ReleaseTypes[$ReleaseType]) || $GroupCategoryID != 1 && $ReleaseType) {
-		error(403);
-	}
+      
+// Variables for database input - with edit, the variables are passed with POST
+//$GroupID = (int)$_REQUEST['groupid'];
+$OldCategoryID = (int)$_POST['oldcategoryid'];
+$CategoryID = (int)$_POST['categoryid'];
+$Body = $_POST['body'];
+$Image = $_POST['image'];
 
-	// Trickery
-	if(!preg_match("/^".IMAGE_REGEX."$/i", $Image)) {
-		$Image = '';
-	}
-	$Summary = db_string($_POST['summary']);
+$Text->validate_bbcode($_POST['body'],  get_permissions_advtags($LoggedUser['ID']));
+        
+$whitelist_regex = get_whitelist_regex();
+
+$Validate->SetFields('image', '0', 'image', 'The image URL you entered was not valid.', array('regex' => $whitelist_regex, 'maxlength' => 255, 'minlength' => 12));
+
+$Validate->SetFields('body', '1', 'desc', 'Description', array('minimages'=>1, 'regex' => $whitelist_regex, 'maxlength' => 1000000, 'minlength' => 20));
+
+$Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
+ 
+if ($Err) { // Show the upload form, with the data the user entered
+    $HasDescriptionData = TRUE; /// tells editgroup to use $Body and $Image vars instead of requerying them
+    $_GET['groupid'] = $GroupID;
+    $Name = $_POST['name'];
+    $AuthorID = $_POST['authorid'];
+    $EditSummary = $_POST['summary'];
+    include(SERVER_ROOT . '/sections/torrents/editgroup.php');
+    die();
 }
 
-// Insert revision
-if(empty($RevisionID)) { // edit
-	$DB->query("INSERT INTO wiki_torrents (PageID, Body, Image, UserID, Summary, Time)
-				VALUES ('$GroupID', '".db_string($Body)."', '".db_string($Image)."', '$UserID', '$Summary', '".sqltime()."')");
-	
-	$DB->query("UPDATE torrents_group SET ReleaseType='$ReleaseType' WHERE ID='$GroupID'");
-	update_hash($GroupID);
-	
-	$DB->query("SELECT ArtistID FROM torrents_artists WHERE GroupID = ".$GroupID);
-	$Artists = $DB->collect('ArtistID');
-	foreach($Artists as $ArtistID) {
-		$Cache->delete_value('artist_'.$ArtistID);
-	}
-	
-}
-else { // revert
-	$DB->query("SELECT PageID,Body,Image FROM wiki_torrents WHERE RevisionID='$RevisionID'");
-	list($PossibleGroupID, $Body, $Image) = $DB->next_record();
-	if($PossibleGroupID != $GroupID) { error(404); }
-	
-	$DB->query("INSERT INTO wiki_torrents (PageID, Body, Image, UserID, Summary, Time) 
-		SELECT '$GroupID', Body, Image, '$UserID', 'Reverted to revision $RevisionID', '".sqltime()."' 
-		FROM wiki_artists WHERE RevisionID='$RevisionID'");
+// Trickery
+if(!preg_match("/^".URL_REGEX."$/i", $Image)) {
+        $Image = '';
 }
 
-$RevisionID=$DB->inserted_id();
+$TorrentCache = get_group_info($GroupID, true);
+$GroupName = $TorrentCache[0][0][3];
 
-$Body = db_string($Body);
+//$Summary = db_string($_POST['summary']);
 $Image = db_string($Image);
+//$SearchText = db_string($GroupName . ' ' . $Text->db_clean_search($Body));
+$SearchText = db_string(trim($GroupName) . ' ' . $Text->db_clean_search(trim($Body)));
+$Body =  db_string($Body);
 
-// Update torrents table (technically, we don't need the RevisionID column, but we can use it for a join which is nice and fast)
+// Update torrents table
 $DB->query("UPDATE torrents_group SET 
-	RevisionID='$RevisionID',
-	".((isset($VanityHouse)) ? "VanityHouse='$VanityHouse'," : "")."
-	WikiBody='$Body',
-	WikiImage='$Image'
+	NewCategoryID='$CategoryID',
+        Body='$Body',
+	Image='$Image',
+        SearchText='$SearchText'
 	WHERE ID='$GroupID'");
-// Log VH changes
-if ($OldVH != $VanityHouse && check_perms('torrents_edit_vanityhouse')) {
-	$DB->query("INSERT INTO group_log (GroupID, UserID, Time, Info)
-				VALUES ('$GroupID',".$LoggedUser['ID'].",'".sqltime()."','".db_string('Vanity house status changed to '.($VanityHouse?'true':'false'))."')");
+
+// The category has been changed, update the category tag
+if ($OldCategoryID != $CategoryID) {
+    $OldTag = $NewCategories[$OldCategoryID]['tag'];
+    $NewTag = $NewCategories[$CategoryID]['tag'];
+    
+    // Remove the old tag
+    $DB->query("DELETE tt, ttv
+                FROM torrents_tags AS tt
+                INNER JOIN tags t ON tt.TagID=t.ID
+                LEFT JOIN torrents_tags_votes AS ttv ON ttv.TagID=tt.TagID AND ttv.GroupID='$GroupID'
+                WHERE t.name='$OldTag' AND tt.GroupID='$GroupID'");    
+    
+    $DB->query("UPDATE tags SET Uses=Uses-1 WHERE Name='$OldTag'");
+
+    // And insert the new one.
+    $DB->query("INSERT INTO tags
+                (Name, UserID, Uses) VALUES
+                ('" . $NewTag . "', $LoggedUser[ID], 1)
+                ON DUPLICATE KEY UPDATE Uses=Uses+1;
+            ");
+
+    $TagID = $DB->inserted_id();
+                
+    /* $Vote = empty($LoggedUser['NotVoteUpTags'])?9:8;
+    $DB->query("INSERT INTO torrents_tags
+                (TagID, GroupID, UserID, PositiveVotes) VALUES
+                ($TagID, $GroupID, $LoggedUser[ID], $Vote)
+                ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1; "); */
+     
+    if (empty($LoggedUser['NotVoteUpTags'])){
+        
+        $DB->query("INSERT INTO torrents_tags
+                    (TagID, GroupID, UserID, PositiveVotes) VALUES
+                    ($TagID, $GroupID, $LoggedUser[ID], 9)
+                    ON DUPLICATE KEY UPDATE PositiveVotes=PositiveVotes+1; ");
+     
+        $DB->query("INSERT IGNORE INTO torrents_tags_votes (TagID, GroupID, UserID, Way) VALUES 
+                                ($TagID, $GroupID, $LoggedUser[ID], 'up');");
+    } else {
+        
+        $DB->query("INSERT IGNORE INTO torrents_tags
+                    (TagID, GroupID, UserID, PositiveVotes) VALUES
+                    ($TagID, $GroupID, $LoggedUser[ID], 8); ");
+     
+    }
 }
 
 // There we go, all done!
-
-//$Cache->delete_value("artist_".$GroupID); // Delete artist cache
 $Cache->delete_value('torrents_details_'.$GroupID);
 $DB->query("SELECT CollageID FROM collages_torrents WHERE GroupID='$GroupID'");
 if($DB->record_count()>0) {
@@ -106,6 +132,8 @@ if($DB->record_count()>0) {
 		$Cache->delete_value('collage_'.$CollageID);
 	}
 }
+
+update_hash($GroupID);
 
 //Fix Recent Uploads/Downloads for image change
 $DB->query("SELECT DISTINCT UserID
@@ -119,8 +147,8 @@ foreach($UserIDs as $UserID) {
 	if(is_array($RecentUploads)) {
 		foreach($RecentUploads as $Key => $Recent) {
 			if($Recent['ID'] == $GroupID) {
-				if($Recent['WikiImage'] != $Image) {
-					$Recent['WikiImage'] = $Image;
+				if($Recent['Image'] != $Image) {
+					$Recent['Image'] = $Image;
 					$Cache->begin_transaction('recent_uploads_'.$UserID);
 					$Cache->update_row($Key, $Recent);
 					$Cache->commit_transaction(0);
@@ -139,8 +167,8 @@ foreach($Snatchers as $UserID) {
 	if(is_array($RecentSnatches)) {
 		foreach($RecentSnatches as $Key => $Recent) {
 			if($Recent['ID'] == $GroupID) {
-				if($Recent['WikiImage'] != $Image) {
-					$Recent['WikiImage'] = $Image;
+				if($Recent['Image'] != $Image) {
+					$Recent['Image'] = $Image;
 					$Cache->begin_transaction('recent_snatches_'.$UserID);
 					$Cache->update_row($Key, $Recent);
 					$Cache->commit_transaction(0);
@@ -150,5 +178,25 @@ foreach($Snatchers as $UserID) {
 	}
 }
 
-header("Location: torrents.php?id=".$GroupID);
+$DB->query("SELECT NewCategoryID, Name, Body, Image FROM torrents_group WHERE ID=$GroupID");
+list($OrigCatID, $OrigName, $OrigBody, $OrigImage) = $DB->next_record();
+
+if($CategoryID != $OrigCatID) {
+    $LogDetails = "Category";
+    $Concat = ', ';
+}
+if($Body != $OrigBody) {
+    $LogDetails .= "{$Concat}Description";
+    $Concat = ', ';
+}
+if($Image != $OrigImage) $LogDetails .= "{$Concat}Image";
+
+if($_POST['summary'] != '') $Summary = db_string(" ({$_POST['summary']})");
+else $Summary='';
+
+write_log("Torrent $TorrentIDs ($OrigName) was edited by ".$LoggedUser['Username']." ($LogDetails)"); //in group $GroupID 
+write_group_log($GroupID, $TorrentIDs, $LoggedUser['ID'], "Torrent edited: $LogDetails$Summary", 0);
+
+
+header("Location: torrents.php?id=".$GroupID."&did=1");
 ?>

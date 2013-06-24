@@ -23,6 +23,7 @@ switch($_REQUEST['action']) {
 		require('takeedit.php');
 		break;
 	case 'compose':
+	case 'forward':
 		require('compose.php');
 		break;
 	case 'viewconv':
@@ -34,9 +35,10 @@ switch($_REQUEST['action']) {
 	case 'get_post':
 		require('get_post.php');
 		break;		
+    /*  //forward processing changed - now sends to compose.php (and starts a new conversation)
 	case 'forward':
 		require('forward.php');
-		break;
+		break; */
 	default:
 		require(SERVER_ROOT.'/sections/inbox/inbox.php');
 }

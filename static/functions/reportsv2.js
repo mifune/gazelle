@@ -5,15 +5,20 @@ function ChangeReportType() {
 }
 
 function ChangeResolve(reportid) {
-	ajax.get('reportsv2.php?action=ajax_change_resolve&id=' + reportid + '&type=' + $('#resolve_type' + reportid).raw().value + '&categoryid=' + $('#categoryid' + reportid).raw().value, function (response) {
+	ajax.get('reportsv2.php?action=ajax_change_resolve&id=' + reportid + '&type=' + $('#resolve_type' + reportid).raw().value, function (response) {
 			var x = json.decode(response);
 			$('#delete' + reportid).raw().checked = (x[0] == '1' ? true : false);
+            $('#bounty_amount' + reportid).raw().innerHTML =x[3];
+			$('#bounty' + reportid).raw().disabled = (x[3] == '0' ? true : false);
+            $('#pm_message' + reportid).raw().innerHTML =x[4];
 			if($('#uploaderid' + reportid).raw().value == $('#reporterid' + reportid).raw().value) {
 				$('#warning' + reportid).raw().selectedIndex = 0;
 				$('#upload' + reportid).raw().checked = false;
+				$('#bounty' + reportid).raw().checked = false;
 			} else {
 				$('#upload' + reportid).raw().checked = (x[1] == '1' ? true : false);
 				$('#warning' + reportid).raw().selectedIndex = x[2];
+				$('#bounty' + reportid).raw().checked = (x[3] != '0' ? true : false);
 			}
 			$('#update_resolve' + reportid).raw().disabled = false;
 		}
@@ -29,15 +34,20 @@ function Load(reportid) {
 		}
 	}
 	//Can't use ChangeResolve() because we need it to block to do the uploader==reporter part
-	ajax.get('reportsv2.php?action=ajax_change_resolve&id=' + reportid + '&type=' + $('#resolve_type' + reportid).raw().value + '&categoryid=' + $('#categoryid' + reportid).raw().value, function (response) {
+	ajax.get('reportsv2.php?action=ajax_change_resolve&id=' + reportid + '&type=' + $('#resolve_type' + reportid).raw().value , function (response) {
 		var x = json.decode(response);
 			$('#delete' + reportid).raw().checked = (x[0] == '1' ? true : false);
+            $('#bounty_amount' + reportid).raw().innerHTML =x[3];
+			$('#bounty' + reportid).raw().disabled = (x[3] == '0' ? true : false);
+            $('#pm_message' + reportid).raw().innerHTML =x[4];
 			if($('#uploaderid' + reportid).raw().value == $('#reporterid' + reportid).raw().value) {
 				$('#warning' + reportid).raw().selectedIndex = 0;
 				$('#upload' + reportid).raw().checked = false;
+				$('#bounty' + reportid).raw().checked = false;
 			} else {
 				$('#upload' + reportid).raw().checked = (x[1] == '1' ? true : false);
 				$('#warning' + reportid).raw().selectedIndex = x[2];
+				$('#bounty' + reportid).raw().checked = (x[3] != '0' ? true : false);
 			}
 			$('#update_resolve' + reportid).raw().disabled = false;
 		}
@@ -63,8 +73,9 @@ function TakeResolve(reportid) {
 		if(response) {
 			ErrorBox(reportid, response);
 		} else {
-			if($('#from_delete' + reportid).results()) {
-				window.location = location.protocol + '//' + location.host + location.pathname + "?id=" + $('#from_delete' + reportid).raw().value;
+			if($('#from_delete' + reportid).raw().value > 0) {
+                window.location = location.protocol + '//' + location.host + "/log.php?search=Torrent+"+ $('#from_delete' + reportid).raw().value;
+                //window.location = location.protocol + '//' + location.host + location.pathname + "?id=" + $('#from_delete' + reportid).raw().value;
 			} else {
 				$('#report' + reportid).remove();
 				if($('#dynamic').raw().checked) {
@@ -148,21 +159,25 @@ function UpdateComment(reportid) {
 function GiveBack(id) {
 	if(!id) {
 		var x = document.getElementsByName("reportid");
+            var str = ''; var div = '';
 		for(i = 0; i < x.length; i++) {
-			/*ajax.get("ajax.php?action=giveback_report&id=" + x[i].value, function (response) {
-				if(response) {
-					alert(response);
-				}
-			});*/
-			$('#report' + x[i].value).remove();
+                  str += div + x[i].value;
+			div=',';
 		}
+            if(str != ''){
+			ajax.get("ajax.php?action=giveback_report&id=" + str, function (response) {
+				//if(response) // alert(response);
+                        for(i = x.length - 1; i >= 0 ; i--) {
+                            $('#report' + x[i].value).remove();
+                        }
+			});
+            }
 	} else {
 		ajax.get("ajax.php?action=giveback_report&id=" + id, function (response) {
-			if(response) {
-				alert(response);
-			}
+			//if(response) alert(response);
+                  $('#report' + id).remove();
 		});
-		$('#report' + id).remove();
+		
 	}
 }
 
@@ -222,22 +237,25 @@ function MultiResolve() {
 
 function UpdateResolve(reportid) {
 	var newresolve = $('#resolve_type' + reportid).raw().options[$('#resolve_type' + reportid).raw().selectedIndex].value;
-	ajax.get("reportsv2.php?action=ajax_update_resolve&reportid=" + reportid + "&newresolve=" + newresolve + "&categoryid=" + $('#categoryid' + reportid).raw().value, function (response) {
-		$('#update_resolve' + reportid).raw().disabled = true;
-	});
+	ajax.get("reportsv2.php?action=ajax_update_resolve&reportid=" + reportid + "&newresolve=" + newresolve, function (response) {
+		//$('#update_resolve' + reportid).raw().disabled = true;
+		window.location.reload(true); 
+      });
 }
 
 
-function Switch(reportid, torrentid, otherid) {
+function Switch(reportid, reporterid, usercomment, torrentid, otherid) {
 	//We want to switch positions of the reported torrent
 	//This entails invalidating the current report and creating a new with the correct preset.
 	Dismiss(reportid);
 
 	var report = new Array();
 	report['auth'] = authkey;
-	report['torrentid'] = otherid
+	report['torrentid'] = otherid;
 	report['type'] = $('#type' + reportid).raw().value;
-	report['otherid'] = torrentid
+	report['otherid'] = torrentid;
+	report['reporterid'] = reporterid;
+	report['usercomment'] = usercomment;
 
 	ajax.post('reportsv2.php?action=ajax_create_report', report, function (response) {
 			//Returns new report ID.

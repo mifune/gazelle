@@ -1,5 +1,5 @@
 <?
-if(!check_perms('users_mod')) { error(403); }
+if(!check_perms('admin_email_blacklist')) { error(403); }
 
 authorize();
 
@@ -30,6 +30,8 @@ if($_POST['submit'] == 'Delete'){ //Delete
 	}
 }
 
+$Cache->delete_value('emailblacklist_regex');
+
 // Go back
-header('Location: tools.php?action=email_blacklist')
+header('Location: tools.php?action=email_blacklist');
 ?>

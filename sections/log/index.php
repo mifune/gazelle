@@ -6,18 +6,32 @@ if (!defined('LOG_ENTRIES_PER_PAGE')) {
 }
 list($Page,$Limit) = page_limit(LOG_ENTRIES_PER_PAGE);
 
+$_GET['search'] = trim($_GET['search']);
+
 if(!empty($_GET['search'])) {
-	$Search = db_string($_GET['search']);
+	$Search = ($_GET['search']);
 } else {
 	$Search = false;
 }
-$Words = explode(' ', $Search);
+//$Words = explode(' ', $Search);
+
 $sql = "SELECT
 	SQL_CALC_FOUND_ROWS 
 	Message,
 	Time
 	FROM log ";
 if($Search) {
+    // Break search string down into individual words
+    $Words = explode(' ',  $Search);
+    foreach($Words as $Key => &$Word) {
+        $Word = trim($Word);
+        $slen = strlen($Word);
+        if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) { 
+            $word = db_string($word);
+        } else {
+            unset($Words[$Key]);
+        }
+    }
 	$sql .= "WHERE Message LIKE '%";
 	$sql .= implode("%' AND Message LIKE '%", $Words);
 	$sql .= "%' ";
@@ -31,7 +45,7 @@ if(!check_perms('site_view_full_log')) {
 	$sql .= " Time>'".time_minus(3600*24*28)."' ";
 }
 
-$sql .= "ORDER BY ID DESC LIMIT $Limit";
+$sql .= "ORDER BY Time DESC LIMIT $Limit";
 
 show_header("Site log");
 
@@ -41,8 +55,7 @@ list($Results) = $DB->next_record();
 $DB->set_query_id($Log);
 ?>
 <div class="thin">
-	<h2>Site log</h2>
-	<div>
+	<h2>Site log</h2> 
 		<form action="" method="get">
 			<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
 				<tr>
@@ -54,11 +67,8 @@ $DB->set_query_id($Log);
 					</td>
 				</tr>
 			</table>	
-		</form>
-	</div>
-	
-	
-	
+		</form> 
+		
 	<div class="linkbox">
 <?
 $Pages=get_pages($Page,$Results,LOG_ENTRIES_PER_PAGE,9);
@@ -88,6 +98,19 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 			$MessageParts[$i] = '<a href="'.substr($MessageParts[$i], $Offset).'">'.substr($MessageParts[$i], $Offset).'</a>';
 		}
 		switch ($MessageParts[$i]) {
+			case "Tag":
+			case "tag":
+			case "Synonym":
+			case "synonym":
+				$Tag = $MessageParts[$i + 1];
+				//$Tag = str_replace(',', '', $Tag);
+				if (is_string($Tag)) {
+					$Message = $Message.' '.$MessageParts[$i].' <a href="torrents.php?taglist='.str_replace(',', '', $Tag).'"> '.$Tag.'</a>';
+					$i++;
+				} else {
+					$Message = $Message.' '.$MessageParts[$i];
+				}
+				break;
 			case "Torrent":
 			case "torrent":
 				$TorrentID = $MessageParts[$i + 1];
@@ -98,20 +121,25 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 					$Message = $Message.' '.$MessageParts[$i];
 				}
 				break;
+			case "Torrents":
+			case "torrents": // actually groups but call it torrents to not overely confuse user
+                        $TorrentIDs = explode(',', $MessageParts[$i + 1]);
+				//$TorrentID = $MessageParts[$i + 1];
+                        $Links='';
+                        $Div='';
+                        foreach($TorrentIDs as $TorrentID){
+                            if (is_numeric($TorrentID)) {
+                                    $Links .= $Div .'<a href="torrents.php?id='.$TorrentID.'">'.$TorrentID.'</a>';
+                                    $Div=', ';
+                            }
+                        }
+				$Message = "$Message $MessageParts[$i] $Links";
+                        if ($Links != '') $i++;
+				break;
 			case "Request":
 				$RequestID = $MessageParts[$i + 1];
 				if (is_numeric($RequestID)) {
 					$Message = $Message.' '.$MessageParts[$i].' <a href="requests.php?action=view&id='.$RequestID.'"> '.$RequestID.'</a>';
-					$i++;
-				} else {
-					$Message = $Message.' '.$MessageParts[$i];
-				}
-				break;
-			case "Artist":
-			case "artist":
-				$ArtistID = $MessageParts[$i + 1];
-				if (is_numeric($ArtistID)) {
-					$Message = $Message.' '.$MessageParts[$i].' <a href="artist.php?id='.$ArtistID.'"> '.$ArtistID.'</a>';
 					$i++;
 				} else {
 					$Message = $Message.' '.$MessageParts[$i];
@@ -155,21 +183,47 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				}
 				$Message = $Message." by ".$URL;
 				break;
+			case "converted":
+				if ($Color === false) {
+					$Color = 'purple';
+				}
+				$Message = $Message." ".$MessageParts[$i];
+				break;
+			case "Awarding":
+				if ($Color === false) {
+					$Color = 'purple';
+				}
+				$Message = $Message." ".$MessageParts[$i];
+				break;
 			case "uploaded":
+			case "created":
+				if ($Color === false) {
+					$Color = 'blue';
+				}
+				$Message = $Message." ".$MessageParts[$i];
+				break;
+                  case "Okay":
 				if ($Color === false) {
 					$Color = 'green';
 				}
 				$Message = $Message." ".$MessageParts[$i];
 				break;
 			case "deleted":
-				if ($Color === false || $Color === 'green') {
+			case "auto-deleted":
+				//if ($Color === false || $Color === 'green') {
 					$Color = 'red';
-				}
+				//}
+				$Message = $Message." ".$MessageParts[$i];
+				break;
+                  case "Warned":
+				//if ($Color === false || $Color === 'green') {
+					$Color = '#a07100';
+				//}
 				$Message = $Message." ".$MessageParts[$i];
 				break;
 			case "edited":
 				if ($Color === false) {
-					$Color = 'blue';
+					$Color = '#1E90FF';
 				}
 				$Message = $Message." ".$MessageParts[$i];
 				break;

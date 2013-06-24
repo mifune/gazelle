@@ -7,8 +7,8 @@ require(SERVER_ROOT.'/sections/torrents/functions.php');
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 $Text = new TEXT;
 
-$GroupAllowed = array('WikiBody', 'WikiImage', 'ID', 'Name', 'Year', 'RecordLabel', 'CatalogueNumber', 'ReleaseType', 'CategoryID', 'Time', 'VanityHouse');
-$TorrentAllowed = array('ID', 'Media', 'Format', 'Encoding', 'Remastered', 'RemasterYear', 'RemasterTitle', 'RemasterRecordLabel', 'RemasterCatalogueNumber', 'Scene', 'HasLog', 'HasCue', 'LogScore', 'FileCount', 'Size', 'Seeders', 'Leechers', 'Snatched', 'FreeTorrent', 'Time', 'Description', 'FileList', 'FilePath', 'UserID', 'Username');
+$GroupAllowed = array('Body', 'Image', 'ID', 'Name', 'NewCategoryID', 'Time');
+$TorrentAllowed = array('ID', 'FileCount', 'Size', 'Seeders', 'Leechers', 'Snatched', 'FreeTorrent', 'Time', 'FileList', 'FilePath', 'UserID', 'Username');
 
 $GroupID = (int)$_GET['id'];
 
@@ -21,18 +21,12 @@ function filter_by_key($input, $keys) { return array_intersect_key($input, array
 
 $TorrentDetails = filter_by_key($TorrentCache[0][0], $GroupAllowed);
 $JsonTorrentDetails = array(
-	'wikiBody' => $Text->full_format($TorrentDetails['WikiBody']),
-	'wikiImage' => $TorrentDetails['WikiImage'],
+	'Body' => $Text->full_format($TorrentDetails['Body']),
+	'Image' => $TorrentDetails['Image'],
 	'id' => (int) $TorrentDetails['ID'],
 	'name' => $TorrentDetails['Name'],
-	'year' => (int) $TorrentDetails['Year'],
-	'recordLabel' => $TorrentDetails['RecordLabel'],
-	'catalogueNumber' => $TorrentDetails['CatalogueNumber'],
-	'releaseType' => (int) $TorrentDetails['ReleaseType'],
-	'categoryId' => (int) $TorrentDetails['CategoryID'],
+	'categoryId' => (int) $TorrentDetails['NewCategoryID'],
 	'time' => $TorrentDetails['Time'],
-	'vanityHouse' => $TorrentDetails['VanityHouse'] == 1,
-	'artists' => get_artist($GroupID),
 );
 $TorrentList = array();
 foreach ($TorrentCache[1] as $Torrent) {
@@ -42,18 +36,6 @@ $JsonTorrentList = array();
 foreach ($TorrentList as $Torrent) {
 	$JsonTorrentList[] = array(
 		'id' => (int) $Torrent['ID'],
-		'media' => $Torrent['Media'],
-		'format' => $Torrent['Format'],
-		'encoding' => $Torrent['Encoding'],
-		'remastered' => $Torrent['Remastered'] == 1,
-		'remasterYear' => (int) $Torrent['RemasterYear'],
-		'remasterTitle' => $Torrent['RemasterTitle'],
-		'remasterRecordLabel' => $Torrent['RemasterRecordLabel'],
-		'remasterCatalogueNumber' => $Torrent['RemasterCatalogueNumber'],
-		'scene' => $Torrent['Scene'] == 1,
-		'hasLog' => $Torrent['HasLog'] == 1,
-		'hasCue' => $Torrent['HasCue'] == 1,
-		'logScore' => (int) $Torrent['LogScore'],
 		'fileCount' => (int) $Torrent['FileCount'],
 		'size' => (int) $Torrent['Size'],
 		'seeders' => (int) $Torrent['Seeders'],
@@ -61,7 +43,6 @@ foreach ($TorrentList as $Torrent) {
 		'snatched' => (int) $Torrent['Snatched'],
 		'freeTorrent' => $Torrent['FreeTorrent'] == 1,
 		'time' => $Torrent['Time'],
-		'description' => $Torrent['Description'],
 		'fileList' => $Torrent['FileList'],
 		'filePath' => $Torrent['FilePath'],
 		'userId' => (int) $Torrent['UserID'],

@@ -1,7 +1,7 @@
 <?
 
 function can_bookmark($Type) {
-	return in_array($Type, array('torrent', 'artist', 'collage', 'request'));
+	return in_array($Type, array('torrent', 'collage', 'request'));
 }
 
 // Recommended usage:
@@ -10,9 +10,6 @@ function bookmark_schema($Type) {
 	switch ($Type) {
 		case 'torrent':
 			return array('bookmarks_torrents', 'GroupID');
-			break;
-		case 'artist':
-			return array('bookmarks_artists', 'ArtistID');
 			break;
 		case 'collage':
 			return array('bookmarks_collages', 'CollageID');

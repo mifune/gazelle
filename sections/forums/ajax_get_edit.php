@@ -59,19 +59,23 @@ if($Depth != 0) {
 }
 ?>
 
-				<?=$Text->full_format($Body)?>
-				<br />
-				<br />
-
+				<div class="post_content"><?=$Text->full_format($Body, true)?></div>
+                        <div class="post_footer">
 <? if($Depth < count($Edits)) { ?>
 					<a href="#edit_info_<?=$PostID?>" onclick="LoadEdit('<?=$Type?>', <?=$PostID?>, <?=($Depth + 1)?>); return false;">&laquo;</a>
-					<?=(($Depth == 0) ? 'Last edited by' : 'Edited by')?>
+					<span class="editedby"><?=(($Depth == 0) ? 'Last edited by' : 'Edited by')?>
 					<?=format_username($UserID, $Username) ?> <?=time_diff($Time,2,true,true)?>
+                              </span>
 <? } else { ?>
 					<em>Original Post</em>
 <? }
 
 if($Depth > 0) { ?>
-					<a href="#edit_info_<?=$PostID?>" onclick="LoadEdit('<?=$Type?>', <?=$PostID?>, <?=($Depth - 1)?>); return false;">&raquo;</a>
+                              <span class="editedby">
+                                  <a href="#edit_info_<?=$PostID?>" onclick="LoadEdit('<?=$Type?>', <?=$PostID?>, <?=($Depth - 1)?>); return false;">&raquo;</a>
+                              </span>
 <? } ?>
 
+                        </div>
+                        
+                        

@@ -14,24 +14,42 @@ switch($_REQUEST['action']) {
 		break;
 	case 'add_torrent':
 	case 'add_torrent_batch':
-		if(!check_perms('site_collages_manage')) { error(403); }
 		require(SERVER_ROOT.'/sections/collages/add_torrent.php');
 		break;
 	case 'manage':
-		if(!check_perms('site_collages_manage')) { error(403); }
 		require(SERVER_ROOT.'/sections/collages/manage.php');
 		break;
 	case 'manage_handle':
-		if(!check_perms('site_collages_manage')) { error(403); }
 		require(SERVER_ROOT.'/sections/collages/manage_handle.php');
 		break;
 	case 'edit':
-		if(!check_perms('site_edit_wiki')) { error(403); }
 		require(SERVER_ROOT.'/sections/collages/edit.php');
 		break;
 	case 'edit_handle':
-		if(!check_perms('site_edit_wiki')) { error(403); }
 		require(SERVER_ROOT.'/sections/collages/edit_handle.php');
+		break;
+	case 'change_level':
+          
+            authorize();
+
+            $CollageID = $_POST['collageid'];
+            if(!is_number($CollageID))  error(0);
+
+            if (!check_perms('site_collages_manage')){
+                $DB->query("SELECT UserID FROM collages WHERE ID='$CollageID'");
+                list($UserID) = $DB->next_record();
+                if ($UserID != $LoggedUser['ID']) error(403); 
+            }
+            
+            $Permissions = $_POST['permission'];
+            if(!is_number($Permissions)) error(0);
+            $Permissions=(int)$Permissions; 
+            if ($Permissions !=0 && !array_key_exists($Permissions, $ClassLevels)) error(0);
+             
+            $DB->query("UPDATE collages SET Permissions=$Permissions WHERE ID='$CollageID'");
+            
+            $Cache->delete_value('collage_'.$CollageID);
+            header('Location: collages.php?id='.$CollageID);
 		break;
 	case 'delete':
 		authorize();
@@ -76,7 +94,7 @@ switch($_REQUEST['action']) {
 			die();
  		}
 		$NameStr = ($CollageCount > 0)?" no. " . ($CollageCount + 1):'';
-		$DB->query("INSERT INTO collages (Name, Description, CategoryID, UserID) VALUES ('$LoggedUser[Username]\'s personal collage$NameStr', 'Personal collage for $LoggedUser[Username]. The first 5 albums will appear on his or her [url=http:\/\/".NONSSL_SITE_URL."\/user.php?id=$LoggedUser[ID]]profile[\/url].', '0', $LoggedUser[ID])");
+		$DB->query("INSERT INTO collages (Name, Description, CategoryID, UserID) VALUES ('$LoggedUser[Username]\'s personal collage$NameStr', 'Personal collage for $LoggedUser[Username]. The first 5 torrents will appear on his or her [url=http:\/\/".NONSSL_SITE_URL."\/user.php?id=$LoggedUser[ID]]profile[\/url].', '0', $LoggedUser[ID])");
 		$CollageID = $DB->inserted_id();
 		header('Location: collage.php?id='.$CollageID);
 		die();

@@ -1,3 +1,5 @@
+
+/*
 function ChangeCategory(catid) {
 	if(catid == 1) {
 		$('#split_releasetype').show();
@@ -13,6 +15,7 @@ function ChangeCategory(catid) {
 		$('#split_year').hide();
 	}
 }
+
 
 function ArtistManager() {
 	var GroupID = window.location.search.match(/[?&]id=(\d+)/);
@@ -206,7 +209,7 @@ function ArtistManagerDelete() {
 	$('#manager_action').raw().value = 'delete';
 	ArtistManagerSubmit();
 	$('#manager_action').raw().value = 'manage';
-}
+} */
 
 function Vote(amount, requestid) {
 	if(typeof amount == 'undefined') {

@@ -80,7 +80,7 @@ show_header('Forums'.' > '.'Search');
 		<input type="hidden" name="action" value="search" />
 		<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
 			<tr>
-				<td><strong>Search for:</strong></td>
+				<td class=""><strong>Search for:</strong></td>
 				<td>
 					<input type="text" name="search" size="70" value="<?=display_str($Search)?>" />
 				</td>
@@ -88,7 +88,7 @@ show_header('Forums'.' > '.'Search');
 <?
 if (empty($ThreadID)) { ?>			
 			<tr>
-				<td><strong>Search in:</strong></td>
+				<td class=""><strong>Search in:</strong></td>
 				<td>
 					<input type="radio" name="type" id="type_title" value="title" <? if($Type == 'title') { echo 'checked="checked" '; }?>/> 
 					<label for="type_title">Titles</label>
@@ -97,7 +97,7 @@ if (empty($ThreadID)) { ?>
 				</td>
 			</tr>
 			<tr>
-				<td><strong>Forums:</strong></td>
+				<td class=""><strong>Forums:</strong></td>
 				<td>
 		<table class="cat_list">
 	
@@ -129,20 +129,20 @@ if (empty($ThreadID)) { ?>
 			$Columns = 0;
 			$Open = true;
 ?>
-			<tr>
-				<td colspan="5"><strong><?=$ForumCats[$Forum['CategoryID']]?></strong></td>
+			<tr  class="">
+				<td colspan="5"><h3><?=$ForumCats[$Forum['CategoryID']]?></h3></td>
 			</tr>
-			<tr>
+			<tr  class="">
 <?		} elseif ($Columns%5  == 0) { ?>
 			</tr>
-			<tr>
+			<tr class="">
 <?		} ?>
 				<td>
 					<input type="checkbox" name="forums[]" value="<?=$Forum['ID']?>" id="forum_<?=$Forum['ID']?>"<? if(isset($_GET['forums']) && in_array($Forum['ID'], $_GET['forums'])) { echo ' checked="checked"';} ?> />
 					<label for="forum_<?=$Forum['ID']?>"><?=$Forum['Name']?></label>
 				</td>
-<? 	} 
-	if ($Columns%5) { ?>
+<? 	}
+	if ( $Columns%5 == 0) { ?>
 				<td colspan="<?=(5-($Columns%5))?>"></td>
 <?	} ?>
 			</tr>
@@ -153,7 +153,7 @@ if (empty($ThreadID)) { ?>
 				<input type="hidden" name="threadid" value="<?=$ThreadID?>" />
 <? } ?>
 				<tr>
-					<td><strong>Username:</strong></td>
+					<td class=""><strong>Username:</strong></td>
 					<td>
 						<input type="text" name="user" size="70" value="<?=display_str($User)?>" />
 					</td>
@@ -169,7 +169,16 @@ if (empty($ThreadID)) { ?>
 <?
 
 // Break search string down into individual words
-$Words = explode(' ',  db_string($Search));
+$Words = explode(' ',  $Search);
+foreach($Words as $Key => &$Word) {
+    $Word = trim($Word);
+    $slen = strlen($Word);
+	if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) { 
+        $word = db_string($word);
+	} else {
+        unset($Words[$Key]);
+	}
+}
 
 if($Type == 'body') {
 

@@ -16,7 +16,7 @@ authorize();
 $Escaped = db_array($_POST, array('log_message','admin_message', 'raw_name'));
 
 //If we're here from the delete torrent page instead of the reports page.
-if(!isset($Escaped['from_delete'])) {
+if(!isset($Escaped['from_delete']) || $Escaped['from_delete']==0) {
 	$Report = true;
 } else if(!is_number($Escaped['from_delete'])) {
 	echo 'Hax occured in from_delete';
@@ -43,20 +43,26 @@ if(!is_number($UploaderID)) {
 	die();
 }
 
+if (isset($Escaped['reporterid'])){
+    $ReporterID = (int)$Escaped['reporterid'];
+    if(!is_number($ReporterID)) {
+          echo 'Hax occuring on the reporterid';
+          die();
+    }
+}
+
 $Warning = (int)$Escaped['warning'];
 if(!is_number($Warning)) {
 	echo 'Hax occuring on the warning';
 	die();
 }
 
-$CategoryID = $Escaped['categoryid'];
-if(!isset($CategoryID)) {
-	echo 'Hax occuring on the categoryid';
-	die();
-}
-
 $TorrentID = $Escaped['torrentid'];
 $RawName = $Escaped['raw_name'];
+
+// GroupID is only used to delete the torrent group cache key.
+$DB->query("SELECT GroupID FROM torrents WHERE ID='$TorrentID'");
+list($GroupID) = $DB->next_record();
 
 if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss" ) && $Report) {
 	if($Escaped['comment']) {
@@ -80,17 +86,18 @@ if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss
 	if($DB->affected_rows() > 0) {
 		$Cache->delete_value('num_torrent_reportsv2');
 		$Cache->delete_value('reports_torrent_'.$TorrentID);
+                $Cache->delete_value('torrent_group_'.$GroupID);
 	} else {
 	//Someone beat us to it. Inform the staffer.
 ?>
-	<table cellpadding="5">
-		<tr>
-			<td>
-				<a href="reportsv2.php?view=report&amp;id=<?=$ReportID?>">Somebody has already resolved this report</a>
-				<input type="button" value="Clear" onclick="ClearReport(<?=$ReportID?>);" />
-			</td>
-		</tr>
-	</table>
+        <table cellpadding="5">
+            <tr>
+                <td>
+                    <a href="reportsv2.php?view=report&amp;id=<?=$ReportID?>">Somebody has already resolved this report</a>
+                    <input type="button" value="Clear" onclick="ClearReport(<?=$ReportID?>);" />
+                </td>
+            </tr>
+        </table>
 <?
 	}
 	die();
@@ -99,13 +106,11 @@ if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss
 if(!isset($Escaped['resolve_type'])) {
 	echo 'No resolve type';
 	die();
-} else if (array_key_exists($_POST['resolve_type'], $Types[$CategoryID])) {
-	$ResolveType = $Types[$CategoryID][$_POST['resolve_type']];
-} else if(array_key_exists($_POST['resolve_type'],$Types['master'])) {
-	$ResolveType = $Types['master'][$_POST['resolve_type']];
+} else if (array_key_exists($_POST['resolve_type'], $Types)) {
+	$ResolveType = $Types[$_POST['resolve_type']];
 } else {
 	//There was a type but it wasn't an option!
-	echo 'HAX (Invalid Resolve Type)';
+	echo "HAX (Invalid Resolve Type)";
 	die();
 }
 
@@ -145,6 +150,11 @@ if($DB->affected_rows() > 0 || !$Report) {
 		$Upload = false;
 	}
 
+	if(isset($Escaped['bounty'])) {
+		$Bounty = true;
+	} else {
+		$Bounty = false;
+	}
 
 	if($_POST['resolve_type'] == "tags_lots") {
 		$DB->query("INSERT IGNORE INTO torrents_bad_tags (TorrentID, UserID, TimeAdded) VALUES (".$TorrentID.", ".$LoggedUser['ID']." , '".sqltime()."')");
@@ -180,6 +190,38 @@ if($DB->affected_rows() > 0 || !$Report) {
 		}
 		$DB->query("SELECT GroupID FROM torrents WHERE ID = ".$TorrentID);
 		list($GroupID) = $DB->next_record();
+        
+        if($ResolveType['title']=='Dupe' && isset($Escaped['extras_id'])) {
+            //------ if deleting a dupe pm peers with the duped torrents id
+			$ExtraIDs = explode(" ", $Escaped['extras_id']);
+            foreach($ExtraIDs as $ExtraID){
+                if(!is_number($ExtraID)) error(0);
+            }
+            $ExtraIDs = implode(',', $ExtraIDs);
+            
+            $DB->query("SELECT DISTINCT uid FROM xbt_snatched WHERE fid = '$TorrentID'
+                        UNION
+                        SELECT DISTINCT uid FROM xbt_files_users WHERE fid = '$TorrentID'");
+            
+            if ($DB->record_count()>0) {
+                $Peers = $DB->collect('uid');
+                $Message = "Torrent ".$TorrentID." (".$RawName.") was deleted for being a dupe.[br][br]";
+                $Message .= "The torrent it was duping was:";
+                //$DB->query("SELECT ID, Name FROM torrents_group WHERE ID IN ($ExtraIDs)");
+				$DB->query("SELECT tg.ID, tg.Name, t.Time, t.Size, t.UserID, um.Username
+							  FROM torrents AS t JOIN torrents_group AS tg ON tg.ID=t.GroupID
+							  LEFT JOIN users_main AS um ON um.ID=t.UserID
+							 WHERE tg.ID IN ($ExtraIDs) 
+							 ORDER BY t.Time DESC");
+                while(list($xID, $xName, $xTime, $xSize, $xUserID, $xUsername) = $DB->next_record()) {
+					$Message .= "[br][url=/torrents.php?id=$xID]{$xName}[/url] (". get_size($xSize).") uploaded by [url=/user.php?id=$xUserID]{$xUsername}[/url] " .time_diff($xTime,2,false,false);
+                }
+                $Message .= "[br][br]You should be able to join the torrent already here by grabbing its torrent file and doing a force recheck in your torrent client.[br][br]See the [url=/articles.php?topic=unseeded]Reseed a torrent[/url] article for details.";
+                send_pm($Peers, 0, db_string('A torrent you were a peer on was deleted'), db_string($Message)); 
+            }
+ 
+        }
+        
 		delete_torrent($TorrentID);
 		write_log($Log);
 		$Log = "deleted torrent for the reason: ".$ResolveType['title'].". ( ".$Escaped['log_message']." )";
@@ -199,6 +241,25 @@ if($DB->affected_rows() > 0 || !$Report) {
 			WHERE UserID=".$UploaderID);
 	}
 	
+      if($Bounty && $ReporterID){
+          $Bounty = (int)$ResolveType['resolve_options']['bounty'];
+          if ($Bounty>0){
+              
+                $SET = "m.Credits=(m.Credits+$Bounty)";
+                $Summary = sqltime()." - User received a bounty payment of $Bounty credits.";	
+                $SET .=",i.AdminComment=CONCAT_WS( '\n', '".db_string($Summary)."', i.AdminComment)";
+                $Summary = sqltime()." | +$Bounty credits | You got a bounty payment.";
+                $SET .=",i.BonusLog=CONCAT_WS( '\n', '".db_string($Summary)."', i.BonusLog)";
+                
+                $DB->query("UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$ReporterID'");
+                $Cache->delete_value('users_stats_'.$ReporterID);
+            
+                $Body = "Thank-you for your {$ResolveType['title']} report re: [url=http://".NONSSL_SITE_URL."/torrents.php?torrentid=$TorrentID]{$RawName}[/url]\n\nYou received a bounty payment of $Bounty credits.";
+               
+                send_pm($ReporterID, 0, "Received Bounty Payment", db_string($Body));
+          }
+      }
+      
 	if($Warning > 0) {
 		$WarnLength = $Warning * (7*24*60*60); 
 		$Reason = "Uploader of torrent (".$TorrentID.") ".$RawName." which was resolved with the preset: ".$ResolveType['title'].".";
@@ -246,7 +307,7 @@ if($DB->affected_rows() > 0 || !$Report) {
 		}
 		
 		if($Warning > 0) {
-			$PM .= "\nThis has resulted in a [url=http://".NONSSL_SITE_URL."/wiki.php?action=article&id=218]".$Warning." week warning.[/url]\n";	
+			$PM .= "\nThis has resulted in a [url=/articles.php?topic=rules]$Warning week warning.[/url]\n";	
 		}
 		
 		if($Upload) {
@@ -267,13 +328,18 @@ if($DB->affected_rows() > 0 || !$Report) {
 	}
 
 	$Cache->delete_value('reports_torrent_'.$TorrentID);
-	
+	$Cache->delete_value('torrent_group_'.$GroupID);
+        
 	//Now we've done everything, update the DB with values
 	if($Report) { 
+        if ($ResolveType['title']=='Dupe') {
+            $CreditSQL = ",Credit='1'";
+        }
 		$DB->query("UPDATE reportsv2 SET
 		Type = '".$Escaped['resolve_type']."',
 		LogMessage='".db_string($Log)."',
 		ModComment='".$Escaped['comment']."'
+        $CreditSQL
 		WHERE ID=".$ReportID);
 	}
 } else {

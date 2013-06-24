@@ -30,7 +30,7 @@ $DB->query("SELECT
 	ORDER BY ChangeTime DESC");
 
 ?>
-<h2>Password reset history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></h2>
+<div class="head">Password reset history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></div>
 <table width="100%">
 	<tr class="colhead">
 		<td>Changed</td>

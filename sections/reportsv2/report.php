@@ -7,43 +7,45 @@
 //If we're not coming from torrents.php, check we're being returned because of an error.
 if(!isset($_GET['id']) || !is_number($_GET['id'])) {
 	if(!isset($Err)) {
-		error(404);
+		error(0);
 	}
 } else {
-	$TorrentID = $_GET['id'];
-	$DB->query("SELECT tg.CategoryID FROM torrents_group AS tg LEFT JOIN torrents AS t ON t.GroupID=tg.ID WHERE t.ID=".$_GET['id']);
-	list($CategoryID) = $DB->next_record();
+	$TorrentID = (int)$_GET['id'];
+    $DB->query("SELECT GroupID, Name FROM torrents_group AS tg JOIN torrents AS t ON t.GroupID=tg.ID WHERE t.ID=$TorrentID");
+    if ($DB->record_count()==0) error("Not a valid torrentid! ($TorrentID)");
+    list($GroupID, $TorrentName) = $DB->next_record();
 }
 
-show_header('Report', 'reportsv2');
+show_header('Report Torrent', 'reportsv2');
 ?>
 
 <div class="thin">
 	<h2>Report a torrent</h2>
 
+	<div class="head">Report</div>
+	 <div class="box pad"> 
 	<form action="reportsv2.php?action=takereport" enctype="multipart/form-data" method="post" id="report_table">
 		<div>
 			<input type="hidden" name="submit" value="true" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<input type="hidden" name="torrentid" value="<?=$TorrentID?>" />
-			<input type="hidden" name="categoryid" value="<?=$CategoryID?>" />
 		</div>
-		<table>
+		<table>  
+			<tr>
+				<td class="label">Torrent :</td>
+                <td><a href="torrents.php?id=<?=$GroupID?>"> <?=$TorrentName?> </a></td>
+			</tr>
 			<tr>
 				<td class="label">Reason :</td>
 				<td>
 					<select id="type" name="type" onchange="ChangeReportType()">
 <?
-	if (!empty($Types[$CategoryID])) {
-		$TypeList = $Types['master'] + $Types[$CategoryID];
+		$TypeList = $Types;
 		$Priorities = array();
 		foreach ($TypeList as $Key => $Value) {
 			$Priorities[$Key] = $Value['priority'];
 		}
 		array_multisort($Priorities, SORT_ASC, $TypeList);
-	} else {
-		$TypeList = $Types['master'];
-	}
 	foreach($TypeList as $Type => $Data) {
 ?>
 						<option value="<?=$Type?>"><?=$Data['title']?></option>
@@ -52,14 +54,7 @@ show_header('Report', 'reportsv2');
 				</td>
 			</tr>
 		</table>
-			
-		<h3>Reporting guidelines</h3>
-		<div class="box pad">
-			<p>Fields that contain lists of values (for example, listing more than one track number) should be separated by a space.</p>
-			<br />
-			<p><strong>Following the below report type specific guidelines will help the moderators deal with your report in a timely fashion. </strong></p>
-			<br />
-			
+			<p><strong>Please give as much as information as you can to help us resolve this quickly.</strong></p> 
 			<div id="dynamic_form">
 				<? 
 				/*
@@ -76,9 +71,11 @@ show_header('Report', 'reportsv2');
 				<script type="text/javascript">ChangeReportType();</script>
 			</div>
 			
+        <div class="pad center"> 
+            <input type="submit" value="Submit report" />
 		</div>
-	<input type="submit" value="Submit report" />
 	</form>
+		</div>
 </div>
 <?
 show_footer();

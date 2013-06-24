@@ -3,12 +3,14 @@
  *>>>>>>>>>>>>>>>>>>>>>>>>>>> User search <<<<<<<<<<<<<<<<<<<<<<<<<<<<*
  * Best viewed with a wide screen monitor							 *
  **********************************************************************/
+$_GET['search'] = trim($_GET['search']);
+
 if (!empty($_GET['search'])) {
 	if (preg_match("/^".IP_REGEX."$/", $_GET['search'])) {
 		$_GET['ip'] = $_GET['search'];
 	} elseif (preg_match("/^".EMAIL_REGEX."$/i", $_GET['search'])) {
 		$_GET['email'] = $_GET['search'];
-	} elseif (preg_match('/^[a-z0-9_?]{1,20}$/iD',$_GET['search'])) {
+	} elseif (preg_match('/^[a-z0-9_?\-\.]{1,20}$/iD',$_GET['search'])) {
 		$DB->query("SELECT ID FROM users_main WHERE Username='".db_string($_GET['search'])."'");
 		if (list($ID) = $DB->next_record()) {
 			header('Location: user.php?id='.$ID);
@@ -203,8 +205,13 @@ if(count($_GET)){
 		$SQL .= 'um1.PermissionID,
 			um1.Email,
 			um1.Enabled,
-			um1.IP,
-			um1.Invites,
+			um1.IP,';
+		if(empty($_GET['tracker_ip'])){
+			$SQL .= "'' AS TrackerIP1, ";
+		} else {
+			$SQL .= "xfu.ip AS TrackerIP1, ";
+		}
+		$SQL .= 'um1.Invites,
 			ui1.DisableInvites,
 			ui1.Warned,
 			ui1.Donor,
@@ -269,6 +276,9 @@ if(count($_GET)){
 				$Distinct = 'DISTINCT ';
 				$Join['xfu']=' JOIN xbt_files_users AS xfu ON um1.ID=xfu.uid ';
 				$Where[]= ' xfu.ip '.$Match.wrap($_GET['tracker_ip'], '', true);
+				//$Join['xfu']=' LEFT JOIN xbt_files_users AS xfu ON um1.ID=xfu.uid ';
+				//$Join['xs']=' LEFT JOIN xbt_snatched AS xs ON um1.ID=xs.uid ';
+				//$Where[]= ' ((xs.ip '.$Match.wrap($_GET['tracker_ip'], '', true).') OR (xfu.ip '.$Match.wrap($_GET['tracker_ip'], '', true) .'))' ;
 		}
 
 //		if(!empty($_GET['tracker_ip'])){
@@ -690,16 +700,21 @@ echo $Pages;
 			<td>Last Seen</td>
 			<td>Upload</td>
 			<td>Download</td>
-			<td>Downloads</td>
-			<td>Snatched</td>
-			<td>Invites</td>
+			<td title="downloads (number of torrent files downloaded)">Dlds</td>
+			<td title="snatched (number of torrents completed)">Sn'd</td>
+			<td title="invites">Inv's</td>
 		</tr>
 <?
-while(list($UserID, $Username, $Uploaded, $Downloaded, $Snatched, $Class, $Email, $Enabled, $IP, $Invites, $DisableInvites, $Warned, $Donor, $JoinDate, $LastAccess) = $DB->next_record()){ ?>
+while(list($UserID, $Username, $Uploaded, $Downloaded, $Snatched, $Class, $Email, $Enabled, $IP, $trackerIP1, 
+                                        $Invites, $DisableInvites, $Warned, $Donor, $JoinDate, $LastAccess) = $DB->next_record()){ ?>
 		<tr>
-			<td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled == 2 ? false : true, $Class)?></td>
+			<td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class)?></td>
 			<td><?=ratio($Uploaded, $Downloaded)?></td>
-			<td><?=display_str($IP)?></td>
+			<td><?="<span title=\"account ip\">".display_ip($IP)."</span>";
+                  if($trackerIP1) echo "<br/><span title=\"current tracker ip\">".display_ip($trackerIP1)."</span>";
+                  //if($trackerIP2) echo "<br/><span title=\"tracker ip history\">".display_ip($trackerIP2)."</span>";
+            ?>
+            </td>
 			<td><?=display_str($Email)?></td>
 			<td><?=time_diff($JoinDate)?></td>
 			<td><?=time_diff($LastAccess)?></td>

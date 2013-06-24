@@ -2,21 +2,34 @@
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
-if (!$News = $Cache->get_value('news')) {
-	$DB->query("SELECT
-		ID,
-		Title,
-		Body,
-		Time
-		FROM news
-		ORDER BY Time DESC
-		LIMIT 5");
-	$News = $DB->to_array(false,MYSQLI_NUM,false);
-	$Cache->cache_value('news',$News,3600*24*30);
-	$Cache->cache_value('news_latest_id', $News[0][0], 0);
+list($Page,$Limit) = page_limit(5);
+   
+if (!$NumResults = $Cache->get_value("news_totalnum") ){ 
+	$DB->query("SELECT Count(*) FROM news");
+    list($NumResults) = $DB->next_record();
+    $Cache->cache_value("news_totalnum",$NumResults);
 }
 
-if ($LoggedUser['LastReadNews'] != $News[0][0]) {
+if ($Page!=1 || !$News = $Cache->get_value("news")){  
+    
+	$DB->query("SELECT ID,
+                       Title,
+                       Body,
+                       Time
+                  FROM news
+              ORDER BY Time DESC
+                 LIMIT $Limit");
+	$News = $DB->to_array(false,MYSQLI_NUM,false);
+    if ($Page==1) {
+        $Cache->cache_value("news",$News);
+        $Cache->cache_value('news_latest_id', $News[0][0], 0);
+    }
+}
+
+
+$Pages=get_pages($Page,$NumResults,5,9);
+
+if ($Page==1 && $LoggedUser['LastReadNews'] != $News[0][0]) {
 	$Cache->begin_transaction('user_info_heavy_'.$UserID);
 	$Cache->update_row(false, array('LastReadNews' => $News[0][0]));
 	$Cache->commit_transaction(0);
@@ -25,24 +38,29 @@ if ($LoggedUser['LastReadNews'] != $News[0][0]) {
 }
 
 show_header('News','bbcode');
-?>
+?>	
 <div class="thin">
+    <h2>
+        <a style="float:left;margin-top:4px" href="feeds.php?feed=feed_news&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> : News" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
+    <?=SITE_NAME?> <?=((strtolower(substr( SITE_NAME,0,1))===substr( SITE_NAME,0,1))?'news':'News'); ?></h2>
+    
+<? print_latest_forum_topics(); ?>
+    
 	<div class="sidebar">
 <?
 	$FeaturedAlbum = $Cache->get_value('featured_album');
 	if($FeaturedAlbum === false) {
-		$DB->query("SELECT fa.GroupID, tg.Name, tg.WikiImage, fa.ThreadID, fa.Title FROM featured_albums AS fa JOIN torrents_group AS tg ON tg.ID=fa.GroupID WHERE Ended = 0");
+		$DB->query("SELECT fa.GroupID, tg.Name, tg.Image, fa.ThreadID, fa.Title FROM featured_albums AS fa JOIN torrents_group AS tg ON tg.ID=fa.GroupID WHERE Ended = 0");
 		$FeaturedAlbum = $DB->next_record();
 		
 		$Cache->cache_value('featured_album', $FeaturedAlbum, 0);
 	}
 	if(is_number($FeaturedAlbum['GroupID'])) {
-		$Artists = get_artist($FeaturedAlbum['GroupID']);
 ?>
+                <div class="head colhead_dark"><strong>Featured Torrent</strong></div>
 		<div class="box">
-			<div class="head colhead_dark"><strong>Featured Album</strong></div>
-			<div class="center pad"><?=display_artists($Artists, true, true)?><a href="torrents.php?id=<?=$FeaturedAlbum['GroupID']?>"><?=$FeaturedAlbum['Name']?></a></div>
-			<div class="center"><a href="torrents.php?id=<?=$FeaturedAlbum['GroupID']?>" title="<?=display_artists($Artists, false, false)?> - <?=$FeaturedAlbum['Name']?>"><img src="<?=$FeaturedAlbum['WikiImage']?>" alt="<?=display_artists($Artists, false, false)?> - <?=$FeaturedAlbum['Name']?>" width="100%" /></a></div>
+			<div class="center pad"><a href="torrents.php?id=<?=$FeaturedAlbum['GroupID']?>"><?=$FeaturedAlbum['Name']?></a></div>
+			<div class="center"><a href="torrents.php?id=<?=$FeaturedAlbum['GroupID']?>" title="<?=$FeaturedAlbum['Name']?>"><img src="<?=$FeaturedAlbum['Image']?>" alt="<?=$FeaturedAlbum['Name']?>" width="100%" /></a></div>
 			<div class="center pad"><a href="forums.php?action=viewthread&amp;threadid=<?=$FeaturedAlbum['ThreadID']?>"><em>Read the interview with the band, discuss here</em></a></div>
 		</div>
 <?
@@ -50,8 +68,9 @@ show_header('News','bbcode');
 	if (check_perms('users_mod')) {
 ?>
 
+                <div class="head colhead_dark"><a href="staffblog.php">Latest staff blog posts</a></div>
 		<div class="box">
-			<div class="head colhead_dark"><strong><a href="staffblog.php">Latest staff blog posts</a></strong></div>
+			
 <?
 if(($Blog = $Cache->get_value('staff_blog')) === false) {
 	$DB->query("SELECT
@@ -95,8 +114,12 @@ for($i = 0; $i < $Limit; $i++) {
 			</ul>
 		</div>
 <?	}  ?>
+        <div class="head colhead_dark">
+            <a href="blog.php">Latest blog posts</a> 
+            <a style="float:right;margin-top:4px" href="feeds.php?feed=feed_blog&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> : Blog" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
+        </div>
 		<div class="box">
-			<div class="head colhead_dark"><strong><a href="blog.php">Latest blog posts</a></strong></div>
+			
 <?
 if(($Blog = $Cache->get_value('blog')) === false) {
 	$DB->query("SELECT
@@ -131,14 +154,22 @@ for($i = 0; $i < $Limit; $i++) {
 ?>
 			</ul>
 		</div>
-		<div class="box">
-			<div class="head colhead_dark"><strong>Stats</strong></div>
+                <div class="head colhead_dark">Stats</div>
+                <div class="box">
 			<ul class="stats nobullet">
-<? if (USER_LIMIT>0) { ?>
-				<li>Maximum Users: <?=number_format(USER_LIMIT) ?></li>
+                
+<?      if (check_perms('site_view_stats')) { ?>
+				<li class="center">
+                    [<a href="stats.php?action=users">Users</a>] &nbsp;[<a href="stats.php?action=site">Site History</a>]
+<?          if (check_perms('site_stats_advanced')) { ?>
+                    &nbsp;[<a href="stats.php?action=torrents">Torrents</a>]
+<?          }   ?>
+                </li>
+<?      }
 
-<?
-}
+        if (USER_LIMIT>0) { ?>
+				<li>Maximum Users: <?=number_format(USER_LIMIT) ?></li>
+<?      }
 
 if(($UserCount = $Cache->get_value('stats_user_count')) === false){
 	$DB->query("SELECT COUNT(ID) FROM users_main WHERE Enabled='1'");
@@ -147,7 +178,7 @@ if(($UserCount = $Cache->get_value('stats_user_count')) === false){
 }
 $UserCount = (int)$UserCount;
 ?>
-				<li>Enabled Users: <?=number_format($UserCount)?> [<a href="stats.php?action=users">Details</a>]</li>
+				<li>Enabled Users: <?=number_format($UserCount)?></li>
 <?
 
 if (($UserStats = $Cache->get_value('stats_users')) === false) {
@@ -168,34 +199,39 @@ if (($UserStats = $Cache->get_value('stats_users')) === false) {
 				<li>Users active this month: <?=number_format($UserStats['Month'])?> (<?=number_format($UserStats['Month']/$UserCount*100,2)?>%)</li>
 <?
 
+// overall data stats
+if (check_perms('site_stats_advanced')) { 
+    
+    if (($DataStats = $Cache->get_value('stats_data')) === false) {
+        
+        $DB->query("SELECT Sum(Size) FROM torrents ");
+        list($DataStats['TotalSize']) = $DB->next_record();
+        $Cache->cache_value('stats_data',$DataStats,3600*24);
+    }
+?>
+				<li>Total Data: <?=get_size($DataStats['TotalSize'])?></li>
+<?
+}
+
+// torrent stats
+if(($TorrentCountLastDay = $Cache->get_value('stats_torrent_count_daily')) === false) {
+      $DB->query("SELECT COUNT(ID) FROM torrents WHERE Time > '".time_minus(3600*24,true)."'");
+      list($TorrentCountLastDay) = $DB->next_record();
+      $Cache->cache_value('stats_torrent_count_daily', $TorrentCountLastDay, 0); //inf cache 
+}
+
+?>
+				<li>New Torrents last day: <?=number_format($TorrentCountLastDay)?></li>
+<?
+
 if(($TorrentCount = $Cache->get_value('stats_torrent_count')) === false) {
 	$DB->query("SELECT COUNT(ID) FROM torrents");
 	list($TorrentCount) = $DB->next_record();
 	$Cache->cache_value('stats_torrent_count', $TorrentCount, 0); //inf cache
 }
 
-if(($AlbumCount = $Cache->get_value('stats_album_count')) === false) {
-	$DB->query("SELECT COUNT(ID) FROM torrents_group WHERE CategoryID='1'");
-	list($AlbumCount) = $DB->next_record();
-	$Cache->cache_value('stats_album_count', $AlbumCount, 0); //inf cache
-}
-
-if(($ArtistCount = $Cache->get_value('stats_artist_count')) === false) {
-	$DB->query("SELECT COUNT(ArtistID) FROM artists_group");
-	list($ArtistCount) = $DB->next_record();
-	$Cache->cache_value('stats_artist_count', $ArtistCount, 0); //inf cache
-}
-
-if (($PerfectCount = $Cache->get_value('stats_perfect_count')) === false) {
-	$DB->query("SELECT COUNT(ID) FROM torrents WHERE ((LogScore = 100 AND Format = 'FLAC') OR (Media = 'Vinyl' AND Format = 'FLAC') OR (Media = 'WEB' AND Format = 'FLAC') OR (Media = 'DVD' AND Format = 'FLAC') OR (Media = 'Soundboard' AND Format = 'FLAC'))");
-	list($PerfectCount) = $DB->next_record();
-	$Cache->cache_value('stats_perfect_count', $PerfectCount, 0);
-}
 ?>
 				<li>Torrents: <?=number_format($TorrentCount)?></li>
-				<li>Releases: <?=number_format($AlbumCount)?></li>
-				<li>Artists: <?=number_format($ArtistCount)?></li>
-				<li>"Perfect" FLACs: <?=number_format($PerfectCount)?></li>
 <?
 //End Torrent Stats
 
@@ -244,7 +280,7 @@ $PeerCount = $SeederCount + $LeecherCount;
 				<li>Leechers: <?=number_format($LeecherCount) ?></li>
 				<li>Seeder/Leecher Ratio: <?=$Ratio?></li>
 			</ul>
-		</div>
+                </div>
 <?
 if(($TopicID = $Cache->get_value('polls_featured')) === false) {
 	$DB->query("SELECT TopicID FROM forums_polls ORDER BY Featured DESC LIMIT 1");
@@ -290,8 +326,8 @@ if($TopicID) {
 	}
 	
 ?>
+                <div class="head colhead_dark"><strong>Poll<? if ($Closed) { echo ' ['.'Closed'.']'; } ?></strong></div>
 		<div class="box">
-			<div class="head colhead_dark"><strong>Poll<? if ($Closed) { echo ' ['.'Closed'.']'; } ?></strong></div>
 			<div class="pad">
 				<p><strong><?=display_str($Question)?></strong></p>
 <?	if ($UserResponse !== null || $Closed) { ?>
@@ -340,65 +376,6 @@ if($TopicID) {
 	<div class="main_column">
 <?
 
-$Recommend = $Cache->get_value('recommend');
-$Recommend_artists = $Cache->get_value('recommend_artists');
-
-if (!is_array($Recommend) || !is_array($Recommend_artists)) {
-	$DB->query("SELECT
-		tr.GroupID,
-		tr.UserID,
-		u.Username,
-		tg.Name,
-		tg.TagList
-		FROM torrents_recommended AS tr
-		JOIN torrents_group AS tg ON tg.ID=tr.GroupID
-		LEFT JOIN users_main AS u ON u.ID=tr.UserID
-		ORDER BY tr.Time DESC LIMIT 10
-		");
-	$Recommend = $DB->to_array();
-	$Cache->cache_value('recommend',$Recommend,1209600);
-	
-	$Recommend_artists = get_artists($DB->collect('GroupID'));
-	$Cache->cache_value('recommend_artists',$Recommend_artists,1209600);
-}
-
-if (count($Recommend) >= 4) {
-$Cache->increment('usage_index');
-?>
-	<div class="box" id="recommended">
-		<div class="head colhead_dark">
-			<strong>Latest vanity house additions</strong>
-			<a href="#" onclick="$('#vanityhouse').toggle();return false;">(View)</a>
-		</div>
-
-		<table class="hidden" id="vanityhouse">
-<?
-	foreach($Recommend as $Recommendations) {
-		list($GroupID, $UserID, $Username, $GroupName, $TagList) = $Recommendations;
-		$TagsStr = '';
-		if ($TagList) {
-			// No vanity.house tag.
-			$Tags = explode(' ', str_replace('_', '.', str_replace('vanity_house', '', $TagList)));
-			$TagLinks = array();
-			foreach ($Tags as $Tag) {
-				$TagLinks[] = "<a href=\"torrents.php?action=basic&taglist=$Tag\">$Tag</a> ";
-			}
-			$TagStr = "<br />\n<div class=\"tags\">".implode(', ', $TagLinks).'</div>';
-		}
-?>
-			<tr>
-				<td>
-					<?=display_artists($Recommend_artists[$GroupID]) ?>
-					<a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> (by <?=format_username($UserID, $Username)?>)
-					<?=$TagStr?>
-				</td>
-			</tr>
-<?	  } ?>
-		</table>
-	</div>
-<!-- END recommendations section -->
-<?
-}
 $Count = 0;
 foreach ($News as $NewsItem) {
 	list($NewsID,$Title,$Body,$NewsTime) = $NewsItem;
@@ -406,14 +383,14 @@ foreach ($News as $NewsItem) {
 		continue;
 	}
 ?>
-		<div id="news<?=$NewsID?>" class="box">
-			<div class="head">
-				<strong><?=$Text->full_format($Title)?></strong> <?=time_diff($NewsTime);?>
+		<div class="head">
+			<?=$Text->full_format($Title)?> <span class="small"><?=time_diff($NewsTime);?></span>
 <? if(check_perms('admin_manage_news')) {?>
-				- <a href="tools.php?action=editnews&amp;id=<?=$NewsID?>">[Edit]</a> 
+			- <a href="tools.php?action=editnews&amp;id=<?=$NewsID?>">[Edit]</a> 
 <? } ?>
 			</div>
-			<div class="pad"><?=$Text->full_format($Body)?></div>
+                 <div id="news<?=$NewsID?>" class="box">
+                    <div class="pad"><?=$Text->full_format($Body, true)?></div>
 		</div>
 <?
 	if (++$Count > 4) {
@@ -421,12 +398,13 @@ foreach ($News as $NewsItem) {
 	}
 }
 ?>
-		<div id="more_news" class="box">
-			<div class="head">
-				<em>For older news posts, <a href="forums.php?action=viewforum&amp;forumid=19">click here</a></em>
-			</div>
-		</div>
+	<div class="linkbox"><?=$Pages?></div>
+    
+    <!--       <div class="head">
+                        <em>For older news posts, <a href="forums.php?action=viewforum&amp;forumid=19">click here</a></em>
+                </div> -->
 	</div>
+    <div class="clear"></div>
 </div>
 <?
 show_footer(array('disclaimer'=>true));
@@ -455,8 +433,8 @@ function contest() {
 
 ?>
 <!-- Contest Section -->
+		<div class="head colhead_dark"><strong>Quality time scoreboard</strong></div>
 		<div class="box">
-			<div class="head colhead_dark"><strong>Quality time scoreboard</strong></div>
 			<div class="pad">
 				<ol style="padding-left:5px;">
 <?

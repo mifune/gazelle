@@ -1,3 +1,5 @@
+
+// set all checkboxes in formElem by val of checkbox passed
 function toggleChecks(formElem,masterElem) {
 	if (masterElem.checked) { checked=true; } else { checked=false; }
 	for(s=0; s<$('#'+formElem).raw().elements.length; s++) {
@@ -5,6 +7,17 @@ function toggleChecks(formElem,masterElem) {
 			$('#'+formElem).raw().elements[s].checked=checked;
 		}
 	}
+}
+
+// return true if any checkboxes in the passed form are checked
+function anyChecks(formElem) {
+	for(s=0; s<$('#'+formElem).raw().elements.length; s++) {
+		if ($('#'+formElem).raw().elements[s].type=="checkbox") {
+			if ($('#'+formElem).raw().elements[s].checked==true) return true; 
+		}
+	}
+    alert("No messages are selected");
+    return false;
 }
 
 //Lightbox stuff

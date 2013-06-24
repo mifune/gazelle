@@ -1,6 +1,10 @@
 <?
 if(!check_perms('site_view_flow')) { error(403); }
 show_header('Upscale Pool');
+?>
+<div class="thin">
+	<h2>Ratio Watch</h2>
+<?
 define('USERS_PER_PAGE', 50);
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
@@ -78,5 +82,8 @@ if($DB->record_count()) {
 <? } else { ?>
 	<h2 align="center">There are currently no users on ratio watch.</h2>
 <? }
+?>
+</div>
+<?
 show_footer();
 ?>

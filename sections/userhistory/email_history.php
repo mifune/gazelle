@@ -66,7 +66,7 @@ if ($UsersOnly == 1) {
 }
 $History = $DB->to_array();
 ?>
-<h2>Email history for <a href="user.php?id=<?=$UserID ?>"><?=$Username ?></a></h2>
+<div class="head">Email history for <a href="user.php?id=<?=$UserID ?>"><?=$Username ?></a></div>
 <table width="100%">
 	<tr class="colhead">
 		<td>Email</td>
@@ -105,7 +105,7 @@ foreach($History as $Key => $Values){
 			list($Enabled)=$DB->next_record();
 			$DB->set_query_id($ueQuery);
 ?>
-		<td><a href="<?=display_str($UserURL)?>"><?=format_username($UserID2, $Username, 0, 0, $Enabled == 2 ? false : true, "")?></a></td>
+		<td><a href="<?=display_str($UserURL)?>"><?=format_username($UserID2, $Username, 0, 0, $Enabled, "")?></a></td>
 	</tr>	
 <?
 		}

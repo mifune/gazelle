@@ -43,7 +43,7 @@ if (isset($_REQUEST['act']) && $_REQUEST['act']=="recover") {
 
 		if ($UserID && strtotime($Expires)>time()) {
 			// If the user has requested a password change, and his key has not expired
-			$Validate->SetFields('password','1','string','You entered an invalid password.',array('maxlength'=>'40','minlength'=>'6'));
+			$Validate->SetFields('password','1','string','You entered an invalid password.',array('maxlength'=>'40','minlength'=>'5'));
 			$Validate->SetFields('verifypassword','1','compare','Your passwords did not match.',array('comparefield'=>'password'));
 
 			if (!empty($_REQUEST['password'])) {
@@ -163,7 +163,7 @@ if (isset($_REQUEST['act']) && $_REQUEST['act']=="recover") {
 
 // Normal login
 else {
-	$Validate->SetFields('username',true,'regex','You did not enter a valid username.',array('regex'=>'/^[a-z0-9_?]{1,20}$/i'));
+	$Validate->SetFields('username',true,'regex','You did not enter a valid username.',array('regex'=>'/^[A-Za-z0-9_\-\.]{1,20}$/i'));
 	$Validate->SetFields('password','1','string','You entered an invalid password.',array('maxlength'=>'40','minlength'=>'6'));
 
 	$DB->query("SELECT ID, Attempts, Bans, BannedUntil FROM login_attempts WHERE IP='".db_string($_SERVER['REMOTE_ADDR'])."'");
@@ -172,6 +172,18 @@ else {
 	// Function to log a user's login attempt
 	function log_attempt($UserID) {
 		global $DB, $AttemptID, $Attempts, $Bans, $BannedUntil, $Time;
+                
+                // The user exists in the database, inform the user about the failed login attempt.
+                if ($UserID > 0) {
+                    $DB->query("SELECT Username FROM users_main WHERE ID='$UserID'");
+                    list($Username) = $DB->next_record(MYSQLI_BOTH, false);
+                    send_pm($UserID, 0, db_string('Security Alert'), db_string( 
+                            "Somebody (probably you, $Username) tried to login but failed!\n".
+                            "Their IP Address was : {$_SERVER['REMOTE_ADDR']}\n".
+                            "If this wasn't you please report this event to a staff member\n".
+                            "- Thank you."));
+                }
+                
 		if($AttemptID) { // User has attempted to log in recently
 			$Attempts++;
 			if ($Attempts>5) { // Only 6 allowed login attempts, ban user's IP
@@ -189,16 +201,16 @@ else {
 					if($DB->record_count() > 0) {
 						//Ban exists already, only add new entry if not for same reason
 						list($Reason) = $DB->next_record(MYSQLI_BOTH, false);
-						if($Reason != "Automated ban per >60 failed login attempts") {
+						if($Reason != "Automated ban per >6 failed login attempts") {
 							$DB->query("UPDATE ip_bans
-								SET Reason = CONCAT('Automated ban per >60 failed login attempts AND ', Reason)
+								SET Reason = CONCAT('Automated ban per >6 failed login attempts AND ', Reason)
 								WHERE FromIP = ".$IP." AND ToIP = ".$IP);
 						}
 					} else {
 						//No ban
 						$DB->query("INSERT INTO ip_bans
 							(FromIP, ToIP, Reason) VALUES
-							('$IP','$IP', 'Automated ban per >60 failed login attempts')");
+							('$IP','$IP', 'Automated ban per >6 failed login attempts')");
 						$Cache->delete_value('ip_bans');
 					}
 				}
@@ -235,6 +247,7 @@ else {
 				AND Username<>''");
 			list($UserID,$PermissionID,$CustomPermissions,$PassHash,$Secret,$Enabled)=$DB->next_record(MYSQLI_NUM, array(2));
 			if (strtotime($BannedUntil)<time()) {
+                            //die("{$_POST['password']}, PassHash: $PassHash, Secret: $Secret, Generated PassHash:".make_hash($_POST['password'],$Secret));
 				if ($UserID && $PassHash==make_hash($_POST['password'],$Secret)) {
 					if ($Enabled == 1) {
 						$SessionID = make_secret();
@@ -242,10 +255,10 @@ else {
 
 						if(isset($_POST['keeplogged']) && $_POST['keeplogged']) {
 							$KeepLogged = 1;
-							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false);
+							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false,true);
 						} else {
 							$KeepLogged = 0;
-							setcookie('session', $Cookie,0,'/','',false);
+							setcookie('session', $Cookie,0,'/','',false,true);
 						}
 						
 						//TODO: another tracker might enable this for donors, I think it's too stupid to bother adding that

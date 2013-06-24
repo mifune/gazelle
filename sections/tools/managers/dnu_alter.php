@@ -29,6 +29,7 @@ if($_POST['submit'] == 'Delete'){ //Delete
 			('$P[name]','$P[comment]','$LoggedUser[ID]','".sqltime()."')");
 	}
 }
+$Cache->delete_value('do_not_upload_list');
 
 // Go back
 header('Location: tools.php?action=dnu')

@@ -13,25 +13,55 @@ $DB->query("SELECT
 	LEFT JOIN users_main AS um ON um.ID=d.UserID
 	ORDER BY d.Time DESC");
 ?>
-<h2>Do Not Uploads</h2>
+<div class="thin">
+<h2>Do Not Upload List</h2>
 <table>
-	<tr class="colhead">
-		<td>Name</td>
-		<td>Comment</td>
-		<td>Added</td>
-		<td>Submit</td>
-	</tr>
-<? while(list($ID, $Name, $Comment, $UserID, $Username, $DNUTime) = $DB->next_record()){ ?>
-	<tr>
+    <tr>
+        <td colspan="4" class="colhead">Add item to Do Not Upload List</td>
+    </tr>
+    <tr class="colhead">
+        <td width="37%">Name</td>
+        <td width="49%" colspan="2">Comment</td> 
+        <td width="14%">Submit</td>
+    </tr>
+    <tr class="rowa">
+          <form action="tools.php" method="post">
+                <input type="hidden" name="action" value="dnu_alter" />
+                <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+                <td>
+                      <input class="long"  type="text" name="name" />
+                </td>
+                <td colspan="2">
+                      <input class="long"  type="text" name="comment" />
+                </td>
+                <td>
+                      <input type="submit" value="Create" />
+                </td>
+          </form>
+    </tr>
+</table>
+<br/>
+<table> 
+    <tr class="colhead">
+        <td width="37%">Name</td>
+        <td width="37%">Comment</td>
+        <td width="12%">Added</td>
+        <td width="14%">Submit</td>
+    </tr>
+<? $Row = 'b';
+while(list($ID, $Name, $Comment, $UserID, $Username, $DNUTime) = $DB->next_record()){ 
+	$Row = ($Row === 'a' ? 'b' : 'a');
+?>
+    <tr class="row<?=$Row?>">
 		<form action="tools.php" method="post">
 			<td>
 				<input type="hidden" name="action" value="dnu_alter" />
 				<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 				<input type="hidden" name="id" value="<?=$ID?>" />
-				<input type="text" name="name" value="<?=display_str($Name)?>" size="30" />
+				<input class="long" type="text" name="name" value="<?=display_str($Name)?>" />
 			</td>
 			<td>
-				<input type="text" name="comment" value="<?=display_str($Comment)?>" size="60" />
+				<input class="long"  type="text" name="comment" value="<?=display_str($Comment)?>" />
 			</td>
 			<td>
 				<?=format_username($UserID, $Username)?><br />
@@ -43,23 +73,6 @@ $DB->query("SELECT
 		</form>
 	</tr>
 <? } ?>
-<tr>
-	<td colspan="4" class="colhead">Add Do Not Upload</td>
-</tr>
-<tr class="rowa">
-	<form action="tools.php" method="post">
-		<input type="hidden" name="action" value="dnu_alter" />
-		<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-		<td>
-			<input type="text" name="name" size="30" />
-		</td>
-		<td colspan="2">
-			<input type="text" name="comment" size="60" />
-		</td>
-		<td>
-			<input type="submit" value="Create" />
-		</td>
-	</form>
-</tr>
 </table>
+</div>
 <? show_footer(); ?>

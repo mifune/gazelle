@@ -46,8 +46,8 @@ $DB->set_query_id($TrackerIps);
 $Pages=get_pages($Page,$NumResults,IPS_PER_PAGE,9);
 
 ?>
-	<h2>Tracker IP history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></h2>
 	<div class="linkbox"><?=$Pages?></div>
+        <div class="head">Tracker IP history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></div>
 	<table>
 		<tr class="colhead">
 			<td>IP address</td>
@@ -61,7 +61,10 @@ foreach($Results as $Index => $Result) {
 
 ?>
 	<tr class="rowa">
-		<td><?=$IP?> (<?=get_cc($IP)?>)<br /><?=get_host($IP)?> 
+		<td>
+                <?=display_ip($IP, geoip($IP))?><br />
+				<?=get_host($IP)?> 
+        </td>
 		<td><a href="torrents.php?torrentid=<?=$TorrentID?>"><?=$TorrentID?></a></td>
 		<td><?=date("Y-m-d g:i:s", $Time)?></td>
 	</tr>

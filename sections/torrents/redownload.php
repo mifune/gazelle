@@ -5,7 +5,7 @@ if (!empty($_GET['userid']) && is_number($_GET['userid'])) {
 	error(0);
 }
 
-if(!check_perms('zip_downloader')) {
+if($UserID != $LoggedUser['ID'] && !check_perms('zip_downloader')) {
 	error(403);
 }
 
@@ -22,34 +22,36 @@ if (empty($_GET['type'])) {
 	
 	switch ($_GET['type']) {
 		case 'uploads':
-			if(!check_paranoia('uploads', $User['Paranoia'], $UserClass, $UserID)) { error(403); }
+			if(!check_paranoia('uploads', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 			$SQL = "WHERE t.UserID='$UserID'";
 			$Month = "t.Time";
 			break;
 		case 'snatches':
-			if(!check_paranoia('snatched', $User['Paranoia'], $UserClass, $UserID)) { error(403); }
+			if(!check_paranoia('snatched', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 			$SQL = "JOIN xbt_snatched AS x ON t.ID=x.fid WHERE x.uid='$UserID'";
 			$Month = "FROM_UNIXTIME(x.tstamp)";
 			break;
 		case 'seeding':
-			if(!check_paranoia('seeding', $User['Paranoia'], $UserClass, $UserID)) { error(403); }
+			if(!check_paranoia('seeding', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 			$SQL = "JOIN xbt_files_users AS xfu ON t.ID = xfu.fid WHERE xfu.uid='$UserID' AND xfu.remaining = 0";
 			$Month = "FROM_UNIXTIME(xfu.mtime)";
+			break;
+		case 'grabbed':
+			if(!check_paranoia('grabbed', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
+			$SQL = "JOIN users_downloads AS ud ON t.ID = ud.TorrentID WHERE ud.UserID='$UserID'";
+			$Month = "t.Time";
 			break;
 		default:
 			error(0);
 	}
 }
 
+
 ZIP::unlimit();
 
 $DB->query("SELECT 
 	DATE_FORMAT(".$Month.",'%b \'%y') AS Month,
 	t.GroupID,
-	t.Media,
-	t.Format,
-	t.Encoding,
-	IF(t.RemasterYear=0,tg.Year,t.RemasterYear),
 	tg.Name,
 	t.Size,
 	f.File
@@ -59,38 +61,17 @@ $DB->query("SELECT
 	".$SQL."
 	GROUP BY t.ID");
 $Downloads = $DB->to_array(false,MYSQLI_NUM,false);
-$Artists = get_artists($DB->collect('GroupID'));
 
 list($UserID, $Username) = array_values(user_info($UserID));
 $Zip = new ZIP($Username.'\'s '.ucfirst($_GET['type']));
 foreach($Downloads as $Download) {
-	list($Month, $GroupID, $Media, $Format, $Encoding, $Year, $Album, $Size, $Contents) = $Download;
-	$Artist = display_artists($Artists[$GroupID],false,true,false);
+	list($Month, $GroupID, $Album, $Size, $Contents) = $Download;
 	$Contents = unserialize(base64_decode($Contents));
 	$Tor = new TORRENT($Contents, true);
 	$Tor->set_announce_url(ANNOUNCE_URL.'/'.$LoggedUser['torrent_pass'].'/announce');
 	unset($Tor->Val['announce-list']);
 
-	$TorrentName='';
-	$TorrentInfo='';
-	$TorrentName = $Artist;
-	$TorrentName .= $Album;
-
-	if ($Year>0) { $TorrentName.=' - '.$Year; }
-
-	if ($Media!='') { $TorrentInfo.=$Media; }
-
-	if ($Format!='') {
-		if ($TorrentInfo!='') { $TorrentInfo.=' - '; }
-		$TorrentInfo.=$Format;
-	}
-
-	if ($Encoding!='') {
-		if ($TorrentInfo!='') { $TorrentInfo.=' - '; }
-		$TorrentInfo.=$Encoding;
-	}
-
-	if ($TorrentInfo!='') { $TorrentName.=' ('.$TorrentInfo.')'; }
+	$TorrentName = $Album;
 
 	if (!$TorrentName) { $TorrentName="No Name"; }
 

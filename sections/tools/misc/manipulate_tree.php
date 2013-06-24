@@ -97,6 +97,7 @@ if($_POST['id']) {
 ?>
 
 <div class="thin">
+	<h2>Manage Invite tree</h2>
 	<? if($Msg) { ?>
 	<div class="center">
 		<p style="color: red;text-align:center;"><?=$Msg?></p>
