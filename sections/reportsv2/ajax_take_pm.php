@@ -20,17 +20,8 @@ if(isset($_POST['uploader_pm']) && $_POST['uploader_pm'] != "") {
 	die();
 }
 
-if(!is_number($_POST['categoryid']) || !is_number($TorrentID)) {
-	echo 'HAX on categoryid!';
-	die();
-} else {
-	$CategoryID = $_POST['categoryid'];
-}
-
-if (array_key_exists($_POST['type'], $Types[$CategoryID])) {
-	$ReportType = $Types[$CategoryID][$_POST['type']];
-} else if(array_key_exists($_POST['type'],$Types['master'])) {
-	$ReportType = $Types['master'][$_POST['type']];
+if (array_key_exists($_POST['type'], $Types)) {
+	$ReportType = $Types[$_POST['type']];
 } else {
 	//There was a type but it wasn't an option!
 	echo 'HAX on section type';

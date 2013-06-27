@@ -2,6 +2,9 @@
 enforce_login();
 show_header('IRC');	
 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+/*
 $DB->query("SELECT IRCKey FROM users_main WHERE ID = $LoggedUser[ID]");
 list($IRCKey) = $DB->next_record();
 
@@ -17,12 +20,20 @@ if(empty($IRCKey)) {
 </div>
 <?
 } else {
-	if(!isset($_POST["accept"])) {
+    */
+	if(!$_POST["connect"] || (!isset($_POST["emp"]) && !isset($_POST["help"]) && !isset($_POST["staff"]))) {
 ?>
 <div class="thin">
-	<h3 id="irc">IRC Rules - Please read these carefully!</h3>
+	<div class="head">IRC Rules - Please read these carefully!</div>
 	<div class="box pad" style="padding:10px 10px 10px 20px;">
-		<ul>
+            <?
+        $Body=get_article('chatrules'); 
+        if (!$Body) $Body = "could not find article 'chatrules'"; 
+        echo $Text->full_format($Body, true);
+         
+        ?>
+		<!-- 
+        <ul>
 			<li>
 				Staff have the final decision, if they say stop and you continue, expect at least to be banned from the IRC server. 
 			</li>
@@ -68,54 +79,79 @@ if(empty($IRCKey)) {
 			<li>
 				<strong>Read the topic before asking questions.</strong>
 			</li>
-		</ul>
+		</ul> -->
 	</div>
+    <form method="post" action="chat.php" onsubmit="return ($('#channel1').raw().checked || $('#channel2').raw().checked || $('#channel3').raw().checked);">
+        <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+        <br/>
+        <table>
+            <tr>
+                <td class="noborder right" width="60%">
+                     connect to the <strong>#empornium</strong> general chat channel
+                    <input type="checkbox" id="channel1" name="emp" value="1" checked="checked" /><br/>
+                     connect to the <strong>#empornium-help</strong> channel*
+                    <input type="checkbox" id="channel2" name="help" value="1" />
+<?                      if ( $LoggedUser['SupportFor'] !="" || $LoggedUser['DisplayStaff'] == 1 ) { ?>
+                    <br/> connect to the <strong>#empornium-staff</strong> channel*
+                    <input type="checkbox" id="channel3" name="staff" value="1" />
+ <?                     }       ?>
+                </td>
+                <td class="noborder">
+                    <input type="submit" id="connect" name="connect" style="width:160px" value="I agree to the rules" />
+                </td>
+            </tr>
+            <tr>
+                <td class="noborder right" colspan="2">
+                    *note: Please be patient we are not around 24/7. If you want help idle in the help channel (or if you want to help) &nbsp;&nbsp;
+                </td>
+            </tr>
+        </table> 
+    </form>
 </div>
-<form method="post" action="chat.php">
-	<center>
-		<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-		<input type="submit" name="accept" value="I agree to these rules" />
-	</center>
-</form>
+
 <?
 	} else {
 		$nick = $LoggedUser["Username"];
 		$nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
 		if(strlen($nick) == 0) {
-			$nick = "WhatGuest????";
+			$nick = "EmpGuest????";
 		} else {
 			if(is_numeric(substr($nick, 0, 1))) {
 				$nick = "_" . $nick;
 			}
 		}
+            $channels='';
+            $div='';
+            if(isset($_POST["emp"])) {
+                $channels='empornium';
+                $div='%2c';
+            }
+            if(isset($_POST["help"])) {
+                $channels .= "{$div}empornium-help";
+                $div='%2c';
+            }
+            if(isset($_POST["staff"])) 
+                if ( $LoggedUser['SupportFor'] !="" || $LoggedUser['DisplayStaff'] == 1 ) 
+                    $channels .= "{$div}empornium-staff"; 
+            
+            //$channels=$_POST["channel"]=='help'?'empornium-help':'empornium';
+            
+                    // webchat.digitalwizardry.org 
+                    // irc.emprn.tk
+                    
+                    //http://webchat.digitalirc.org/?prompt=1&uio=MTY9ZmFsc2U67&nick=<?=$nick?/>&channels=<?=$channels?/>
+                    //http://shire.digitalirc.org:9090/
+                    
+                    
 ?>
 <div class="thin">
-	<h3 id="general">IRC</h3>
-	<div class="box pad" style="padding:10px 0px 10px 0px;">
-		<div style="padding:0px 10px 10px 20px;">
-			<p>If you have an IRC client, visit <a href="wiki.php?action=article&amp;name=IRC+-+How+to+join">this wiki entry</a> for more information how to connect. (IRC Applet users are automatically identified with Drone.)</p>
-		</div>
-		<center>
-			<applet codebase="static/irc/" code="IRCApplet.class" archive="irc.jar,sbox.jar" width=800 height=600>
-				<param name="nick" value="<?=$nick?>">
-				<param name="alternatenick" value="WhatGuest????">
-				<param name="name" value="Java IRC User">
-				<param name="host" value="<?=BOT_SERVER?>">
-				<param name="multiserver" value="true">
-				<param name="autorejoin" value="false">
-
-				<param name="gui" value="sbox">
-				<param name="pixx:highlight" value="true">
-				<param name="pixx:highlightnick" value="true">
-				<param name="pixx:prefixops" value="true">
-				<param name="sbox:scrollspeed" value="5">
-			</applet>
-		</center>
+	<div class="head">IRC</div>
+	<div class="box pad center"> 
+                <iframe src="http://webchat.digitalirc.org/?prompt=1&uio=MTY9ZmFsc2U67&nick=<?=$nick?>&channels=<?=$channels?>" width="98%" height="600"></iframe>  
 	</div>
 </div>
 <?
 	}
-}
-
+ 
 show_footer();
 ?>

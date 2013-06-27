@@ -10,12 +10,16 @@ if ($ID = (int)($_GET['id'])) {
 			error(403);
 		}*/
 
-		// Conversation belongs to user or user is staff, unresolve it
-		$DB->query("UPDATE staff_pm_conversations SET Status='Unanswered' WHERE ID=$ID");
+		// Conversation belongs to user or user is staff, unresolve it // changed from Unanswered to OPen on unresolve
+		$DB->query("UPDATE staff_pm_conversations SET Status='Open' WHERE ID=$ID");
 		// Clear cache for user
 		$Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']);
 		
-		header('Location: staffpm.php');
+        if (isset($_GET['return']))
+            header("Location: staffpm.php?action=viewconv&id=$ID");
+        else
+            header('Location: staffpm.php');
+        
 	} else {
 		// Conversation does not belong to user
 		error(403);

@@ -167,6 +167,9 @@ class BENCODE_DICT extends BENCODE {
 	function enc(){
 		$Str = 'd';
 		reset($this->Val);
+		// Sort by key to respect spec
+		ksort($this->Val);
+        
 		foreach ($this->Val as $Key => $Value) {
 			$Str.=strlen($Key).':'.$Key.$this->encode($Value);
 		}
@@ -246,6 +249,9 @@ class TORRENT extends BENCODE_DICT {
 		$this->Val['announce'] = $Announce;
 	}
 	
+	function set_comment($Comment) {
+		$this->Val['comment'] = $Comment;
+	}
 	// Returns an array of:
 	// 	* the files in the torrent 
 	//	* the total size of files described therein
@@ -292,7 +298,7 @@ class TORRENT extends BENCODE_DICT {
 		unset($this->Val['libtorrent_resume']);
 		
 		//----- End properties that do not affect the infohash
-		if ($this->Val['info']->Val['private']) {
+		if ($this->Val['info']->Val['private']===1) {
 			return true; // Torrent is private
 		} else {
 			// Torrent is not private!

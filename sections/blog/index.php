@@ -1,9 +1,9 @@
 <?
 enforce_login();
 
-define('ANNOUNCEMENT_FORUM_ID', 19);
 show_header('Blog','bbcode');
 require(SERVER_ROOT.'/classes/class_text.php');
+ 
 $Text = new TEXT;
 
 if(check_perms('admin_manage_blog')) {
@@ -55,7 +55,12 @@ if(check_perms('admin_manage_blog')) {
 						header('Location: blog.php');
 					} 
 				} else {
-					$ThreadID = create_thread(ANNOUNCEMENT_FORUM_ID, $LoggedUser[ID], $Title, $Body);
+                              $ForumID = (int)$_POST['forumid'];
+					$DB->query("SELECT ID FROM forums WHERE ID=$ForumID");
+					if($DB->record_count() < 1) {
+						error("No forum with id=$ForumID exists!");
+					} 
+					$ThreadID = create_thread($ForumID, $LoggedUser[ID], $Title, $Body);
 					if($ThreadID < 1) {
 						error(0);
 					}
@@ -73,34 +78,61 @@ if(check_perms('admin_manage_blog')) {
 		}
 	}
 		
+include(SERVER_ROOT.'/sections/forums/functions.php');
+ 
+$ForumCats = get_forum_cats();
+//This variable contains all our lovely forum data
+$Forums = get_forums_info();
+
 	?>
-		<div class="box thin">
-			<div class="head">
-				<?=((empty($_GET['action'])) ? 'Create a blog post' : 'Edit blog post')?>
-			</div>
-			<form action="blog.php" method="post">
-				<div class="pad">
-					<input type="hidden" name="action" value="<?=((empty($_GET['action'])) ? 'takenewblog' : 'takeeditblog')?>" />
-					<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-	<? if(!empty($_GET['action']) && $_GET['action'] == 'editblog'){?> 
-					<input type="hidden" name="blogid" value="<?=$BlogID; ?>" />
-	<? }?> 
-					<h3>Title</h3>
-					<input type="text" name="title" size="95" <? if(!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> /><br />
-					<h3>Body</h3>
-					<textarea name="body" cols="95" rows="15"><? if(!empty($Body)) { echo display_str($Body); } ?></textarea> <br />
-					<h3>Thread ID</h3>
-					<input type="text" name="thread" size="8"<? if(!empty($ThreadID)) { echo 'value="'.display_str($ThreadID).'"'; } ?> />
-					(Leave blank to create thread automatically)
-					<br /><br />
-					<input id="subscribebox" type="checkbox" name="subscribe"<?=!empty($HeavyInfo['AutoSubscribe'])?' checked="checked"':''?> tabindex="2" />
-					<label for="subscribebox">Subscribe</label>
-					<div class="center">
-						<input type="submit" value="<?=((!isset($_GET['action'])) ? 'Create blog post' : 'Edit blog post') ?>" />
-					</div>
-				</div>
-			</form>
-		</div>
+		<div class="thin">
+            <h2>    
+                <a style="float:left;margin-top:4px" href="feeds.php?feed=feed_blog&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> - Blog" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
+        <?=SITE_NAME?> Blog</h2>
+                <div id="quickreplypreview">
+                    <div id="contentpreview" style="text-align:left;"></div>
+                </div>  
+            </div>
+                <div class="thin">
+                        <div class="head">
+                                <?=((empty($_GET['action'])) ? 'Create a blog post' : 'Edit blog post')?>
+                        </div>
+                    <div class="box">
+                            <form  id="quickpostform" action="blog.php" method="post">
+                                    <div class="pad">
+                                    <div id="quickreplytext">
+                                    <input type="hidden" name="action" value="<?=((empty($_GET['action'])) ? 'takenewblog' : 'takeeditblog')?>" />
+                                            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+            <? if(!empty($_GET['action']) && $_GET['action'] == 'editblog'){?> 
+                                            <input type="hidden" name="blogid" value="<?=$BlogID; ?>" />
+            <? }?> 
+                                            <br/><h3>Title</h3>
+                                            <input type="text" name="title" class="long"  <? if(!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> /><br />
+                                            <br/><h3>Body</h3>
+                            <? $Text->display_bbcode_assistant('textbody', true)  ?>
+                                            <textarea id="textbody" name="body" class="long" rows="15"><? if(!empty($Body)) { echo display_str($Body); } ?></textarea> <br />
+                                            <br/><h3>Discussion Thread</h3>
+                                            <input type="radio" name="autothread" value="0" title="if selected a forum must be supplied" checked="checked" />
+                                            Automatically create thread in forum:
+                                           
+                            <?= print_forums_select($Forums, $ForumCats, ANNOUNCEMENT_FORUM_ID) ?>
+                                            <br/>
+                                             <input type="radio" name="autothread" value="1" title="if selected a valid threadid must be supplied" />
+                                            Thread already discussing this topic:
+                                            <input type="text" name="thread" size="8"<? if(!empty($ThreadID)) { echo 'value="'.display_str($ThreadID).'"'; } ?> />
+                                            &nbsp;(must be a valid thread id)
+                                            <br /><br />
+                                            <input id="subscribebox" type="checkbox" name="subscribe"<?=!empty($HeavyInfo['AutoSubscribe'])?' checked="checked"':''?> tabindex="2" />
+                                            <label for="subscribebox">Subscribe</label>
+                            </div>
+                                            <div class="center">
+                                                    <input id="post_preview" type="button" value="Preview" onclick="if(this.preview){Quick_Edit_Blog();}else{Quick_Preview_Blog();}" />
+                                        <input type="submit" value="<?=((!isset($_GET['action'])) ? 'Create blog post' : 'Edit blog post') ?>" />
+                                            </div>
+                                    </div>
+                            </form>
+                    </div>
+                </div>
 		<br />
 <? 
 }
@@ -125,21 +157,21 @@ if (!$Blog = $Cache->get_value('blog')) {
 foreach ($Blog as $BlogItem) {
 	list($BlogID, $Author, $Title, $Body, $BlogTime, $ThreadID) = $BlogItem;
 ?>
+                        <div class="head">
+                                <strong><?=$Title?></strong> - posted <?=time_diff($BlogTime);?> by <?=$Author?>
+        <? if(check_perms('admin_manage_blog')) { ?> 
+                                - <a href="blog.php?action=editblog&amp;id=<?=$BlogID?>">[Edit]</a>
+                                <a href="blog.php?action=deleteblog&amp;id=<?=$BlogID?>&amp;auth=<?=$LoggedUser['AuthKey']?>">[Delete]</a>
+            <? } ?>
+                        </div>
 			<div id="blog<?=$BlogID?>" class="box">
-				<div class="head">
-					<strong><?=$Title?></strong> - posted <?=time_diff($BlogTime);?> by <?=$Author?>
-		<? if(check_perms('admin_manage_blog')) { ?> 
-					- <a href="blog.php?action=editblog&amp;id=<?=$BlogID?>">[Edit]</a>
-					<a href="blog.php?action=deleteblog&amp;id=<?=$BlogID?>&amp;auth=<?=$LoggedUser['AuthKey']?>">[Delete]</a>
-		 <? } ?>
-				</div>
 				<div class="pad">
-					<?=$Text->full_format($Body)?>
+					<?=$Text->full_format($Body, true)?>
 		<? if($ThreadID) { ?>
 					<br /><br />
 					<em><a href="forums.php?action=viewthread&threadid=<?=$ThreadID?>">Discuss this post here</a></em>
 		<? 		if(check_perms('admin_manage_blog')) { ?> 
-					<a href="blog.php?action=deadthread&amp;id=<?=$BlogID?>&amp;auth=<?=$LoggedUser['AuthKey']?>">[Dead]</a>
+					&nbsp;<a href="blog.php?action=deadthread&amp;id=<?=$BlogID?>&amp;auth=<?=$LoggedUser['AuthKey']?>">[Remove link]</a>
 		<? 		}
 			} ?>
 				</div>

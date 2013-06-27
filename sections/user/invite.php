@@ -145,12 +145,12 @@ if(!$Sneaky
 <?
 } elseif (!empty($LoggedUser['DisableInvites'])) {?>
 	<div class="box pad" style="text-align: center">
-		<strong class="important_text">Your invites have been disabled.  Please read <a href="wiki.php?action=article&id=310">this article</a> for more information.</strong>
+		<strong class="important_text">Your invites have been disabled.  Please read <a href="articles.php?topic=invites">this article</a> for more information.</strong>
 	</div>
 <?
 } elseif ($LoggedUser['RatioWatch'] || !$CanLeech) { ?>
 	<div class="box pad" style="text-align:center">
-		<strong class="important_text">You may not send invites while on Ratio Watch or while your leeching privileges are disabled.  Please read <a href="wiki.php?action=article&id=310">this article</a> for more information.</strong>
+		<strong class="important_text">You may not send invites while on Ratio Watch or while your leeching privileges are disabled.  Please read <a href="articles.php?topic=invites">this article</a> for more information.</strong>
 	</div>
 <?
 }
@@ -183,8 +183,7 @@ if (!empty($Pending)) {
 }
 
 ?> 
-	<h3>Invitee list</h3>
-	<div class="box pad">
+	<div class="head">Invitee list</div>
 		<table width="100%">
 			<tr class="colhead">
 				<td><a href="user.php?action=invite&amp;order=username&amp;sort=<?=(($CurrentOrder == 'username') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Username</a></td>
@@ -202,7 +201,7 @@ if (!empty($Pending)) {
 		$Row = ($Row == 'a') ? 'b' : 'a';
 ?> 
 			<tr class="row<?=$Row?>">
-				<td><?=format_username($ID, $Username, $Donor, $Warned, $Enabled == 2 ? false : true, $Class)?></td>
+				<td><?=format_username($ID, $Username, $Donor, $Warned, $Enabled, $Class)?></td>
 				<td><?=display_str($Email)?></td>
 				<td><?=time_diff($JoinDate,1)?></td>
 				<td><?=time_diff($LastAccess,1);?></td>
@@ -212,7 +211,7 @@ if (!empty($Pending)) {
 			</tr>
 <? } ?>
 		</table>
-	</div>
+
 </div>
 <?
 show_footer();

@@ -30,12 +30,16 @@ $DB->query("SELECT
 	WHERE p.TopicID=(SELECT TopicID FROM forums_posts WHERE ID='$PostID')");
 list($TopicID, $ForumID, $Pages, $Page) = $DB->next_record();
 
+if( !check_forumperm($ForumID, 'Write') ) { error(403); }
+    
 // $Pages = number of pages in the thread
 // $Page = which page the post is on
 // These are set for cache clearing.
 
 $DB->query("DELETE FROM forums_posts WHERE ID='$PostID'");
 
+$DB->query("DELETE FROM forums_last_read_topics WHERE PostID='$PostID'");
+            
 $DB->query("SELECT MAX(ID) FROM forums_posts WHERE TopicID='$TopicID'");
 list($LastID) = $DB->next_record();
 $DB->query("UPDATE forums AS f, forums_topics AS t SET f.NumPosts=f.NumPosts-1, t.NumPosts=t.NumPosts-1 WHERE f.ID='$ForumID' AND t.ID='$TopicID'");
@@ -76,6 +80,8 @@ if($LastID < $PostID) { // Last post in a topic was removed
 	$UpdateArrayForums = array('NumPosts' => '-1');
 	$UpdateArrayThread = array('Posts' => '-1');
 }
+
+update_latest_topics();
 
 //We need to clear all subsequential catalogues as they've all been bumped with the absence of this post
 $ThisCatalogue = floor((POSTS_PER_PAGE*$Page-POSTS_PER_PAGE)/THREAD_CATALOGUE);

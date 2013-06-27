@@ -109,7 +109,7 @@ if(!empty($_GET['userid'])) {
 
 	$UserLink = '<a href="user.php?id='.$UserID.'">'.$User['Username'].'</a>';
 	if(!empty($_GET['contrib'])) {
-		if (!check_paranoia('collagecontribs', $User['Paranoia'], $UserClass, $UserID)) { error(403); }
+		if (!check_paranoia('collagecontribs', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 		$DB->query("SELECT DISTINCT CollageID FROM collages_torrents WHERE UserID = $UserID");
 		$CollageIDs = $DB->collect('CollageID');
 		if(empty($CollageIDs)) {
@@ -118,7 +118,7 @@ if(!empty($_GET['userid'])) {
 			$SQL .= " AND c.ID IN(".db_string(implode(',', $CollageIDs)).")";
 		}
 	} else {
-		if (!check_paranoia('collages', $User['Paranoia'], $UserClass, $UserID)) { error(403); }
+		if (!check_paranoia('collages', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 		$SQL .= " AND UserID='".$_GET['userid']."'";
 	}
 	$Categories[] = 0;
@@ -142,16 +142,13 @@ list($NumResults) = $DB->next_record();
 show_header(($BookmarkView)?'Your bookmarked collages':'Browse collages');
 ?>
 <div class="thin">
-<? if ($BookmarkView) { ?>
-	<h2>Your bookmarked collages</h2>
-<? } else { ?>
-	<h2>Browse collages<?=(!empty($UserLink) ? (isset($CollageIDs) ? ' with contributions by '.$UserLink : ' started by '.$UserLink) : '')?></h2>
-<? } ?>
+    <h2>Collages</h2>
 <? if (!$BookmarkView) { ?>
-	<div>
+	
+		<div class="head">Search</div>
 		<form action="" method="get">
-			<div><input type="hidden" name="action" value="search" /></div>
-			<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
+			<input type="hidden" name="action" value="search" />
+			<table cellpadding="6" cellspacing="1" border="0" width="100%">
 				<tr>
 					<td class="label"><strong>Search for:</strong></td>
 					<td colspan="3">
@@ -201,13 +198,15 @@ show_header(($BookmarkView)?'Your bookmarked collages':'Browse collages');
 				</tr>
 			</table>	
 		</form>
-	</div>
-<? } // if (!$BookmarkView) ?>
+	
+<? }  ?>
 	<div class="linkbox">
 <? if (!$BookmarkView) {
 if (check_perms('site_collages_create')) { ?>
 		<a href="collages.php?action=new">[New collage]</a>
-<? } 
+<?		} else { ?>
+            <em> <a href="articles.php?topic=collagehelp">You must be a Good Perv with a ratio of at least 1.05 to be able to create a collage.</a></em><br/>
+<?          }
 if (check_perms('site_collages_personal')) {
 	
  	$DB->query("SELECT ID FROM collages WHERE UserID='$LoggedUser[ID]' AND CategoryID='0' AND Deleted='0'");
@@ -238,16 +237,19 @@ if (check_perms('site_collages_create') || check_perms('site_collages_personal')
 		<a href="collages.php?userid=<?=$LoggedUser['ID']?>&amp;contrib=1">[Collages you've contributed to]</a>
 <? } else { ?>
 		<a href="bookmarks.php?type=torrents">[Torrents]</a>
-		<a href="bookmarks.php?type=artists">[Artists]</a>
 		<a href="bookmarks.php?type=collages">[Collages]</a>
 		<a href="bookmarks.php?type=requests">[Requests]</a>
 <? } ?>
-<br /><br />
 <?
 $Pages=get_pages($Page,$NumResults,COLLAGES_PER_PAGE,9);
 echo $Pages;
 ?>
 	</div>
+<? if ($BookmarkView) { ?>
+	<div class="head">Your bookmarked collages</div>
+<? } else { ?>
+	<div class="head">Browse collages<?=(!empty($UserLink) ? (isset($CollageIDs) ? ' with contributions by '.$UserLink : ' started by '.$UserLink) : '')?></div>
+<? } ?>    
 <? if (count($Collages) == 0) { ?>
 <div class="box pad" align="center">
 <?	if ($BookmarkView) { ?>
@@ -292,9 +294,11 @@ foreach ($Collages as $Collage) {
 				<a href="#" onclick="Unbookmark('collage', <?=$ID?>,'');return false;">[Remove bookmark]</a>
 			</span>
 <?	} ?>
+                        <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 			<div class="tags">
 				<?=$Tags?>
 			</div>
+                        <? } ?>
 		</td>
 		<td><?=(int)$NumTorrents?></td>
 		<td><?=format_username($UserID, $Username)?></td>

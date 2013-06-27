@@ -3,7 +3,7 @@
 include(SERVER_ROOT.'/sections/reports/array.php');
 
 if(empty($_GET['type']) || empty($_GET['id']) || !is_number($_GET['id'])) {
-	error(404);
+	error(0);
 }
 
 if(!array_key_exists($_GET['type'], $Types)) {
@@ -23,40 +23,28 @@ switch($Short) {
 		list($Username) = $DB->next_record();
 		break;
 
-	case "request_update" :
-		$NoReason = true;
-		$DB->query("SELECT Title, Description, TorrentID, CategoryID, Year FROM requests WHERE ID=".$ID);
-		if($DB->record_count() < 1) {
-			error(404);
-		}
-		list($Name, $Desc, $Filled, $CategoryID, $Year) = $DB->next_record();
-		if($Filled || ($CategoryID != 0 && ($Categories[$CategoryID-1] != "Music" || $Year != 0))) {
-			error(403);
-		}
-		break;
-
 	case "request" :
-		$DB->query("SELECT Title, Description, TorrentID FROM requests WHERE ID=".$ID);
+		$DB->query("SELECT Title, Description, TorrentID, UserID FROM requests WHERE ID=".$ID);
 		if($DB->record_count() < 1) {
 			error(404);
 		}
-		list($Name, $Desc, $Filled) = $DB->next_record();
+		list($Name, $Desc, $Filled, $AuthorID) = $DB->next_record();
 		break;
 
 	case "collage" :
-		$DB->query("SELECT Name, Description FROM collages WHERE ID=".$ID);
+		$DB->query("SELECT Name, Description, UserID FROM collages WHERE ID=".$ID);
 		if($DB->record_count() < 1) {
 			error(404);
 		}
-		list($Name, $Desc) = $DB->next_record();
+		list($Name, $Desc, $AuthorID) = $DB->next_record();
 		break;
 
 	case "thread" :
-		$DB->query("SELECT ft.Title, ft.ForumID, um.Username FROM forums_topics AS ft JOIN users_main AS um ON um.ID=ft.AuthorID WHERE ft.ID=".$ID);
+		$DB->query("SELECT ft.Title, ft.ForumID, um.Username, um.ID FROM forums_topics AS ft JOIN users_main AS um ON um.ID=ft.AuthorID WHERE ft.ID=".$ID);
 		if($DB->record_count() < 1) {
 			error(404);
 		}
-		list($Title, $ForumID, $Username) = $DB->next_record();
+		list($Title, $ForumID, $Username, $AuthorID) = $DB->next_record();
 		$DB->query("SELECT MinClassRead FROM forums WHERE ID = ".$ForumID);
 		list($MinClassRead) = $DB->next_record();
 		if(!empty($LoggedUser['DisableForums']) ||
@@ -67,11 +55,11 @@ switch($Short) {
 		break;
 
 	case "post" :
-		$DB->query("SELECT fp.Body, fp.TopicID, um.Username FROM forums_posts AS fp JOIN users_main AS um ON um.ID=fp.AuthorID WHERE fp.ID=".$ID);
+		$DB->query("SELECT fp.Body, fp.TopicID, um.Username, um.ID FROM forums_posts AS fp JOIN users_main AS um ON um.ID=fp.AuthorID WHERE fp.ID=".$ID);
 		if($DB->record_count() < 1) {
 			error(404);
 		}
-		list($Body, $TopicID, $Username) = $DB->next_record();
+		list($Body, $TopicID, $Username, $AuthorID) = $DB->next_record();
 		$DB->query("SELECT ForumID FROM forums_topics WHERE ID = ".$TopicID);
 		list($ForumID) = $DB->next_record();
 		$DB->query("SELECT MinClassRead FROM forums WHERE ID = ".$ForumID);
@@ -92,11 +80,11 @@ switch($Short) {
 		} else {
 			$Column = "AuthorID";
 		}
-		$DB->query("SELECT ".$Short.".Body, um.Username FROM ".$Table." AS ".$Short." JOIN users_main AS um ON um.ID=".$Short.".".$Column." WHERE ".$Short.".ID=".$ID);
+		$DB->query("SELECT ".$Short.".Body, um.Username, um.ID FROM ".$Table." AS ".$Short." JOIN users_main AS um ON um.ID=".$Short.".".$Column." WHERE ".$Short.".ID=".$ID);
 		if($DB->record_count() < 1) {
 			error(404);
 		}
-		list($Body, $Username) = $DB->next_record();
+		list($Body, $Username, $AuthorID) = $DB->next_record();
 		break;
 }
 
@@ -104,7 +92,7 @@ show_header('Report a '.$Type['title'],'bbcode');
 ?>
 <div class="thin">
 	<h2>Report <?=$Type['title']?></h2>
-	<h3>Reporting guidelines</h3>
+	<div class="head">Reporting guidelines</div>
 	<div class="box pad">
 		<p>Following these guidelines will help the moderators deal with your report in a timely fashion. </p>
 		<ul>
@@ -130,16 +118,16 @@ switch($Short) {
 		break;
 	case "request_update" :
 ?>
-	<p>You are reporting the request:</p>
+	<div class="head">You are reporting the request:</div>
 	<table>
 		<tr class="colhead">
-			<td>Title</td>
+			<td width="20%">Title</td>
 			<td>Description</td>
-			<td>Filled?</td>
+			<td width="20">Filled?</td>
 		</tr>
 		<tr>
 			<td><?=display_str($Name)?></td>
-			<td><?=$Text->full_format($Desc)?></td>	
+			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>	
 			<td><strong><?=($Filled == 0 ? 'No' : 'Yes')?></strong></td>
 		</tr>
 	</table>
@@ -153,26 +141,6 @@ switch($Short) {
 			<input type="hidden" name="id" value="<?=$ID?>" />
 			<input type="hidden" name="type" value="<?=$Short?>" />
 			<table>
-				<tr>
-					<td class="label">Year (required)</td>
-					<td>
-						<input type="text" size="4" name="year" />
-					</td>
-				</tr>
-				<tr>
-					<td class="label">Release Type</td>
-					<td>
-						<select id="releasetype" name="releasetype">
-							<option value='0'>---</option>
-<?		
-		foreach ($ReleaseTypes as $Key => $Val) {
-?>							<option value='<?=$Key?>' <?=(!empty($ReleaseType) ? ($Key == $ReleaseType ?" selected='selected'" : "") : '') ?>><?=$Val?></option>
-<?			
-		}
-?>
-						</select>
-					</td>
-				</tr>
 				<tr>
 					<td class="label">Comment</td>
 					<td>
@@ -189,16 +157,16 @@ switch($Short) {
 		break;
 	case "request" :
 ?>
-	<p>You are reporting the request:</p>
+	<div class="head">You are reporting the request:</div>
 	<table>
 		<tr class="colhead">
-			<td>Title</td>
+			<td width="20%">Title</td>
 			<td>Description</td>
-			<td>Filled?</td>
+			<td width="20">Filled?</td>
 		</tr>
 		<tr>
 			<td><?=display_str($Name)?></td>
-			<td><?=$Text->full_format($Desc)?></td>	
+			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>	
 			<td><strong><?=($Filled == 0 ? 'No' : 'Yes')?></strong></td>
 		</tr>
 	</table>
@@ -206,25 +174,25 @@ switch($Short) {
 		break;
 	case "collage" :
 ?>
-		<p>You are reporting the collage:</p>
-		<table>
+	<div class="head">You are reporting the collage:</div>
+	<table>
 		<tr class="colhead">
-			<td>Title</td>
+			<td width="20%">Title</td>
 			<td>Description</td>
 		</tr>
 		<tr>
 			<td><?=display_str($Name)?></td>	
-			<td><?=$Text->full_format($Desc)?></td>
+			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
 <?	
 		break;
 	case "thread" :
 ?>
-		<p>You are reporting the thread:</p>
-		<table>
+	<div class="head">You are reporting the thread:</div>
+	<table>
 		<tr class="colhead">
-			<td>Username</td>
+			<td width="20%">Username</td>
 			<td>Title</td>
 		</tr>
 		<tr>
@@ -236,15 +204,15 @@ switch($Short) {
 		break;
 	case "post" :
 ?>
-		<p>You are reporting the post:</p>
-		<table>
+	<div class="head">You are reporting the post:</div>
+	<table>
 		<tr class="colhead">
-			<td>Username</td>
+			<td width="20%">Username</td>
 			<td>Body</td>
 		</tr>
 		<tr>
 			<td><?=display_str($Username)?></td>	
-			<td><?=$Text->full_format($Body)?></td>
+			<td><?=$Text->full_format($Body, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
 <?	
@@ -253,15 +221,15 @@ switch($Short) {
 	case "torrents_comment" :
 	case "collages_comment" :
 ?>
-		<p>You are reporting the <?=$Types[$Short]['title']?>:</p>
-		<table>
+	<div class="head">You are reporting the <?=$Types[$Short]['title']?>:</div>
+	<table>
 		<tr class="colhead">
-			<td>Username</td>
+			<td width="20%">Username</td>
 			<td>Body</td>
 		</tr>
 		<tr>
 			<td><?=display_str($Username)?></td>	
-			<td><?=$Text->full_format($Body)?></td>
+			<td><?=$Text->full_format($Body, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
 <?	
@@ -269,14 +237,15 @@ switch($Short) {
 }
 if(empty($NoReason)) {
 ?>
-	<h3>Reason</h3>
+    <br/>
+	<div class="head">Your reason for reporting:</div>
 	<div class="box pad center">
 		<form action="" method="post">
 			<input type="hidden" name="action" value="takereport" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<input type="hidden" name="id" value="<?=$ID?>" />
 			<input type="hidden" name="type" value="<?=$Short?>" />
-			<textarea rows="10" cols="95" name="reason"></textarea><br /><br />
+			<textarea rows="10" class="long" name="reason"></textarea><br /><br />
 			<input type="submit" value="Submit report" />
 		</form>
 	</div>

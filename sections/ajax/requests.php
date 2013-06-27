@@ -5,7 +5,7 @@ include(SERVER_ROOT.'/sections/requests/functions.php');
 
 $Queries = array();
 
-$OrderWays = array('year', 'votes', 'bounty', 'created', 'lastvote', 'filled');
+$OrderWays = array('votes', 'bounty', 'created', 'lastvote', 'filled');
 list($Page,$Limit) = page_limit(REQUESTS_PER_PAGE);
 $Submitted = !empty($_GET['submit']);
 					
@@ -121,86 +121,9 @@ if(!empty($_GET['filter_cat'])) {
 	$SS->set_filter('categoryid', $Keys);
 }
 
-if(!empty($_GET['releases'])) {
-	$ReleaseArray = $_GET['releases'];
-	if(count($ReleaseArray) != count($ReleaseTypes)) {
-		foreach($ReleaseArray as $Index => $Value) {
-			if(!is_number($Value)) {
-				print json_encode(array('status' => 'failure'));
-				die();
-			}
-		}
-		
-		$SS->set_filter('releasetype', $ReleaseArray);
-	}
-}
-
-if(!empty($_GET['formats'])) {
-	$FormatArray = $_GET['formats'];
-	if(count($FormatArray) != count($Formats)) {
-		$FormatNameArray = array();
-		foreach($FormatArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Formats)) {
-				$FormatNameArray[$Index] = $Formats[$MasterIndex];
-			} else {
-				//Hax
-				print json_encode(array('status' => 'failure'));
-				die();
-			}
-		}
-		
-		$Queries[]='@formatlist '.implode(' | ', $FormatNameArray);
-	}
-}
-
-if(!empty($_GET['media'])) {
-	$MediaArray = $_GET['media'];
-	if(count($MediaArray) != count($Media)) {
-		$MediaNameArray = array();
-		foreach($MediaArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Media)) {
-				$MediaNameArray[$Index] = $Media[$MasterIndex];
-			} else {
-				//Hax
-				print json_encode(array('status' => 'failure'));
-				die();
-			}
-		}
-
-		$Queries[]='@medialist '.implode(' | ', $MediaNameArray);
-	}
-}
-
-if(!empty($_GET['bitrates'])) {
-	$BitrateArray = $_GET['bitrates'];
-	if(count($BitrateArray) != count($Bitrates)) {
-		$BitrateNameArray = array();
-		foreach($BitrateArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Bitrates)) {
-				$BitrateNameArray[$Index] = $SS->EscapeString($Bitrates[$MasterIndex]);
-			} else {
-				//Hax
-				print json_encode(array('status' => 'failure'));
-				die();
-			}
-		}
-
-		$Queries[]='@bitratelist '.implode(' | ', $BitrateNameArray);
-	}
-}
-
 if(!empty($_GET['requestor']) && check_perms('site_see_old_requests')) {
 	if(is_number($_GET['requestor'])) {
 		$SS->set_filter('userid', array($_GET['requestor']));
-	} else {
-		print json_encode(array('status' => 'failure'));
-		die();
-	}
-}
-
-if(isset($_GET['year'])) {
-	if(is_number($_GET['year']) || $_GET['year'] == 0) {
-		$SS->set_filter('year', array($_GET['year']));
 	} else {
 		print json_encode(array('status' => 'failure'));
 		die();
@@ -252,9 +175,6 @@ switch($CurrentOrder) {
 		break;
 	case 'filled' :
 		$OrderBy = "TimeFilled";
-		break;
-	case 'year' :
-		$OrderBy = "Year";
 		break;
 	default :
 		$OrderBy = "TimeAdded";
@@ -313,13 +233,9 @@ if ($NumResults == 0) {
 	$JsonResults = array();
 	$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 	foreach ($Requests as $RequestID => $Request) {
-		
-		//list($BitrateList, $CatalogueNumber, $CategoryID, $Description, $FillerID, $FormatList, $RequestID, $Image, $LogCue, $MediaList, $ReleaseType, 
-		//	$Tags, $TimeAdded, $TimeFilled, $Title, $TorrentID, $RequestorID, $RequestorName, $Year, $RequestID, $Categoryid, $FillerID, $LastVote, 
-		//	$ReleaseType, $TagIDs, $TimeAdded, $TimeFilled, $TorrentID, $RequestorID, $Voters) = array_values($Request);
-		
-		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Year, $Image, $Description, $CatalogueNumber, 
-			$ReleaseType, $BitrateList, $FormatList, $MediaList, $LogCue, $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
+				
+		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+                     $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
 			
 		$RequestVotes = get_votes_array($RequestID);
 		
@@ -328,15 +244,9 @@ if ($NumResults == 0) {
 		if($CategoryID == 0) {
 			$CategoryName = "Unknown";
 		} else {
-			$CategoryName = $Categories[$CategoryID - 1];
+			$CategoryName = $NewCategories[$CategoryID]['name'];
 		}
 		
-		$JsonArtists = array();
-		if($CategoryName == "Music") {
-			$ArtistForm = get_request_artists($RequestID);
-			$JsonArtists = array_values($ArtistForm);
-		}
-
 		$Tags = $Request['Tags'];
 		
 		$JsonResults[] = array(
@@ -349,17 +259,9 @@ if ($NumResults == 0) {
 			'bounty' => $RequestVotes['TotalBounty'],
 			'categoryId' => (int) $CategoryID,
 			'categoryName' => $CategoryName,
-			'artists' => $JsonArtists,
 			'title' => $Title,
-			'year' => (int) $Year,
 			'image' => $Image,
 			'description' => $Description,
-			'catalogueNumber' => $CatalogueNumber,
-			'releaseType' => $ReleaseType,
-			'bitrateList' => $BitrateList,
-			'formatList' => $FormatList,
-			'mediaList' => $MediaList,
-			'logCue' => $LogCue,
 			'isFilled' => ($TorrentID > 0),
 			'fillerId' => (int) $FillerID,
 			'fillerName' => $FillerName == 0 ? "" : $FillerName,

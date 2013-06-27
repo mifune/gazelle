@@ -5,10 +5,20 @@ $UserID = $LoggedUser['ID'];
 authorize();
 replace */
 
+if (isset($_POST['delete'])) {
+	$Action = "delete";
+} elseif (isset($_POST['unread'])) {
+	$Action = "mark as unread";
+} elseif (isset($_POST['read'])) {
+	$Action = "mark as read";
+} else {
+    error(0);
+}
+
 if(!isset($_POST['messages']) || !is_array($_POST['messages'])){
-	error('You forgot to select messages to delete.');
-	header('Location: inbox.php');
-	die();
+	error("No messages are selected to $Action.");
+	//header('Location: inbox.php');
+	//die();
 }
 
 $Messages = $_POST['messages'];

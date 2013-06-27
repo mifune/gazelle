@@ -7,18 +7,19 @@ if (!($IsFLS)) {
 if ($ConvID = (int)$_GET['convid']) {
 	// FLS, check level of conversation
 	$DB->query("SELECT Level FROM staff_pm_conversations WHERE ID=$ConvID");
-	list($Level) = $DB->next_record;
+	//list($Level) = $DB->next_record;
+	list($Level) = $DB->next_record();
 	
 	if ($Level == 0) {
 		// FLS conversation, assign to staff (moderator)
 		if(!empty($_GET['to'])) {
 			$Level = 0;
 			switch($_GET['to']) {
-				case 'forum' :
-					$Level = 650;
+				case 'staff' :  // in this context 'staff' == Mod Pervs
+					$Level = 500; //  650;
 					break;
-				case 'staff' :
-					$Level = 700;
+				case 'admin' :  // in this context 'admin' == Admins+
+					$Level = 600; // 700;
 					break;
 				default :
 					error(404);
@@ -38,7 +39,8 @@ if ($ConvID = (int)$_GET['convid']) {
 } elseif ($ConvID = (int)$_POST['convid']) {
 	// Staff (via ajax), get current assign of conversation
 	$DB->query("SELECT Level, AssignedToUser FROM staff_pm_conversations WHERE ID=$ConvID");
-	list($Level, $AssignedToUser) = $DB->next_record;
+	//list($Level, $AssignedToUser) = $DB->next_record;
+	list($Level, $AssignedToUser) = $DB->next_record();
 	
 	if ($LoggedUser['Class'] >= $Level || $AssignedToUser == $LoggedUser['ID']) {
 		// Staff member is allowed to assign conversation, assign

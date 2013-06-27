@@ -1,36 +1,60 @@
 <?
-$TagID = db_string($_GET['tagid']);
-$GroupID = db_string($_GET['groupid']);
+
+header('Content-Type: application/json; charset=utf-8');
+
+if(!empty($LoggedUser['DisableTagging'])) {
+	error(403,true);
+}
+
+include(SERVER_ROOT . '/sections/torrents/functions.php');
+
+
+$TagID = db_string($_POST['tagid']);
+$GroupID = db_string($_POST['groupid']);
 
 if(!is_number($TagID) || !is_number($GroupID)) {
-	error(404);
+	error(0, true); 
 }
+ 
+$DB->query("SELECT Name, TagType FROM tags WHERE ID='$TagID'");
+list($TagName, $TagType) = $DB->next_record();
+if (!$TagName) error(0, true);
+        
 if(!check_perms('site_delete_tag')) {
-	error(403);
+    //only need to check this if not already permitted
+    $DB->query("SELECT t.UserID, tt.UserID 
+                  FROM torrents AS t 
+             LEFT JOIN torrents_tags AS tt 
+                    ON t.GroupID=tt.GroupID 
+                   AND tt.TagID='$TagID'
+                 WHERE t.GroupID='$GroupID'");
+    list($AuthorID,$OwnerID) = $DB->next_record();
+    // must be both torrent owner and tag owner to delete
+    if ($AuthorID!=$OwnerID || $AuthorID!=$LoggedUser['ID']) error(403, true);
 }
 
-$DB->query("SELECT Name FROM tags WHERE ID='$TagID'");
-if (list($TagName) = $DB->next_record()) {
-	$DB->query("INSERT INTO group_log (GroupID, UserID, Time, Info)
+$DB->query("INSERT INTO group_log (GroupID, UserID, Time, Info)
 				VALUES ('$GroupID',".$LoggedUser['ID'].",'".sqltime()."','".db_string('Tag "'.$TagName.'" removed from group')."')");
-}
+ 
 
 $DB->query("DELETE FROM torrents_tags_votes WHERE GroupID='$GroupID' AND TagID='$TagID'");
 $DB->query("DELETE FROM torrents_tags WHERE GroupID='$GroupID' AND TagID='$TagID'");
 
-
-
 $Cache->delete_value('torrents_details_'.$GroupID); // Delete torrent group cache
 update_hash($GroupID);
 
+// Decrease the tag count, if it's not in use any longer and not an official tag, delete it from the list.
 $DB->query("SELECT COUNT(GroupID) FROM torrents_tags WHERE TagID=".$TagID);
 list($Count) = $DB->next_record();
-if($Count < 1) {
-	$DB->query("SELECT Name FROM tags WHERE ID=".$TagID);
-	list($TagName) = $DB->next_record();
-	
-	$DB->query("DELETE FROM tags WHERE ID=".$TagID);
+if ($TagType == 'genre' || $Count > 0) {
+    $Count = $Count > 0 ? $Count : 0;
+    $DB->query("UPDATE tags SET Uses=$Count WHERE ID=$TagID");
+} else {
+    $DB->query("DELETE FROM tags WHERE ID=".$TagID." AND TagType='other'");
 }
 
-header('Location: '.$_SERVER['HTTP_REFERER']);
+$Result = array(1, "Deleted tag $TagName");
+echo json_encode(array(array($Result), get_taglist_html($GroupID, $_POST['tagsort'])));
+
+//header('Location: '.$_SERVER['HTTP_REFERER']);
 ?>

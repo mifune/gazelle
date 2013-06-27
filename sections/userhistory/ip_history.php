@@ -82,13 +82,13 @@ $DB->set_query_id($RS);
 $Pages=get_pages($Page,$NumResults,IPS_PER_PAGE,9);
 
 ?>
-	<h2>IP history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></h2>
 	<div class="linkbox"><?=$Pages?></div>
-	<table>
+        <div class="head">IP history for <a href="/user.php?id=<?=$UserID?>"><?=$Username?></a></div>
+        <table>
 		<tr class="colhead">
-			<td>IP address</td>
-			<td>Started</td>
-			<td>Ended</td>
+			<td style="width:20%">IP address</td>
+			<td style="width:30%">Started</td>
+			<td style="width:20%">Ended</td>
 			<td>Elapsed</td>
 		</tr>
 <?
@@ -111,14 +111,14 @@ foreach($Results as $Index => $Result) {
 ?>
 		<tr class="rowa">
 			<td>
-				<?=$IP?> (<?=get_cc($IP)?>)				<br />
-				<?=get_host($IP)?>
+                <? $cc = geoip($IP);  echo display_ip($IP, $cc)?><br />
+				<?=get_host($IP)?><br />
 			<?=($HasDupe ? 
-			'<a href="#" onclick="ShowIPs('.$Index.'); return false;">('.count($UserIDs).')</a>' 
+			'<a id="toggle'.$Index.'" href="#" onclick="ShowIPs('.$Index.'); return false;">show/hide dupes ('.count($UserIDs).')</a>' 
 			: '(0)')?></td>
 			<td><?=time_diff($StartTime)?></td>
 			<td><?=time_diff($EndTime)?></td>
-			<td><?//time_diff(strtotime($StartTime), strtotime($EndTime)); ?></td>
+			<td><?=time_diff(strtotime($StartTime), strtotime($EndTime)); ?></td>
 		</tr>
 <?
 	if($HasDupe){
@@ -127,10 +127,10 @@ foreach($Results as $Index => $Result) {
 		if(!$UserEndTimes[$Key]){ $UserEndTimes[$Key] = sqltime(); }
 ?>
 		<tr class="rowb<?=($HideMe ? ' hidden' : '')?>" name="<?=$Index?>">
-			<td>&nbsp;&nbsp;&#187;&nbsp;<?=format_username($Val, $Usernames[$Key], $UsersDonor[$Key], $UsersWarned[$Key], $UsersEnabled[$Key] == 2 ? false : true)?></td>
+			<td>&nbsp;&nbsp;&#187;&nbsp;<?=format_username($Val, $Usernames[$Key], $UsersDonor[$Key], $UsersWarned[$Key], $UsersEnabled[$Key])?></td>
 			<td><?=time_diff($UserStartTimes[$Key])?></td>
 			<td><?=time_diff($UserEndTimes[$Key])?></td>
-			<td><?//time_diff(strtotime($UserStartTimes[$Key]), strtotime($UserEndTimes[$Key])); ?></td>
+			<td><?=time_diff(strtotime($UserStartTimes[$Key]), strtotime($UserEndTimes[$Key])); ?></td>
 		</tr>
 <?
 			

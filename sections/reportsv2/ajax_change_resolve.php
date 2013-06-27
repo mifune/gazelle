@@ -15,19 +15,10 @@ if(is_number($_GET['id'])) {
 	die();
 }
 
-if(!isset($_GET['categoryid'])) {
-	echo 'HAX on categoryid';
-	die();
-} else {
-	$CategoryID = $_GET['categoryid'];
-}
-
 if(!isset($_GET['type'])) {
 	error(404);
-} else if (array_key_exists($_GET['type'], $Types[$CategoryID])) {
-	$ReportType = $Types[$CategoryID][$_GET['type']];
-} else if(array_key_exists($_GET['type'],$Types['master'])) {
-	$ReportType = $Types['master'][$_GET['type']];
+} else if (array_key_exists($_GET['type'], $Types)) {
+	$ReportType = $Types[$_GET['type']];
 } else {
 	//There was a type but it wasn't an option!
 	echo 'HAX on section type';
@@ -38,5 +29,7 @@ $Array = array();
 $Array[0] = $ReportType['resolve_options']['delete'];
 $Array[1] = $ReportType['resolve_options']['upload'];
 $Array[2] = $ReportType['resolve_options']['warn'];
+$Array[3] = $ReportType['resolve_options']['bounty'];
+$Array[4] = $ReportType['resolve_options']['pm'];
 
 echo json_encode($Array);

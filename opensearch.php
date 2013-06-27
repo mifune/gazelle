@@ -4,7 +4,7 @@ require('classes/config.php');
 
 $SSL = ($_SERVER['SERVER_PORT'] === '443');
 
-$Type = ((!empty($_GET['type']) && in_array($_GET['type'],array('torrents','artists','requests','forums','users','wiki','log')))?$_GET['type']:'artists');
+$Type = ((!empty($_GET['type']) && in_array($_GET['type'],array('torrents','tags','requests','forums','users','log')))?$_GET['type']:'torrents');
 
 /*
 $FH = fopen(SERVER_ROOT.'/favicon.ico','r');
@@ -21,16 +21,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 	<Image width="16" height="16" type="image/x-icon">http<?=($SSL?'s':'')?>://<?=SITE_URL?>/favicon.ico</Image>
 <?
 switch ($Type) {
-	case 'artists':
-?>
-	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/artist.php?artistname={searchTerms}"></Url>
-	<Url type="application/x-suggestions+json" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/artist.php?action=autocomplete&amp;name={searchTerms}"/>
-	<moz:SearchForm>http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php?action=advanced</moz:SearchForm>
-<? 
-		break;
 	case 'torrents':
 ?>
-	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php?action=basic&amp;searchstr={searchTerms}"></Url>
+	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php?searchtext={searchTerms}"></Url>
+	<moz:SearchForm>http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php</moz:SearchForm>
+<? 
+		break;
+	case 'tags':
+?>
+	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php?taglist={searchTerms}"></Url>
 	<moz:SearchForm>http<?=($SSL?'s':'')?>://<?=SITE_URL?>/torrents.php</moz:SearchForm>
 <? 
 		break;
@@ -50,12 +49,6 @@ switch ($Type) {
 ?>
 	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/user.php?action=search&amp;search={searchTerms}"></Url>
 	<moz:SearchForm>http<?=($SSL?'s':'')?>://<?=SITE_URL?>/user.php?action=search</moz:SearchForm>
-<? 
-		break;
-	case 'wiki':
-?>
-	<Url type="text/html" method="get" template="http<?=($SSL?'s':'')?>://<?=SITE_URL?>/wiki.php?action=search&amp;search={searchTerms}"></Url>
-	<moz:SearchForm>http<?=($SSL?'s':'')?>://<?=SITE_URL?>/wiki.php?action=search</moz:SearchForm>
 <? 
 		break;
 	case 'log':

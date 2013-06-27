@@ -17,13 +17,13 @@ $Forum = get_forum_info($ForumID);
 if($Forum === false) {
 	error(404);
 }
-
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = NEW TEXT;
 
 if(!check_forumperm($ForumID, 'Write') || !check_forumperm($ForumID, 'Create')) { error(403); }
-show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode');
+show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 ?>
 <div class="thin">
-	<h2><a href="forums.php">Forums</a> &gt; <a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>"><?=$Forum['Name']?></a> &gt; <span id="newthreadtitle">New Topic</span></h2>
 	<div class="hidden" id="newthreadpreview">
 		<div class="linkbox">
 			<div class="center">
@@ -46,7 +46,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode');
 			<tr class="colhead_dark">
 				<td colspan="2">
 					<span style="float:left;"><a href='#newthreadpreview'>#XXXXXX</a>
-						by <strong><?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'] == 2 ? false : true, $LoggedUser['PermissionID'])?></strong> <? if (!empty($LoggedUser['Title'])) { echo '('.$LoggedUser['Title'].')'; }?>
+						<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true)?> <? //if (!empty($LoggedUser['Title'])) { echo '('.$LoggedUser['Title'].')'; }?>
 					Just now
 					</span>
 					<span id="barpreview" style="float:right;">
@@ -58,10 +58,11 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode');
 			</tr>
 			<tr>
 				<td class="avatar" valign="top">
-			<? if (!empty($LoggedUser['Avatar'])) { ?>
-					<img src="<?=$LoggedUser['Avatar']?>" width="150" alt="<?=$LoggedUser['Username']?>'s avatar" />
+			<? if (!empty($LoggedUser['Avatar'])) { 
+                              $PermissionsInfo = get_permissions($LoggedUser['PermissionID']) ; ?>
+					<img src="<?=$LoggedUser['Avatar']?>" class="avatar" style="<?=get_avatar_css($PermissionsInfo['MaxAvatarWidth'], $PermissionsInfo['MaxAvatarHeight'])?>" alt="<?=$LoggedUser['Username']?>'s avatar" />
 			<? } else { ?>
-					<img src="<?=STATIC_SERVER?>common/avatars/default.png" width="150" alt="Default avatar" />
+					<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
 			<? } ?>
 				</td>
 				<td class="body" valign="top">
@@ -70,8 +71,10 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode');
 			</tr>
 		</table>
 	</div>
-	<div class="box pad">
-		<form action="" id="newthreadform" method="post">
+        <div class="messagecontainer" id="container"><div id="message" class="hidden center messagebar"></div></div>
+	<div class="head"><a href="forums.php">Forums</a> &gt; <a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>"><?=$Forum['Name']?></a> &gt; <span id="newthreadtitle">New Topic</span></div>
+        <div class="box pad">
+		<form action="" id="newthreadform" method="post" onsubmit="return Validate_Form('message',new Array('title','posttext'))">
 			<input type="hidden" name="action" value="new" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<input type="hidden" name="forum" value="<?=$ForumID?>" />
@@ -82,7 +85,9 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode');
 				</tr>
 				<tr>
 					<td class="label">Body</td>
-					<td><textarea id="posttext" style="width: 98%;" onkeyup="resize('posttext');" name="body" cols="90" rows="8"></textarea></td>
+					<td> <? $Text->display_bbcode_assistant("posttext", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+                                   <textarea id="posttext" class="long" onkeyup="resize('posttext');" name="body" cols="90" rows="8"></textarea>
+                              </td>
 				</tr>
 				<tr>
 					<td></td>

@@ -13,28 +13,35 @@ if(strtotime($BannedUntil)<time() && !$BanID) {
 	}
 	if(isset($Err)) {
 ?>
-	<span class="warning"><?=$Err?><br /><br /></span>
+	<span class="warning"><?=$Err?></span><br /><br />
 <? } ?>
+        <span style="font-size:2em">
+          <!--<br/>this is not torrents.empornium.me but a test site and access is by invitation only, do not try to login unless you are meant to be here.
+          <br/>Please use <a href="http://torrents.empornium.me">http://torrents.empornium.me</a> for all your pron related needs.<br/>-->
+            <br/>Welcome to <?=SITE_URL?> 
+            <br/>
+        </span>
+        <br/><br/>
 <? if ($Attempts > 0) { ?>
 	You have <span class="info"><?=(6-$Attempts)?></span> attempts remaining.<br /><br />
 	<strong>WARNING:</strong> You will be banned for 6 hours after your login attempts run out!<br /><br />
 <? } ?>
 	<table>
 		<tr>
-			<td>Username&nbsp;</td>
-			<td colspan="2"><input type="text" name="username" id="username" class="inputtext" required="required" maxlength="20" pattern="[A-Za-z0-9_?]{1,20}" autofocus="autofocus" /></td>
+			<td width="70px">Username&nbsp;</td>
+			<td width="200px" colspan="2"><input style="width: 98%;" type="text" name="username" id="username" class="inputtext" required="required" maxlength="20" pattern="[A-Za-z0-9_\-\.]{1,20}" autofocus="autofocus" /></td>
 		</tr>
 		<tr>
-			<td>Password&nbsp;</td>
-			<td colspan="2"><input type="password" name="password" id="password" class="inputtext" required="required" maxlength="40" pattern=".{6,40}" /></td>
+			<td width="70px">Password&nbsp;</td>
+			<td width="200px" colspan="2"><input style="width: 98%;" type="password" name="password" id="password" class="inputtext" required="required" maxlength="40" pattern=".{6,40}" /></td>
 		</tr>
 		<tr>
-			<td></td>
-			<td>
+			<td width="70px"></td>
+			<td width="150px">
 				<input type="checkbox" id="keeplogged" name="keeplogged" value="1"<? if(isset($_REQUEST['keeplogged']) && $_REQUEST['keeplogged']) { ?> checked="checked"<? } ?> />
 				<label for="keeplogged">Remember me</label>
 			</td>
-			<td><input type="submit" name="login" value="Login" class="submit" /></td>
+			<td width="50px"><input type="submit" name="login" value="Login" class="submit" /></td>
 		</tr>
 	</table>
 	</form>
@@ -52,7 +59,7 @@ if(strtotime($BannedUntil)<time() && !$BanID) {
 if ($Attempts > 0) {
 ?>
 	<br /><br />
-	Lost your password? <a href="login.php?act=recover">Recover it here!</a>
+	<span style="font-size:2em">Lost your password? <a href="login.php?act=recover">Recover it here!</a></span>
 <? } ?>
 <script type="text/javascript">
 cookie.set('cookie_test',1,1);

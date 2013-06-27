@@ -116,7 +116,7 @@ class INVITE_TREE {
 			}
 ?>
 			<li>
-				<strong><?=format_username($ID, $Username, $Donor, $Warned, $Enabled == 2 ? false : true, $Class)?></strong>
+				<strong><?=format_username($ID, $Username, $Donor, $Warned, $Enabled, $Class)?></strong>
 <?
 			if(check_paranoia(array('uploaded', 'downloaded'), $Paranoia, $UserClass)) {
 				$TotalUpload += $Uploaded;

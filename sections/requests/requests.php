@@ -2,7 +2,7 @@
 
 $Queries = array();
 
-$OrderWays = array('year', 'votes', 'bounty', 'created', 'lastvote', 'filled');
+$OrderWays = array('votes', 'bounty', 'created', 'lastvote', 'filled');
 list($Page,$Limit) = page_limit(REQUESTS_PER_PAGE);
 $Submitted = !empty($_GET['submit']);
 					
@@ -14,7 +14,7 @@ $UserClass = $Perms['Class'];
 $BookmarkView = false;
 
 if(empty($_GET['type'])) { 
-	$Title = 'Requests';
+	$Title = 'Search Requests';
 	if(!check_perms('site_see_old_requests') || empty($_GET['showall'])) {
 		$SS->set_filter('visible', array(1));
 	}
@@ -27,7 +27,7 @@ if(empty($_GET['type'])) {
 		case 'voted':
 			if(!empty($_GET['userid'])) {
 				if(is_number($_GET['userid'])) {
-					if (!check_paranoia('requestsvoted_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(403); }
+					if (!check_paranoia('requestsvoted_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
 					$Title = "Requests voted for by ".$UserInfo['Username'];
 					$SS->set_filter('voter', array($_GET['userid']));
 				} else {
@@ -42,7 +42,7 @@ if(empty($_GET['type'])) {
 			if(empty($_GET['userid']) || !is_number($_GET['userid'])) {
 				error(404);
 			} else {
-				if (!check_paranoia('requestsfilled_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(403); }
+				if (!check_paranoia('requestsfilled_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
 				$Title = "Requests filled by ".$UserInfo['Username'];
 				$SS->set_filter('fillerid', array($_GET['userid']));
 			}
@@ -64,6 +64,7 @@ if($Submitted && empty($_GET['show_filled'])) {
 if(!empty($_GET['search'])) {
 	$Words = explode(' ', $_GET['search']);
 	foreach($Words as $Key => &$Word) {
+        $Word = trim($Word);
 		if($Word[0] == '!' && strlen($Word) > 2) {
 			if(strpos($Word,'!',1) === false) {
 				$Word = '!'.$SS->EscapeString(substr($Word,1));
@@ -82,7 +83,8 @@ if(!empty($_GET['search'])) {
 }
 
 if(!empty($_GET['tags'])){
-	$Tags = explode(',', $_GET['tags']);
+        $Tags = cleanup_tags($_GET['tags']);
+	$Tags = array_unique(explode(' ', $Tags));
 	$TagNames = array();
 	foreach ($Tags as $Tag) {
 		$Tag = sanitize_tag($Tag);
@@ -109,81 +111,9 @@ if(!empty($_GET['filter_cat'])) {
 	$SS->set_filter('categoryid', $Keys);
 }
 
-if(!empty($_GET['releases'])) {
-	$ReleaseArray = $_GET['releases'];
-	if(count($ReleaseArray) != count($ReleaseTypes)) {
-		foreach($ReleaseArray as $Index => $Value) {
-			if(!is_number($Value)) {
-				error(0);
-			}
-		}
-		
-		$SS->set_filter('releasetype', $ReleaseArray);
-	}
-}
-
-if(!empty($_GET['formats'])) {
-	$FormatArray = $_GET['formats'];
-	if(count($FormatArray) != count($Formats)) {
-		$FormatNameArray = array();
-		foreach($FormatArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Formats)) {
-				$FormatNameArray[$Index] = $Formats[$MasterIndex];
-			} else {
-				//Hax
-				error(0);
-			}
-		}
-		
-		$Queries[]='@formatlist '.implode(' | ', $FormatNameArray);
-	}
-}
-
-if(!empty($_GET['media'])) {
-	$MediaArray = $_GET['media'];
-	if(count($MediaArray) != count($Media)) {
-		$MediaNameArray = array();
-		foreach($MediaArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Media)) {
-				$MediaNameArray[$Index] = $Media[$MasterIndex];
-			} else {
-				//Hax
-				error(0);
-			}
-		}
-
-		$Queries[]='@medialist '.implode(' | ', $MediaNameArray);
-	}
-}
-
-if(!empty($_GET['bitrates'])) {
-	$BitrateArray = $_GET['bitrates'];
-	if(count($BitrateArray) != count($Bitrates)) {
-		$BitrateNameArray = array();
-		foreach($BitrateArray as $Index => $MasterIndex) {
-			if(array_key_exists($Index, $Bitrates)) {
-				$BitrateNameArray[$Index] = $SS->EscapeString($Bitrates[$MasterIndex]);
-			} else {
-				//Hax
-				error(0);
-			}
-		}
-
-		$Queries[]='@bitratelist '.implode(' | ', $BitrateNameArray);
-	}
-}
-
 if(!empty($_GET['requestor']) && check_perms('site_see_old_requests')) {
 	if(is_number($_GET['requestor'])) {
 		$SS->set_filter('userid', array($_GET['requestor']));
-	} else {
-		error(404);
-	}
-}
-
-if(isset($_GET['year'])) {
-	if(is_number($_GET['year']) || $_GET['year'] == 0) {
-		$SS->set_filter('year', array($_GET['year']));
 	} else {
 		error(404);
 	}
@@ -233,9 +163,6 @@ switch($CurrentOrder) {
 	case 'filled' :
 		$OrderBy = "TimeFilled";
 		break;
-	case 'year' :
-		$OrderBy = "Year";
-		break;
 	default :
 		$OrderBy = "TimeAdded";
 		break;
@@ -272,6 +199,7 @@ if(!empty($SphinxResults['notfound'])) {
 		//$Requests['matches'][$ID] = array_merge($Requests['matches'][$ID], $SQLResult);
 		//We ksort because depending on the filter modes, we're given our data in an unpredictable order
 		//ksort($Requests['matches'][$ID]);
+        
 	}
 }
 
@@ -279,31 +207,38 @@ $PageLinks = get_pages($Page, $NumResults, REQUESTS_PER_PAGE);
 
 $Requests = $SphinxResults['matches'];
 
+    
 $CurrentURL = get_url(array('order', 'sort'));
 
-show_header($Title, 'requests');
+show_header($Title, 'requests,jquery,jquery.cookie');
 
 ?>
 <div class="thin">
-	<h2><?=$Title?></h2>
+    <h2>Requests</h2>
+      
 	<div class="linkbox">
 <?	if (!$BookmarkView) { ?>
+        <a href="requests.php">[Search requests]</a>
 <?		if(check_perms('site_submit_requests')){ ?> 
-		<a href="requests.php?action=new">[New request]</a>
-		<a href="requests.php?type=created">[My requests]</a>
-<?		} 
+            <a href="requests.php?action=new">[New request]</a>
+            <a href="requests.php?type=created">[My requests]</a>
+<?		}
 		if(check_perms('site_vote')){?> 
-		<a href="requests.php?type=voted">[Requests I've voted on]</a>
-<?		} ?>
-<?	} else { ?>
+            <a href="requests.php?type=voted">[Requests I've voted on]</a>
+<?		} 
+ 		if(!check_perms('site_submit_requests')){ ?> 
+            <br/><em> <a href="articles.php?topic=requests">You must be a Good Perv with a ratio of at least 1.05 to be able to make a Request.</a></em>
+<?      }
+ 	} else { ?>
 		<a href="bookmarks.php?type=torrents">[Torrents]</a>
-		<a href="bookmarks.php?type=artists">[Artists]</a>
 		<a href="bookmarks.php?type=collages">[Collages]</a>
 		<a href="bookmarks.php?type=requests">[Requests]</a>
 <?	} ?>
 	</div>
-	<div>
+      
 		<form action="" method="get">
+    <div class="head"><?=$Title?></div>
+	<div class="box pad">
 <?	if ($BookmarkView) { ?>
 			<input type="hidden" name="action" value="view" />
 			<input type="hidden" name="type" value="requests" />
@@ -314,7 +249,7 @@ show_header($Title, 'requests');
 <?	if(!empty($_GET['userid']) && is_number($_GET['userid'])) { ?>
 			<input type="hidden" name="userid" value="<?=$_GET['userid']?>" />
 <?	} ?>
-			<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
+			<table cellpadding="6" cellspacing="1" border="0" class="" width="100%">
 				<tr>
 					<td class="label">Search terms:</td>
 					<td>
@@ -322,9 +257,9 @@ show_header($Title, 'requests');
 					</td>
 				</tr>
 				<tr>
-					<td class="label">Tags (comma-separated):</td>
+					<td class="label">Tags:</td>
 					<td>
-						<input type="text" name="tags" size="60" value="<?= (!empty($TagNames) ? display_str(implode(', ', $TagNames)) : '') ?>" />&nbsp;
+						<input type="text" name="tags" size="60" value="<?= (!empty($TagNames) ? display_str(implode(' ', $TagNames)) : '') ?>" />&nbsp;
 						<input type="radio" name="tags_type" id="tags_type0" value="0" <?selected('tags_type',0,'checked')?> /><label for="tags_type0"> Any</label>&nbsp;&nbsp;
 						<input type="radio" name="tags_type" id="tags_type1" value="1"  <?selected('tags_type',1,'checked')?> /><label for="tags_type1"> All</label>
 					</td>
@@ -350,82 +285,33 @@ show_header($Title, 'requests');
 					</td>
 				</tr>
 <?	*/} ?>
-			</table>
+			</table><br/>
 			<table class="cat_list">
 <?
-$x=1;
-reset($Categories);
-foreach($Categories as $CatKey => $CatName) {
-	if($x%8==0 || $x==1) {
-?>
-					<tr class="cat_list">
-<?	} ?>
-						<td>
-							<input type="checkbox" name="filter_cat[<?=($CatKey+1)?>]" id="cat_<?=($CatKey+1)?>" value="1" <? if(isset($_GET['filter_cat'][$CatKey+1])) { ?>checked="checked"<? } ?> />
-							<label for="cat_<?=($CatKey+1)?>"><?=$CatName?></label>
-						</td>
-<?
+$x=0;
+reset($NewCategories);
+$row = 'a';
+foreach($NewCategories as $Cat) {
 	if($x%7==0) {
+		if($x > 0) {
 ?>
-					</tr>
+			</tr>
+<?		} ?>
+			<tr class="row<?=$row?>">
 <?
+            $row = ($row == 'a' ? 'b' :'a');
 	}
 	$x++;
-}
 ?>
-			</table>
-			<table>
-				<tr id="release_list">
-					<td class="label">Release Types</td>
-					<td>
-						<input type="checkbox" id="toggle_releases" onchange="Toggle('releases', 0)" <?=(!$Submitted || !empty($ReleaseArray) && count($ReleaseArray) == count($ReleaseTypes) ? ' checked="checked"' : '')?>/> <label for="toggle_releases">All</label>
-<?		$i = 0;
-		foreach ($ReleaseTypes as $Key => $Val) {
-			if($i % 8 == 0) echo "<br />";?>
-						<input type="checkbox" name="releases[]" value="<?=$Key?>" id="release_<?=$Key?>"
-							<?=(((!$Submitted) || !empty($ReleaseArray) && in_array($Key, $ReleaseArray)) ? ' checked="checked" ' : '')?>
-						/> <label for="release_<?=$Key?>"><?=$Val?></label>
-<?			$i++;
-		}?>
-					</td>
-				</tr>
-				<tr id="format_list">
-					<td class="label">Formats</td>
-					<td>
-						<input type="checkbox" id="toggle_formats" onchange="Toggle('formats', 0);" <?=(!$Submitted || !empty($FormatArray) && count($FormatArray) == count($Formats) ? ' checked="checked"' : '')?>/> <label for="toggle_formats">All</label>
-<?		foreach ($Formats as $Key => $Val) {
-			if($Key % 8 == 0) echo "<br />";?>
-						<input type="checkbox" name="formats[]" value="<?=$Key?>" id="format_<?=$Key?>"
-							<?=(((!$Submitted) || !empty($FormatArray) && in_array($Key, $FormatArray)) ? ' checked="checked" ' : '')?>
-						/> <label for="format_<?=$Key?>"><?=$Val?></label>
-<?		}?>
-					</td>
-				</tr>				
-				<tr id="bitrate_list">
-					<td class="label">Bitrates</td>
-					<td>
-						<input type="checkbox" id="toggle_bitrates" onchange="Toggle('bitrates', 0);"<?=(!$Submitted || !empty($BitrateArray) && count($BitrateArray) == count($Bitrates) ? ' checked="checked"' : '')?> /> <label for="toggle_bitrates">All</label>
-<?		foreach ($Bitrates as $Key => $Val) {
-			if($Key % 8 == 0) echo "<br />";?>
-						<input type="checkbox" name="bitrates[]" value="<?=$Key?>" id="bitrate_<?=$Key?>"
-							<?=(((!$Submitted) || !empty($BitrateArray) && in_array($Key, $BitrateArray)) ? ' checked="checked" ' : '')?>
-						/> <label for="bitrate_<?=$Key?>"><?=$Val?></label>
-<?		}?>
-					</td>
-				</tr>
-				<tr id="media_list">
-					<td class="label">Media</td>
-					<td>
-						<input type="checkbox" id="toggle_media" onchange="Toggle('media', 0);"<?=(!$Submitted || !empty($MediaArray) && count($MediaArray) == count($Media) ? ' checked="checked"' : '')?> /> <label for="toggle_media">All</label>
-<?		foreach ($Media as $Key => $Val) {
-			if($Key % 8 == 0) echo "<br />";?>
-						<input type="checkbox" name="media[]" value="<?=$Key?>" id="media_<?=$Key?>"
-							<?=(((!$Submitted) || !empty($MediaArray) && in_array($Key, $MediaArray)) ? ' checked="checked" ' : '')?>
-						/> <label for="media_<?=$Key?>"><?=$Val?></label>
-<?		}?>
-					</td>
-				</tr>
-			</table>
+				<td>
+					<input type="checkbox" name="filter_cat[<?=($Cat['id'])?>]" id="cat_<?=($Cat['id'])?>" value="1" <? if(isset($_GET['filter_cat'][$Cat['id']])) { ?>checked="checked"<? } ?>/>
+					<label for="cat_<?=($Cat['id'])?>"><a href="requests.php?filter_cat[<?=$Cat['id']?>]=1"><?= $Cat['name'] ?></a></label>
+				</td>
+<?}?>                           
+                                <td colspan="<?=7-($x%7)?>"></td>
+                        </tr>
+        		</table>
+
 			<table>
 				<tr>
 					<td colspan="2" class="center">
@@ -433,96 +319,94 @@ foreach($Categories as $CatKey => $CatName) {
 					</td>
 				</tr>
 			</table>	
-		</form>
 	</div>
+		</form>
 	
 	<div class="linkbox">
 		<?=$PageLinks?>
 	</div>
-	<table id="request_table" cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
-		<tr class="colhead_dark">
-			<td style="width: 38%;" class="nobr">
-				<strong>Request Name</strong> / <a href="?order=year&amp;sort=<?=(($CurrentOrder == 'year') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Year</strong></a>
+	<div class="head">Requests</div>
+	<table id="request_table" cellpadding="6" cellspacing="1" border="0" class="shadow" width="100%">
+		<tr class="colhead">
+            <td class="small cats_col"></td>
+            <td width="40%" class="nobr">
+				Request Name
 			</td>
 			<td class="nobr">
-				<a href="?order=votes&amp;sort=<?=(($CurrentOrder == 'votes') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Votes</strong></a>
+				<a href="?order=votes&amp;sort=<?=(($CurrentOrder == 'votes') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Votes</a>
 			</td>
 			<td class="nobr">
-				<a href="?order=bounty&amp;sort=<?=(($CurrentOrder == 'bounty') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Bounty</strong></a>
+				<a href="?order=bounty&amp;sort=<?=(($CurrentOrder == 'bounty') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Bounty</a>
 			</td>
 			<td class="nobr">
-				<a href="?order=filled&amp;sort=<?=(($CurrentOrder == 'filled') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Filled</strong></a>
+				<a href="?order=filled&amp;sort=<?=(($CurrentOrder == 'filled') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Filled</a>
 			</td>
 			<td class="nobr">
-				<strong>Filled by</strong>
+				Filled by
 			</td>
 			<td class="nobr">
-				<strong>Requested by</strong>
+				Requested by
 			</td>
 			<td class="nobr">
-				<a href="?order=created&amp;sort=<?=(($CurrentOrder == 'created') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Created</strong></a>
+				<a href="?order=created&amp;sort=<?=(($CurrentOrder == 'created') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Created</a>
 			</td>
 			<td class="nobr">
-				<a href="?order=lastvote&amp;sort=<?=(($CurrentOrder == 'lastvote') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>"><strong>Last Vote</strong></a>
+				<a href="?order=lastvote&amp;sort=<?=(($CurrentOrder == 'lastvote') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Last Vote</a>
 			</td>
 		</tr>
 <?	if($NumResults == 0) { ?>
 		<tr class="rowb">
-			<td colspan="8">
-				Nothing found!
+			<td colspan="9" style="text-align:center">
+				No requests!
 			</td>
 		</tr>
 <?	} else {
 		$Row = 'a';
-		$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
+		//$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 		foreach ($Requests as $RequestID => $Request) {
 			
-			//list($BitrateList, $CatalogueNumber, $CategoryID, $Description, $FillerID, $FormatList, $RequestID, $Image, $LogCue, $MediaList, $ReleaseType, 
-			//	$Tags, $TimeAdded, $TimeFilled, $Title, $TorrentID, $RequestorID, $RequestorName, $Year, $RequestID, $Categoryid, $FillerID, $LastVote, 
-			//	$ReleaseType, $TagIDs, $TimeAdded, $TimeFilled, $TorrentID, $RequestorID, $Voters) = array_values($Request);
-			
-			list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Year, $Image, $Description, $CatalogueNumber, $RecordLabel,
-				$ReleaseType, $BitrateList, $FormatList, $MediaList, $LogCue, $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
+			list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+                             $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
 				
 			$RequestVotes = get_votes_array($RequestID);
 			
 			$VoteCount = count($RequestVotes['Voters']);
 			
-			if($CategoryID == 0) {
+			/* if($CategoryID == 0) {
 				$CategoryName = "Unknown";
 			} else {
-				$CategoryName = $Categories[$CategoryID - 1];
-			}
+				$CategoryName = $NewCategories[$CategoryID]['name'];
+			} */
 			
 			$IsFilled = ($TorrentID != 0);
 			
-			if($CategoryName == "Music") {
-				$ArtistForm = get_request_artists($RequestID);
-				$ArtistLink = display_artists($ArtistForm, true, true);
-				$FullName = $ArtistLink."<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title." [".$Year."]</a>";
-			} else if($CategoryName == "Audiobooks" || $CategoryName == "Comedy") {
-				$FullName = "<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title." [".$Year."]</a>";
-			} else {
-				$FullName ="<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title."</a>";
-			}
+            $FullName ="<a href='requests.php?action=view&amp;id=".$RequestID."'>".$Title."</a>";
 			
 			$Row = ($Row == 'a') ? 'b' : 'a';
 			
 			$Tags = $Request['Tags'];
 ?>
 		<tr class="row<?=$Row?>">
+            <td class="center ">
+                <? $CatImg = 'static/common/caticons/' . $NewCategories[$CategoryID]['image']; ?>
+                <div title="<?= $NewCategories[$CategoryID]['tag'] ?>">
+                    <a href="requests.php?filter_cat[<?=$CategoryID?>]=1"><img src="<?= $CatImg ?>" /></a>
+                </div>
+            </td>
 			<td>
 				<?=$FullName?>
+                                <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 				<div class="tags">
 <?			
 			$TagList = array();
 			foreach($Tags as $TagID => $TagName) {
 				$TagList[] = "<a href='?tags=".$TagName.($BookmarkView ? "&amp;type=requests" : "")."'>".display_str($TagName)."</a>";
 			}
-			$TagList = implode(', ', $TagList);
+			$TagList = implode(' ', $TagList);
 ?>
 					<?=$TagList?>
 				</div>
+                                <? } ?>
 			</td>
 			<td class="nobr">
 				<form id="form_<?=$RequestID?>">
@@ -530,16 +414,16 @@ foreach($Categories as $CatKey => $CatName) {
 <?  	 	if(!$IsFilled && check_perms('site_vote')){ ?>
 					<input type="hidden" id="requestid_<?=$RequestID?>" name="requestid" value="<?=$RequestID?>" />
 					<input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-					&nbsp;&nbsp; <a href="javascript:Vote(0, <?=$RequestID?>)"><strong>(+)</strong></a>
-				</form>
+					&nbsp;&nbsp; <a href="javascript:VotePromptMB(<?=$RequestID?>)"><strong>(+)</strong></a>
 <?  		} ?> 
+				</form>
 			</td>
 			<td class="nobr">
-				<?=get_size($RequestVotes['TotalBounty'])?>
+                <span id="bounty_<?=$RequestID?>"><?=get_size($RequestVotes['TotalBounty'])?></span>
 			</td>
 			<td>
 <?   		if($IsFilled){ ?>
-				<a href="torrents.php?<?=(strtotime($TimeFilled)<$TimeCompare?'id=':'torrentid=').$TorrentID?>"><strong><?=time_diff($TimeFilled)?></strong></a>
+				<a href="torrents.php?id=<?=$TorrentID?>"><strong><?=time_diff($TimeFilled)?></strong></a>
 <?   		} else { ?>
 				<strong>No</strong>
 <?   		} ?>

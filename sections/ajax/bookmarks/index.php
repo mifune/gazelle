@@ -10,9 +10,6 @@ switch ($_REQUEST['type']) {
 	case 'torrents':
 		require(SERVER_ROOT.'/sections/ajax/bookmarks/torrents.php');
 		break;
-	case 'artists':
-		require(SERVER_ROOT.'/sections/ajax/bookmarks/artists.php');
-		break;
 	case 'collages':
 		$_GET['bookmarks'] = 1;
 		require(SERVER_ROOT.'/sections/ajax/collages/browse.php');

@@ -36,7 +36,7 @@ $Zip->add_file(file_get_contents("data/file.txt"), "File.txt");
 
 	Adds the contents of data/file.txt into File.txt in the archive root.
 
-$Zip->add_file($TorrentData, "Bookmarks/Artist - Album [2008].torrent");
+$Zip->add_file($TorrentData, "Bookmarks/Album [2008].torrent");
 
 	Adds the parsed torrent to the archive in the Bookmarks folder (created simply by placing it in the path).
 	

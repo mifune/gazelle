@@ -17,8 +17,8 @@ list($Page,$Limit) = page_limit(NOTIFICATIONS_PER_PAGE);
 
 $TokenTorrents = $Cache->get_value('users_tokens_'.$UserID);
 if (empty($TokenTorrents)) {
-	$DB->query("SELECT TorrentID FROM users_freeleeches WHERE UserID=$UserID AND Expired=FALSE");
-	$TokenTorrents = $DB->collect('TorrentID');
+	$DB->query("SELECT TorrentID, FreeLeech, DoubleSeed FROM users_slots WHERE UserID=$UserID");
+	$TokenTorrents = $DB->to_array('TorrentID');
 	$Cache->cache_value('users_tokens_'.$UserID, $TokenTorrents);
 }
 
@@ -26,26 +26,16 @@ $Results = $DB->query("SELECT SQL_CALC_FOUND_ROWS
 		t.ID,
 		g.ID,
 		g.Name,
-		g.CategoryID,
+		g.NewCategoryID,
 		g.TagList,
 		t.Size,
 		t.FileCount,
-		t.Format,
-		t.Encoding,
-		t.Media,
-		t.Scene,
-		t.RemasterYear,
-		g.Year,
-		t.RemasterYear,
-		t.RemasterTitle,
 		t.Snatched,
 		t.Seeders,
 		t.Leechers,
 		t.Time,
-		t.HasLog,
-		t.HasCue,
-		t.LogScore,
 		t.FreeTorrent,
+                t.double_seed,
 		tln.TorrentID AS LogInDB,
 		unt.UnRead,
 		unt.FilterID,
@@ -91,11 +81,9 @@ unset($Result);
 foreach($FilterGroups as $ID => $FilterResults) {
 	unset($FilterResults['FilterLabel']);
 	foreach($FilterResults as $Result) {
-		list($TorrentID, $GroupID, $GroupName, $GroupCategoryID, $TorrentTags, $Size, $FileCount, $Format, $Encoding,
-			$Media, $Scene, $RemasterYear, $GroupYear, $RemasterYear, $RemasterTitle, $Snatched, $Seeders, 
-			$Leechers, $NotificationTime, $HasLog, $HasCue, $LogScore, $FreeTorrent, $LogInDB, $UnRead) = $Result;
-		
-		$Artists = get_artist($GroupID);
+		list($TorrentID, $GroupID, $GroupName, $GroupCategoryID, $TorrentTags, $Size, $FileCount,
+			$Snatched, $Seeders, $Leechers, $NotificationTime, $FreeTorrent, $DoubleSeed, $LogInDB, 
+                        $UnRead) = $Result;
 		
 		if ($Unread) $NumNew++;
 		
@@ -107,21 +95,12 @@ foreach($FilterGroups as $ID => $FilterResults) {
 			'torrentTags' => $TorrentTags,
 			'size' => (float) $Size,
 			'fileCount' => (int) $FileCount,
-			'format' => $Format,
-			'encoding' => $Encoding,
-			'media' => $Media,
-			'scene' => $Scene == 1,
-			'groupYear' => (int) $GroupYear,
-			'remasterYear' => (int) $RemasterYear,
-			'remasterTitle' => $RemasterTitle,
 			'snatched' => (int) $Snatched,
 			'seeders' => (int) $Seeders,
 			'leechers' => (int) $Leechers,
 			'notificationTime' => $NotificationTime,
-			'hasLog' => $HasLog == 1,
-			'hasCue' => $HasCue == 1,
-			'logScore' => (float) $LogScore,
 			'freeTorrent' => $FreeTorrent == 1,
+                        'doubleSeed' => $DoubleSeed == 1,
 			'logInDb' => $LogInDB,
 			'unread' => $UnRead == 1
 		);

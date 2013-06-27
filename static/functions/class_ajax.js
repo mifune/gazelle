@@ -40,6 +40,20 @@ var json = {
 };
 
 var ajax = {
+	getXML: function (url, callback) {
+		var req = (typeof(window.ActiveXObject) === 'undefined') ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+		//if(req.overrideMimeType) req.overrideMimeType("text/xml");
+            if (callback !== undefined) {
+			req.onreadystatechange = function () {
+				if (req.readyState !== 4 || req.status !== 200) {
+					return;
+				}
+				callback(req.responseXML);
+			};
+		}
+		req.open("GET", url, true);
+		req.send(null);
+	},
 	get: function (url, callback) {
 		var req = (typeof(window.ActiveXObject) === 'undefined') ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 		if (callback !== undefined) {
@@ -119,7 +133,7 @@ function Bookmark(type, id, newName) {
 	var lnk = $('#bookmarklink_' + type + '_' + id).raw();
 	var oldName = lnk.innerHTML;
 	ajax.get("bookmarks.php?action=add&type=" + type + "&auth=" + authkey + "&id=" + id, function() {
-		lnk.onclick = function() { Unbookmark(type, id, oldName); return false; };
+		lnk.onclick = function() {Unbookmark(type, id, oldName);return false;};
 		lnk.innerHTML = newName;
 		lnk.title = 'Remove bookmark';
 	});
@@ -136,7 +150,7 @@ function Unbookmark(type, id, newName) {
 		var lnk = $('#bookmarklink_' + type + '_' + id).raw();
 		var oldName = lnk.innerHTML;
 		ajax.get("bookmarks.php?action=remove&type=" + type + "&auth=" + authkey + "&id=" + id, function() {
-			lnk.onclick = function() { Bookmark(type, id, oldName); return false; };
+			lnk.onclick = function() {Bookmark(type, id, oldName);return false;};
 			lnk.innerHTML = newName;
 			lnk.title = 'Add bookmark';
 		});

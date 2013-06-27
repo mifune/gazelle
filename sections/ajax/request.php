@@ -2,8 +2,6 @@
 
 authorize(true);
 
-$RequestTax = 0.1;
-
 // Minimum and default amount of upload to remove from the user when they vote.
 // Also change in static/functions/requests.js
 $MinimumVote = 20*1024*1024;
@@ -44,81 +42,30 @@ if(empty($Request)) {
 	die();
 }
 
-list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Year, $Image, $Description, $CatalogueNumber, $ReleaseType,
-	$BitrateList, $FormatList, $MediaList, $LogCue, $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
+list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+	$FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
 
 //Convenience variables
 $IsFilled = !empty($TorrentID);
 $CanVote = (empty($TorrentID) && check_perms('site_vote'));
 
 if($CategoryID == 0) {
-	$CategoryName = "Unknown";
+    $CategoryName = "Unknown";
 } else {
-	$CategoryName = $Categories[$CategoryID - 1];
+    $CategoryName = $NewCategories[$CategoryID]['name'];
 }
 
-//Do we need to get artists?
-if($CategoryName == "Music") {
-	$ArtistForm = get_request_artists($RequestID);
-	$ArtistName = display_artists($ArtistForm, false, true);
-	$ArtistLink = display_artists($ArtistForm, true, true);
-	
-	if($IsFilled) {
-		$DisplayLink = $ArtistLink."<a href='torrents.php?torrentid=".$TorrentID."'>".$Title."</a> [".$Year."]";
-	} else {
-		$DisplayLink = $ArtistLink.$Title." [".$Year."]";
-	}
-	$FullName = $ArtistName.$Title." [".$Year."]";
-	
-	if($BitrateList != "") {
-		$BitrateString = implode(", ", explode("|", $BitrateList));
-		$FormatString = implode(", ", explode("|", $FormatList));
-		$MediaString = implode(", ", explode("|", $MediaList));
-	} else {
-		$BitrateString = "Unknown, please read the description.";
-		$FormatString = "Unknown, please read the description.";
-		$MediaString = "Unknown, please read the description.";
-	}
-	
-	if(empty($ReleaseType)) {
-		$ReleaseName = "Unknown";
-	} else {
-		$ReleaseName = $ReleaseTypes[$ReleaseType];
-	}
-	
-} else if($CategoryName == "Audiobooks" || $CategoryName == "Comedy") {
-	$FullName = $Title." [".$Year."]";
-	$DisplayLink = $Title." [".$Year."]";
-} else {
-	$FullName = $Title;
-	$DisplayLink = $Title;
-}
+$FullName = $Title;
+$DisplayLink = $Title;
 
 //Votes time
 $RequestVotes = get_votes_array($RequestID);
 $VoteCount = count($RequestVotes['Voters']);
-$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0) || ($CategoryName == "Music" && $Year == 0)));
+$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0)));
 $UserCanEdit = (!$IsFilled && $LoggedUser['ID'] == $RequestorID && $VoteCount < 2);
 $CanEdit = ($UserCanEdit || $ProjectCanEdit || check_perms('site_moderate_requests'));
 
 $JsonMusicInfo = array();
-if ($CategoryName == "Music") {
-	$JsonMusicInfo = array(
-		/*'composers' => $ArtistForm[4] != null ? $ArtistForm[4] : array(),
-		'dj' => $ArtistForm[6] != null ? $ArtistForm[6] : array(),
-		'artists' => $ArtistForm[1] != null ? $ArtistForm[1] : array(),
-		'with' => $ArtistForm[2] != null ? $ArtistForm[2] : array(),
-		'conductor' => $ArtistForm[5] != null ? $ArtistForm[5] : array(),
-		'remixedBy' => $ArtistForm[3] != null ? $ArtistForm[3] : array()*/
-		'composers' => $ArtistForm[4] == null ? array() : pullmediainfo($ArtistForm[4]),
-		'dj' => $ArtistForm[6] == null ? array() : pullmediainfo($ArtistForm[6]),
-		'artists' => $ArtistForm[1] == null ? array() : pullmediainfo($ArtistForm[1]),
-		'with' => $ArtistForm[2] == null ? array() : pullmediainfo($ArtistForm[2]),
-		'conductor' => $ArtistForm[5] == null ? array() : pullmediainfo($ArtistForm[5]),
-		'remixedBy' => $ArtistForm[3] == null ? array() : pullmediainfo($ArtistForm[3]),
-		'producer' => $ArtistForm[7] == null ? array() : pullmediainfo($ArtistForm[7])
-	);
-}
 
 $JsonTopContributors = array();
 $VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
@@ -176,7 +123,7 @@ $Thread = array_slice($Catalogue,((TORRENT_COMMENTS_PER_PAGE*$Page-TORRENT_COMME
 $JsonRequestComments = array();
 foreach($Thread as $Key => $Post){
 	list($PostID, $AuthorID, $AddedTime, $Body, $EditedUserID, $EditedTime, $EditedUsername) = array_values($Post);
-	list($AuthorID, $Username, $PermissionID, $Paranoia, $Artist, $Donor, $Warned, $Avatar, $Enabled, $UserTitle) = array_values(user_info($AuthorID));
+	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle) = array_values(user_info($AuthorID));
 	$JsonRequestComments[] = array(
 		'postId' => (int) $PostID,
 		'authorId' => (int) $AuthorID,
@@ -207,7 +154,6 @@ print
 				'requestId' => (int) $RequestID,
 				'requestorId' => (int) $RequestorID,
 				'requestorName' => $RequestorName,
-				'requestTax' => $RequestTax,
 				'timeAdded' => $TimeAdded,
 				'canEdit' => $CanEdit,
 				'canVote' => $CanVote,
@@ -219,17 +165,10 @@ print
 				'categoryId' => (int) $CategoryID,
 				'categoryName' => $CategoryName,
 				'title' => $Title,
-				'year' => (int) $Year,
 				'image' => $Image,
 				'description' => $Text->full_format($Description),
 				'musicInfo' => $JsonMusicInfo,
-				'catalogueNumber' => $CatalogueNumber,
-				'releaseType' => (int) $ReleaseType,
 				'releaseName' => $ReleaseName,
-				'bitrateList' => $BitrateList,
-				'formatList' => $FormatList,
-				'mediaList' => $MediaList,
-				'logCue' => $LogCue,
 				'isFilled' => $IsFilled,
 				'fillerId' => (int) $FillerID,
 				'fillerName' => $FillerName,

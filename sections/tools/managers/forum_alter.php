@@ -53,6 +53,6 @@ if($_POST['submit'] == 'Delete'){ //Delete
 
 $Cache->delete('forums_list'); // Clear cache
 
-// Go back
-header('Location: tools.php?action=forum')
+// Go back 
+header('Location: tools.php?action=forum');
 ?>

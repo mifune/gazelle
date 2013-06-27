@@ -1,37 +1,30 @@
 var username;
 var postid;
 
-function Quote(post, user) {
+function Quote(post, place, user) {
 	username = user;
 	postid = post;
-	ajax.get("?action=get_post&post=" + postid, function(response){
-		if ($('#quickpost').raw().value !== '') {
-			$('#quickpost').raw().value = $('#quickpost').raw().value + "\n\n";
-		}
-		$('#quickpost').raw().value = $('#quickpost').raw().value + "[quote="+username+"]" + 
-			//response.replace(/(img|aud)(\]|=)/ig,'url$2').replace(/\[url\=(https?:\/\/[^\s\[\]<>"\'()]+?)\]\[url\](.+?)\[\/url\]\[\/url\]/gi, "[url]$1[/url]")
-			html_entity_decode(response)
-		+ "[/quote]";
+	ajax.get("?action=get_post&body=1&post=" + postid, function(response){
+            var params = place != '' ? ","+place+","+postid : '';
+            var s = "[quote="+username+params+"]" +  html_entity_decode(response) + "[/quote]";
+            if ( $('#quickpost').raw().value != '')   s = "\n" + s + "\n";
+            insert( s, 'quickpost');
 		resize('quickpost');
 	});
 }
 
 function Edit_Form(post,key) {
 	postid = post;
-	if (location.href.match(/torrents\.php/)) {
-		boxWidth="50";
-	} else {
-		boxWidth="80";
-	}
 	$('#bar' + postid).raw().cancel = $('#content' + postid).raw().innerHTML;
 	$('#bar' + postid).raw().oldbar = $('#bar' + postid).raw().innerHTML;
-	$('#content' + postid).raw().innerHTML = "<div id=\"preview" + postid + "\"></div><form id=\"form" + postid + "\" method=\"post\"><input type=\"hidden\" name=\"auth\" value=\"" + authkey + "\" /><input type=\"hidden\" name=\"key\" value=\"" + key + "\" /><input type=\"hidden\" name=\"post\" value=\"" + postid + "\" /><textarea id=\"editbox" + postid + "\" onkeyup=\"resize('editbox" + postid + "');\" name=\"body\" cols=\""+boxWidth+"\" rows=\"10\"></textarea></form>";
-	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Preview\" onclick=\"Preview_Edit(" + postid + ");\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit(" + postid + ")\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit(" + postid + ");\" />";
+	$('#content' + postid).raw().innerHTML = "<div id=\"preview" + postid + "\"></div><input type=\"hidden\" name=\"auth\" value=\"" + authkey + "\" /><input type=\"hidden\" id=\"key"+postid+"\" name=\"key\" value=\"" + key + "\" /><input type=\"hidden\" name=\"post\" value=\"" + postid + "\" /><div id=\"editcont" + postid + "\"></div>";
+	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Preview\" onclick=\"Preview_Edit('" + postid + "');\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit('" + postid + "')\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit('" + postid + "');\" />";
 	ajax.get("?action=get_post&post=" + postid, function(response){
-		$('#editbox' + postid).raw().value = html_entity_decode(response);
+		$('#editcont' + postid).raw().innerHTML = response;   
 		resize('editbox' + postid);
 	});
 }
+
 
 function Cancel_Edit(postid) {
 	$('#bar' + postid).raw().innerHTML = $('#bar' + postid).raw().oldbar;
@@ -39,46 +32,106 @@ function Cancel_Edit(postid) {
 }
 
 function Preview_Edit(postid) {
-	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Editor\" onclick=\"Cancel_Preview(" + postid + ");\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit(" + postid + ")\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit(" + postid + ");\" />";
-	ajax.post("ajax.php?action=preview","form" + postid, function(response){
+		var ToPost = [];
+		ToPost['auth'] = authkey;
+		ToPost['key'] = $('#key'+postid).raw().value;
+		ToPost['post'] = postid;
+		ToPost['body'] = $('#editbox'+postid).raw().value;
+	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Editor\" onclick=\"Cancel_Preview('" + postid + "');\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit('" + postid + "')\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit('" + postid + "');\" />";
+	ajax.post("ajax.php?action=preview", ToPost, function(response){  // "form" + postid
 		$('#preview' + postid).raw().innerHTML = response;
-		$('#editbox' + postid).hide();	
+		//$('#editbox' + postid).hide();
+		$('#editcont' + postid).hide();	
 	});
 }
 
 function Cancel_Preview(postid) {
-	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Preview\" onclick=\"Preview_Edit(" + postid + ");\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit(" + postid + ")\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit(" + postid + ");\" />";
+	$('#bar' + postid).raw().innerHTML = "<input type=\"button\" value=\"Preview\" onclick=\"Preview_Edit('" + postid + "');\" /><input type=\"button\" value=\"Post\" onclick=\"Save_Edit('" + postid + "')\" /><input type=\"button\" value=\"Cancel\" onclick=\"Cancel_Edit('" + postid + "');\" />";
 	$('#preview' + postid).raw().innerHTML = "";
-	$('#editbox' + postid).show();
+	//$('#editbox' + postid).show();
+	$('#editcont' + postid).show();
 }
 
 function Save_Edit(postid) {
+		var ToPost = [];
+		ToPost['auth'] = authkey;
+		ToPost['key'] = $('#key'+postid).raw().value;
+		ToPost['post'] = postid;
+		ToPost['body'] = $('#editbox'+postid).raw().value;
 	if (location.href.match(/forums\.php/)) {
-		ajax.post("forums.php?action=takeedit","form" + postid, function (response) {
+		ajax.post("forums.php?action=takeedit",ToPost, function (response) {
 			$('#bar' + postid).raw().innerHTML = "";
 			$('#preview' + postid).raw().innerHTML = response;
-			$('#editbox' + postid).hide();
+                  $('#editcont' + postid).hide();
+                  $('#editcont' + postid).raw().innerHTML = '';
 		});
 	} else if (location.href.match(/collages?\.php/)) {
-		ajax.post("collages.php?action=takeedit_comment","form" + postid, function (response) {
+		ajax.post("collages.php?action=takeedit_comment",ToPost, function (response) {
 			$('#bar' + postid).raw().innerHTML = "";
 			$('#preview' + postid).raw().innerHTML = response;
-			$('#editbox' + postid).hide();
+			$('#editcont' + postid).hide();
+                  $('#editcont' + postid).raw().innerHTML = '';
 		});
 	} else if (location.href.match(/requests\.php/)) {
-		ajax.post("requests.php?action=takeedit_comment","form" + postid, function (response) {
+		ajax.post("requests.php?action=takeedit_comment",ToPost, function (response) {
 			$('#bar' + postid).raw().innerHTML = "";
 			$('#preview' + postid).raw().innerHTML = response;
-			$('#editbox' + postid).hide();
+			$('#editcont' + postid).hide();
+                  $('#editcont' + postid).raw().innerHTML = '';
 		});
 	} else {
-		ajax.post("torrents.php?action=takeedit_post","form" + postid, function (response) {
+		ajax.post("torrents.php?action=takeedit_post",ToPost, function (response) {
 			$('#bar' + postid).raw().innerHTML = "";
 			$('#preview' + postid).raw().innerHTML = response;
-			$('#editbox' + postid).hide();
+                  $('#editcont' + postid).hide();
+                  $('#editcont' + postid).raw().innerHTML = '';
 		});
 	}
 }
+
+
+function SetSplitInterface() {
+    //$('#split_title').disable( !$('#split_new').raw().checked );
+    //$('#split_forum').disable( !$('#split_new').raw().checked );
+    $('#split_threadid').disable( !$('#split_merge').raw().checked );
+    $('#split_comment').disable( !$('#split_trash').raw().checked );
+    //$('#split_comment').disable( !$('#split_trash').raw().checked );
+    if ( $('#split_new').raw().checked ) {
+       jQuery('#split_forum').css("color", 'black');
+       jQuery('#split_forum').css("background", 'none');
+       $('#split_forum').disable(false);
+       $('#split_title').disable(false);
+    } else {
+       jQuery('#split_forum').css("color", '#bbb');
+       jQuery('#split_forum').css("background-color", '#eee');
+       $('#split_forum').disable(true);
+       $('#split_title').disable(true);
+    }
+}
+
+function Trash(threadid, postid) {
+    var reason = prompt('Move this post to the Trash forum\n                                                             \nComment:');
+	if (reason && reason != '') {
+		var ToPost = [];
+        ToPost['action']= 'trash_post';
+		ToPost['auth'] = authkey;
+        ToPost['threadid']= threadid;
+        ToPost['postid'] = postid;
+        ToPost['comment'] = reason;
+        //ToPost['']= '';
+		ajax.post("forums.php", ToPost, function (response) {
+            var x = json.decode(response);
+            if (is_array(x)) {
+				$('#post' + postid).hide();
+                //location.href=x[0];
+            } else {    // error from ajax
+                alert(x);
+            }
+		});
+	}
+}
+
+
 
 function Delete(post) {
 	postid = post;
@@ -104,7 +157,7 @@ function Delete(post) {
 }
 
 function Quick_Preview() {
-	var quickreplybuttons;
+	//var quickreplybuttons;
 	$('#post_preview').raw().value = "Make changes";
 	$('#post_preview').raw().preview = true;
 	ajax.post("ajax.php?action=preview","quickpostform", function(response){
@@ -115,7 +168,7 @@ function Quick_Preview() {
 }
 
 function Quick_Edit() {
-	var quickreplybuttons;
+	//var quickreplybuttons;
 	$('#post_preview').raw().value = "Preview";
 	$('#post_preview').raw().preview = false;
 	$('#quickreplypreview').hide();
@@ -135,7 +188,7 @@ function Newthread_Preview(mode) {
 			pollanswers = pollanswers.children;
 			$('#pollquestion').raw().innerHTML = $('#pollquestionfield').raw().value;
 			for(var i=0; i<pollanswers.length; i+=2) {
-				if(!pollanswers[i].value) { continue; }
+				if(!pollanswers[i].value) {continue;}
 				var el = document.createElement('input');
 				el.id = 'answer_'+(i+1);
 				el.type = 'radio';

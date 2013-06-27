@@ -11,26 +11,21 @@ if(!is_number($RequestID)) {
 
 $DB->query("SELECT UserID,
 			Title,
-			CategoryID,
 			GroupID
 			FROM requests
 			WHERE ID = ".$RequestID);
-list($UserID, $Title, $CategoryID, $GroupID) = $DB->next_record();
+list($UserID, $Title, $GroupID) = $DB->next_record();
 
+/* now that requests expire maybe we shouldnt let users delete them
 if($LoggedUser['ID'] != $UserID && !check_perms('site_moderate_requests')) { 
+	error(403);
+} */
+
+if(!check_perms('site_moderate_requests')) { 
 	error(403);
 }
 
-$CategoryName = $Categories[$CategoryID - 1];
-
-//Do we need to get artists?
-if($CategoryName == "Music") {
-	$ArtistForm = get_request_artists($RequestID);
-	$ArtistName = display_artists($ArtistForm, false, true);
-	$FullName = $ArtistName.$Title;	
-} else {
-	$FullName = $Title;
-}
+$FullName = $Title;
 
 
 
@@ -38,12 +33,6 @@ if($CategoryName == "Music") {
 $DB->query("DELETE FROM requests WHERE ID='$RequestID'");
 $DB->query("DELETE FROM requests_votes WHERE RequestID='$RequestID'");
 $DB->query("DELETE FROM requests_tags WHERE RequestID='$RequestID'");
-$DB->query("SELECT ArtistID FROM requests_artists WHERE RequestID = ".$RequestID);
-$RequestArtists = $DB->to_array();
-foreach($RequestArtists as $RequestArtist) {
-	$Cache->delete_value('artists_requests_'.$RequestArtist);
-}
-$DB->query("DELETE FROM requests_artists WHERE RequestID='$RequestID'");
 
 if($UserID != $LoggedUser['ID']) {
 	send_pm($UserID, 0, db_string("A request you created has been deleted"), db_string("The request '".$FullName."' was deleted by [url=http://".NONSSL_SITE_URL."/user.php?id=".$LoggedUser['ID']."]".$LoggedUser['Username']."[/url] for the reason: ".$_POST['reason']));

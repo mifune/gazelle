@@ -51,9 +51,6 @@ class USER_RANK {
 				//Request bunny exception
 				$Query = "SELECT SUM(rv.Bounty) AS Bounty FROM users_main AS um JOIN requests_votes AS rv ON rv.UserID=um.ID WHERE um.Enabled='1' AND um.ID <> 260542 GROUP BY um.ID ORDER BY Bounty;";
 				break;
-			case 'artists':
-				$Query = "SELECT COUNT(ta.ArtistID) AS Artists FROM torrents_artists AS ta JOIN torrents_group AS tg ON tg.ID=ta.GroupID JOIN torrents AS t ON t.GroupID = tg.ID WHERE t.UserID != ta.UserID GROUP BY tg.ID ORDER BY Artists ASC";
-				break;
 		}
 		return $Query;
 	}
@@ -84,7 +81,7 @@ class USER_RANK {
 		return 100; // 100th percentile
 	}
 	
-	function overall_score($Uploaded, $Downloaded, $Uploads, $Requests, $Posts, $Bounty, $Artists, $Ratio){
+	function overall_score($Uploaded, $Downloaded, $Uploads, $Requests, $Posts, $Bounty, $Ratio){
 		// We can do this all in 1 line, but it's easier to read this way
 		if($Ratio>1) { $Ratio = 1; }
 		$TotalScore = 0;
@@ -94,7 +91,6 @@ class USER_RANK {
 		$TotalScore += $Requests*2;
 		$TotalScore += $Posts;
 		$TotalScore += $Bounty;
-		$TotalScore += $Artists;
 		$TotalScore /= (15+8+25+2+1+1+1);
 		$TotalScore *= $Ratio;
 		return $TotalScore;

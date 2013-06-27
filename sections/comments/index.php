@@ -26,12 +26,14 @@ if(isset($_GET['id'])) {
 	}
 	$Perms = get_permissions($UserInfo['PermissionID']);
 	$UserClass = $Perms['Class'];
-	if (!check_paranoia('torrentcomments', $UserInfo['Paranoia'], $UserClass, $UserID)) { error(403); }
+	if (!check_paranoia('torrentcomments', $UserInfo['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 } else {
 	$UserID = $LoggedUser['ID'];
 	$Username = $LoggedUser['Username'];
 	$Self = true;
 }
+
+show_header($MyTorrents?"Comments left on $Username's torrents":"Comment history for $Username",'bbcode');
 
 if (isset($LoggedUser['PostsPerPage'])) {
 	$PerPage = $LoggedUser['PostsPerPage'];
@@ -57,21 +59,23 @@ else {
 
 $Comments = $DB->query("SELECT
 	SQL_CALC_FOUND_ROWS
-	m.ID,
+	m.ID AS UserID,
 	m.Username,
 	m.PermissionID,
+	m.GroupPermissionID,
 	m.Enabled,
+            m.CustomPermissions,
 	
 	i.Avatar,
 	i.Donor,
 	i.Warned,
 	
-	t.ID,
+	t.ID AS TorrentID,
 	t.GroupID,
 	
 	tg.Name,
 	
-	tc.ID,
+	tc.ID AS PostID,
 	tc.Body,
 	tc.AddedTime,
 	tc.EditedTime,
@@ -97,36 +101,41 @@ $Comments = $DB->query("SELECT
 
 $DB->query("SELECT FOUND_ROWS()");
 list($Results) = $DB->next_record();
+
 $Pages=get_pages($Page,$Results,$PerPage, 11);
 
 $DB->set_query_id($Comments);
+
 $GroupIDs = $DB->collect('GroupID');
 
-$Artists = get_artists($GroupIDs);
-
-$DB->set_query_id($Comments);
-show_header($Title,'bbcode');
+$DB->set_query_id($Comments); 
 
 ?><div class="thin">
-	<h2>
-		<?=$Header?>
-	</h2>
-	
+    <h2><?=$Header?></h2>    
 	<div class="linkbox">
-	<?=$OtherLink?>
+	<?=$OtherLink?>&nbsp;&nbsp;&nbsp;
+			<a href="userhistory.php?action=posts&amp;userid=<?=$LoggedUser['ID']?>">Go to post history</a>&nbsp;&nbsp;&nbsp;
+			<a href="userhistory.php?action=subscriptions">Go to subscriptions</a>
 	<br /><br />
 	<?=$Pages?>
 	</div>
-<?php
+<?
 
-while(list($UserID, $Username, $Class, $Enabled, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = $DB->next_record()) {
-	?>
+     $Posts = $DB->to_array(false,MYSQLI_ASSOC,array('CustomPermissions'));
+
+foreach($Posts as $Post){
+	list($UserID, $Username, $Class, $GroupPermID, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = array_values($Post);
+          
+//while(list($UserID, $Username, $Class, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = $DB->next_record(MYSQLI_BOTH,  array('CustomPermissions'))) {
+	$AuthorPermissions = get_permissions($Class);
+      list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
+?>   
 	<table class='forum_post box vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>' id="post<?=$PostID?>">
-		<tr class='colhead_dark'>
+		<tr class='smallhead'>
 			<td  colspan="2">
 				<span style="float:left;"><a href='torrents.php?id=<?=$GroupID?>&amp;postid=<?=$PostID?>#post<?=$PostID?>'>#<?=$PostID?></a>
-					by <strong><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class)?></strong> <?=time_diff($AddedTime) ?>
-					on <?=display_artists($Artists[$GroupID])?><a href="torrents.php?id=<?=$GroupID?>"><?=$Title?></a>
+					by <?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, false, true, $GroupPermID)?> <?=time_diff($AddedTime) ?>
+					on <a href="torrents.php?id=<?=$GroupID?>"><?=$Title?></a>
 				</span>
 			</td>
 		</tr>
@@ -136,22 +145,16 @@ if(empty($HeavyInfo['DisableAvatars'])) {
 ?>
 			<td class='avatar' valign="top">
 <?
-				if($Avatar){ 
-?>
-				<img src='<?=$Avatar?>' width='150' alt="<?=$Username ?>'s avatar" />
-<?
-				} else { ?>
-				<img src="<?=STATIC_SERVER?>common/avatars/default.png" width="150" alt="Default avatar" />
-<?
-				} 
-?>
+                    if($Avatar){    ?>
+                        <img src="<?=$Avatar?>" class="avatar" style="<?=get_avatar_css($MaxAvatarWidth, $MaxAvatarHeight)?>" alt="<?=$Username ?>'s avatar" />
+<?                  } else {        ?>
+                        <img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
+<?                  }               ?>
 			</td>
-<?
-}
-?>
+<? } ?>
 			<td class='body' valign="top">
-				<?=$Text->full_format($Body) ?> 
-<?
+				<?=$Text->full_format($Body, get_permissions_advtags($UserID, unserialize($CustomPermissions), $AuthorPermissions)) ?> 
+<? 
 				if($EditorID){ 
 ?>
 				<br /><br />
@@ -160,7 +163,6 @@ if(empty($HeavyInfo['DisableAvatars'])) {
 <?
 				}
 ?>
-
 			</td>
 		</tr>
 	</table>

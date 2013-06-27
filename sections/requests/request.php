@@ -22,184 +22,79 @@ if(empty($Request)) {
 	error(404);
 }
 
-list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Year, $Image, $Description, $CatalogueNumber, $RecordLabel, $ReleaseType,
-	$BitrateList, $FormatList, $MediaList, $LogCue, $FillerID, $FillerName, $TorrentID, $TimeFilled, $GroupID) = $Request;
+list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description,
+     $FillerID, $FillerName, $TorrentID, $TimeFilled, $GroupID) = $Request;
 
 //Convenience variables
+$NowTime = time();
+$TimeExpires = strtotime($TimeAdded) + (3600*24*90); // 90 days from start 
 $IsFilled = !empty($TorrentID);
-$CanVote = (empty($TorrentID) && check_perms('site_vote'));
+$CanVote = (empty($TorrentID) && check_perms('site_vote') && $TimeExpires > $NowTime);
 
 if($CategoryID == 0) {
-	$CategoryName = "Unknown";
+    $CategoryName = 'unknown';
 } else {
-	$CategoryName = $Categories[$CategoryID - 1];
+    $CategoryName = $NewCategories[$CategoryID]['name'];
 }
 
-//Do we need to get artists?
-if($CategoryName == "Music") {
-	$ArtistForm = get_request_artists($RequestID);
-	$ArtistName = display_artists($ArtistForm, false, true);
-	$ArtistLink = display_artists($ArtistForm, true, true);
-	
-	if($IsFilled) {
-		$DisplayLink = $ArtistLink."<a href='torrents.php?torrentid=".$TorrentID."'>".$Title."</a> [".$Year."]";
-	} else {
-		$DisplayLink = $ArtistLink.$Title." [".$Year."]";
-	}
-	$FullName = $ArtistName.$Title." [".$Year."]";
-	
-	if($BitrateList != "") {
-		$BitrateString = implode(", ", explode("|", $BitrateList));
-		$FormatString = implode(", ", explode("|", $FormatList));
-		$MediaString = implode(", ", explode("|", $MediaList));
-	} else {
-		$BitrateString = "Unknown, please read the description.";
-		$FormatString = "Unknown, please read the description.";
-		$MediaString = "Unknown, please read the description.";
-	}
-	
-	if(empty($ReleaseType)) {
-		$ReleaseName = "Unknown";
-	} else {
-		$ReleaseName = $ReleaseTypes[$ReleaseType];
-	}
-	
-} else if($CategoryName == "Audiobooks" || $CategoryName == "Comedy") {
-	$FullName = $Title." [".$Year."]";
-	$DisplayLink = $Title." [".$Year."]";
-} else {
-	$FullName = $Title;
-	$DisplayLink = $Title;
-}
+$FullName = $Title;
+$DisplayLink = $Title;
 
 //Votes time
 $RequestVotes = get_votes_array($RequestID);
+//error(print_r($RequestVotes,true));
 $VoteCount = count($RequestVotes['Voters']);
-$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0) || ($CategoryName == "Music" && $Year == 0)));
+//$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0)));
 $UserCanEdit = (!$IsFilled && $LoggedUser['ID'] == $RequestorID && $VoteCount < 2);
-$CanEdit = ($UserCanEdit || $ProjectCanEdit || check_perms('site_moderate_requests'));
+$CanEdit = ($UserCanEdit || check_perms('site_moderate_requests'));  // $ProjectCanEdit ||
 
-show_header('View request: '.$FullName, 'comments,requests,bbcode');
+show_header('View request: '.$FullName, 'comments,requests,bbcode,jquery,jquery.cookie');
 
 ?>
 <div class="thin">
 	<h2><a href="requests.php">Requests</a> &gt; <?=$CategoryName?> &gt; <?=$DisplayLink?></h2>
+    <a id="messages" ></a>
 	<div class="linkbox">
-<? if($CanEdit) { ?> 
+<?  if($CanEdit) { ?> 
 		<a href="requests.php?action=edit&amp;id=<?=$RequestID?>">[Edit]</a>
-<? }
-if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
+<?  }
+    if(check_perms('site_moderate_requests') ) {  // $CanEdit   // $UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requests')) { ?>
 		<a href="requests.php?action=delete&amp;id=<?=$RequestID?>">[Delete]</a>
-<? } ?>
-<?	if(has_bookmarked('request', $RequestID)) { ?>
+<?  }
+ 	if(has_bookmarked('request', $RequestID)) { ?>
 		<a href="#" id="bookmarklink_request_<?=$RequestID?>" onclick="Unbookmark('request', <?=$RequestID?>,'[Bookmark]');return false;">[Remove bookmark]</a>
 <?	} else { ?>
 		<a href="#" id="bookmarklink_request_<?=$RequestID?>" onclick="Bookmark('request', <?=$RequestID?>,'[Remove bookmark]');return false;">[Bookmark]</a>
 <?	} ?>
 		<a href="reports.php?action=report&amp;type=request&amp;id=<?=$RequestID?>">[Report Request]</a>
 		<a href="upload.php?requestid=<?=$RequestID?><?=($GroupID?"&groupid=$GroupID":'')?>">[Upload Request]</a>
-<? if(!$IsFilled && (($CategoryID == 0) || ($CategoryName == "Music" && $Year == 0))) { ?>
+<?  /* if(!$IsFilled && $CategoryID == 0) { ?>
 		<a href="reports.php?action=report&amp;type=request_update&amp;id=<?=$RequestID?>">[Request Update]</a>
-<? } ?>
+<? } */   
+    if (check_perms('users_mod')) { ?>
+		<a href="log.php?search=request+<?=$RequestID?>">[View logs]</a>
+<?  }   ?>
 	</div>
 	
 	<div class="sidebar">
-<? if($CategoryID != 0) { ?>
-		<div class="box box_albumart">
-			<div class="head"><strong>Cover</strong></div>
-<?	if (!empty($Image)) { ?>
-			<p align="center"><img style="max-width: 220px;" src="<?=$Image?>" alt="<?=$FullName?>" onclick="lightbox.init(this,220);" /></p>
-<?	} else { ?>
-			<p align="center"><img src="<?=STATIC_SERVER?>common/noartwork/<?=$CategoryIcons[$CategoryID-1]?>" alt="<?=$CategoryName?>" title="<?=$CategoryName?>" width="220" height="220" border="0" /></p>
-<?	} ?>
-		</div>
-<? } 
-	if($CategoryName == "Music") { ?>	
-		<div class="box box_artists">
-			<div class="head"><strong>Artists</strong></div>
-			<ul class="stats nobullet">
-<?
-		if(!empty($ArtistForm[4]) && count($ArtistForm[4]) > 0) { 
-?>
-				<li class="artists_composer"><strong>Composers:</strong></li>
-<?			foreach($ArtistForm[4] as $Artist) {
-?>
-				<li class="artists_composer">
-					<?=display_artist($Artist)?>
-				</li>
-<?			}
-		}
-		if(!empty($ArtistForm[6]) && count($ArtistForm[6]) > 0) { 
-?>
-				<li class="artists_dj"><strong>DJ / Compiler:</strong></li>
-<?			foreach($ArtistForm[6] as $Artist) {
-?>
-				<li class="artists_dj">
-					<?=display_artist($Artist)?>
-				</li>
-<?
-			}
-		}
-		if ((count($ArtistForm[6]) > 0) && (count($ArtistForm[1]) > 0)) {
-			print '				<li class="artists_main"><strong>Artists:</strong></li>';
-		} elseif ((count($ArtistForm[4]) > 0) && (count($ArtistForm[1]) > 0)) {
-			print '				<li class="artists_main"><strong>Performers:</strong></li>';
-		}
-		foreach($ArtistForm[1] as $Artist) {
-?>
-				<li class="artists_main">
-					<?=display_artist($Artist)?>
-				</li>
-<?		}
-		if(!empty($ArtistForm[2]) && count($ArtistForm[2]) > 0) { 
-?>
-				<li class="artists_with"><strong>With:</strong></li>
-<?			foreach($ArtistForm[2] as $Artist) {
-?>
-				<li class="artists_with">
-					<?=display_artist($Artist)?>
-				</li>
-<?			}
-		}
-		if(!empty($ArtistForm[5]) && count($ArtistForm[5]) > 0) { 
-?>
-				<li class="artists_conductor"><strong>Conducted by:</strong></li>
-<?			foreach($ArtistForm[5] as $Artist) {
-?>
-				<li class="artist_guest">
-					<?=display_artist($Artist)?>
-				</li>
-<?			}
-		}
-		if(!empty($ArtistForm[3]) && count($ArtistForm[3]) > 0) { 
-?>
-				<li class="artists_remix"><strong>Remixed by:</strong></li>
-<?			foreach($ArtistForm[3] as $Artist) {
-?>
-				<li class="artists_remix">
-					<?=display_artist($Artist)?>
-				</li>
-<?
-			}
-		}
-		if(!empty($ArtistForm[7]) && count($ArtistForm[7]) > 0) { 
-?>
-				<li class="artists_producer"><strong>Produced by:</strong></li>
-<?			foreach($ArtistForm[7] as $Artist) {
-?>
-				<li class="artists_remix">
-					<?=display_artist($Artist)?>
-				</li>
-<?
-			}
-		}
-?>
-			</ul>
-		</div>
-<?	} ?>
-		<div class="box box_tags">
-			<div class="head"><strong>Tags</strong></div>
-			<ul class="stats nobullet">
+<? if(!empty($Image)) { ?>
+        <div class="head">
+            <strong>Cover</strong>
+            <span style="float:right;"><a href="#" id="covertoggle" onclick="Cover_Toggle(); return false;">(Hide)</a></span>
+        </div>
+		<div id="coverimage" class="box box_albumart center">
+ 
+            <img style="max-width: 220px;" src="<?=$Image?>" alt="<?=$FullName?>" onclick="lightbox.init(this,220);" />
+ 
+		</div><br/>
+<? } ?>
+
+        <div class="head">
+            <strong>Tags</strong>
+            <span style="float:right;margin-left:5px;"><a href="#" id="tagtoggle" onclick="TagBox_Toggle(); return false;">(Hide)</a></span>
+        </div>
+		<div id="tag_container" class="box box_tags">
+			<ul id="torrent_tags" class="stats nobullet">
 <?	foreach($Request['Tags'] as $TagID => $TagName) { ?>
 				<li>
 					<a href="torrents.php?taglist=<?=$TagName?>"><?=display_str($TagName)?></a>
@@ -207,11 +102,15 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 				</li>
 <?	} ?>
 			</ul>
-		</div>
-		<div class="box box_votes">
-			<div class="head"><strong>Top Contributors</strong></div>
-			<table>
-<?	$VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
+		</div><br/>
+        <div class="head"><strong>Top Contributors</strong></div> 
+		<table class="box box_votes" id="request_votes">
+<?	
+
+    echo get_votes_html($RequestVotes);
+    
+    /*
+    $VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
 	$ViewerVote = false;
 	for($i = 0; $i < $VoteMax; $i++) { 
 		$User = array_shift($RequestVotes['Voters']);
@@ -245,73 +144,47 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 <?			}
 		}
 	}
+    */
+    
 ?>
-			</table>
-		</div>
+        </table><br/>
 	</div>
-	<div class="main_column">
-		<table>
+      <div class="middle_column">
+          
+          
+            <div class="head">Request</div>
+		<table> 
+			<tr>
+				<td class="label">
+                    <img style="float:right" src="<?=( 'static/common/caticons/' . $NewCategories[$CategoryID]['image'])?>" />
+                </td>
+				<td style="font-size: 1.2em;text-align:center;font-weight:bold;">
+                    <?=$DisplayLink?>
+                </td>
+			</tr>
+			<tr id="bounty">
+				<td class="label">Total Bounty</td>
+				<td id="formatted_bounty" style="font-size: 1.8em;"><?=get_size($RequestVotes['TotalBounty'])?></td>
+			</tr>
 			<tr>
 				<td class="label">Created</td>
 				<td>
 					<?=time_diff($TimeAdded)?>	by  <strong><?=format_username($RequestorID, $RequestorName)?></strong>
 				</td>
 			</tr>
-<?	if($CategoryName == "Music") {
-		if(!empty($RecordLabel)) { ?>
 			<tr>
-				<td class="label">Record Label</td>
-				<td>
-					<?=$RecordLabel?>
+				<td class="label">Expiry Date</td>
+				<td <? 
+                if(  $TimeExpires < $NowTime ) echo ' class="greybar"'; 
+                elseif( ( $TimeExpires - $NowTime ) <= (3600*24*7) ) echo ' class="redbar"'; 
+                ?> title="On the expiry date if this request is not filled all bounties will be returned to the requestors and the request removed automatically">
+					<?=time_diff($TimeExpires,2,false,false,1)." &nbsp; (".time_diff($TimeExpires,2,false,false,0).')';
+                    if (!$IsFilled && $TimeExpires < $NowTime) echo "<br/>this request will be deleted and the bounties returned within 24 hours";
+                ?>
 				</td>
 			</tr>
-<?		} 
-		if(!empty($CatalogueNumber)) { ?>
-			<tr>
-				<td class="label">Catalogue Number</td>
-				<td>
-					<?=$CatalogueNumber?>
-				</td>
-			</tr>
-<?		} ?>
-			<tr>
-				<td class="label">Release Type</td>
-				<td>
-					<?=$ReleaseName?>
-				</td>
-			</tr>
-			<tr>
-				<td class="label">Acceptable Bitrates</td>
-				<td>
-					<?=$BitrateString?>
-				</td>
-			</tr>
-			<tr>
-				<td class="label">Acceptable Formats</td>
-				<td>
-					<?=$FormatString?>
-				</td>
-			</tr>
-			<tr>
-				<td class="label">Acceptable Media</td>
-				<td>
-					<?=$MediaString?>
-				</td>
-			</tr>
-<?		if(!empty($LogCue)) { ?>
-			<tr>
-				<td class="label">Required FLAC only extra(s)</td>
-				<td>
-					<?=$LogCue?>
-				</td>
-			</tr>
-<?		}
-	} 
-	if ($GroupID) { 
-		/*$Groups = get_groups(array($GroupID), true, true, false);
-		$Group = $Groups['matches'][$GroupID];
-		$GroupLink = display_artists($Group['ExtendedArtists']).'<a href="torrents.php?id='.$GroupID.'">'.$Group['Name'].'</a>';*/
-?>
+
+<?	if ($GroupID) { ?>
 			<tr>
 				<td class="label">Torrent Group</td>
 				<td><a href="torrents.php?id=<?=$GroupID?>">torrents.php?id=<?=$GroupID?></td>
@@ -321,23 +194,23 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 				<td class="label">Votes</td>
 				<td>
 					<span id="votecount"><?=$VoteCount?></span> 
-<?	if($CanVote) { ?>
-					&nbsp;<a href="javascript:Vote(0)"><strong>(+)</strong></a>
+<?	/* if($CanVote) { ?>
+					&nbsp;<a href="javascript:VotePromptMB(0)"><strong>(+)</strong></a>
 					<strong>Costs <?=get_size($MinimumVote, 0)?></strong>
-<?	} ?> 
+<?	} */ ?> 
 				</td>
 			</tr>
 <?	if($CanVote) { ?>
 			<tr id="voting">
-				<td class="label">Custom Vote (MB)</td>
+				<td class="label">Custom Vote</td>
 				<td>
 					<input type="text" id="amount_box" size="8" onchange="Calculate();" />
 					<select id="unit" name="unit" onchange="Calculate();">
-						<option value='mb'>MB</option>
-						<option value='gb'>GB</option>
+						<option value="mb">MB</option>
+						<option value="gb">GB</option>
+                                                <option value="tb">TB</option>
 					</select>
 					<input type="button" value="Preview" onclick="Calculate();"/>
-					<strong><?=($RequestTax * 100)?>% of this is deducted as tax by the system.</strong>
 				</td>
 			</tr>
 			<tr>
@@ -345,41 +218,36 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 				<td>
 					<form action="requests.php" method="get" id="request_form">
 						<input type="hidden" name="action" value="vote" />
-						<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-						<input type="hidden" id="request_tax" value="<?=$RequestTax?>" />
 						<input type="hidden" id="requestid" name="id" value="<?=$RequestID?>" />
 						<input type="hidden" id="auth" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-						<input type="hidden" id="amount" name="amount" value="0">
+						<input type="hidden" id="amount" name="amount" value="0" />
+                        <input type="hidden" id="readable" name="readable" value="" />
 						<input type="hidden" id="current_uploaded" value="<?=$LoggedUser['BytesUploaded']?>" />
 						<input type="hidden" id="current_downloaded" value="<?=$LoggedUser['BytesDownloaded']?>" />
-						<input id="total_bounty" type="hidden" value="<?=$RequestVotes['TotalBounty']?>" />
+						<input type="hidden" id="total_bounty" value="<?=$RequestVotes['TotalBounty']?>" />
 						If you add the entered <strong><span id="new_bounty">0.00 MB</span></strong> of bounty, your new stats will be: <br/>
 						Uploaded: <span id="new_uploaded"><?=get_size($LoggedUser['BytesUploaded'])?></span>
 						Ratio: <span id="new_ratio"><?=ratio($LoggedUser['BytesUploaded'],$LoggedUser['BytesDownloaded'])?></span>
-						<input type="button" id="button" value="Vote!" disabled="disabled" onclick="Vote();"/> 
+						<input type="button" id="button_vote" value="Vote!" disabled="disabled" onclick="Vote();"/> 
 					</form>
 				</td>
 			</tr>
 <? }?> 
-			<tr id="bounty">
-				<td class="label">Bounty</td>
-				<td id="formatted_bounty"><?=get_size($RequestVotes['TotalBounty'])?></td>
-			</tr>
 <?
 	if($IsFilled) {
-		$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 ?>
 			<tr>
 				<td class="label">Filled</td>
 				<td>
-					<strong><a href="torrents.php?<?=(strtotime($TimeFilled)<$TimeCompare?'id=':'torrentid=').$TorrentID?>">Yes</a></strong>, 
+					<strong><a href="torrents.php?torrentid=<?=$TorrentID?>">Yes</a></strong>, 
 					by user <?=format_username($FillerID, $FillerName)?>
-<?		if($LoggedUser['ID'] == $RequestorID || $LoggedUser['ID'] == $FillerID || check_perms('site_moderate_requests')) { ?>
+<?		if( ( $TimeExpires>$NowTime &&  ($LoggedUser['ID'] == $RequestorID || $LoggedUser['ID'] == $FillerID) )
+                || check_perms('site_moderate_requests')) { ?>
 						<strong><a href="requests.php?action=unfill&amp;id=<?=$RequestID?>">(Unfill)</a></strong> Unfilling a request without a valid, nontrivial reason will result in a warning. 
 <?		} ?>
 				</td>
 			</tr>
-<?	} else { ?>
+<?	} elseif ($TimeExpires > $NowTime) { ?>
 			<tr>
 				<td class="label" valign="top">Fill request</td>
 				<td>
@@ -388,28 +256,38 @@ if($UserCanEdit || check_perms('users_mod')) { //check_perms('site_moderate_requ
 							<input type="hidden" name="action" value="takefill" />
 							<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 							<input type="hidden" name="requestid" value="<?=$RequestID?>" />
-							<input type="text" size="50" name="link" <?=(!empty($Link) ? "value='$Link' " : '')?>/>
-							<strong>Should be the permalink (PL) to the torrent (e.g. http://<?=NONSSL_SITE_URL?>/torrents.php?torrentid=xxxx).</strong>
-							<br />
-							<br />
-							<? if(check_perms('site_moderate_requests')) { ?> For User: <input type="text" size="25" name="user" <?=(!empty($FillerUsername) ? "value='$FillerUsername' " : '')?>/>
-							<br />
+                            <strong class="warning">Please make sure the torrent you are filling this request with matches the required parameters.</strong>
+							<br/><input type="text" size="50" name="link" <?=(!empty($Link) ? "value='$Link' " : '')?>/>
+							<br/>Should be the permalink (PL) to the torrent
+                            <br/>e.g. http://<?=NONSSL_SITE_URL?>/torrents.php?id=xxxx
+							<br/><br/>
+							<? if(check_perms('site_moderate_requests')) { ?> 
+                            <span title="Fill this request on behalf of user:">
+                            Fill for user: <input type="text" size="50" name="user" title="the username of the user you are filling this for (they will be recorded as filling this request)" <?=(!empty($FillerUsername) ? "value='$FillerUsername' " : '')?>/>
+							</span><br/><br/>
 							<? } ?>
 							<input type="submit" value="Fill request" />
-							<br /> 
+							<br/> 
 						</div>
 					</form>
 					
 				</td>
 			</tr>
 <?	} ?>
-			<tr>
-				<td colspan="2" class="center"><strong>Description</strong></td>
-			</tr>
-			<tr>
-				<td colspan="2"><?=$Text->full_format($Description)?></td>
-			</tr>
 		</table>
+            
+          
+    </div>  
+    <div style="clear:both"></div>
+    <div class="main_column">
+        <div class="head">
+            <strong>Description</strong>
+            <span style="float:right;"><a href="#" id="desctoggle" onclick="Desc_Toggle(); return false;">(Hide)</a></span>
+        </div>
+		<div id="descbox" class="box pad">
+            <?=$Text->full_format($Description, get_permissions_advtags($RequestorID))?> 
+        </div>
+        <br/>
 <?
 
 $Results = $Cache->get_value('request_comments_'.$RequestID);
@@ -443,6 +321,7 @@ if($Catalogue === false) {
 			u.Username
 			FROM requests_comments as c
 			LEFT JOIN users_main AS u ON u.ID=c.EditedUserID
+            LEFT JOIN users_main AS a ON a.ID = c.AuthorID
 			WHERE c.RequestID = '$RequestID'
 			ORDER BY c.ID
 			LIMIT $CatalogueLimit");
@@ -459,75 +338,99 @@ $Pages=get_pages($Page,$Results,TORRENT_COMMENTS_PER_PAGE,9,'#comments');
 echo $Pages;
 ?>
 	</div>
+      <div class="head">Comments</div>
 <?
 
 //---------- Begin printing
 foreach($Thread as $Key => $Post){
 	list($PostID, $AuthorID, $AddedTime, $Body, $EditedUserID, $EditedTime, $EditedUsername) = array_values($Post);
-	list($AuthorID, $Username, $PermissionID, $Paranoia, $Artist, $Donor, $Warned, $Avatar, $Enabled, $UserTitle) = array_values(user_info($AuthorID));
-?>
-<table class="forum_post box vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>" id="post<?=$PostID?>">
-	<tr class="colhead_dark">
+	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature,,$GroupPermissionID) = array_values(user_info($AuthorID));
+      $AuthorPermissions = get_permissions($PermissionID);
+      list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
+      ?>
+<table class="forum_post  vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>" id="post<?=$PostID?>">
+	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
-				by <strong><?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?></strong> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report Comment]</a>
-				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','<?=$Username?>');">[Quote]</a>
-<?if ($AuthorID == $LoggedUser['ID'] || check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a><? }
-if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
+				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true,$GroupPermissionID,true)?> <?=time_diff($AddedTime)?> 
+				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','r<?=$RequestID?>','<?=$Username?>');">[Quote]</a>
+<?if ( ($AuthorID == $LoggedUser['ID'] && ( time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME ) )
+                                                                                            || check_perms('site_moderate_forums') ) { ?>				
+                        - <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a><? }
+if (check_perms('site_admin_forums')){ ?>
+                        - <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
 			</span>
 			<span id="bar<?=$PostID?>" style="float:right;">
+                <a href="reports.php?action=report&amp;type=requests_comment&amp;id=<?=$PostID?>">[Report]</a>
+                &nbsp;
 				<a href="#">&uarr;</a>
 			</span>
 		</td>
 	</tr>
 	<tr>
-<? if(empty($HeavyInfo['DisableAvatars'])) { ?>
+<?  if(empty($HeavyInfo['DisableAvatars'])) { ?>
 		<td class="avatar" valign="top">
 	<? if ($Avatar) { ?>
-			<img src="<?=$Avatar?>" width="150" alt="<?=$Username ?>'s avatar" />
+			<img src="<?=$Avatar?>" class="avatar" style="<?=get_avatar_css($MaxAvatarWidth, $MaxAvatarHeight)?>" alt="<?=$Username ?>'s avatar" />
 	<? } else { ?>
-			<img src="<?=STATIC_SERVER?>common/avatars/default.png" width="150" alt="Default avatar" />
+			<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
 	<?
-	}
-?>
+         } 
+        $UserBadges = get_user_badges($AuthorID); 
+        if( !empty($UserBadges) ) {  ?>
+               <div class="badges">
+<?                  print_badges_array($UserBadges, $AuthorID); ?>
+               </div>
+<?      }      ?>
 		</td>
 <?
-}
+} 
+$AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
 ?>
 		<td class="body" valign="top">
 			<div id="content<?=$PostID?>">
-<?=$Text->full_format($Body)?>
+                      <div class="post_content"><?=$Text->full_format($Body, $AllowTags) ?> </div>
 <? if($EditedUserID){ ?>
-				<br />
-				<br />
+                        <div class="post_footer">
 <?	if(check_perms('site_moderate_forums')) { ?>
 				<a href="#content<?=$PostID?>" onclick="LoadEdit('requests', <?=$PostID?>, 1); return false;">&laquo;</a> 
 <? 	} ?>
-				Last edited by
+                        <span class="editedby">Last edited by
 				<?=format_username($EditedUserID, $EditedUsername) ?> <?=time_diff($EditedTime,2,true,true)?>
+                        </span>
+                        </div>
 <? } ?>
 			</div>
 		</td>
 	</tr>
+<? /*
+      if( empty($HeavyInfo['DisableSignatures']) && ($MaxSigLength > 0) && !empty($Signature) ) { //post_footer
+                        
+            echo '
+      <tr>
+            <td class="sig"><div id="sig" style="max-height: '.SIG_MAX_HEIGHT. 'px"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
+      </tr>';
+           } */
+?>
 </table>
 <?	} ?>
+       
 		<div class="linkbox">
 		<?=$Pages?>
 		</div>
 <?
 if(!$LoggedUser['DisablePosting']) { ?>
 			<br />
-			<h3>Post comment</h3>
-			<div class="box pad" style="padding:20px 10px 10px 10px;">
+			<div class="messagecontainer" id="container"><div id="message" class="hidden center messagebar"></div></div>
 				<table id="quickreplypreview" class="hidden forum_post box vertical_margin" id="preview">
-					<tr class="colhead_dark">
+					<tr class="smallhead">
 						<td colspan="2">
 							<span style="float:left;"><a href='#quickreplypreview'>#XXXXXX</a>
-								by <strong><?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'] == 2 ? false : true, $LoggedUser['PermissionID'])?></strong> <? if (!empty($LoggedUser['Title'])) { echo '('.$LoggedUser['Title'].')'; }?>
+								<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'],$LoggedUser['Title'],true)?> 
 								Just now
-								<a href="#quickreplypreview">[Report Comment]</a>
 							</span>
-							<span style="float:right;">
+							<span id="barpreview" style="float:right;">
+								<a href="#quickreplypreview">[Report]</a>
 								<a href="#">&uarr;</a>
 							</span>
 						</td>
@@ -535,9 +438,9 @@ if(!$LoggedUser['DisablePosting']) { ?>
 					<tr>
 						<td class="avatar" valign="top">
 				<? if (!empty($LoggedUser['Avatar'])) { ?>
-							<img src="<?=$LoggedUser['Avatar']?>" width="150" alt="<?=$LoggedUser['Username']?>'s avatar" />
+							<img src="<?=$LoggedUser['Avatar']?>" class="avatar" style="<?=get_avatar_css($LoggedUser['MaxAvatarWidth'], $LoggedUser['MaxAvatarHeight'])?>" alt="<?=$LoggedUser['Username']?>'s avatar" />
 				<? } else { ?>
-							<img src="<?=STATIC_SERVER?>common/avatars/default.png" width="150" alt="Default avatar" />
+							<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
 				<? } ?>
 						</td>
 						<td class="body" valign="top">
@@ -545,15 +448,18 @@ if(!$LoggedUser['DisablePosting']) { ?>
 						</td>
 					</tr>
 				</table>
-				<form id="quickpostform" action="" method="post" style="display: block; text-align: center;">
+                  <div class="head">Post reply</div>
+			<div class="box pad shadow">
+				<form id="quickpostform" action="" method="post" onsubmit="return Validate_Form('message', 'quickpost')" style="display: block; text-align: center;">
 					<div id="quickreplytext">
 						<input type="hidden" name="action" value="reply" />
 						<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 						<input type="hidden" name="requestid" value="<?=$RequestID?>" />
-						<textarea id="quickpost" name="body" cols="70" rows="8"></textarea> <br />
+                                    <? $Text->display_bbcode_assistant("quickpost", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+                                    <textarea id="quickpost" name="body" class="long" rows="8"></textarea> <br />
 					</div>
 					<input id="post_preview" type="button" value="Preview" onclick="if(this.preview){Quick_Edit();}else{Quick_Preview();}" />
-					<input type="submit" value="Post reply" />
+					<input type="submit" value="Post comment" />
 				</form>
 			</div>
 <? } ?>

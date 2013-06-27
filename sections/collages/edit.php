@@ -1,4 +1,7 @@
 <?
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+
 $CollageID = $_GET['collageid'];
 if(!is_number($CollageID)) { error(0); }
 
@@ -6,21 +9,25 @@ $DB->query("SELECT Name, Description, TagList, UserID, CategoryID, Locked, MaxGr
 list($Name, $Description, $TagList, $UserID, $CategoryID, $Locked, $MaxGroups, $MaxGroupsPerUser, $Featured) = $DB->next_record();
 $TagList = implode(', ', explode(' ', $TagList));
 
-if($CategoryID == 0 && $UserID!=$LoggedUser['ID'] && !check_perms('site_collages_delete')) { error(403); }
-
-show_header('Edit collage');
+//if($CategoryID == 0 && $UserID!=$LoggedUser['ID'] && !check_perms('site_collages_delete')) { error(403); }
+if (!check_perms('site_collages_manage') && $UserID != $LoggedUser['ID']) {
+          error(403);  
+}
+ 
+show_header('Edit collage','bbcode,jquery');
 ?>
 <div class="thin">
-	<h2>Edit collage <a href="collages.php?id=<?=$CollageID?>"><?=$Name?></a></h2>
-	<form action="collages.php" method="post">
+      <h2>Edit collage <a href="collages.php?id=<?=$CollageID?>"><?=$Name?></a></h2>
+      
+	<form action="collages.php" method="post" id="quickpostform" >
 		<input type="hidden" name="action" value="edit_handle" />
 		<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 		<input type="hidden" name="collageid" value="<?=$CollageID?>" />
 		<table id="edit_collage">
-<? if (check_perms('site_collages_delete') || ($CategoryID == 0 && $UserID == $LoggedUser['ID'] && check_perms('site_collages_renamepersonal'))) { ?>
+<? if (check_perms('site_collages_manage') || ($CategoryID == 0 && $UserID == $LoggedUser['ID'] && check_perms('site_collages_renamepersonal'))) { ?>
 			<tr>
 				<td class="label">Name</td>
-				<td><input type="text" name="name" size="60" value="<?=$Name?>" /></td>
+				<td><input type="text" name="name" class="long" value="<?=$Name?>" /></td>
 			</tr>
 <? } ?>
 <? if($CategoryID>0) { ?>
@@ -39,13 +46,17 @@ show_header('Edit collage');
 <? } ?>
 			<tr>
 				<td class="label">Description</td>
-				<td>
-					<textarea name="description" id="description" cols="60" rows="10"><?=$Description?></textarea>
-				</td>
+				<td> 
+                            <div id="preview" class="box pad hidden"></div>
+                            <div  id="editor">
+                            <? $Text->display_bbcode_assistant("description", get_permissions_advtags($UserID)); ?>
+					<textarea name="description" id="description" class="long" rows="10"><?=$Description?></textarea>
+                            </div>
+                        </td>
 			</tr>
 			<tr>
 				<td class="label">Tags</td>
-				<td><input type="text" name="tags" size="60" value="<?=$TagList?>" /></td>
+				<td><input type="text" name="tags" class="long" value="<?=$TagList?>" /></td>
 			</tr>
 <? if($CategoryID == 0) { ?>
 			<tr>
@@ -53,7 +64,7 @@ show_header('Edit collage');
 				<td><input type="checkbox" name="featured" <?=($Featured?'checked':'')?> /></td>
 			</tr>
 <? }
-   if(check_perms('site_collages_delete')) { ?>
+   if(check_perms('site_collages_manage')) { ?>
 			<tr>
 				<td class="label">Locked</td>
 				<td><input type="checkbox" name="locked" <?if($Locked) { ?>checked="checked" <? }?>/></td>
@@ -69,7 +80,10 @@ show_header('Edit collage');
 			
 <? } ?>
 			<tr>
-				<td colspan="2" class="center"><input type="submit" value="Edit collage" /></td>
+				<td colspan="2" class="center">
+                            <input id="previewbtn" type="button" value="Preview" onclick="Preview_Collage();" />
+                            <input type="submit" value="Edit collage" />
+                        </td>
 			</tr>
 		</table>
 	</form>

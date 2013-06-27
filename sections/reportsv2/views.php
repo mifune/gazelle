@@ -18,9 +18,11 @@ list($OwnerID, $Owner) = $DB->next_record();
 $Owner = display_str($Owner);
 
 ?>
-<h2>Reports v2 Information!</h2>
+<div class="thin">
+<h2>Torrent Reports</h2>
 <br />
-<div class="box pad thin" style="padding: 0px 0px 0px 20px; width: 70%; margin-left: auto; margin-right: auto">
+<div class="head">history</div>
+<div class="box pad">
 	<table><tr><td style="width: 50%;">
 <?
 $DB->query("SELECT um.ID, um.Username, COUNT(r.ID) AS Reports FROM reportsv2 AS r JOIN users_main AS um ON um.ID=r.ResolverID WHERE r.LastChangeTime > NOW() - INTERVAL 24 HOUR GROUP BY r.ResolverID ORDER BY Reports DESC");
@@ -163,18 +165,26 @@ $Results = $DB->to_array();
 				<a href="reportsv2.php?view=resolver&amp;id=<?=$OwnerID?>">http://<?=NONSSL_SITE_URL?>/reportsv2.php?view=resolver&amp;id=<?=$OwnerID?></a>
 			</li>
 		</ul>
-		<br /><br />
-		<strong>For browsing anything more complicated than these, use the search feature.</strong>
+		<br /><!--<br />
+		<strong>For browsing anything more complicated than these, use the search feature.</strong>-->
 	</td>
 	<td style="vertical-align: top;">
 <?
-	$DB->query("SELECT r.ResolverID,
+	/*$DB->query("SELECT r.ResolverID,
 						um.Username, 
 						COUNT(r.ID) AS Count,
 						COUNT(tasted.Tasted) AS Tasted
 				FROM reportsv2 AS r
 				LEFT JOIN users_main AS um ON r.ResolverID=um.ID
 				LEFT JOIN torrents AS tasted ON tasted.ID=r.TorrentID AND tasted.Tasted = '1'
+				WHERE r.Status = 'InProgress'
+				GROUP BY r.ResolverID"); */
+
+	$DB->query("SELECT r.ResolverID,
+						um.Username, 
+						COUNT(r.ID) AS Count
+				FROM reportsv2 AS r
+				LEFT JOIN users_main AS um ON r.ResolverID=um.ID
 				WHERE r.Status = 'InProgress'
 				GROUP BY r.ResolverID");
 	$Staff = $DB->to_array();
@@ -184,7 +194,6 @@ $Results = $DB->to_array();
 			<tr>
 				<td class="colhead">Staff member</td>
 				<td class="colhead">Current Count</td>
-				<td class="colhead">Tasted</td>
 			</tr>
 		
 	<?	
@@ -194,9 +203,6 @@ $Results = $DB->to_array();
 					<a href="reportsv2.php?view=staff&amp;id=<?=$Array['ResolverID']?>"><?=display_str($Array['Username'])?>'s reports</a>
 				</td>
 				<td><?=$Array['Count']?></td>
-				<td>
-					<a href="reportsv2.php?view=tasted&amp;id=<?=$Array['ResolverID']?>"><?=display_str($Array['Tasted'])?></a>
-				</td>
 			</tr>
 	<?	
 		}
@@ -221,12 +227,9 @@ $Results = $DB->to_array();
 <?
 		foreach($Current as $Array) {
 			//Ugliness
-			foreach($Types as $Category) {
-				if(!empty($Category[$Array['Type']])) {
-					$Title = $Category[$Array['Type']]['title'];
-					break;
+				if(!empty($Types[$Array['Type']])) {
+					$Title = $Types[$Array['Type']]['title'];
 				}
-			}
 ?>
 			<tr>
 				<td>
@@ -242,6 +245,7 @@ $Results = $DB->to_array();
 ?>
 		</table>
 	</td></tr></table>
+</div>
 </div>
 <?
 show_footer();

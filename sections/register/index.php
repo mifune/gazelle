@@ -12,12 +12,21 @@ $Val=NEW VALIDATE;
 
 if(!empty($_REQUEST['confirm'])) {
 	// Confirm registration
-	$DB->query("SELECT ID FROM users_main WHERE torrent_pass='".db_string($_REQUEST['confirm'])."' AND Enabled='0'");
-	list($UserID)=$DB->next_record();
+	$DB->query("SELECT ID, Enabled FROM users_main WHERE torrent_pass='".db_string($_REQUEST['confirm'])."'"); //  AND Enabled='0'
+	list($UserID, $Enabled)=$DB->next_record();
 	
 	if($UserID) {
-		$DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
-		$Cache->increment('stats_user_count');
+        $Body = get_article("intro_pm");
+ 
+        if($Body) send_pm($UserID, 0, db_string("Welcome to ". SITE_NAME) , db_string($Body));
+
+        if ($Enabled=='0') {
+            $DB->query("UPDATE users_main SET Enabled='1' WHERE ID='$UserID'");
+            $Cache->increment('stats_user_count');
+
+            update_tracker('add_user', array('id' => $UserID, 'passkey' => $_REQUEST['confirm']));
+        }
+
 		include('step2.php');
 	}
 	
@@ -26,9 +35,10 @@ if(!empty($_REQUEST['confirm'])) {
 	$Val->SetFields('email',true,'email', 'You did not enter a valid email address.');
 	$Val->SetFields('password',true,'string', 'You did not enter a valid password (6 - 40 characters).',array('minlength'=>6,'maxlength'=>40));
 	$Val->SetFields('confirm_password',true,'compare', 'Your passwords do not match.',array('comparefield'=>'password'));
+	//$Val->SetFields('discreq',true,'checkbox', 'You did not check the box that says you agree to our disclaimer.');
 	$Val->SetFields('readrules',true,'checkbox', 'You did not check the box that says you will read the rules.');
-	$Val->SetFields('readwiki',true,'checkbox', 'You did not check the box that says you will read the wiki.');
-	$Val->SetFields('agereq',true,'checkbox', 'You did not check the box that says you are 13 or older.');
+	//$Val->SetFields('readwiki',true,'checkbox', 'You did not check the box that says you will read the wiki.');
+	$Val->SetFields('agereq',true,'checkbox', 'You did not check the box that says you are 18 or older.');
 	//$Val->SetFields('captcha',true,'string', 'You did not enter a captcha code.',array('minlength'=>6,'maxlength'=>6));
 
 	if(!empty($_POST['submit'])) {
@@ -42,13 +52,20 @@ if(!empty($_REQUEST['confirm'])) {
 		if(!$Err) {
 			
 			$DB->query("SELECT COUNT(ID) FROM users_main WHERE Username LIKE '".db_string(trim($_POST['username']))."'");
-			list($UserCount)=$DB->next_record();
-			
+			list($UserCount)=$DB->next_record(); 
 			if($UserCount) {
 				$Err = "There is already someone registered with that username.";
 				$_REQUEST['username']='';
 			}
 			
+			$DB->query("SELECT COUNT(ID) FROM users_main WHERE Email LIKE '".db_string(trim($_POST['email']))."'");
+			list($UserCount)=$DB->next_record(); 
+			if($UserCount) {
+				$Err = 'There is already someone registered with that email address.'; //<br/><br/>
+                    //<a href="login.php?act=recover">If it is your account you can use email recovery to reset the password</a>
+				$_REQUEST['email']='';
+			}
+            
 			if($_POST['invite']) {
 				$DB->query("SELECT InviterID, Email FROM invites WHERE InviteKey='".db_string($_REQUEST['invite'])."'");
 				if($DB->record_count() == 0) {
@@ -75,7 +92,7 @@ if(!empty($_REQUEST['confirm'])) {
 				$Enabled = '1';
 			} else {
 				$NewInstall = false;
-				$Class = USER;
+				$Class = APPRENTICE;
 				$Enabled = '0';
 			}
 
@@ -96,7 +113,8 @@ if(!empty($_REQUEST['confirm'])) {
 			list($StyleID) = $DB->next_record();
 			$AuthKey = make_secret();
 			
-			$DB->query("INSERT INTO users_info (UserID,StyleID,AuthKey, Inviter, JoinDate) VALUES ('$UserID','$StyleID','".db_string($AuthKey)."', '$InviterID', '".sqltime()."')");
+			$DB->query("INSERT INTO users_info (UserID,StyleID,AuthKey, Inviter, JoinDate, RunHour) VALUES 
+                            ('$UserID','$StyleID','".db_string($AuthKey)."', '$InviterID', '".sqltime()."', FLOOR( RAND() * 24 ))");
 			
 			$DB->query("INSERT INTO users_history_ips
 					(UserID, IP, StartTime) VALUES
@@ -106,14 +124,18 @@ if(!empty($_REQUEST['confirm'])) {
 			
 			
 			$DB->query("INSERT INTO users_history_emails
-				(UserID, Email, Time, IP) VALUES 
-				('$UserID', '".db_string($_REQUEST['email'])."', '0000-00-00 00:00:00', '".db_string($_SERVER['REMOTE_ADDR'])."')");
+				(UserID, Email, Time, IP, ChangedbyID) VALUES 
+				('$UserID', '".db_string($_REQUEST['email'])."', '0000-00-00 00:00:00', '".db_string($_SERVER['REMOTE_ADDR'])."','$UserID')");
 				
-			if ($_REQUEST['email'] != $InviteEmail) {
+            /*
+             * not sure what the purpose of this is... it records the inviters email in the new users email history... why??
+             * // blanking this for the moment seems wrong
+			if ($InviteEmail && $_REQUEST['email'] != $InviteEmail) {
 				$DB->query("INSERT INTO users_history_emails
-					(UserID, Email, Time, IP) VALUES 
-					('$UserID', '$InviteEmail', '".sqltime()."', '".db_string($_SERVER['REMOTE_ADDR'])."')");
+					(UserID, Email, Time, IP, ChangedbyID) VALUES 
+					('$UserID', '$InviteEmail', '".sqltime()."', '".db_string($_SERVER['REMOTE_ADDR'])."','$UserID')");
 			}
+             */
 			
 			
 			
@@ -186,7 +208,7 @@ if(!empty($_REQUEST['confirm'])) {
 			$TPL->set('SITE_URL',SITE_URL);
 
 			send_email($_REQUEST['email'],'New account confirmation at '.SITE_NAME,$TPL->get(),'noreply');
-			update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
+			//update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
 			$Sent=1;
 			
 			

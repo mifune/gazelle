@@ -1,6 +1,10 @@
 <?
 if(!check_perms('users_view_ips') || !check_perms('users_view_email')) { error(403); }
 show_header('Registration log');
+?>
+<div class="thin">
+	<h2>Registration Log</h2>
+<?
 define('USERS_PER_PAGE', 50);
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
@@ -91,5 +95,8 @@ if($DB->record_count()) {
 <? } else { ?>
 	<h2 align="center">There have been no new registrations in the past 72 hours.</h2>
 <? }
+?>
+</div>
+<?
 show_footer();
 ?>

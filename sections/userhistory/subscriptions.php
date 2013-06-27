@@ -71,12 +71,13 @@ if($NumResults > $PerPage*($Page-1)) {
 		t.IsLocked,
 		t.IsSticky,
 		p.ID,
-		um.ID,
+		p.AuthorID,
 		um.Username,
 		ui.Avatar,
 		p.EditedUserID,
 		p.EditedTime,
-		ed.Username AS EditedUsername
+		ed.Username AS EditedUsername,
+            um.PermissionID
 		FROM forums_posts AS p
 		LEFT JOIN forums_topics AS t ON t.ID = p.TopicID
 		LEFT JOIN forums AS f ON f.ID = t.ForumID
@@ -89,8 +90,6 @@ if($NumResults > $PerPage*($Page-1)) {
 }
 ?>
 <div class="thin">
-	<h2><?='Subscribed topics'.($ShowUnread?' with unread posts':'')?></h2>
-
 	<div class="linkbox">
 <?
 if(!$ShowUnread) {
@@ -112,13 +111,14 @@ if($NumResults) {
 ?>
 			<a href="userhistory.php?action=catchup&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up</a>&nbsp;&nbsp;&nbsp;
 			<a href="userhistory.php?action=posts&amp;userid=<?=$LoggedUser['ID']?>">Go to post history</a>&nbsp;&nbsp;&nbsp;
+			<a href="comments.php">Go to comment history</a>
 	</div>
 <?
 if(!$NumResults) {
 ?>
-	<div class="center">
+	<p class="center">
 		No subscribed topics<?=$ShowUnread?' with unread posts':''?>
-	</div>
+	</p>
 <?
 } else {
 ?>
@@ -129,16 +129,26 @@ if(!$NumResults) {
 ?>
 	</div>
 <?
-	while(list($ForumID, $ForumName, $TopicID, $ThreadTitle, $Body, $LastPostID, $Locked, $Sticky, $PostID, $AuthorID, $AuthorName, $AuthorAvatar, $EditedUserID, $EditedTime, $EditedUsername) = $DB->next_record()){
+
+     $Posts = $DB->to_array(false,MYSQLI_ASSOC);
+
+foreach($Posts as $Post){
+	list($ForumID, $ForumName, $TopicID, $ThreadTitle, $Body, $LastPostID, $Locked, $Sticky, $PostID, $AuthorID, $AuthorName, $AuthorAvatar, $EditedUserID, $EditedTime, $EditedUsername,$PermissionID) = array_values($Post);
+      //echo "($ForumID, $ForumName, $TopicID, $ThreadTitle, $Body, $LastPostID, $Locked, $Sticky, $PostID, $AuthorID, $AuthorName, $AuthorAvatar, $EditedUserID, $EditedTime, $EditedUsername,$PermissionID)";
+      $AuthorPermissions = get_permissions($PermissionID);
+          list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
+      
 ?>
+	<div class="head"><?='Subscribed topics'.($ShowUnread?' with unread posts':'')?></div>
+    
 	<table class='forum_post box vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>'>
-		<tr class='colhead_dark'>
+		<tr class='smallhead'>
 			<td colspan="2">
 				<span style="float:left;">
 					<a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>"><?=$ForumName?></a> &gt;
 					<a href="forums.php?action=viewthread&amp;threadid=<?=$TopicID?>" title="<?=display_str($ThreadTitle)?>"><?=cut_string($ThreadTitle, 75)?></a>
 		<? if($PostID<$LastPostID && !$Locked) { ?>
-					<span style="color: red;">(New!)</span>
+					<span class="newstatus">(New!)</span>
 		<? } ?>
 				</span>
 				<span style="float:left;" class="last_read" title="Jump to last read">
@@ -154,18 +164,25 @@ if(!$NumResults) {
 		<tr class="row<?=$ShowCollapsed?' hidden':''?>">
 		<? if(empty($HeavyInfo['DisableAvatars'])) { ?>
 			<td class='avatar' valign="top">
-			<? if(check_perms('site_proxy_images') && preg_match('/^https?:\/\/(localhost(:[0-9]{2,5})?|[0-9]{1,3}(\.[0-9]{1,3}){3}|([a-zA-Z0-9\-\_]+\.)+([a-zA-Z]{1,5}[^\.]))(:[0-9]{2,5})?(\/[^<>]+)+\.(jpg|jpeg|gif|png|tif|tiff|bmp)$/is',$AuthorAvatar)) { ?>
+			<? /* if(check_perms('site_proxy_images') && preg_match('/^https?:\/\/(localhost(:[0-9]{2,5})?|[0-9]{1,3}(\.[0-9]{1,3}){3}|([a-zA-Z0-9\-\_]+\.)+([a-zA-Z]{1,5}[^\.]))(:[0-9]{2,5})?(\/[^<>]+)+\.(jpg|jpeg|gif|png|tif|tiff|bmp)$/is',$AuthorAvatar)) { ?>
 				<img src="<?='http://'.SITE_URL.'/image.php?c=1&i='.urlencode($AuthorAvatar)?>" width="150" style="max-height:400px;" alt="<?=$AuthorName?>'s avatar" />
 			<? } elseif(!$AuthorAvatar) { ?>
 				<img src="<?=STATIC_SERVER.'common/avatars/default.png'?>" width="150" style="max-height:400px;" alt="Default avatar" />
 			<? } else { ?>
 				<img src="<?=$AuthorAvatar?>" width="150" style="max-height:400px;" alt="<?=$AuthorName?>'s avatar" />
-			<? } ?>
+			<? } */ ?>
+                        
+	<? if ($AuthorAvatar) { ?>
+			<img src="<?=$AuthorAvatar?>" class="avatar" style="<?=get_avatar_css($MaxAvatarWidth, $MaxAvatarHeight)?>" alt="<?=$AuthorName?>'s avatar" />
+	<? } else { ?>
+			<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
+	<? } ?>
 			</td>
-		<? } ?>
+		<? }
+$AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions); ?>
 			<td class='body' valign="top">
 				<div class="content3">
-					<?=$Text->full_format($Body) ?>
+					<?=$Text->full_format($Body,$AllowTags) ?>
 		<? if($EditedUserID) { ?>
 					<br /><br />
 					Last edited by

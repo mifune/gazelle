@@ -3,6 +3,7 @@ function class_list($Selected=0){
 	global $Classes;
 	$Return = '';
 	foreach ($Classes as $ID => $Class) {
+        if($Class['IsUserClass']=='0') continue;
 		$Name = $Class['Name'];
 		$Level = $Class['Level'];
 		$Return.='<option value="'.$Level.'"';
@@ -25,7 +26,7 @@ $ForumArray = $DB->to_array(); // used for generating the 'parent' drop down lis
 unset($ForumCats);
 $ForumCats = $Cache->get_value('forums_categories');
 if ($ForumCats === false) {
-	$DB->query("SELECT ID, Name FROM forums_categories");
+	$DB->query("SELECT ID, Name FROM forums_categories ORDER BY Sort");
 	$ForumCats = array();
 	while (list($ID, $Name) =  $DB->next_record()) {
 		$ForumCats[$ID] = $Name;
@@ -34,19 +35,20 @@ if ($ForumCats === false) {
 }
 
 $DB->query('SELECT
-	ID,
+	f.ID,
 	CategoryID,
-	Sort,
-	Name,
+	f.Sort,
+	f.Name,
 	Description,
 	MinClassRead,
 	MinClassWrite,
 	MinClassCreate,
 	AutoLock
-	FROM forums
-	ORDER BY CategoryID, Sort ASC');
+	FROM forums AS f LEFT JOIN forums_categories AS fc ON f.CategoryID=fc.ID
+	ORDER BY fc.Sort, f.Sort ASC');
 ?>
 
+<div class="thin">
 <h2>Forum control panel</h2>
 <table width="100%">
 	<tr class="colhead">
@@ -117,7 +119,7 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 }
 ?>
 	<tr>
-		<td colspan="8" class="colhead">Create forum</td>
+		<td colspan="9" class="colhead">Create forum</td>
 	</tr>
 	<tr class="rowa">
 		<form action="" method="post">
@@ -165,4 +167,5 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 		</form>
 	</tr>
 </table>
+</div>
 <? show_footer(); ?>

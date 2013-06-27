@@ -7,6 +7,7 @@ if(!check_perms('admin_reports')){
 show_header('Other reports stats');
 
 ?>
+<div class="thin">
 <h2>Other reports stats!</h2>
 <br />
 <div class="box pad thin" style="padding: 0px 0px 0px 20px; margin-left: auto; margin-right: auto">
@@ -103,6 +104,7 @@ $Results = $DB->to_array();
 		</td>
 		</tr>
 		</table>
+</div>
 </div>
 <?
 show_footer();

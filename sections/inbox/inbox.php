@@ -15,7 +15,6 @@ list($Page,$Limit) = page_limit(MESSAGES_PER_PAGE);
 show_header('Inbox');
 ?>
 <div class="thin">
-	<h2><?= ($Section == 'sentbox') ? 'Sentbox' : 'Inbox' ?></h2>
 	<div class="linkbox">
 <?
 
@@ -30,32 +29,106 @@ if($Section == 'inbox') { ?>
 <?
 
 $Sort = empty($_GET['sort']) || $_GET['sort'] != "unread" ? "Date DESC" : "cu.Unread = '1' DESC, DATE DESC";
+ /*
+if ($Section == 'sentbox'){
+    
+    $sql = "SELECT
+          SQL_CALC_FOUND_ROWS
+          c.ID,
+          c.Subject,
+          cu2.Unread,
+          cu.Sticky,
+          cu.ForwardedTo,
+          um2.Username AS ForwardedName,
+          cu2.UserID,
+          um.Username,
+          ui.Donor,
+          ui.Warned,
+          um.Enabled,
+          cu.SentDate AS Date, 
+          um.PermissionID
+          FROM pm_conversations AS c
+          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
+          LEFT JOIN pm_conversations_users AS cu2 ON cu2.ConvID=c.ID AND cu2.UserID!='$UserID' AND cu2.ForwardedTo=0
+          LEFT JOIN users_main AS um ON um.ID=cu2.UserID
+          LEFT JOIN users_info AS ui ON ui.UserID=um.ID
+          LEFT JOIN users_main AS um2 ON um2.ID=cu.ForwardedTo";
+    
+} else {
+    
+    $sql = "SELECT
+          SQL_CALC_FOUND_ROWS
+          c.ID,
+          c.Subject,
+          cu.Unread,
+          cu.Sticky,
+          cu.ForwardedTo,
+          um2.Username AS ForwardedName,
+          pms.SenderID,
+          um.Username,
+          ui.Donor,
+          ui.Warned,
+          um.Enabled, 
+          cu.ReceivedDate AS Date, 
+          um.PermissionID
+          FROM pm_conversations AS c
+          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
+          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID 
+          LEFT JOIN users_main AS um ON um.ID=pms.SenderID
+          LEFT JOIN users_info AS ui ON ui.UserID=um.ID
+          LEFT JOIN users_main AS um2 ON um2.ID=cu.ForwardedTo";
 
-$sql = "SELECT
-	SQL_CALC_FOUND_ROWS
-	c.ID,
-	c.Subject,
-	cu.Unread,
-	cu.Sticky,
-	cu.ForwardedTo,
-	um2.Username AS ForwardedName,
-	cu2.UserID,
-	um.Username,
-	ui.Donor,
-	ui.Warned,
-	um.Enabled,";
-$sql .= ($Section == 'sentbox')? ' cu.SentDate ' : ' cu.ReceivedDate ';
-$sql .= "AS Date
-	FROM pm_conversations AS c
-	LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
-	LEFT JOIN pm_conversations_users AS cu2 ON cu2.ConvID=c.ID AND cu2.UserID!='$UserID' AND cu2.ForwardedTo=0
-	LEFT JOIN users_main AS um ON um.ID=cu2.UserID
-	LEFT JOIN users_info AS ui ON ui.UserID=um.ID
-	LEFT JOIN users_main AS um2 ON um2.ID=cu.ForwardedTo";
+} */
+
+if ($Section == 'sentbox'){
+    
+    $sql = "SELECT
+          SQL_CALC_FOUND_ROWS
+          c.ID,
+          c.Subject,
+          cu2.Unread,
+          cu.Sticky,
+          cu2.UserID,
+          um.Username,
+          ui.Donor,
+          ui.Warned,
+          um.Enabled,
+          cu.SentDate AS Date, 
+          um.PermissionID
+          FROM pm_conversations AS c
+          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
+          LEFT JOIN pm_conversations_users AS cu2 ON cu2.ConvID=c.ID AND cu2.UserID!='$UserID' AND cu2.ForwardedTo=0
+          LEFT JOIN users_main AS um ON um.ID=cu2.UserID
+          LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
+    
+} else {
+ 
+    
+    $sql = "SELECT
+          SQL_CALC_FOUND_ROWS
+          c.ID,
+          c.Subject,
+          cu.Unread,
+          cu.Sticky,
+          pms.SenderID,
+          um.Username,
+          ui.Donor,
+          ui.Warned,
+          um.Enabled, 
+          cu.ReceivedDate AS Date, 
+          um.PermissionID, 
+          um.GroupPermissionID
+          FROM pm_conversations AS c
+          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
+          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID AND pms.SenderID!='$UserID' 
+          LEFT JOIN users_main AS um ON um.ID=pms.SenderID
+          LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
+} 
 
 if(!empty($_GET['search']) && $_GET['searchtype'] == "message") {
 	$sql .=	" JOIN pm_messages AS m ON c.ID=m.ConvID";
 }
+
 $sql .= " WHERE ";
 if(!empty($_GET['search'])) {
 		$Search = db_string($_GET['search']);
@@ -91,6 +164,7 @@ echo $Pages;
 ?>
 	</div>
 
+    <div class="head"><?= ($Section == 'sentbox') ? 'Sentbox' : 'Inbox' ?></div>
 	<div class="box pad">
 <? if($DB->record_count()==0) { ?>
 	<h2>Your <?= ($Section == 'sentbox') ? 'sentbox' : 'inbox' ?> is currently empty</h2>
@@ -115,22 +189,19 @@ echo $Pages;
 				/>
 			</div>
 		</form>
-		<form action="inbox.php" method="post" id="messageform">
+		<form action="inbox.php" method="post" id="messageform" onsubmit="return anyChecks('messageform')">
 			<input type="hidden" name="action" value="masschange" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<table>
 				<tr class="colhead">
 					<td width="10"><input type="checkbox" onclick="toggleChecks('messageform',this)" /></td>
-					<td width="50%">Subject</td>
+					<td width="45%">Subject</td>
 					<td><?=($Section == 'sentbox')? 'Receiver' : 'Sender' ?></td>
 					<td>Date</td>
-<?		if(check_perms('users_mod')) {?>
-					<td>Forwarded to</td>
-<?		} ?>
 				</tr>
 <?
 	$Row = 'a';
-	while(list($ConvID, $Subject, $Unread, $Sticky, $ForwardedID, $ForwardedName, $SenderID, $Username, $Donor, $Warned, $Enabled, $Date) = $DB->next_record()) {
+	while(list($ConvID, $Subject, $Unread, $Sticky, $SenderID, $Username, $Donor, $Warned, $Enabled, $Date, $ClassID, $GroupPermID) = $DB->next_record()) {
 		if($Unread === '1') {
 			$RowClass = 'unreadpm';
 		} else {
@@ -139,7 +210,7 @@ echo $Pages;
 		}
 ?>
 				<tr class="<?=$RowClass?>">
-					<td class="center"><input type="checkbox" name="messages[]=" value="<?=$ConvID?>" /></td>
+					<td class="center"><input type="checkbox" name="messages[]" value="<?=$ConvID?>" /></td>
 					<td>
 <?		if($Unread) { echo '<strong>'; } ?>
 <?		if($Sticky) { echo 'Sticky: '; }
@@ -148,16 +219,15 @@ echo $Pages;
 <?
 		if($Unread) { echo '</strong>';} ?>
 					</td>
-					<td><?=format_username($SenderID, $Username, $Donor, $Warned, $Enabled == 2 ? false : true)?></td>
+					<td><?=format_username($SenderID, $Username, $Donor, $Warned, $Enabled, $ClassID, false, false, $GroupPermID)?></td>
 					<td><?=time_diff($Date)?></td>
-<?		if(check_perms('users_mod')) { ?>
-					<td><?=($ForwardedID && $ForwardedID != $LoggedUser['ID'] ? format_username($ForwardedID, $ForwardedName):'')?></td>
-<?		} ?>
 				</tr>
 <?	} ?>
 			</table>
+<?          if ($Section == 'inbox') {  ?>
 			<input type="submit" name="read" value="Mark as read" />&nbsp;
 			<input type="submit" name="unread" value="Mark as unread" />&nbsp;
+<?		} ?>
 			<input type="submit" name="delete" value="Delete message(s)" />
 		</form>
 <? } ?>

@@ -2,9 +2,20 @@
 $CollageID = $_GET['collageid'];
 if(!is_number($CollageID)) { error(0); }
 
-$DB->query("SELECT Name, UserID, CategoryID FROM collages WHERE ID='$CollageID'");
-list($Name, $UserID, $CategoryID) = $DB->next_record();
-if($CategoryID == 0 && $UserID!=$LoggedUser['ID'] && !check_perms('site_collages_delete')) { error(403); }
+$DB->query("SELECT Name, UserID, CategoryID, Permissions FROM collages WHERE ID='$CollageID'");
+list($Name, $UserID, $CategoryID, $CPermissions) = $DB->next_record();
+//if($CategoryID == 0 && $UserID!=$LoggedUser['ID'] && !check_perms('site_collages_delete')) { error(403); }
+if (!check_perms('site_collages_manage')){
+    $CPermissions=(int)$CPermissions;
+    if ($UserID == $LoggedUser['ID']) {
+          $CanEdit = true;
+    } elseif ($CPermissions>0) {
+          $CanEdit = $LoggedUser['Class'] >= $CPermissions;
+    } else {
+          $CanEdit=false; // can be overridden by permissions
+    }
+    if(!$CanEdit) { error(403); }
+}
 
 $DB->query("SELECT ct.GroupID,
 	um.ID,
@@ -42,23 +53,14 @@ show_header('Manage collage '.$Name);
 
 $Number = 0;
 foreach ($TorrentList as $GroupID=>$Group) {
-	list($GroupID, $GroupName, $GroupYear, $GroupRecordLabel, $GroupCatalogueNumber, $TagList, $ReleaseType, $GroupVanityHouse, $Torrents, $GroupArtists, $ExtendedArtists) = array_values($Group);
+	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $UserID, $Username, $Sort) = array_values($CollageDataList[$GroupID]);
 	
 	
 	$Number++;
 
 	$DisplayName = $Number.' - ';
-	if (!empty($ExtendedArtists[1]) || !empty($ExtendedArtists[4]) || !empty($ExtendedArtists[5])|| !empty($ExtendedArtists[6])) {
-			unset($ExtendedArtists[2]);
-			unset($ExtendedArtists[3]);
-			$DisplayName .= display_artists($ExtendedArtists);
-	} elseif(count($GroupArtists)>0) {
-			$DisplayName .= display_artists(array('1'=>$GroupArtists));
-	}
 	$DisplayName .= '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-	if($GroupYear>0) { $DisplayName = $DisplayName. ' ['. $GroupYear .']';}
-	if($GroupVanityHouse) { $DisplayName .= ' [<abbr title="This is a vanity house release">VH</abbr>]'; }
 	
 ?>
 		<tr>
