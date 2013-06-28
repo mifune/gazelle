@@ -23,7 +23,7 @@ $UserID = (int)$LoggedUser['ID'];
 $NumBets = min( max((int)$_REQUEST['numbets'], 1), 3);
 $TotalBet = $NumBets * $BetAmount;
 
-if($LoggedUser['Credits']<$TotalBet) ajax_error("Not enough credits to bet ".number_format ($TotalBet));
+if($LoggedUser['TotalCredits']<$TotalBet) ajax_error("Not enough credits to bet ".number_format ($TotalBet));
 
 $Pos = array();     
 
@@ -59,6 +59,8 @@ $HighPayout = $Cache->get_value('sm_lowest_top_payout');
 
 $DB->query("UPDATE users_main SET Credits=(Credits+$Win-$TotalBet) WHERE ID=$UserID");
 
+$LoggedUser['TotalCredits'] += ($Win-$TotalBet);
+$LoggedUser['Credits'] += ($Win-$TotalBet);
 
 //$Cache->delete_value('user_info_heavy_'.$UserID);
 $Cache->delete_value('user_stats_'.$UserID);
