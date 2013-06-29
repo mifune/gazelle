@@ -1280,15 +1280,15 @@ class TEXT {
     function is_color_attrib(&$Attrib) {
         global $ClassNames;  
          
-        $Attrib = strtolower($Attrib);
+        $Att = strtolower($Attrib);
         
         // convert class names to class colors
-        if (isset($ClassNames[$Attrib]['Color'])) $Attrib = '#' . $ClassNames[$Attrib]['Color'];
+        if (isset($ClassNames[$Att]['Color'])) $Attrib = '#' . $ClassNames[$Att]['Color'];
         // if in format #rgb hex then return as is
-        if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Attrib)) return true;
+        if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Att)) return true;
         
         // check and capture #rgba format
-        if (preg_match('/^#(?|([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})|([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1}))$/', $Attrib, $matches) ) {
+        if (preg_match('/^#(?|([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})|([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1}))$/', $Att, $matches) ) {
             // capture #rgba hex and convert into rgba(r,g,b,a) format (from base 16 to base 10 0->255)
             for($i=1;$i<4;$i++){
                 if (strlen($matches[$i])==1) $matches[$i] = "$matches[$i]$matches[$i]";
@@ -1303,7 +1303,7 @@ class TEXT {
         }
          
         // if not in #rgb or #rgba format then check for allowed colors
-        return in_array($Attrib, $this->get_allowed_colors());
+        return in_array($Att, $this->get_allowed_colors());
     }
     
 
