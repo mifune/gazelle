@@ -1239,7 +1239,8 @@ class TEXT {
 
                         $Array[$ArrayPos] = array('Type' => $TagName, 'Val' => $this->parse($Block));
                         if (isset($Attrib) && $MaxAttribs > 0) {
-                            $Array[$ArrayPos]['Attr'] = strtolower($Attrib);
+                            // $Array[$ArrayPos]['Attr'] = strtolower($Attrib);
+                            $Array[$ArrayPos]['Attr'] = $Attrib;
                         }
                     }
             }
@@ -1279,6 +1280,8 @@ class TEXT {
     function is_color_attrib(&$Attrib) {
         global $ClassNames;  
          
+        $Attrib = strtolower($Attrib);
+        
         // convert class names to class colors
         if (isset($ClassNames[$Attrib]['Color'])) $Attrib = '#' . $ClassNames[$Attrib]['Color'];
         // if in format #rgb hex then return as is
@@ -1311,7 +1314,7 @@ class TEXT {
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
             if ($attributes) {
-                foreach ($attributes as $att) {
+                foreach ($attributes as &$att) {
                     
                     if ($this->is_color_attrib($att)) {
                         $Elements['color'][] = $att;
