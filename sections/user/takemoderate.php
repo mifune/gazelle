@@ -757,12 +757,14 @@ if($SendConfirmMail) {
 }
 
 if ($MergeStatsFrom && check_perms('users_edit_ratio')) {
-	$DB->query("SELECT ID, Uploaded, Downloaded FROM users_main WHERE Username LIKE '".$MergeStatsFrom."'");
+	$DB->query("SELECT ID, Uploaded, Downloaded, Credits FROM users_main WHERE Username LIKE '".$MergeStatsFrom."'");
 	if($DB->record_count() > 0) {
-		list($MergeID, $MergeUploaded, $MergeDownloaded) = $DB->next_record();
-		$DB->query("UPDATE users_main AS um JOIN users_info AS ui ON um.ID=ui.UserID SET um.Uploaded = 0, um.Downloaded = 0, ui.AdminComment = CONCAT('".sqltime()." - Stats merged into http://".NONSSL_SITE_URL."/user.php?id=".$UserID." (".$Cur['Username'].") by ".$LoggedUser['Username']."\n', ui.AdminComment) WHERE ID = ".$MergeID);
+		list($MergeID, $MergeUploaded, $MergeDownloaded, $MergeCredits) = $DB->next_record();
+		$DB->query("UPDATE users_main AS um JOIN users_info AS ui ON um.ID=ui.UserID SET um.Uploaded = 0, um.Downloaded = 0, um.Credits = 0,
+			ui.AdminComment = CONCAT('".sqltime()." - Stats merged into http://".NONSSL_SITE_URL."/user.php?id=".$UserID." (".$Cur['Username'].") by ".$LoggedUser['Username']."\n', ui.AdminComment) WHERE ID = ".$MergeID);
 		$UpdateSet[]="Uploaded = Uploaded + '$MergeUploaded'";
 		$UpdateSet[]="Downloaded = Downloaded + '$MergeDownloaded'";
+		$UpdateSet[]="Credits = Credits + '$MergeCredits'";
 		$EditSummary[]="stats merged from http://".NONSSL_SITE_URL."/user.php?id=".$MergeID." (".$MergeStatsFrom.")";
 		$Cache->delete_value('users_stats_'.$UserID);
 		$Cache->delete_value('users_stats_'.$MergeID);
