@@ -390,7 +390,12 @@ function user_heavy_info($UserID) {
                     i.BlockPMs,
                     i.CommentsNotify,
                     i.TimeZone,
-               i.SuppressConnPrompt
+                    i.SuppressConnPrompt,
+                i.DisableForums,
+                i.DisableTagging,
+                i.DisableSignature,
+                i.DisableTorrentSig,
+                i.DisableIRC
 			FROM users_main AS m
 			INNER JOIN users_info AS i ON i.UserID=m.ID
 			WHERE m.ID='$UserID'");
