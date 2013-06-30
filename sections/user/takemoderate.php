@@ -767,8 +767,10 @@ if ($MergeStatsFrom && check_perms('users_edit_ratio')) {
 		$UpdateSet[]="Downloaded = Downloaded + '$MergeDownloaded'";
 		$UpdateSet[]="Credits = Credits + '$MergeCredits'";
 		$EditSummary[]="stats merged from http://".NONSSL_SITE_URL."/user.php?id=".$MergeID." (".$MergeStatsFrom.") - Added ".get_size($MergeUploaded)." uploaded / ".get_size($MergeDownloaded)." downloaded / ".$MergeCredits." credits";
-		$Cache->delete_value('users_stats_'.$UserID);
-		$Cache->delete_value('users_stats_'.$MergeID);
+		$Cache->delete_value('user_stats_'.$UserID);
+		$Cache->delete_value('user_stats_'.$MergeID);
+		$HeavyUpdates['Credits'] = (isset($HeavyUpdates['Credits']) ? $HeavyUpdates['Credits'] : $Cur['Credits']) + $MergeCredits;
+		$Cache->delete_value('user_info_heavy_'.$MergeID);
 	}
 }
 
