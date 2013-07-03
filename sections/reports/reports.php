@@ -225,11 +225,12 @@ $DB->set_query_id($Reports);
                                                        WHERE ID <= " . $ThingID . " 
                                                        AND collages_comments.CollageID = cc.CollageID) AS CommentNum,
                                      c.Name,
-                                     tc.UserID,
+                                     cc.UserID,
                                      u.Username
                                      FROM collages_comments AS cc
                                      LEFT JOIN collages AS c ON c.ID = cc.CollageID 
-                                     LEFT JOIN users_main AS u ON u.ID = tc.UserID WHERE cc.ID=" . $ThingID);
+                                     LEFT JOIN users_main AS u ON u.ID = cc.UserID 
+                                     WHERE cc.ID=" . $ThingID);
                 if ($DB->record_count() < 1) {
                     $Link = "No comment with the reported ID found";
                 } else {
