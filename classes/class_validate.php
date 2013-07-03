@@ -221,7 +221,7 @@ class VALIDATE {
 
 
                                     // get all the image urls in the field ; inside [img]url[/img] && [img=url] tags
-                                    $num = preg_match_all('#(?|\[thumb\](.*?)\[/thumb\]|\[img\](.*?)\[/img\]|\[img\=(.*?)\])#ism', $ValidateVar, $imageurls);
+                                    $num = preg_match_all('#(?|\[thumb\](.*?)\[/thumb\]|\[img\](.*?)\[/img\]|\[imgnm\](.*?)\[/imgnm\]|\](.*?)\[/imgalt\]|\[img\=(.*?)\])#ism', $ValidateVar, $imageurls);
 
                                     if($num && $num >= $MinImages) { // if there are no img tags then it validates 
                                         for ($j=0;$j<$num;$j++) {  
