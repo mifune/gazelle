@@ -115,7 +115,7 @@ show_header('Official Tags Manager','tagmanager');
                 </div>
             
                     <select id="permdeletetagid" name="permdeletetagid" 
-                            onclick="Get_Taglist('permdeletetagid', 'all')" >
+                            onclick="Get_Taglist_All('permdeletetagid', 'all')" >
                         <option value="0" selected="selected">click to load ALL tags (might take a while)&nbsp;</option>
                          
                     </select>
