@@ -361,8 +361,8 @@ foreach ($Collages as $Collage) {
                         <? } ?>
 		</td>
 		<td class="center"><?=(int)$NumTorrents?></td>
-        <td class="nobr"><?=time_diff($StartDate)?></td>
-        <td class="nobr"><?=time_diff($LastDate)?></td>
+        <td class=""><?=time_diff($StartDate)?></td>
+        <td class=""><?=time_diff($LastDate)?></td>
 		<td class="center"><?=format_username($UserID, $Username)?></td>
 	</tr>
 <? } ?>
