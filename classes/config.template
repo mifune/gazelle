@@ -116,6 +116,8 @@ $ForumsRevealVoters = array(15,21);
 $ForumsDoublePost = array();
 
 $CollageCats = array(0=>'Personal', 1=>'Theme', 2=>'Porn Star', 3=>'Studio', 4=>'Staff picks');
+$CollageIcons = array(0=>'col_personal.png', 1=>'col_themed.png', 2=>'col_pornstar.png', 3=>'col_studio.png', 4=>'col_staffpicks.png');
+
 $ArticleCats = array(0=>'Rules', 1=>'Help', 2=>'Hidden');
 $ArticleSubCats = array(0=>'Intro', 1=>'Other', 2=>'Rules', 3=>'Torrents', 4=>'IRC', 5=>'Uploading', 6=>'Site', 7=>'Guides', 8=>'Staff');
 

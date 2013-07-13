@@ -261,6 +261,9 @@ table.userinfo_stats td {
     margin: 0px;
 }
 
+#header_bottom ul li ul li {
+    white-space: nowrap;
+}
 #stats_block a, #stats_block a:visited, #header_bottom a, #header_bottom a:visited {
     text-decoration: none;
     color: #fff;

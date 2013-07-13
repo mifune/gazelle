@@ -314,6 +314,9 @@ span.infinity {
     margin: 0px;
 }
 
+#header_bottom ul li ul li {
+    white-space: nowrap;
+}
 
 
 table.userinfo_stats, table.userinfo_stats tr, #staff table.userinfo_stats {

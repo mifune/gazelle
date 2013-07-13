@@ -116,7 +116,8 @@ if (isset($_POST['deletetagperm'])) {
         $DB->query("DELETE FROM requests_tags WHERE TagID = '$TagID'");
 
         foreach ($RequestIDs as $RID) {
-            update_sphinx_requests($RID); // update sphinx requests delta
+            // update_sphinx_requests($RID); // update sphinx requests delta
+            $Cache->delete_value('request_'.$RID);
         }
         
         $Message .= "Permanently deleted tag $TagName.";
