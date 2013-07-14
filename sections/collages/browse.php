@@ -148,8 +148,8 @@ if(!empty($Search)) {
 }
 
 if(!empty($Tags)) {
-	$SQL.= " AND TagList LIKE '%";
-	$SQL .= implode("%' AND TagList LIKE '%", $Tags);
+	$SQL.= " AND c.TagList LIKE '%";
+	$SQL .= implode("%' AND c.TagList LIKE '%", $Tags);
 	$SQL .= "%'";
 }
 
@@ -174,13 +174,13 @@ if(!empty($_GET['userid'])) {
 		}
 	} else {
 		if (!check_paranoia('collages', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
-		$SQL .= " AND UserID='".$_GET['userid']."'";
+		$SQL .= " AND c.UserID='".$_GET['userid']."'";
 	}
 	$Categories[] = 0;
 }
 
 if(!empty($Categories)) {
-	$SQL.=" AND CategoryID IN(".db_string(implode(',',$Categories)).")";
+	$SQL.=" AND c.CategoryID IN(".db_string(implode(',',$Categories)).")";
 }
 
 if ($_GET['action'] == 'mine') {
