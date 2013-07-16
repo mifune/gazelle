@@ -1,46 +1,8 @@
 <?
-/*
-if (!list($Labels,$InFlow,$OutFlow,$NetFlow,$Max) = $Cache->get_value('torrents_timeline')) {
-	$DB->query("SELECT DATE_FORMAT(Time,'%b \'%y') AS Month, COUNT(ID) FROM log WHERE Message LIKE 'Torrent % was uploaded by %' GROUP BY Month ORDER BY Time DESC LIMIT 1, 12");
-	$TimelineIn = array_reverse($DB->to_array());
-	$DB->query("SELECT DATE_FORMAT(Time,'%b \'%y') AS Month, COUNT(ID) FROM log WHERE Message LIKE 'Torrent % was deleted %' GROUP BY Month ORDER BY Time DESC LIMIT 1, 12");
-	$TimelineOut = array_reverse($DB->to_array());
-	$DB->query("SELECT DATE_FORMAT(Time,'%b \'%y') AS Month, COUNT(ID) FROM torrents GROUP BY Month ORDER BY Time DESC LIMIT 1, 12");
-	$TimelineNet = array_reverse($DB->to_array());
 
-	foreach($TimelineIn as $Month) {
-		list($Label,$Amount) = $Month;
-		if ($Amount > $Max) {
-			$Max = $Amount;
-		}
-	}
-	foreach($TimelineOut as $Month) {
-		list($Label,$Amount) = $Month;
-		if ($Amount > $Max) {
-			$Max = $Amount;
-		}
-	}
-	foreach($TimelineNet as $Month) {
-		list($Label,$Amount) = $Month;
-		if ($Amount > $Max) {
-			$Max = $Amount;
-		}
-	}
-	foreach($TimelineIn as $Month) {
-		list($Label,$Amount) = $Month;
-		$Labels[] = $Label;
-		$InFlow[] = number_format(($Amount/$Max)*100,4);
-	}
-	foreach($TimelineOut as $Month) {
-		list($Label,$Amount) = $Month;
-		$OutFlow[] = number_format(($Amount/$Max)*100,4);
-	}
-	foreach($TimelineNet as $Month) {
-		list($Label,$Amount) = $Month;
-		$NetFlow[] = number_format(($Amount/$Max)*100,4);
-	}
-	$Cache->cache_value('torrents_timeline',array($Labels,$InFlow,$OutFlow,$NetFlow,$Max),mktime(0,0,0,date('n')+1,2)); //Tested: fine for dec -> jan
-}  */
+if (!check_perms('site_stats_advanced')) error(403);
+
+
 
 include_once(SERVER_ROOT.'/classes/class_charts.php');
 $DB->query("SELECT tg.NewCategoryID, COUNT(t.ID) AS Torrents 

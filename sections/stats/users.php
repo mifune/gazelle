@@ -1,4 +1,6 @@
 <?
+if (!check_perms('site_stats_advanced')) error(403);
+
 if (!list($Countries,$Rank,$CountryUsers,$CountryMax,$CountryMin,$LogIncrements,$CountryUsersNum,$CountryName) = $Cache->get_value('geodistribution')) {
 	include_once(SERVER_ROOT.'/classes/class_charts.php');
 	$DB->query('SELECT Code, Users, country FROM users_geodistribution AS ug LEFT JOIN countries AS c ON c.cc=ug.Code ORDER BY Users DESC');
@@ -50,10 +52,42 @@ if(!$ClassDistribution = $Cache->get_value('class_distribution')) {
 		$Pie->add($Label,$Users);
 	}
 	$Pie->transparent();
-	$Pie->color('FF33CC');
+	$Pie->color('FF11aa');
 	$Pie->generate();
 	$ClassDistribution = $Pie->url();
 	$Cache->cache_value('class_distribution',$ClassDistribution,3600*36); // 24*14
+}
+if(!$ClassDistributionWeek = $Cache->get_value('class_distribution_wk')) {
+	include_once(SERVER_ROOT.'/classes/class_charts.php');
+	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID 
+                WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*7, true)."' GROUP BY p.Name ORDER BY Users DESC");
+	$ClassSizes = $DB->to_array();
+	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	foreach($ClassSizes as $ClassSize) {
+		list($Label,$Users) = $ClassSize;
+		$Pie->add($Label,$Users);
+	}
+	$Pie->transparent();
+	$Pie->color('FF11aa');
+	$Pie->generate();
+	$ClassDistributionWeek = $Pie->url();
+	$Cache->cache_value('class_distribution_wk',$ClassDistributionWeek,3600*36); // 24*14
+}
+if(!$ClassDistributionMonth = $Cache->get_value('class_distribution_month')) {
+	include_once(SERVER_ROOT.'/classes/class_charts.php');
+	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID 
+                WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*30, true)."' GROUP BY p.Name ORDER BY Users DESC");
+	$ClassSizes = $DB->to_array();
+	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	foreach($ClassSizes as $ClassSize) {
+		list($Label,$Users) = $ClassSize;
+		$Pie->add($Label,$Users);
+	}
+	$Pie->transparent();
+	$Pie->color('FF11aa');
+	$Pie->generate();
+	$ClassDistributionMonth = $Pie->url();
+	$Cache->cache_value('class_distribution_month',$ClassDistributionMonth,3600*36); // 24*14
 }
 if(!$PlatformDistribution = $Cache->get_value('platform_distribution')) {
 	include_once(SERVER_ROOT.'/classes/class_charts.php');
@@ -376,7 +410,15 @@ show_header('User Statistics', 'charts,jquery');
     <div class="head">User Classes</div>
     <div class="box pad center">
         <h1>User Classes</h1>
-          <img src="<?=$ClassDistribution?>" />
+        <div>
+        [<a onclick="$('#classdist2').hide(); $('#classdist3').hide(); $('#classdist1').show(); return false;" href="#" >active</a>]&nbsp;&nbsp;&nbsp;
+        [<a onclick="$('#classdist1').hide(); $('#classdist2').hide(); $('#classdist3').show(); return false;" href="#" >last month</a>]&nbsp;&nbsp;&nbsp;
+        [<a onclick="$('#classdist1').hide(); $('#classdist3').hide(); $('#classdist2').show(); return false;" href="#" >last week</a>]&nbsp;&nbsp;&nbsp;
+        </div>
+        
+        <img id="classdist1" src="<?=$ClassDistribution?>" />
+        <img id="classdist2" src="<?=$ClassDistributionWeek?>" class="hidden" />
+        <img id="classdist3" src="<?=$ClassDistributionMonth?>" class="hidden" />
     </div>
     <br />
     <div class="head">User Platforms</div>
