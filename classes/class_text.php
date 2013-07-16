@@ -1283,7 +1283,10 @@ class TEXT {
         $Att = strtolower($Attrib);
         
         // convert class names to class colors
-        if (isset($ClassNames[$Att]['Color'])) $Attrib = '#' . $ClassNames[$Att]['Color'];
+        if (isset($ClassNames[$Att]['Color'])) {
+            $Attrib = '#' . $ClassNames[$Att]['Color'];
+            $Att = strtolower($Attrib);
+        }
         // if in format #rgb hex then return as is
         if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Att)) return true;
         
