@@ -59,7 +59,8 @@ if (isset($_REQUEST['act']) && $_REQUEST['act']=="recover") {
 						SET m.PassHash='".db_string(make_hash($_REQUEST['password'],$Secret))."',
 						m.Secret='".db_string($Secret)."',
 						i.ResetKey='',
-						i.ResetExpires='0000-00-00 00:00:00' 
+						i.ResetExpires='0000-00-00 00:00:00',
+						i.AdminComment=CONCAT( '".sqltime()." - User reset password using email recovery link\n', i.AdminComment) 
 						WHERE m.ID='".db_string($UserID)."' 
 						AND i.UserID=m.ID");
 					$Reset = true; // Past tense form of "to reset", meaning that password has now been reset
