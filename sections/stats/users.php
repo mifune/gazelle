@@ -46,7 +46,7 @@ if(!$ClassDistribution = $Cache->get_value('class_distribution')) {
 	include_once(SERVER_ROOT.'/classes/class_charts.php');
 	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID WHERE m.Enabled='1' GROUP BY p.Name ORDER BY Users DESC");
 	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
 	foreach($ClassSizes as $ClassSize) {
 		list($Label,$Users) = $ClassSize;
 		$Pie->add($Label,$Users);
@@ -62,7 +62,7 @@ if(!$ClassDistributionWeek = $Cache->get_value('class_distribution_wk')) {
 	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID 
                 WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*7, true)."' GROUP BY p.Name ORDER BY Users DESC");
 	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
 	foreach($ClassSizes as $ClassSize) {
 		list($Label,$Users) = $ClassSize;
 		$Pie->add($Label,$Users);
@@ -78,7 +78,7 @@ if(!$ClassDistributionMonth = $Cache->get_value('class_distribution_month')) {
 	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID 
                 WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*30, true)."' GROUP BY p.Name ORDER BY Users DESC");
 	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
 	foreach($ClassSizes as $ClassSize) {
 		list($Label,$Users) = $ClassSize;
 		$Pie->add($Label,$Users);
