@@ -21,7 +21,7 @@ function CursorToEnd(textarea){
 function Load_Cookie()  {
 			 
 	if(jQuery.cookie('searchPanelState') == undefined) {
-		jQuery.cookie('searchPanelState', 'expanded');
+		jQuery.cookie('searchPanelState', 'expanded', { expires: 100 });
 	}
 	//var state = jQuery.cookie('searchPanelState');
       
@@ -37,10 +37,10 @@ function Load_Cookie()  {
 function Panel_Toggle() { 
     jQuery('#search_box').slideToggle('slow', function() { 
         if(jQuery.cookie('searchPanelState') == 'expanded') {
-            jQuery.cookie('searchPanelState', 'collapsed');
+            jQuery.cookie('searchPanelState', 'collapsed', { expires: 100 });
             jQuery('#search_button').text('Open Search Center');
         } else {
-            jQuery.cookie('searchPanelState', 'expanded');
+            jQuery.cookie('searchPanelState', 'expanded', { expires: 100 });
             jQuery('#search_button').text('Close Search Center');
         }
     });
