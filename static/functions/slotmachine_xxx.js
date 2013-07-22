@@ -65,7 +65,7 @@ function Pull_Lever(){
     var num_bets = parseInt($('#numbets').raw().value);
     var bet_amount = parseInt($('#betamount').raw().value);
     bet = num_bets * bet_amount;
-    if ( parseInt($('#winnings').raw().innerHTML ) < bet ) {
+    if ( parseInt($('#winnings').raw().innerHTML.replace(/,/gi, '') ) < bet ) {
         alert('you do not have enough credits to bet ' + bet + ' credits');
         bet=0;
         return;
