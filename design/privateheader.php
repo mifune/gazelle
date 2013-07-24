@@ -677,6 +677,10 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
                                 
                                 <li id="nav_sandbox" class="normal"><a href="sandbox.php">Sandbox</a></li>
                                 
+<?          if ( check_perms('site_play_slots') ) {  ?>
+                                <li id="nav_slots" class="normal"><a href="bonus.php?action=slot">Slot Machine</a></li>
+<?          } ?>
+                                
                         <!--    <li id="nav_collages" class="normal"><a href="collages.php">Collages</a></li>
                                 <li id="nav_logs" class="normal"><a onmousedown="Stats('logs');" href="log.php">Logs</a></li>
                                 <li id="nav_conncheck" class="normal"><a onmousedown="Stats('conncheck');" href="user.php?action=connchecker">Conn-Checker</a></li> -->
