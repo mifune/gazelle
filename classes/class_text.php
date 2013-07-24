@@ -1433,7 +1433,7 @@ class TEXT {
     function to_html($Array) {
         global $LoggedUser;
         $this->Levels++;
-        if ($this->Levels > 10) {
+        if ($this->Levels > 20) {
             return $Block['Val'];
         } // Hax prevention
         $Str = '';
