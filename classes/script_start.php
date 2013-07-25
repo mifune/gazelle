@@ -866,11 +866,11 @@ function get_article($TopicID){
 }
 
 
-function flood_check($Table = 'forums_posts' ){
+function flood_check($Table = 'forums_posts'){
     global $DB, $LoggedUser;
     if (check_perms('site_ignore_floodcheck')) return true;
-    if ( !in_array($Table, array('forums_posts','requests_comments','torrents_comments','collages_comments'))) error(0);
-    if ($Table=='collages_comments'){
+    if ( !in_array($Table, array('forums_posts','requests_comments','torrents_comments','collages_comments','sm_results'))) error(0);
+    if ($Table=='collages_comments' || $Table=='sm_results'){
         $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'".USER_FLOOD_POST_TIME."')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM $Table 
                   WHERE UserID = $LoggedUser[ID] 
                     AND UNIX_TIMESTAMP( Time)>= ( UNIX_TIMESTAMP(  UTC_TIMESTAMP())-'".USER_FLOOD_POST_TIME."')");
@@ -887,6 +887,20 @@ function flood_check($Table = 'forums_posts' ){
 }
 
 
+function flood_check_slots(){  // gives ajax error
+    global $DB, $LoggedUser;
+    if (check_perms('site_ignore_floodcheck')) return true;
+    
+    $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'5')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM sm_results 
+                  WHERE UserID = $LoggedUser[ID] 
+                    AND UNIX_TIMESTAMP( Time)>= ( UNIX_TIMESTAMP(  UTC_TIMESTAMP())-'5')");
+    
+    if ($DB->record_count()==0) return true;
+    else {
+        list($Secs) = $DB->next_record();
+        return (int)$Secs;
+    }
+}
 
 
 

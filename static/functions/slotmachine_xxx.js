@@ -60,6 +60,7 @@ function PlaySound(wav){
 	$('#sound').raw().innerHTML = '<embed src="static/common/casino/' + wav + '" hidden="true" autostart="true" loop="false" />';
 }
    
+
 function Pull_Lever(){
     if (count>0) return; // make them wait!
     var num_bets = parseInt($('#numbets').raw().value);
@@ -84,7 +85,14 @@ function Pull_Lever(){
     }
     $('#lever').raw().setAttribute("src", 'static/common/casino/leverDown.png');
     if ($('#playsound').raw().checked) PlaySound("wheelspin.wav");
-    ajax.get("?action=slot_result&bet="+bet_amount+"&numbets="+num_bets, function (response) {
+    
+	var ToPost = [];
+	ToPost['auth'] = authkey;
+	ToPost['bet'] = bet_amount;
+	ToPost['numbets'] = num_bets;
+ 
+    ajax.post("?action=slot_result", ToPost, function(response){  // "form" + postid
+	//ajax.get("?action=slot_result&bet="+bet_amount+"&numbets="+num_bets, function (response) {
         var x = json.decode(response); 
         setTimeout("leverup();", 800);
         if ( is_array(x)){

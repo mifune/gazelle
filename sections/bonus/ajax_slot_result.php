@@ -12,15 +12,30 @@ include(SERVER_ROOT.'/sections/bonus/slot_xxx_arrays.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
+
+$FloodCheck = $Cache->get_value('slots_floodcheck_'.$LoggedUser['ID']);
+if($FloodCheck !== false) ajax_error("You must wait 5 secs before playing again");
+$Cache->cache_value('slots_floodcheck_'.$LoggedUser['ID'], true, 5);
+
+
+/*
+$err = flood_check_slots();
+if ($err!==true) {
+    ajax_error("You must wait $err secs before playing again");
+} */
+
 // this might need adjusting
 $MaxBet = 100;
 
-$BetAmount = (int)$_REQUEST['bet'];
-if(!$BetAmount) ajax_error('No bet');
+$BetAmount = (int)$_POST['bet'];
+if(!$BetAmount) {
+    if ( (int)$_GET['bet'] > 0 ) ajax_error('cheeky! - you have been reported for trying to haxx0r the slot machine!');
+    else ajax_error('No bet');
+}
 if($BetAmount>$MaxBet) ajax_error('You cannot bet more than '.  number_format($MaxBet).' credits');
 
 $UserID = (int)$LoggedUser['ID'];
-$NumBets = min( max((int)$_REQUEST['numbets'], 1), 3);
+$NumBets = min( max((int)$_POST['numbets'], 1), 3);
 $TotalBet = $NumBets * $BetAmount;
 
 if($LoggedUser['TotalCredits']<$TotalBet) ajax_error("Not enough credits to bet ".number_format ($TotalBet));
