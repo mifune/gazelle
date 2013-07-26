@@ -1003,6 +1003,7 @@ CREATE TABLE IF NOT EXISTS `reportsv2` (
   `ExtraID` text,
   `Link` text,
   `LogMessage` text,
+  `Credit` enum('0','1') NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   KEY `Status` (`Status`),
   KEY `Type` (`Type`(1)),

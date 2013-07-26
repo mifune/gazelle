@@ -60,8 +60,17 @@ function PlaySound(wav){
 	$('#sound').raw().innerHTML = '<embed src="static/common/casino/' + wav + '" hidden="true" autostart="true" loop="false" />';
 }
    
+
 function Pull_Lever(){
     if (count>0) return; // make them wait!
+    var num_bets = parseInt($('#numbets').raw().value);
+    var bet_amount = parseInt($('#betamount').raw().value);
+    bet = num_bets * bet_amount;
+    if ( parseInt($('#winnings').raw().innerHTML.replace(/,/gi, '') ) < bet ) {
+        alert('you do not have enough credits to bet ' + bet + ' credits');
+        bet=0;
+        return;
+    }
     winningreels= new Array(3);
     count = 90; 
     animateMS=10;
@@ -76,10 +85,14 @@ function Pull_Lever(){
     }
     $('#lever').raw().setAttribute("src", 'static/common/casino/leverDown.png');
     if ($('#playsound').raw().checked) PlaySound("wheelspin.wav");
-    var num_bets = parseInt($('#numbets').raw().value);
-    var bet_amount = parseInt($('#betamount').raw().value);
-    bet = num_bets * bet_amount;
-    ajax.get("?action=slot_result&bet="+bet_amount+"&numbets="+num_bets, function (response) {
+    
+	var ToPost = [];
+	ToPost['auth'] = authkey;
+	ToPost['bet'] = bet_amount;
+	ToPost['numbets'] = num_bets;
+ 
+    ajax.post("?action=slot_result", ToPost, function(response){  // "form" + postid
+	//ajax.get("?action=slot_result&bet="+bet_amount+"&numbets="+num_bets, function (response) {
         var x = json.decode(response); 
         setTimeout("leverup();", 800);
         if ( is_array(x)){
@@ -126,7 +139,6 @@ function animate(){
             $('#winnings').raw().innerHTML = addCommas( parseInt( $('#winnings').raw().innerHTML.replace(/,/gi, '') )+won-bet);
             $('#result').raw().innerHTML = won>0?'*Win* ' +won:'';
             count=0;
-            //setTimeout("Pull_Lever();", 400);
         }
     }
     if (stopped[3]==0){

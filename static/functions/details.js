@@ -172,12 +172,12 @@ function Select_Reason(overwrite_warn){
 
 function Tools_Toggle() {
     if ($('#slide_tools_button').raw().innerHTML=='Hide Tools'){
-        jQuery.cookie('torrentDetailsToolState', 'collapsed');
+        jQuery.cookie('torrentDetailsToolState', 'collapsed', { expires: 100 });
         $('#slide_tools_button').raw().innerHTML=('Show Tools');
         jQuery('#staff_tools').hide();
                             
     } else{
-        jQuery.cookie('torrentDetailsToolState', 'expanded');
+        jQuery.cookie('torrentDetailsToolState', 'expanded', { expires: 100 });
         $('#slide_tools_button').raw().innerHTML=('Hide Tools');
         jQuery('#staff_tools').show();
     }
@@ -190,7 +190,7 @@ function Load_Tools_Cookie()  {
 	var button = jQuery('#slide_tools_button');
     
 	if(jQuery.cookie('torrentDetailsToolState') == undefined) {
-		jQuery.cookie('torrentDetailsToolState', 'expanded');
+		jQuery.cookie('torrentDetailsToolState', 'expanded', { expires: 100 });
 	}
 	if(jQuery.cookie('torrentDetailsToolState') == 'collapsed') {
 		panel.hide();
@@ -200,10 +200,11 @@ function Load_Tools_Cookie()  {
       }
 }
 
+
 function Details_Toggle() {
-    var state = new Array();
-    state[1]=((jQuery('#coverimage').is(':hidden'))?'0':'1');
-    state[2]=((jQuery('#tag_container').is(':hidden'))?'0':'1');
+    //var state = new Array();
+    //state[1]=((jQuery('#coverimage').is(':hidden'))?'0':'1');
+    //state[2]=((jQuery('#tag_container').is(':hidden'))?'0':'1');
     
     jQuery('#details_top').slideToggle('700', function(){
             
@@ -212,8 +213,10 @@ function Details_Toggle() {
         else
             jQuery('#slide_button').html('Hide Info');
             
-        state[0]=((jQuery('#details_top').is(':hidden'))?'0':'1');
-        jQuery.cookie('torrentDetailsState', json.encode(state));
+        //state[0]=((jQuery('#details_top').is(':hidden'))?'0':'1');
+        //jQuery.cookie('torrentDetailsState', json.encode(state), { expires: 100 });
+        
+        jQuery.cookie('torrentDetailsState', Get_Cookie(), { expires: 100 });
    
     });
     return false;
@@ -228,7 +231,7 @@ function Cover_Toggle() {
     else  
         jQuery('#covertoggle').html('(Hide)');
             
-    jQuery.cookie('torrentDetailsState', Get_Cookie());
+    jQuery.cookie('torrentDetailsState', Get_Cookie(), { expires: 100 });
     return false;
 }
 
@@ -241,7 +244,7 @@ function TagBox_Toggle() {
     else  
         jQuery('#tagtoggle').html('(Hide)');
             
-    jQuery.cookie('torrentDetailsState', Get_Cookie());
+    jQuery.cookie('torrentDetailsState', Get_Cookie(), { expires: 100 });
     return false;
 }
 
@@ -254,7 +257,7 @@ function Desc_Toggle() {
     else  
         jQuery('#desctoggle').html('(Hide)');
             
-    jQuery.cookie('torrentDetailsState', Get_Cookie());
+    jQuery.cookie('torrentDetailsState', Get_Cookie(), { expires: 100 });
     return false;
 }
 
@@ -267,7 +270,7 @@ function BuyFL_Toggle() {
     else  
         jQuery('#donatebutton').html('(Hide)');
             
-    jQuery.cookie('torrentDetailsState', Get_Cookie());
+    jQuery.cookie('torrentDetailsState', Get_Cookie(), { expires: 100 });
     return false;
 }
 
@@ -281,7 +284,7 @@ function Get_Cookie() {
 
 
 function Write_Tagsort_Cookie() {
-    jQuery.cookie('tagsort', json.encode([sort_type, sort_order]));
+    jQuery.cookie('tagsort', json.encode([sort_type, sort_order]), { expires: 100 });
 }
 
 function Load_Tagsort_Cookie()  {
@@ -328,7 +331,7 @@ function Load_Details_Cookie()  {
       } else 
 		jQuery('#donatebutton').text('(Hide)');
     
-	if(state[3] == '0') {
+	if(state[4] == '0') {
 		jQuery('#descbox').hide();
 		jQuery('#desctoggle').text('(Show)');
       } else 

@@ -12,14 +12,13 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
     $AllResults=array();
     $UniqueResults = 0;
     
-    //$Queries=array();
     foreach ($TorrentFilelist as $File) {
         list($Size, $Name) = $File;
    
-        //skip matching files < 1mb in size
+        // skip matching files < 1mb in size
         if ($Size < 1024*1024*2) continue; 
         
-        //preg_match_all('/\.([^\.]*)\{\{\{/ism', $FileList, $Extensions);
+        // skip image files
         preg_match('/\.([^\.]+)$/i', $Name, $ext);
         if (in_array($ext[1], $Image_FileTypes)) continue;
         
@@ -31,7 +30,6 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             $AllResults = array_merge($AllResults, $FakeEntry);
             continue;
         }
-        //$Queries[] =  $SS->EscapeString($Size);
         
         $Query = '@filelist "' . $SS->EscapeString($Size) .'"';  // . '"~20';
 
@@ -59,8 +57,15 @@ function check_size_dupes($TorrentFilelist, $ExcludeID=0) {
             }
             foreach ($Results['matches'] as $ID => $tdata) {
                 //if ( $tdata['ID']==$ExcludeID || isset( $AllResults[$tdata['ID']]) ) unset($Results['matches'][$ID]);
-                if ( $tdata['ID']==$ExcludeID ) unset($Results['matches'][$ID]);
-                else $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
+                if ( $tdata['ID']==$ExcludeID ) {
+                    unset($Results['matches'][$ID]);
+                }
+                elseif ( (time_ago($tdata['Torrents'][$ID]['Time']) > 24*3600*EXCLUDE_DUPES_AFTER_DAYS) &&
+                            ($tdata['Torrents'][$ID]['Seeders']< EXCLUDE_DUPES_SEEDS) ) {
+                    unset($Results['matches'][$ID]);
+                } else {
+                    $Results['matches'][$ID]['dupedfile'] = "$Name (".  get_size($Size).")";
+                }
             }
             if (count($Results['matches'])>0) {
                 $UniqueResults++;

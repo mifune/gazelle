@@ -59,7 +59,8 @@ if (isset($_REQUEST['act']) && $_REQUEST['act']=="recover") {
 						SET m.PassHash='".db_string(make_hash($_REQUEST['password'],$Secret))."',
 						m.Secret='".db_string($Secret)."',
 						i.ResetKey='',
-						i.ResetExpires='0000-00-00 00:00:00' 
+						i.ResetExpires='0000-00-00 00:00:00',
+						i.AdminComment=CONCAT( '".sqltime()." - User reset password using email recovery link\n', i.AdminComment) 
 						WHERE m.ID='".db_string($UserID)."' 
 						AND i.UserID=m.ID");
 					$Reset = true; // Past tense form of "to reset", meaning that password has now been reset
@@ -255,10 +256,10 @@ else {
 
 						if(isset($_POST['keeplogged']) && $_POST['keeplogged']) {
 							$KeepLogged = 1;
-							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false,true);
+							setcookie('session', $Cookie,time()+60*60*24*365,'/','',false);
 						} else {
 							$KeepLogged = 0;
-							setcookie('session', $Cookie,0,'/','',false,true);
+							setcookie('session', $Cookie,0,'/','',false);
 						}
 						
 						//TODO: another tracker might enable this for donors, I think it's too stupid to bother adding that

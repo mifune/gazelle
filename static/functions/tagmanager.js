@@ -26,6 +26,23 @@ function Clear_Multi() {
 }
 
 
+function Get_Taglist_All(select_id, char_search) {
+    //only load each taglist once
+    if (in_array(char_search, started)) return;
+    //record if we started fetching this one already
+    started.push(char_search);
+ 
+    
+    ajax.get('ajax.php?action=get_taglist&char='+char_search, function(response) {
+        var x = json.decode(response);
+        if ( is_array(x)){
+            $('#'+select_id).raw().innerHTML = x[0];
+        } else {
+            alert(x);
+        }
+    });
+}
+
 function Get_Taglist(select_id, char_search) {
     //only load each taglist once
     if (in_array(char_search, started)) return;
@@ -33,7 +50,7 @@ function Get_Taglist(select_id, char_search) {
     started.push(char_search);
  
     var uses = '';
-    if ($('#excludeuses').raw().checked){
+    if (!$('#excludeuses') || $('#excludeuses').raw().checked){
         var numuses = parseInt($('#numuses').raw().value);
         if (numuses>0) uses = '&minuses=' + numuses;
     }
@@ -47,7 +64,6 @@ function Get_Taglist(select_id, char_search) {
         }
     });
 }
-
 
         
 function Check_Taglist() {
