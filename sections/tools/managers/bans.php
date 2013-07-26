@@ -29,7 +29,7 @@ if (isset($_POST['submit'])) {
 			if(empty($_POST['id']) || !is_number($_POST['id'])) {
 				error(404);
 			}
-            $DB->query("SELECT EndTime FROM ip_bans WHERE ID='$_POST[id]'");
+            $DB->query("SELECT Endtime FROM ip_bans WHERE ID='$_POST[id]'");
             list($EndTime) = $DB->next_record();
             if ($EndHours != 1 && $time != $EndTime) {
                 $SQL_ENDTIME = "EndTime='$time',";
@@ -223,7 +223,7 @@ $endtime = display_str($_GET['uend']);
                         <option value="168">1 week</option>
                         <option value="336">2 weeks</option>
                         <option value="672">4 weeks</option>
-                        <option value="0" <?=(!$EndTime)?'selected="seleced"':''?>>Never</option>
+                        <option value="0" <?=(!$EndTime || $EndTime=='0000-00-00 00:00:00')?'selected="seleced"':''?>>Never</option>
                     </select>
                 </td>
                 <td>
