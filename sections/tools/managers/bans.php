@@ -18,36 +18,60 @@ if (isset($_POST['submit'])) {
 		$Notes = db_string($_POST['notes']);
 		$Start = ip2unsigned($_POST['start']); //Sanitized by Validation regex
 		$End = ip2unsigned($_POST['end']); //See above
-
+        $EndHours = db_string($_POST['endtime']);
+         
+        $time = '0000-00-00 00:00:00';
+        if ($EndHours > 1) {
+            $time = time_plus( 3600*$EndHours );
+        }
+        
 		if($_POST['submit'] == 'Edit'){ //Edit
 			if(empty($_POST['id']) || !is_number($_POST['id'])) {
 				error(404);
 			}
+            $DB->query("SELECT EndTime FROM ip_bans WHERE ID='$_POST[id]'");
+            list($EndTime) = $DB->next_record();
+            if ($EndHours != 1 && $time != $EndTime) {
+                $SQL_ENDTIME = "EndTime='$time',";
+            } else  $SQL_ENDTIME = '';
+            
 			$DB->query("UPDATE ip_bans SET
 				FromIP=$Start,
 				ToIP='$End',
+                $SQL_ENDTIME
 				Reason='$Notes'
-				WHERE ID='".$_POST['id']."'");
+				WHERE ID='$_POST[id]'");
 			$Bans = $Cache->get_value('ip_bans');
 			$Cache->begin_transaction();
 			$Cache->update_row($_POST['id'], array($_POST['id'], $Start, $End));
 			$Cache->commit_transaction();
 		} else { //Create
+            $Username = trim($_POST['user']);
+            if ($Username) {
+                $UserID = get_userid($Username);
+                if (!$UserID) error("Could not find User '$Username'");
+            } else 
+                $UserID=0;
+            
 			$DB->query("INSERT INTO ip_bans
-				(FromIP, ToIP, Reason) VALUES
-				('$Start','$End', '$Notes')");
+				(FromIP, ToIP, UserID, StaffID, EndTime, Reason) VALUES
+				('$Start','$End', '$UserID', '$LoggedUser[ID]', '$time', '$Notes')");
 			$ID = $DB->inserted_id();
 			$Bans = $Cache->get_value('ip_bans');
 			$Bans[$ID] = array($ID, $Start, $End);
 			$Cache->cache_value('ip_bans', $Bans, 0);
 		}
 	}
+    
+    header('Location: tools.php?action=ip_ban');
+    die();
 }
 
-define('BANS_PER_PAGE', '20');
+define('BANS_PER_PAGE', '50');
+
 list($Page,$Limit) = page_limit(BANS_PER_PAGE);
 
-$sql = "SELECT SQL_CALC_FOUND_ROWS ID, FromIP, ToIP, Reason FROM ip_bans AS i ";
+$sql = "SELECT SQL_CALC_FOUND_ROWS ID, FromIP, ToIP, UserID, StaffID, EndTime, Reason FROM ip_bans AS i ";
 
 if(!empty($_REQUEST['notes'])) {
 	$sql .= "WHERE Reason LIKE '%".db_string($_REQUEST['notes'])."%' ";
@@ -63,15 +87,33 @@ if(!empty($_REQUEST['ip']) && preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/',
 
 $sql .= "ORDER BY FromIP ASC";
 $sql .= " LIMIT ".$Limit;
-$Bans = $DB->query($sql);
+//$Bans = $DB->query($sql);
+$DB->query($sql);
+$Bans = $DB->to_array();
 
 $DB->query('SELECT FOUND_ROWS()');
 list($Results) = $DB->next_record();
 
 $PageLinks=get_pages($Page,$Results,BANS_PER_PAGE,11);
 
-show_header('IP Bans');
-$DB->set_query_id($Bans);
+show_header('IP Bans','bbcode');
+//$DB->set_query_id($Bans);
+
+
+$userid = $_GET['userid'];
+if($userid){
+    $UserInfo = user_info($userid);
+    $username = $UserInfo['Username'];
+}
+$startip = display_str($_GET['uip']);  
+$endip = display_str($_GET['uip']);  
+$notes = display_str($_GET['unotes']);
+$endtime = display_str($_GET['uend']);
+
+
+//$endHours = db_string($_POST['endtime']);
+         
+        
 ?>
 
 <div class="thin">
@@ -87,7 +129,6 @@ $DB->set_query_id($Bans);
                     </td>
                     <td class="label"><label for="notes">Notes:</label></td>
                     <td>
-                        <input type="hidden" name="action" value="ip_ban" />
                         <input type="text" id="notes" name="notes" size="60" value="<?=(!empty($_GET['notes']) ? display_str($_GET['notes']) : '')?>" />
                     </td>
                     <td>
@@ -103,20 +144,40 @@ $DB->set_query_id($Bans);
     <div class="linkbox"><?=$PageLinks?></div>
     <table width="100%">
         <tr class="colhead">
-            <td colspan="2">Range</td>
-            <td>Notes</td>
+            <td >Range</td>
+            <td class="center" style="width:100px">User</td>
+            <td class="center">Staff</td>
+            <td class="center">Endtime</td>
+            <td style="width:40%">Notes</td>
             <td>Submit</td>
         </tr>
         <tr class="rowa">
             <form action="" method="post">
                 <input type="hidden" name="action" value="ip_ban" />
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                <td colspan="2">
-                    <input type="text" size="12" name="start" />
-                    <input type="text" size="12" name="end" />
+                <td class="nobr">
+                    <input type="text" size="12" name="start" value="<?=$startip?>"/>
+                    <input type="text" size="12" name="end"  value="<?=$endip?>"/>
+                </td>
+                <td class="center" style="width:100px">
+                    <input type="text" class="medium" name="user"  value="<?=$username?>"/>
+                </td>
+                <td class="center">
+                    <?=$LoggedUser['Username']?>
+                </td>
+                <td class="center">
+                    <select name="endtime">
+                        <option value="24" <?if($endtime==24)echo'selected="selected" '?>>24 hours</option>
+                        <option value="48" <?if($endtime==48)echo'selected="selected" '?>>48 hours</option>
+                        <option value="168" <?if($endtime==168)echo'selected="selected" '?>>1 week</option>
+                        <option value="336" <?if($endtime==336)echo'selected="selected" '?>>2 weeks</option>
+                        <option value="672" <?if($endtime==672)echo'selected="selected" '?>>4 weeks</option>
+                        <option value="2016" <?if($endtime==2016)echo'selected="selected" '?>>12 weeks</option>
+                        <option value="0" <?if(!$endtime)echo'selected="selected" '?>>Never</option>
+                    </select>
                 </td>
                 <td>
-                    <input type="text" size="72" name="notes" />
+                    <textarea name="notes" id="notes0" class="long" rows="1" onkeyup="resize('notes0')" ><?=$notes?></textarea>
                 </td>
                 <td>
                     <input type="submit" name="submit" value="Create" />
@@ -126,24 +187,49 @@ $DB->set_query_id($Bans);
         </tr>
 <?
     $Row = 'a';
-    while(list($ID, $Start, $End, $Reason) = $DB->next_record()){
+    foreach($Bans as $Ban){
+        list($ID, $Start, $End, $UserID, $StaffID, $EndTime, $Reason) = $Ban;
+    //while(list($ID, $Start, $End, $UserID, $StaffID, $EndTime, $Reason) = $DB->next_record()){
         $Row = ($Row === 'a' ? 'b' : 'a');
         $Start=long2ip($Start);
         $End=long2ip($End);
+        $UserInfo = user_info($UserID);
+        $StaffInfo = user_info($StaffID);
 ?>
         <tr class="row<?=$Row?>">
             <form action="" method="post">
                 <input type="hidden" name="id" value="<?=$ID?>" />
                 <input type="hidden" name="action" value="ip_ban" />
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                <td colspan="2">
+                <td class="nobr">
                     <input type="text" size="12" name="start" value="<?=$Start?>" />
                     <input type="text" size="12" name="end" value="<?=$End?>" />
                 </td>
-                <td>
-                    <input type="text" size="72" name="notes" value="<?=$Reason?>" />
+                <td class="nobr center">
+ <?=  $UserID ? format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, false, $UserInfo['GroupPermissionID'], true, true) : '-';?>
+                 
+                </td>
+                <td class="nobr center">
+  <?= $StaffID ? format_username($StaffID, $StaffInfo['Username'], $StaffInfo['Donor'], $StaffInfo['Warned'], $StaffInfo['Enabled'], $StaffInfo['PermissionID'], false, false, $StaffInfo['GroupPermissionID'], true, true): '-';?>
+               
+                </td>
+                <td class="center">
+                    <select name="endtime">
+ <? if ($EndTime > sqltime()) { ?>
+                        <option value="1" selected="selected"><?=time_diff($EndTime, 2, false,false,0)?></option>
+ <? } ?>
+                        <option value="24">24 hours</option>
+                        <option value="48">48 hours</option>
+                        <option value="168">1 week</option>
+                        <option value="336">2 weeks</option>
+                        <option value="672">4 weeks</option>
+                        <option value="0" selected="<?=(!$EndTime)?'seleced':''?>">Never</option>
+                    </select>
                 </td>
                 <td>
+                    <textarea name="notes" id="notes<?=$ID?>" class="long" rows="1" onkeyup="resize('notes<?=$ID?>')" ><?=$Reason?></textarea>
+                </td>
+                <td class="nobr">
                     <input type="submit" name="submit" value="Edit" />
                     <input type="submit" name="submit" value="Delete" />
                 </td>

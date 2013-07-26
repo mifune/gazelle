@@ -136,7 +136,7 @@ if(empty($_POST['action'])) {
                     }
                 } else {
                     $Username = $item;
-                    $DB->query("SELECT ID FROM users_main WHERE Username = '$Username'");
+                    $DB->query("SELECT ID FROM users_main WHERE Username = '" . db_string($Username). "'");
                     if ($DB->record_count()==0) 
                         $result = '<img src="'. STATIC_SERVER .'common/symbols/warned.png" alt="No result" title="Could not find user '.$Username.'" /> Could not find user \''.$Username.'\'<br/>';
                     else  {

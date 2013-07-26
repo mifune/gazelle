@@ -488,6 +488,18 @@ function user_peers($UserID) {
 }
 
 
+function get_userid($Username) {
+    global $DB;
+    if(!$Username) return 0;
+    $DB->query("SELECT ID FROM users_main WHERE Username = '" . db_string($Username). "'");
+    if ($DB->record_count() > 0) {
+        list($UserID) = $DB->next_record();
+        return $UserID;
+   }
+   return 0;
+}
+
+
 /**
  * update a users site_options field with a new value
  * 
@@ -1036,7 +1048,7 @@ function lookup_ip($IP) {
 }
 
 
-function display_ip($IP, $cc = '?', $gethost = false) {
+function display_ip($IP, $cc = '?', $gethost = false, $baniplink=false) {
     global $DB, $Cache;
     //$cc = geoip($IP);
     if($gethost) $Line = get_host($IP);
@@ -1055,7 +1067,9 @@ function display_ip($IP, $cc = '?', $gethost = false) {
     }
     $Line .= ' [<a href="user.php?action=search&amp;ip_history=on&amp;ip=' . display_str($IP) . '&amp;matchtype=fuzzy" title="Search IP History">S</a>]';
     $Line .= ' [<a href="user.php?action=search&amp;tracker_ip=' . display_str($IP) . '&amp;matchtype=fuzzy" title="Search Tracker IP\'s">S</a>]';
-
+    if ($baniplink && check_perms('admin_manage_ipbans')){ 
+        $Line .= ' [<a href="tools.php?action=ip_ban&uip='.display_str($IP).'" title="Ban this users current IP ('.display_str($IP).')">B</a>]';
+    }
     return $Line;
 }
 /*
@@ -1693,14 +1707,15 @@ function make_hash($Str, $Secret) {
  */
 
 function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000-00-00 00:00:00', 
-                            $Enabled = 1, $Class = false, $Title = false, $DrawInBox = false, $GroupPerm = false, $DropDown=false) {
+                            $Enabled = 1, $Class = false, $Title = false, $DrawInBox = false, $GroupPerm = false, $DropDown=false, $Colorname=false) {
     global $DB, $Cache, $LoggedUser, $Classes;
     if ($UserID == 0) {
         return 'System';
     } elseif ($Username == '') {
         return "Unknown [$UserID]";
     }
-    $str = '<a href="user.php?id=' . $UserID . '">' . $Username . '</a>';
+    if ($Colorname) $str = '<a href="user.php?id=' . $UserID . '">' . '<span style="color:#'. $Classes[$Class]['Color'] . '">' .$Username . '</span></a>';
+    else $str = '<a href="user.php?id=' . $UserID . '">' . $Username . '</a>';
     if($DropDown && $LoggedUser['ID']!==$UserID){
         $ddlist = '<li><a href="user.php?id='.$UserID.'" title="View '.$Username.'\'s profile">View profile</a></li>';
         if(check_perms('users_mod')) {      //  $Classes[$Class]['Level']>=STAFF_LEVEL){
@@ -1744,9 +1759,9 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
     //$str.=(!$IsEnabled) ? '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' : '';
 
     if($GroupPerm) $str.= make_groupperm_string($GroupPerm, TRUE) ;  // ' (' . make_groupperm_string($GroupPerm, TRUE) . ')' ;
-    if($Class) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
+    if($Class && !$Colorname) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
     if($Title){
-        if($Class || $GroupPerm) $str.= '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' ;
+        if(($Class && !$Colorname) || $GroupPerm) $str.= '&nbsp;<span class="user_title">' . display_str($Title) . '</span>' ;
         else $str.= '&nbsp;(<span class="user_title">' . display_str($Title) . '</span>)' ;
     }
     if ($DrawInBox)

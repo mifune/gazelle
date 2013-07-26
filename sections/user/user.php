@@ -229,7 +229,10 @@ show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
 		$links2 .= '[<a href="reportsv2.php?view=reporter&amp;id='.$UserID.'">Reports</a>] ';
     }
     if (check_perms('users_mod')) {
-		$links2 .= '[<a href="userhistory.php?action=token_history&amp;userid='.$UserID.'">Slots</a>]';
+		$links2 .= '[<a href="userhistory.php?action=token_history&amp;userid='.$UserID.'">Slots</a>] ';
+    }
+    if (check_perms('admin_manage_ipbans')) {
+		$links2 .= '[<a href="tools.php?action=ip_ban&userid='.$UserID.'&uip='.display_str($IP).'" title="Ban this users current IP ('.display_str($IP).')">IP Ban</a>] ';
     }
  
     if ($links2) echo $links2;

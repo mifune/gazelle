@@ -190,10 +190,19 @@ These functions are run every hour.
 if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
 	echo "Ran hourly functions\n";
 	
+    // ------------- remove old ip bans ------------
+    
+    $DB->query("DELETE FROM ip_bans WHERE EndTime!='0000-00-00 00:00:00' AND EndTime<'$sqltime'");
+    
+    
+    
+    
     // ---------- remove old torrents_files_temp (can get left behind by aborted uploads) -------------
     
     $DB->query("DELETE FROM torrents_files_temp WHERE time < '".time_minus(3600*24)."'");  
         
+    
+    
     
     // ---------- remove old requests (and return bounties) -------------
     
