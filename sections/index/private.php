@@ -160,7 +160,10 @@ for($i = 0; $i < $Limit; $i++) {
                 
 <?      if (check_perms('site_view_stats')) { ?>
 				<li class="center">
-                    [<a href="stats.php?action=users">Users</a>] &nbsp;[<a href="stats.php?action=site">Site History</a>]
+<?          if (check_perms('site_stats_advanced')) { ?>
+                    [<a href="stats.php?action=users">Users</a>] &nbsp;
+<?          }   ?>
+                    [<a href="stats.php?action=site">Site History</a>]
 <?          if (check_perms('site_stats_advanced')) { ?>
                     &nbsp;[<a href="stats.php?action=torrents">Torrents</a>]
 <?          }   ?>

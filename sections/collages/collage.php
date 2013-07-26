@@ -272,9 +272,13 @@ if (check_perms('site_collages_manage') || ($CanEdit && !$Locked)) { ?>
 	</div>
 	<div class="sidebar">
 		<div class="head"><strong>Category</strong></div>
-		<div class="box">
-			<div class="pad"><a href="collages.php?action=search&amp;cats[<?=(int)$CollageCategoryID?>]=1"><?=$CollageCats[(int)$CollageCategoryID]?></a></div>
-		</div>
+		<div class="box pad">
+			<table class="center"><tr>
+                <td class="center"><h3><?=$CollageCats[(int)$CollageCategoryID]?></h3></td>
+                <td class="right"><a href="collages.php?action=search&amp;cats[<?=(int)$CollageCategoryID?>]=1"><img src="static/common/collageicons/<?=$CollageIcons[(int)$CollageCategoryID]?>" alt="<?=$CollageCats[(int)$CollageCategoryID]?>" title="<?=$CollageCats[(int)$CollageCategoryID]?>" /></a></td>
+                
+            </tr></table>
+        </div>
 <?
 if(check_perms('zip_downloader')){
 ?>

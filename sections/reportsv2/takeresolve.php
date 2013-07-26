@@ -252,7 +252,7 @@ if($DB->affected_rows() > 0 || !$Report) {
                 $SET .=",i.BonusLog=CONCAT_WS( '\n', '".db_string($Summary)."', i.BonusLog)";
                 
                 $DB->query("UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$ReporterID'");
-                $Cache->delete_value('users_stats_'.$ReporterID);
+                $Cache->delete_value('user_stats_'.$ReporterID);
             
                 $Body = "Thank-you for your {$ResolveType['title']} report re: [url=http://".NONSSL_SITE_URL."/torrents.php?torrentid=$TorrentID]{$RawName}[/url]\n\nYou received a bounty payment of $Bounty credits.";
                
