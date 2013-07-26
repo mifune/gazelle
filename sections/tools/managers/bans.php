@@ -223,7 +223,7 @@ $endtime = display_str($_GET['uend']);
                         <option value="168">1 week</option>
                         <option value="336">2 weeks</option>
                         <option value="672">4 weeks</option>
-                        <option value="0" selected="<?=(!$EndTime)?'seleced':''?>">Never</option>
+                        <option value="0" <?=(!$EndTime)?'selected="seleced"':''?>>Never</option>
                     </select>
                 </td>
                 <td>
