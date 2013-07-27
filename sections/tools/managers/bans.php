@@ -215,7 +215,7 @@ $endtime = display_str($_GET['uend']);
                 </td>
                 <td class="center">
                     <select name="endtime">
- <? if ($EndTime > sqltime()) { ?>
+ <? if ($EndTime !='0000-00-00 00:00:00') { ?>
                         <option value="1" selected="selected"><?=time_diff($EndTime, 2, false,false,0)?></option>
  <? } ?>
                         <option value="24">24 hours</option>
@@ -223,6 +223,7 @@ $endtime = display_str($_GET['uend']);
                         <option value="168">1 week</option>
                         <option value="336">2 weeks</option>
                         <option value="672">4 weeks</option>
+                        <option value="2016">12 weeks</option>
                         <option value="0" <?=(!$EndTime || $EndTime=='0000-00-00 00:00:00')?'selected="seleced"':''?>>Never</option>
                     </select>
                 </td>
