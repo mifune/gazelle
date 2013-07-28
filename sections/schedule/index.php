@@ -193,7 +193,9 @@ if($Hour != next_hour() || $_GET['runhour'] || isset($argv[2])){
     // ------------- remove old ip bans ------------
     
     $DB->query("DELETE FROM ip_bans WHERE EndTime!='0000-00-00 00:00:00' AND EndTime<'$sqltime'");
-    
+    if ($DB->affected_rows()>0){
+        $Cache->delete_value('ip_bans');
+    }
     
     
     

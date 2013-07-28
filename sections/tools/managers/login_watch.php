@@ -91,7 +91,7 @@ show_header('Login Watch');
         <td><a href="<?=header_link('Attempts') ?>">Attempts</a></td>
         <td><a href="<?=header_link('LastAttempt') ?>">Last Attempt</a></td>
         <td><a href="<?=header_link('Bans') ?>">Bans</a></td>
-        <td><a href="<?=header_link('BannedUntil') ?>">Remaining</a></td>
+        <td><a href="<?=header_link('BannedUntil') ?>">Banned Until</a></td>
 		<td style="width:160px">Submit</td> 
 	</tr>
 <?

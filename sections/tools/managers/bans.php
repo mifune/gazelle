@@ -7,7 +7,8 @@ if (isset($_POST['submit'])) {
 	if ($_POST['submit'] == 'Delete') { //Delete
 		if(!is_number($_POST['id']) || $_POST['id'] == ''){ error(0); }
 		$DB->query('DELETE FROM ip_bans WHERE ID='.$_POST['id']);
-		$Bans = $Cache->delete_value('ip_bans');
+		//$Bans = $Cache->delete_value('ip_bans');
+        $Cache->delete_value('ip_bans');
 	} else { //Edit & Create, Shared Validation
 		$Val->SetFields('start', '1','regex','You must inculde starting IP address.',array('regex'=>'/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/i'));
 		$Val->SetFields('end', '1','regex','You must inculde ending IP address.',array('regex'=>'/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/i'));
