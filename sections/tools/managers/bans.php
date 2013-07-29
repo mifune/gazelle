@@ -70,9 +70,49 @@ if (isset($_POST['submit'])) {
 
 define('BANS_PER_PAGE', '50');
 
+
+
+// The "order by x" links on columns headers
+function header_link($SortKey, $DefaultWay = "desc") {
+    global $OrderBy, $OrderWay;
+    if ($SortKey == $OrderBy) {
+        if ($OrderWay == "desc") {
+            $NewWay = "asc";
+        } else {
+            $NewWay = "desc";
+        }
+    } else {
+        $NewWay = $DefaultWay;
+    }
+
+    return "tools.php?action=ip_ban&order_way=" . $NewWay . "&amp;order_by=" . $SortKey . "&amp;" . get_url(array('action', 'order_way', 'order_by'));
+}
+
+
+if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('FromIP', 'Username', 'Staffname', 'EndTime', 'Notes'  ))) {
+    $_GET['order_by'] = 'FromIP';
+    $OrderBy = 'FromIP';   
+} else {
+    $OrderBy = $_GET['order_by'];
+}
+
+if (!empty($_GET['order_way']) && $_GET['order_way'] == 'desc') {
+    $OrderWay = 'desc';
+} else {
+    $_GET['order_way'] = 'asc';
+    $OrderWay = 'asc';
+}
+
+
+
 list($Page,$Limit) = page_limit(BANS_PER_PAGE);
 
-$sql = "SELECT SQL_CALC_FOUND_ROWS ID, FromIP, ToIP, UserID, StaffID, EndTime, Reason FROM ip_bans AS i ";
+
+$sql = "SELECT SQL_CALC_FOUND_ROWS 
+                i.ID, i.FromIP, i.ToIP, i.UserID, i.StaffID, i.EndTime, i.Reason as Notes, um.Username as Username, um2.Username as Staffname
+          FROM ip_bans AS i 
+     LEFT JOIN users_main as um ON i.UserID=um.ID
+     LEFT JOIN users_main as um2 ON i.StaffID=um2.ID";
 
 if(!empty($_REQUEST['notes'])) {
 	$sql .= "WHERE Reason LIKE '%".db_string($_REQUEST['notes'])."%' ";
@@ -86,8 +126,9 @@ if(!empty($_REQUEST['ip']) && preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/',
 	}
 }
 
-$sql .= "ORDER BY FromIP ASC";
-$sql .= " LIMIT ".$Limit;
+$sql .= " ORDER BY  $OrderBy $OrderWay";
+$sql .= " LIMIT $Limit";
+
 //$Bans = $DB->query($sql);
 $DB->query($sql);
 $Bans = $DB->to_array();
@@ -143,9 +184,11 @@ $endtime = display_str($_GET['uend']);
 
     <h2>Manage</h2>
     <div class="linkbox"><?=$PageLinks?></div>
+    
+    <div class="head">Create new IP ban</div>
     <table width="100%">
         <tr class="colhead">
-            <td >Range</td>
+            <td>Range</td>
             <td class="center" style="width:100px">User</td>
             <td class="center">Staff</td>
             <td class="center">Endtime</td>
@@ -185,6 +228,19 @@ $endtime = display_str($_GET['uend']);
                 </td>
 
             </form>
+        </tr>
+    </table>
+    
+    <br/>
+    <div class="head"><?=  str_plural('IP ban', $Results) ?> </div>
+    <table width="100%">
+        <tr class="colhead">
+            <td><a href="<?=header_link('FromIP') ?>">Range</a></td>
+            <td class="center" style="width:100px"><a href="<?=header_link('Username') ?>">User</a></td>
+            <td class="center"><a href="<?=header_link('Staffname') ?>">Staff</a></td>
+            <td class="center"><a href="<?=header_link('EndTime') ?>">Endtime</a></td>
+            <td style="width:40%"><a href="<?=header_link('Notes') ?>">Notes</a></td>
+            <td>Submit</td>
         </tr>
 <?
     $Row = 'a';
