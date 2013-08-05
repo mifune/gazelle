@@ -2219,19 +2219,23 @@ span.reported {
     color: red;
 }
 .reels, .reelsi {
-    background-color: #eee;
 }
 .reels.play {
-    background-color: #fff;
 }
 
 .reels img {
-    border: 3px solid #ddd;
+    background-color: #ddd;
+    border: 3px solid #ccc;
+}
+.reels.play img {
+    background-color: #fff;
+    border: 3px solid #bbb;
 }
 .reelsi img {
+    background-color: #e2e2e2;
     border: 1px solid #ccc;
 }
-img.win {
+.reels img.win {
     border: 3px solid black;  
 }
 img.win.flash {
@@ -2239,12 +2243,13 @@ img.win.flash {
 }
 .payout {
     width:74px;
-    vertical-align: middle;
+    vertical-align:top;
     display:inline-block;
     text-align: center;
     font-weight: bold;
     font-size: 14px;
     color:black;
+    padding-top:7px;
 }
 
 .fmresults td {

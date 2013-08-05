@@ -2453,7 +2453,7 @@ span.reported {
     color: red;
     float: none;
 }
-
+/*
 .reels, .reelsi {
     background-color: #ddd;
 }
@@ -2469,18 +2469,40 @@ span.reported {
 }
 img.win {
     border: 2px solid blue;  
+} */
+
+.reels, .reelsi {
+}
+.reels.play {
+}
+
+.reels img {
+    background-color: #ddd;
+    border: 3px solid #ccc;
+}
+.reels.play img {
+    background-color: #fff;
+    border: 3px solid #bbb;
+}
+.reelsi img {
+    background-color: #e2e2e2;
+    border: 1px solid #ccc;
+}
+.reels img.win {
+    border: 3px solid blue;  
 }
 img.win.flash {
     border: 2px solid gold; 
 }
 .payout {
     width:74px;
-    vertical-align: middle;
+    vertical-align: top;
     display:inline-block;
     text-align: center;
     font-weight: bold;
     font-size: 14px;
     color:black;
+    padding-top:7px;
 }
 
 .fmresults td {

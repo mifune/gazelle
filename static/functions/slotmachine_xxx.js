@@ -23,11 +23,12 @@ addDOMLoadEvent(Set_Interface);
 
 function Change_NumBets(){
     var num = parseInt($('#numbets').raw().value);
-    num++;
-    if(num>3)num=1;
+    num++;  // increment (change) value
+    if(num>3)num=1;  // rollover
     Set_NumBets_Interface(num);
 }
 function Set_NumBets_Interface(num){
+    if (!in_array(num, new Array(1,2,3))) num = 1;
     $('#numbets').raw().value = num;
     Toggle_Play_Row('a',num>2);
     Toggle_Play_Row('c',num>1);
@@ -48,6 +49,7 @@ function Change_Bet(){
     Set_Bet_Interface(num);
 }
 function Set_Bet_Interface(num){
+    if (!in_array(num, new Array(1,10,100))) num = 1;
     $('#betamount').raw().value = num;
     ajax.get("?action=ajax_slot_paytable&bet="+num, function (response) {
         $('#payout_table').html(response);
@@ -57,14 +59,19 @@ function Set_Bet_Interface(num){
     $('#betcnum').html(num);
 }
 function PlaySound(wav){
-	$('#sound').raw().innerHTML = '<embed src="static/common/casino/' + wav + '" hidden="true" autostart="true" loop="false" />';
+    if ($('#forcesound').raw().checked)
+        $('#sound').raw().innerHTML = '<embed src="static/common/casino/' + wav + '"  style="visibility:hidden;" autostart="true" loop="false" />';
+    else
+        $('#sound').raw().innerHTML = '<embed src="static/common/casino/' + wav + '" hidden="true" autostart="true" loop="false" />';
 }
    
 
 function Pull_Lever(){
     if (count>0) return; // make them wait!
     var num_bets = parseInt($('#numbets').raw().value);
+    if (!in_array(num_bets, new Array(1,2,3))) num_bets = 1;
     var bet_amount = parseInt($('#betamount').raw().value);
+    if (!in_array(bet_amount, new Array(1,10,100))) bet_amount = 1;
     bet = num_bets * bet_amount;
     if ( parseInt($('#winnings').raw().innerHTML.replace(/,/gi, '') ) < bet ) {
         alert('you do not have enough credits to bet ' + bet + ' credits');
@@ -85,6 +92,7 @@ function Pull_Lever(){
     }
     $('#lever').raw().setAttribute("src", 'static/common/casino/leverDown.png');
     if ($('#playsound').raw().checked) PlaySound("wheelspin.wav");
+    
     
 	var ToPost = [];
 	ToPost['auth'] = authkey;
@@ -163,8 +171,5 @@ function EndReel(x,pos){
     $('#reelb'+ x).raw().setAttribute("src", 'static/common/casino/' + reelPix[x][(pos+1)%20] + '.png');
     $('#reelc'+ x).raw().setAttribute("src", 'static/common/casino/' + reelPix[x][pos] + '.png');
 }
-
-
- 
 
 

@@ -21,6 +21,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
         
         <div class="head center"> payouts </div>
         <div class="box pad"> 
+            <div class="box pad center"><strong class="important_text">note:</strong> all winning lines must start with the left hand reel</div>
             <span id="payout_table" class="reelsi"><? print_payout_table($BetAmount) ?></span>
         </div> 
 <?  //if ( isset($_REQUEST['showreels'])){    ?>
@@ -46,7 +47,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
 <?  //}   ?>
     </div>
     
-    <div class=" " style="position:relative;width:660px;margin:20px 330px 50px auto;">
+    <div class=" " style="position:relative;width:666px;margin:20px 330px 50px auto;">
         
         <div class="head center"> slot machine </div> 
         <div class="box pad">
@@ -61,7 +62,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             </table>
         </div>
         <div class="box pad shadow">
-            <div id="rollers" >
+            <div id="rollers" class="center">
                 <div id="reelsa" class="reels">
                     <img id="reela0" src="<?=STATIC_SERVER?>common/casino/<?=$Reel[0][2]?>.png" />
                     <img id="reela1" src="<?=STATIC_SERVER?>common/casino/<?=$Reel[1][2]?>.png" />
@@ -82,6 +83,8 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             </div>
             </div>
             <div  style="float:right">
+                <span title="if you cannot hear the sound you can try 'forcing' it, this forces the player to be rendered (although it hides it from view) and 'fixes' problems with a bug in FF22 but may make the screen flicker annoyingly... this is not a great solution but its the best I can do right now"><label for="forcesound">(force sound)</label>
+                <input id="forcesound" name="forcesound" type="checkbox" value="1" /> </span> &nbsp;&nbsp;&nbsp;
                 <label for="playsound">Sound</label>
                 <input id="playsound" name="playsound" type="checkbox" value="1" checked="checked" />
             </div>
@@ -89,9 +92,9 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             <a href="#" style="position:absolute;right:-80px;top:120px;" onclick="Pull_Lever(); return false">
                 <img id="lever" src="<?=STATIC_SERVER?>common/casino/leverUp.png" />
             </a>
-            <div id="beta" class="chip hidden" style="top:168px;"><span id="betanum">10</span></div>
-            <div id="betb" class="chip" style="top:324px;"><span id="betbnum">10</span></div>
-            <div id="betc" class="chip hidden" style="top:479px;"><span id="betcnum">10</span></div>
+            <div id="beta" class="chip hidden" style="top:188px;"><span id="betanum">10</span></div>
+            <div id="betb" class="chip" style="top:344px;"><span id="betbnum">10</span></div>
+            <div id="betc" class="chip hidden" style="top:499px;"><span id="betcnum">10</span></div>
         </div>
     
         <div class="head center"> your slot machine history </div> 
@@ -197,7 +200,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             </table>
         </div>
     </div>
-    <span id="sound"></span>
+    <span id="sound" style="visibility:hidden;height:0px;"></span>
 </div>
 
 <?

@@ -25,14 +25,17 @@ if ($err!==true) {
 } */
 
 // this might need adjusting
-$MaxBet = 100;
+//$MaxBet = 100;
 
 $BetAmount = (int)$_POST['bet'];
 if(!$BetAmount) {
     if ( (int)$_GET['bet'] > 0 ) ajax_error('cheeky! - you have been reported for trying to haxx0r the slot machine!');
     else ajax_error('No bet');
 }
-if($BetAmount>$MaxBet) ajax_error('You cannot bet more than '.  number_format($MaxBet).' credits');
+//if($BetAmount>$MaxBet) ajax_error('You cannot bet more than '.  number_format($MaxBet).' credits');
+// use a more rigorous check to avoid -ve bets etc
+if(!in_array($BetAmount, array(1,10,100)))  ajax_error('You can only bet valid values: 1, 10, or 100');
+
 
 $UserID = (int)$LoggedUser['ID'];
 $NumBets = min( max((int)$_POST['numbets'], 1), 3);
