@@ -2152,6 +2152,7 @@ span.reported {
 }  */
 
 .reels, .reelsi {
+    white-space:nowrap;
 }
 .reels.play {
 }

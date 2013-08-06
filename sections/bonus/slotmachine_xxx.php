@@ -47,7 +47,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
 <?  //}   ?>
     </div>
     
-    <div class=" " style="position:relative;width:666px;margin:20px 330px 50px auto;">
+    <div class=" " style="position:relative;width:664px;margin:20px 330px 50px auto;">
         
         <div class="head center"> slot machine </div> 
         <div class="box pad">

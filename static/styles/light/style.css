@@ -2219,6 +2219,7 @@ span.reported {
     color: red;
 }
 .reels, .reelsi {
+    white-space:nowrap;
 }
 .reels.play {
 }

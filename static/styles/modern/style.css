@@ -2472,6 +2472,7 @@ img.win {
 } */
 
 .reels, .reelsi {
+    white-space:nowrap;
 }
 .reels.play {
 }
