@@ -2075,5 +2075,6 @@ if (check_perms('users_mod', $Class)) {
         }
 ?>
 	</div>
+    <div class="clear"></div>
 </div>
 <? show_footer(); ?>
