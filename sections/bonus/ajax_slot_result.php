@@ -24,8 +24,6 @@ if ($err!==true) {
     ajax_error("You must wait $err secs before playing again");
 } */
 
-// this might need adjusting
-//$MaxBet = 100;
 
 $BetAmount = (int)$_POST['bet'];
 if(!$BetAmount) {

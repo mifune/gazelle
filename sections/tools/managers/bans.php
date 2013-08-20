@@ -115,14 +115,14 @@ $sql = "SELECT SQL_CALC_FOUND_ROWS
      LEFT JOIN users_main as um2 ON i.StaffID=um2.ID";
 
 if(!empty($_REQUEST['notes'])) {
-	$sql .= "WHERE Reason LIKE '%".db_string($_REQUEST['notes'])."%' ";
+	$sql .= " WHERE Reason LIKE '%".db_string($_REQUEST['notes'])."%' ";
 }
 
 if(!empty($_REQUEST['ip']) && preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $_REQUEST['ip'])) {
 	if (!empty($_REQUEST['notes'])) {
-		$sql .= "AND '".ip2unsigned($_REQUEST['ip'])."' BETWEEN FromIP AND ToIP ";
+		$sql .= " AND '".ip2unsigned($_REQUEST['ip'])."' BETWEEN FromIP AND ToIP ";
 	} else {
-		$sql .= "WHERE '".ip2unsigned($_REQUEST['ip'])."' BETWEEN FromIP AND ToIP ";
+		$sql .= " WHERE '".ip2unsigned($_REQUEST['ip'])."' BETWEEN FromIP AND ToIP ";
 	}
 }
 
