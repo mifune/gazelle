@@ -254,6 +254,8 @@ if (($_POST['ResetSession'] || $_POST['LogOut']) && check_perms('users_logout'))
 	$Cache->delete_value('user_stats_'.$UserID);
 	$Cache->delete_value('enabled_'.$UserID);
 	
+	$EditSummary[]='reset user cache';
+    
 	if($_POST['LogOut']) {
 		$DB->query("SELECT SessionID FROM users_sessions WHERE UserID='$UserID'");
 		while(list($SessionID) = $DB->next_record()) {
@@ -263,6 +265,7 @@ if (($_POST['ResetSession'] || $_POST['LogOut']) && check_perms('users_logout'))
 		
 		
 		$DB->query("DELETE FROM users_sessions WHERE UserID='$UserID'");
+        $EditSummary[]='forcibly logged out user';
 		
 	}
 }
@@ -816,8 +819,9 @@ if ($Email){
 if (empty($UpdateSet) && empty($EditSummary)) {
 	if(!$Reason) {
 		if (str_replace("\r", '', $Cur['AdminComment']) != str_replace("\r", '', $AdminComment)) {
-            if (!check_perms('users_admin_notes')) error(403);
-			$UpdateSet[]="AdminComment='$AdminComment'";
+            //if (!check_perms('users_admin_notes')) error(403);
+			//$UpdateSet[]="AdminComment='$AdminComment'";
+            if (check_perms('users_admin_notes')) $UpdateSet[]="AdminComment='$AdminComment'";
 		} else {
 			header("Location: user.php?id=$UserID");
 			die();
