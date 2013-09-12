@@ -149,9 +149,16 @@ function Upload_Quick_Preview() {
 	$('#post_preview').raw().value = "Make changes";
 	$('#post_preview').raw().preview = true;
 	ajax.post("ajax.php?action=preview_upload","upload_table", function(response){
-		$('#uploadpreviewbody').show();
-		$('#contentpreview').raw().innerHTML = response;
-		$('.uploadbody').hide(); 
+        
+        var x = json.decode(response); 
+        if ( is_array(x)){
+            $('#uploadpreviewbody').show();
+            $('#messagebar').raw().innerHTML = x[0];
+            if(x[0]) $('#messagebar').show();
+            else $('#messagebar').hide()
+            $('#contentpreview').raw().innerHTML = x[1];
+            $('.uploadbody').hide(); 
+        }
 	});
 }
 

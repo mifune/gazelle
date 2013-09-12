@@ -55,7 +55,7 @@ class TORRENT_FORM {
             //for testing form vars set action="http://www.tipjar.com/cgi-bin/test"
 ?>
       <div id="messagebar" class="messagebar alert<? if(!$this->Error) echo ' hidden'?>"><? if($this->Error) echo ($this->Error) ; ?></div><br />
-      <div id="uploadpreviewbody" class="hidden"> 
+      <div id="uploadpreviewbody" class="hidden">
             <div id="contentpreview" style="text-align:left;"></div>  
 	</div>
 	<form action="" enctype="multipart/form-data" method="post" id="upload_table" onsubmit="$('#post').raw().disabled = 'disabled'">
