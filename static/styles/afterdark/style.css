@@ -1302,7 +1302,7 @@ ul.poll li.graph {
     background-color:#D7E2EF;
 }
 .group_torrent {
-    background-color: white;
+    /*  background-color: white; */
 }
 .group_torrent span {
     float:right;
@@ -2143,7 +2143,8 @@ text-decoration: underline;
    overflow: hidden;
 }
 #torrentsigbox {
-   padding: 3px 10px 10px 10px;
+    /* padding: 3px 10px 10px 10px;  */
+    padding-top: 5px;
    overflow: hidden;
    border-top: #ccc solid 1px;
 }
@@ -2316,4 +2317,201 @@ table.noborder td, .torrent td, .torrent_table td {
 .torrent_table td {
     padding: 5px;
 	color: #999;
+}
+
+
+
+
+.nopad {
+    margin:0px;
+    padding:0px;
+}
+.nopad .scale_image {
+    margin:0px;
+    padding:0px;
+}
+.nopad td {
+    margin:0px;
+    padding:0px;
+}
+
+table.vat td {
+    vertical-align: top;
+}
+table.vam td  {
+    vertical-align: middle;
+}
+table.vab td  {
+    vertical-align: bottom;
+}
+
+td.bbcode.vat {
+    vertical-align: top;
+}
+td.bbcode.vam  {
+    vertical-align: middle;
+}
+td.bbcode.vab  {
+    vertical-align: bottom;
+}
+
+
+
+blockquote.bbcode.error {
+    border: 2px solid #c00;
+    padding: 5px 10px;
+}
+blockquote.bbcode.error code.error {
+    font-size: 1.2em;
+}
+
+
+.tag_header {
+    padding: 7px 5px 0px 5px;
+    text-align: center;
+}
+  
+.button_sort {
+    display: inline-block;
+    border: 1px solid #7BA3C1;
+    border-radius: 3px;
+    background-color: #333;  /*  #eff3f6;  */
+    text-align: center;
+    font-style: normal;
+    width: 40px;
+    margin:auto;
+    cursor:pointer;
+}
+
+.button_sort.sort_select {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+}
+.button_sort.sort_select a {
+    color: white;
+}
+
+.button_sort a, .button_sort a:visited {
+    color: #ccc; /* #0261A3; */
+}
+.button_sort:hover {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+    
+}
+.button_sort:hover a {
+    background-color: #0261A3;
+    background-color: #5A8Bb8;
+    color: white;
+    
+}
+
+.button_sort a:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.tag_header div {
+    margin-bottom:4px;
+}
+
+.tag_header div:before {
+    font-size: 0.8em;
+    content: "sort by";
+    margin-right: 3px;
+} 
+
+.indent {
+    margin-left: 20px;
+}
+
+
+
+
+.statusown a {
+	cursor: pointer; 
+}
+.thin > h2:first-child + .status_box {
+      margin: -15px auto 10px; 
+      width: 100%; 
+}
+.status_box {
+      margin: 10px auto 0px;
+      width: 96%; 
+      min-width: 920px;
+      max-width: 1200px;
+      border: none;
+      padding:4px; 
+}
+.staffstatus {
+	display: inline-block;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+      margin: 4px 4px;
+	text-decoration: none;
+	color: #fff;
+	font-size: 11px;
+	vertical-align: top;
+	cursor: default; 
+	line-height: 11px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 12px;
+	font-family: Verdana, Geneva, sans-serif;
+	padding: 3px 15px; 
+}
+.staffstatus a {
+	color: #222;	
+}
+.staffstatus a:visited {
+	color: #222;	
+}
+.status_checking {
+    float:right;
+    background: #5da53a;
+    border: 1px solid #9Be361;
+}
+.status_notchecking {
+    float:left;
+    background: #eaa;
+    border: 1px solid #822;
+}
+.nostaff_checking {
+    margin-top:6px;
+    float:right;
+    color: #ddd;
+    margin-right:10px;
+}
+.status_loading {
+    margin-top:6px;
+    float:left;
+    color:#ccc;
+}
+
+.pager {
+    font-weight:bold;
+}
+.pager_on {
+    color: #abf;
+}
+
+.debug_table_head { 
+    border-top: 1.5px solid #6a9bb7;
+    font-weight: bold;
+    color: #444;  
+}
+.debug_table_head td {
+    background-color: #d3e3f3;
+}
+.debug_table_head td:first-child {
+    background-color: transparent;
+    width:10px;
+}
+
+.seedhistory {
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+    font-weight: bold;
 }

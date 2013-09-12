@@ -2534,7 +2534,8 @@ h2 span.arrow img {
     overflow: hidden;
 }
 #torrentsigbox {
-    padding: 3px 10px 10px 10px; 
+    /* padding: 3px 10px 10px 10px;  */
+    padding-top: 5px;
     overflow: hidden;
     border-top: #ccc solid 1px;
 }
