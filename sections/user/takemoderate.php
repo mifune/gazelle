@@ -140,6 +140,7 @@ $DB->query("SELECT
 	DisableUpload,
 	DisablePM,
 	DisableIRC,
+	DisableRequests,
 	DisableSignature,
 	DisableTorrentSig,
 	m.RequiredRatio,
