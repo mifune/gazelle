@@ -114,7 +114,7 @@ function dupe_comments($GroupID, $Comments) {
 	$DB->query("SELECT Comments, SHA1(Comments) AS CommentHash FROM dupe_groups WHERE ID = '$GroupID'");
 	list($OldComment, $OldCommentHash) = $DB->next_record();
 	if ($OldCommentHash != sha1($Comments)) {
-		$AdminComment = sqltime()." - Linked accounts updated: Comments changed from '".db_string($OldComment)."' to '".db_string($Comments)."' by ".$LoggedUser['Username'];
+		$AdminComment = sqltime()." - Linked accounts updated: Comments changed from [bg=#f3f3f3]". ($OldComment)."[/bg] to [bg=#f3f3f3]". ($Comments)."[/bg] by ".$LoggedUser['Username'];
 		if ($_POST['form_comment_hash'] == $OldCommentHash) {
 			$DB->query("UPDATE dupe_groups SET Comments = '".db_string($Comments)."' WHERE ID = '$GroupID'");
 		} else {
