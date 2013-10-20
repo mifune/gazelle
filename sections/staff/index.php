@@ -1,5 +1,8 @@
 <?
 enforce_login();
+
+if(!check_perms('site_staff_page'))  error(403);
+
 show_header('Staff','bbcode,inbox,jquery');
 
 include(SERVER_ROOT.'/sections/staff/functions.php');

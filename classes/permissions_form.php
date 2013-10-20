@@ -19,9 +19,12 @@
 	'site_view_stats' => 'View the site stats page.',
 	'site_stats_advanced' => 'View selected site stats.',
      
-	'site_vote' => 'Request vote access.',
+	'site_vote' => 'Can vote on requests.',
 	'site_submit_requests' => 'Request create access.',
-	'site_see_old_requests' => 'View old requests.',
+	'site_see_old_requests' => 'Can see old requests.',
+     
+	'site_staff_page' => 'Can see the Staff page.',
+     
 	'site_advanced_search' => 'Advanced search access.',
 	'site_top10' => 'Top 10 access.',
 	'site_advanced_top10' => 'Advanced Top 10 access.',
@@ -194,6 +197,9 @@ function permissions_form(){ ?>
 					<? display_perm('site_vote','Can vote on requests.'); ?>
 					<? display_perm('site_submit_requests','Can submit requests.'); ?>
 					<? display_perm('site_see_old_requests','Can see old requests.'); ?>
+                    
+					<? display_perm('site_staff_page','Can see the Staff page.'); ?>
+    
 					<? display_perm('site_advanced_search','Can use advanced search.'); ?>
 					<? display_perm('site_top10','Can access top 10.'); ?>
 					<? display_perm('site_torrents_notify','Can access torrents notifications system.'); ?>
