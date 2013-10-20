@@ -1,8 +1,6 @@
 <?
 enforce_login();
 
-if(!check_perms('site_staff_page'))  error(403);
-
 show_header('Staff','bbcode,inbox,jquery');
 
 include(SERVER_ROOT.'/sections/staff/functions.php');
@@ -30,8 +28,11 @@ $Msg = isset($_REQUEST['msg'])?$_REQUEST['msg']:'';
             </div>
 		<? print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
 		<br />
-      </div>
+    </div>
 <? 
+
+if(check_perms('site_staff_page'))  {
+    
 	if( count($FrontLineSupport)>0) { 
 ?>
 	<div class="head">First-line Support</div>
@@ -170,6 +171,11 @@ $Msg = isset($_REQUEST['msg'])?$_REQUEST['msg']:'';
 		</table><br/>
 		
 	</div>
+
+<?
+} 
+?>
+    
 </div>
 <?
 show_footer();

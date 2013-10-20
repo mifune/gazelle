@@ -5,8 +5,19 @@ nbproject/
 *.save
 *~
 info.php
+
+# Logs and databases #
+######################
+# if we want to upload the db files we need to edit this #
+*.log
+*.sql
+*.sqlite
+
+##  specific db and import files ##
 import_articles.sql
 import_database.sql
 import_geoip.sql
 import_languages.sql
 import_values.sql
+import_authkeys.php
+import_database.php

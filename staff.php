@@ -1,2 +1,2 @@
-<? require('classes/script_start.php');
+<? require('classes/script_start.php'); ?>
 
