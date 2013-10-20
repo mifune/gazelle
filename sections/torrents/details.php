@@ -794,8 +794,10 @@ if (count($FilledRequests) > 0) {
 						<a href="torrents.php?action=masspm&amp;id=<?=$GroupID?>&amp;torrentid=<?=$TorrentID?>">[Mass PM Snatchers]</a>
 					</div>
 <? } ?>
-					<div class="linkbox">
+					<div class="linkbox"> 
+<? if(check_perms('site_view_torrent_peerlist')) { ?> 
 						<a href="#" onclick="show_peers('<?=$TorrentID?>', 0);return false;">(View Peerlist)</a>
+<? } ?>
 <? if(check_perms('site_view_torrent_snatchlist')) { ?> 
 						<a href="#" onclick="show_downloads('<?=$TorrentID?>', 0);return false;">(View Downloadlist)</a>
 						<a href="#" onclick="show_snatches('<?=$TorrentID?>', 0);return false;">(View Snatchlist)</a>

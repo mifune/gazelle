@@ -51,6 +51,8 @@
 	'site_view_full_log' => 'Can view old log entries.',
 	'site_view_torrent_snatchlist' => 'Can view torrent snatchlists.',
      
+	'site_view_torrent_peerlist' => 'Can view torrent peerlists.',
+     
             'site_vote_tag' => 'Can vote on tags.',
             'site_add_tag' => 'Can add tags.',
             'site_add_multiple_tags' => 'Can add multiple tags at once.',
@@ -223,6 +225,9 @@ function permissions_form(){ ?>
 					<? display_perm('site_view_flow', 'Can view site stats and data pools.'); ?>
 					<? display_perm('site_view_full_log', 'Can view the full site log.'); ?>
 					<? display_perm('site_view_torrent_snatchlist', 'Can view torrent snatchlists.'); ?>
+                    
+					<? display_perm('site_view_torrent_peerlist', 'Can view torrent peerlists.'); ?>
+    
                                           <? display_perm('site_vote_tag', 'Can vote on tags.'); ?>
                                           <? display_perm('site_add_tag', 'Can add tags.'); ?>
             <? display_perm('site_add_multiple_tags','Can add multiple tags at once.'); ?>

@@ -1,6 +1,8 @@
 <?
+if(!check_perms('site_view_torrent_peerlist')) error(403,true);
+
 if (!isset($_GET['torrentid']) || !is_number($_GET['torrentid'])) {
-    error(404);
+    error(404, true);
 }
 $TorrentID = $_GET['torrentid'];
 
