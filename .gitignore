@@ -5,3 +5,8 @@ nbproject/
 *.save
 *~
 info.php
+import_articles.sql
+import_database.sql
+import_geoip.sql
+import_languages.sql
+import_values.sql
