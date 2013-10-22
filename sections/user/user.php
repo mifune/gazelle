@@ -2067,7 +2067,7 @@ if (check_perms('users_mod', $Class)) {
                 
       <a id="torrents"></a>
 <?    
-	  if ($LoggedUser['HideUserTorrents']==0 && check_paranoia_here('uploads')) { 
+	  if ($LoggedUser['HideUserTorrents']==0 && check_paranoia_here('uploads') && !check_perms('site_force_anon_uploaders')) { 
             $INLINE=true;
             $_GET['userid'] = $UserID;
             $_GET['type'] = 'uploaded';

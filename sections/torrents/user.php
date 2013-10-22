@@ -1,5 +1,10 @@
 <?
 
+if (check_perms('site_force_anon_uploaders')) {
+    // then you dont get to see any torrents for any uploader!
+     error(403);
+}
+
 //include(SERVER_ROOT . '/sections/torrents/functions.php');
 include(SERVER_ROOT . '/sections/bookmarks/functions.php');
 
@@ -130,6 +135,11 @@ if(!empty($_GET['filter'])) {
 
 if(empty($GroupBy)) {
 	$GroupBy = "t.ID";
+}
+
+    // if anon ... 
+if($UserID!=$LoggedUser['ID'] && !check_perms('users_view_anon_uploaders')) {
+    $ExtraWhere .= " AND t.Anonymous='0'";
 }
 
 if((empty($_GET['search']) || trim($_GET['search']) == '') && $Order!='Name') {
