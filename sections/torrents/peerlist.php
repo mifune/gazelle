@@ -14,7 +14,7 @@ if (!empty($_GET['page']) && is_number($_GET['page'])) {
     $Limit = 100;
 }
 
-$DB->query("SELECT UserID, Anonymous FROM torrents WHERE t.ID='$TorrentID' ");
+$DB->query("SELECT UserID, Anonymous FROM torrents WHERE ID='$TorrentID' ");
 list($AuthorID, $IsAnon) = $DB->next_record();
 
 

@@ -705,7 +705,7 @@ if($Day != next_day() || $_GET['runday']){
 	
 	// Take users off ratio watch and enable leeching
 	$UserQuery = $DB->query("SELECT m.ID, torrent_pass FROM users_info AS i JOIN users_main AS m ON m.ID=i.UserID
-		WHERE m.Uploaded/m.Downloaded >= m.RequiredRatio
+		WHERE m.Downloaded = 0 OR m.Uploaded/m.Downloaded >= m.RequiredRatio
 		AND i.RatioWatchEnds!='0000-00-00 00:00:00' 
 		AND m.can_leech='0'
 		AND m.Enabled='1'");
@@ -735,7 +735,7 @@ if($Day != next_day() || $_GET['runday']){
 
         // Take users off ratio watch 
         $UserQuery = $DB->query("SELECT m.ID, torrent_pass FROM users_info AS i JOIN users_main AS m ON m.ID=i.UserID
-                WHERE m.Uploaded/m.Downloaded >= m.RequiredRatio
+                WHERE m.Downloaded=0 OR m.Uploaded/m.Downloaded >= m.RequiredRatio
                 AND i.RatioWatchEnds!='0000-00-00 00:00:00'
                 AND m.Enabled='1'");
         $OffRatioWatch = $DB->collect('ID');
@@ -765,7 +765,7 @@ if($Day != next_day() || $_GET['runday']){
 	// Put user on ratio watch if he doesn't meet the standards
 	sleep(10);
 	$DB->query("SELECT m.ID, m.Downloaded FROM users_info AS i JOIN users_main AS m ON m.ID=i.UserID
-		WHERE m.Uploaded/m.Downloaded < m.RequiredRatio
+		WHERE m.Downloaded>0 AND m.Uploaded/m.Downloaded < m.RequiredRatio
 		AND i.RatioWatchEnds='0000-00-00 00:00:00'
 		AND m.Enabled='1'
 		AND m.can_leech='1'");
@@ -1109,6 +1109,10 @@ if($Day != next_day() || $_GET['runday']){
 		}
 	}
 }
+
+
+
+
 /*************************************************************************\
 //--------------Run twice per month -------------------------------------//
 
@@ -1153,52 +1157,59 @@ if($BiWeek != next_biweek() || $_GET['runbiweek']) {
 	
 	*/
 
-	$DB->query("SELECT ID 
-				FROM users_main AS um 
-				JOIN users_info AS ui on ui.UserID=um.ID
-				WHERE um.Enabled='1' AND ui.DisableInvites = '0'
-					AND ((um.PermissionID = ".GOOD_PERV." AND um.Invites < 2) OR (um.PermissionID = ".SEXTREME_PERV." AND um.Invites < 4))");
-	$UserIDs = $DB->collect('ID');
-	if (count($UserIDs) > 0) {
-		foreach($UserIDs as $UserID) {
-				$Cache->begin_transaction('user_info_heavy_'.$UserID);
-				$Cache->update_row(false, array('Invites' => '+1'));
-				$Cache->commit_transaction(0);
-		}
-		$DB->query("UPDATE users_main SET Invites=Invites+1 WHERE ID IN (".implode(',',$UserIDs).")");
-	}
+    $GiveOutInvites = false;
+    
+    if($GiveOutInvites) {
+        
+        $DB->query("SELECT ID 
+                    FROM users_main AS um 
+                    JOIN users_info AS ui on ui.UserID=um.ID
+                    WHERE um.Enabled='1' AND ui.DisableInvites = '0'
+                        AND ((um.PermissionID = ".GOOD_PERV." AND um.Invites < 2) OR (um.PermissionID = ".SEXTREME_PERV." AND um.Invites < 4))");
+        $UserIDs = $DB->collect('ID');
+        if (count($UserIDs) > 0) {
+            foreach($UserIDs as $UserID) {
+                    $Cache->begin_transaction('user_info_heavy_'.$UserID);
+                    $Cache->update_row(false, array('Invites' => '+1'));
+                    $Cache->commit_transaction(0);
+            }
+            $DB->query("UPDATE users_main SET Invites=Invites+1 WHERE ID IN (".implode(',',$UserIDs).")");
+        }
 
-	$BonusReqs = array(
-		array(0.75, 2*1024*1024*1024),
-		array(2.0, 10*1024*1024*1024),
-		array(3.0, 20*1024*1024*1024));
-	
-	// Since MySQL doesn't like subselecting from the target table during an update, we must create a temporary table.
+        $BonusReqs = array(
+            array(0.75, 2*1024*1024*1024),
+            array(2.0, 10*1024*1024*1024),
+            array(3.0, 20*1024*1024*1024));
 
-	$DB->query("CREATE TEMPORARY TABLE temp_sections_schedule_index
-		SELECT SUM(Uploaded) AS Upload,SUM(Downloaded) AS Download,Inviter
-		FROM users_main AS um JOIN users_info AS ui ON ui.UserID=um.ID
-		GROUP BY Inviter");
-	
-	foreach ($BonusReqs as $BonusReq) {
-		list($Ratio, $Upload) = $BonusReq;
-		$DB->query("SELECT ID
-					FROM users_main AS um 
-					JOIN users_info AS ui ON ui.UserID=um.ID
-					JOIN temp_sections_schedule_index AS u ON u.Inviter = um.ID
-					WHERE u.Upload>$Upload AND u.Upload/u.Download>$Ratio 
-						AND um.Enabled = '1' AND ui.DisableInvites = '0' 
-						AND ((um.PermissionID = ".GOOD_PERV." AND um.Invites < 2) OR (um.PermissionID = ".SEXTREME_PERV." AND um.Invites < 4))");
-		$UserIDs = $DB->collect('ID');
-		if (count($UserIDs) > 0) {
-			foreach($UserIDs as $UserID) {
-					$Cache->begin_transaction('user_info_heavy_'.$UserID);
-					$Cache->update_row(false, array('Invites' => '+1'));
-					$Cache->commit_transaction(0);
-			}
-			$DB->query("UPDATE users_main SET Invites=Invites+1 WHERE ID IN (".implode(',',$UserIDs).")");
-		}
-	}
+        // Since MySQL doesn't like subselecting from the target table during an update, we must create a temporary table.
+
+        $DB->query("CREATE TEMPORARY TABLE temp_sections_schedule_index
+            SELECT SUM(Uploaded) AS Upload,SUM(Downloaded) AS Download,Inviter
+            FROM users_main AS um JOIN users_info AS ui ON ui.UserID=um.ID
+            GROUP BY Inviter");
+
+        foreach ($BonusReqs as $BonusReq) {
+            list($Ratio, $Upload) = $BonusReq;
+            $DB->query("SELECT ID
+                        FROM users_main AS um 
+                        JOIN users_info AS ui ON ui.UserID=um.ID
+                        JOIN temp_sections_schedule_index AS u ON u.Inviter = um.ID
+                        WHERE u.Upload>$Upload AND u.Upload/u.Download>$Ratio 
+                            AND um.Enabled = '1' AND ui.DisableInvites = '0' 
+                            AND ((um.PermissionID = ".GOOD_PERV." AND um.Invites < 2) OR (um.PermissionID = ".SEXTREME_PERV." AND um.Invites < 4))");
+            $UserIDs = $DB->collect('ID');
+            if (count($UserIDs) > 0) {
+                foreach($UserIDs as $UserID) {
+                        $Cache->begin_transaction('user_info_heavy_'.$UserID);
+                        $Cache->update_row(false, array('Invites' => '+1'));
+                        $Cache->commit_transaction(0);
+                }
+                $DB->query("UPDATE users_main SET Invites=Invites+1 WHERE ID IN (".implode(',',$UserIDs).")");
+            }
+        }
+        
+    } // end give out invites
+    
 	
 	if($BiWeek == 8) {
 		$DB->query("TRUNCATE TABLE top_snatchers;");
