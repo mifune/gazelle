@@ -1,5 +1,7 @@
 <?
 
+define('TORRENT_EDIT_TIME', 3600 * 24 * 14  );
+
 //Function used for pagination of peer/snatch/download lists on details.php
 function js_pages($Action, $TorrentID, $NumResults, $CurrentPage) {
 	$NumPages = ceil($NumResults/100);
@@ -111,10 +113,17 @@ if(!empty($_REQUEST['action'])) {
 			enforce_login();
 			include(SERVER_ROOT.'/sections/torrents/grouplog.php');
 			break;
-                    
-		case 'edit':
+                     
+		
+		case 'editanon':
 			enforce_login();
-			include(SERVER_ROOT.'/sections/torrents/edit.php');
+			include(SERVER_ROOT.'/sections/torrents/editanon.php');
+			break;
+				
+        
+		case 'takeeditanon':
+			enforce_login();
+			include(SERVER_ROOT.'/sections/torrents/takeeditanon.php');
 			break;
 		
 		case 'editgroup':

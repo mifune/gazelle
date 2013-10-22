@@ -7,10 +7,13 @@ $Text = new TEXT;
 
 show_header("History for Group $GroupID");
 
-$Groups = get_groups(array($GroupID), true, false);
+$Groups = get_groups(array($GroupID), true, true);
 if (!empty($Groups['matches'][$GroupID])) {
 	$Group = $Groups['matches'][$GroupID];
 	$Title = '<a href="torrents.php?id='.$GroupID.'">'.$Group['Name'].'</a>';
+    list($tID, $Torrents) = each($Group['Torrents']);
+    $IsAnon = $Torrents['Anonymous'];
+    $AuthorID = $Torrents['UserID'];
 } else {
 	$Title = "Group $GroupID";
 }
@@ -49,8 +52,14 @@ if (!empty($Groups['matches'][$GroupID])) {
 			$DB->query("SELECT Username FROM users_main WHERE ID = ".$UserID);
 			list($Username) = $DB->next_record();
 			$DB->set_query_id($Log);  */
+
+            if ( $AuthorID == $UserID ) {
+                $TorrentUsername = torrent_username($UserID, $Username, $IsAnon);
+            } else {
+                $TorrentUsername = format_username($UserID, $Username);
+            }
 ?>
-			<td><?=format_username($UserID, $Username)?></td>
+			<td><?=$TorrentUsername?></td>
 			<td><?=$Text->full_format($Info)?></td>
 		</tr>
 <?

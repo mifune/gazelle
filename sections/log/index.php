@@ -92,6 +92,7 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 	$MessageParts = explode(" ", $Message);
 	$Message = "";
 	$Color = $Colon = false;
+    $HideName=false;
 	for ($i = 0, $PartCount = sizeof($MessageParts); $i < $PartCount; $i++) {
 		if ((strpos($MessageParts[$i], 'https://'.SSL_SITE_URL) === 0 && $Offset = strlen('https://'.SSL_SITE_URL.'/')) ||
 				(strpos($MessageParts[$i], 'http://'.NONSSL_SITE_URL) === 0 && $Offset = strlen('http://'.NONSSL_SITE_URL.'/'))) {
@@ -113,6 +114,7 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				break;
 			case "Torrent":
 			case "torrent":
+                $HideName = true;
 				$TorrentID = $MessageParts[$i + 1];
 				if (is_numeric($TorrentID)) {
 					$Message = $Message.' '.$MessageParts[$i].' <a href="torrents.php?torrentid='.$TorrentID.'"> '.$TorrentID.'</a>';
@@ -159,28 +161,36 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				$UserID = 0;
 				$User = "";
 				$URL = "";
-				if ($MessageParts[$i + 1] == "user") {
-					$i++;
-					if (is_numeric($MessageParts[$i + 1])) {
-						$UserID = $MessageParts[++$i];
-					}
-					$URL = "user ".$UserID." ".'<a href="user.php?id='.$UserID.'">'.$MessageParts[++$i]."</a>";
-				} else {
-					$User = $MessageParts[++$i];
-					if(substr($User,-1) == ':') {
-						$User = substr($User, 0, -1);
-						$Colon = true;
-					}
-					if(!isset($Usernames[$User])) {
-						$DB->query("SELECT ID FROM users_main WHERE Username = '".$User."'");
-						list($UserID) = $DB->next_record();
-						$Usernames[$User] = $UserID ? $UserID : '';
-					} else {
-						$UserID = $Usernames[$User];
-					}
-					$DB->set_query_id($Log);
-					$URL = $Usernames[$User] ? '<a href="user.php?id='.$UserID.'">'.$User."</a>".($Colon?':':'') : $User;
-				}
+                
+                if(!$HideName || check_perms('users_view_anon_uploaders')) {
+
+                    if ($MessageParts[$i + 1] == "user") {
+                        $i++;
+                        if (is_numeric($MessageParts[$i + 1])) {
+                            $UserID = $MessageParts[++$i];
+                        }
+                        $URL = "user ".$UserID." ".'<a href="user.php?id='.$UserID.'">'.$MessageParts[++$i]."</a>";
+                    } else {
+                        $User = $MessageParts[++$i];
+                        if(substr($User,-1) == ':') {
+                            $User = substr($User, 0, -1);
+                            $Colon = true;
+                        }
+                        if(!isset($Usernames[$User])) {
+                            $DB->query("SELECT ID FROM users_main WHERE Username = '".$User."'");
+                            list($UserID) = $DB->next_record();
+                            $Usernames[$User] = $UserID ? $UserID : '';
+                        } else {
+                            $UserID = $Usernames[$User];
+                        }
+                        $DB->set_query_id($Log);
+                        $URL = $Usernames[$User] ? '<a href="user.php?id='.$UserID.'">'.$User."</a>".($Colon?':':'') : $User;
+                    }
+                
+                } else {
+                    $URL = "User";
+                    $MessageParts[$i + 1] = '';
+                }
 				$Message = $Message." by ".$URL;
 				break;
 			case "converted":
@@ -202,22 +212,24 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				}
 				$Message = $Message." ".$MessageParts[$i];
 				break;
-                  case "Okay":
+            case "Okay":
+                $HideName = false;
 				if ($Color === false) {
 					$Color = 'green';
 				}
+				$Message = $Message." ".$MessageParts[$i];
+				break;
+            case "Warned":
+                $HideName = false;
+				//if ($Color === false || $Color === 'green') {
+					$Color = '#a07100';
+				//}
 				$Message = $Message." ".$MessageParts[$i];
 				break;
 			case "deleted":
 			case "auto-deleted":
 				//if ($Color === false || $Color === 'green') {
 					$Color = 'red';
-				//}
-				$Message = $Message." ".$MessageParts[$i];
-				break;
-                  case "Warned":
-				//if ($Color === false || $Color === 'green') {
-					$Color = '#a07100';
 				//}
 				$Message = $Message." ".$MessageParts[$i];
 				break;

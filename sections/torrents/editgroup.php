@@ -14,13 +14,28 @@ if($HasDescriptionData !== TRUE) {
           tg.Image,
           tg.Body,
           t.UserID,
-          t.FreeTorrent
+          t.FreeTorrent,
+          tg.Time,
+          t.Anonymous
           FROM torrents_group AS tg
           JOIN torrents AS t ON t.GroupID = tg.ID
           WHERE tg.ID='$GroupID'");
     if($DB->record_count() == 0) { error(404); }
-    list($CategoryID, $Name, $Image, $Body, $AuthorID, $Free) = $DB->next_record();
-    $CanEdit = check_perms('torrents_edit') || ($AuthorID == $LoggedUser['ID']);
+    list($CategoryID, $Name, $Image, $Body, $AuthorID, $Free, $AddedTime, $IsAnon) = $DB->next_record();
+    //$CanEdit = check_perms('torrents_edit') || ($AuthorID == $LoggedUser['ID']);
+    
+    $CanEdit = check_perms('torrents_edit');
+    if (!$CanEdit){
+
+        if ($LoggedUser['ID'] == $AuthorID) {
+            if ( check_perms ('site_edit_override_timelock') || time_ago($AddedTime)< TORRENT_EDIT_TIME ) {
+                $CanEdit = true;
+            } else {
+                error("Sorry - you only have ". date('z\d\a\y\s i\m\i\n\s', TORRENT_EDIT_TIME). "  to edit your torrent before it is automatically locked.");
+            }
+        }
+
+    }
 }
 
 if(!$CanEdit) { error(403); }
@@ -115,8 +130,8 @@ show_header('Edit torrent','bbcode,edittorrent');
 					<td class="label">Freeleech</td>
 					<td>
                                   
-                                    <input name="freeleech" value="0" type="radio"<? if($Free!=1) echo ' checked="checked"';?>/> None&nbsp;&nbsp;
-                                    <input name="freeleech" value="1" type="radio"<? if($Free==1) echo ' checked="checked"';?>/> Freeleech&nbsp;&nbsp;
+                        <input name="freeleech" value="0" type="radio"<? if($Free!=1) echo ' checked="checked"';?>/> None&nbsp;&nbsp;
+                        <input name="freeleech" value="1" type="radio"<? if($Free==1) echo ' checked="checked"';?>/> Freeleech&nbsp;&nbsp;
                               
 					</td>
 				</tr>	

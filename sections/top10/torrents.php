@@ -121,7 +121,8 @@ $BaseQuery = "SELECT
       t.UserID,
       u.Username, 
       t.FreeTorrent, 
-      t.double_seed 
+      t.double_seed ,
+      t.Anonymous
 	FROM torrents AS t
 	LEFT JOIN torrents_group AS g ON g.ID = t.GroupID
     LEFT JOIN users_main AS u ON u.ID = t.UserID ";
@@ -276,7 +277,7 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
     $Bookmarks = all_bookmarks('torrent');
 	foreach ($Details as $Detail) {
 		list($TorrentID,$GroupID,$GroupName, $NewCategoryID, $TorrentTags,
-			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName) = $Detail;
+			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName,,,$IsAnon) = $Detail;
 		// highlight every other row
 		$Rank++;
 		$row = ($Rank % 2 ? 'b' : 'a');
@@ -324,7 +325,7 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 		<td class="top10"><?=number_format((double) $Seeders)?></td>
 		<td class="top10"><?=number_format((double) $Leechers)?></td>
 		<td class="top10"><?=number_format($Seeders+$Leechers)?></td>
-        <td class="top10"><?=format_username($UploaderID, $UploaderName)?></td>
+        <td class="top10"><?=torrent_username($UploaderID, $UploaderName, $IsAnon)?></td>
 	</tr>
 <?
 	}

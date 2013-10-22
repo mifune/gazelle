@@ -45,6 +45,8 @@ $Properties['TemplateFooter'] = $_POST['templatefooter'];
 $Properties['IgnoreDupes'] = $_POST['ignoredupes'];
 $Properties['FreeLeech'] = ($_POST['freeleech']=='1' && check_perms('torrents_freeleech'))?'1':'0';
 
+$Properties['Anonymous'] = ($_POST['anonymous']=='1' && check_perms('site_upload_anon'))?'1':'0';
+
 //$Properties['GroupID'] = $_POST['groupid'];
 $RequestID = $_POST['requestid'];
 
@@ -442,10 +444,10 @@ if ($Properties['FreeLeech']==='1' || $TotalSize >= AUTO_FREELEECH_SIZE) {      
 // Torrent
 $DB->query("
 	INSERT INTO torrents
-		(GroupID, UserID, info_hash, FileCount, FileList, FilePath, Size, Time, FreeTorrent) 
+		(GroupID, UserID, info_hash, FileCount, FileList, FilePath, Size, Time, FreeTorrent, Anonymous) 
 	VALUES
 		( $GroupID, " . $LoggedUser['ID'] . ", '" . db_string($InfoHash) . "', " . $NumFiles . ", " . $FileString . ", '" . $FilePath . "', " . $TotalSize . ", 
-		'$sqltime', '" . $Properties['FreeTorrent'] . "')");
+		'$sqltime', '" . $Properties['FreeTorrent'] . "', '" . $Properties['Anonymous'] . "')");
 
 $Cache->increment('stats_torrent_count');
 $TorrentID = $DB->inserted_id();

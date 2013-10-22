@@ -70,7 +70,8 @@ function get_group_info($GroupID, $Return = true) {
                 tfi.TorrentID,
                 t.LastReseedRequest,
                 tln.TorrentID AS LogInDB,
-                t.ID AS HasFile 
+                t.ID AS HasFile ,
+                t.Anonymous
                     
 			FROM torrents AS t
             LEFT JOIN users_main AS um ON um.ID=t.UserID 
@@ -223,6 +224,8 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
     // Group details - get tag details
     //list(, , , , , , $TorrentTags, $TorrentTagIDs, $TorrentTagUserIDs, $TagPositiveVotes, $TagNegativeVotes) = array_shift($TorrentDetails);
  
+    list(, , , , , , , , , , , $UserID, $Username, , , , , , , ,$IsAnon) = $TorrentList[0];
+    
     if(!$tagsort || !in_array($tagsort, array('uses','score','az','added'))) $tagsort = 'uses';
 
     $Tags = array();
@@ -235,17 +238,18 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
             $Tags[$TagKey]['score'] = ($TagPositiveVotes - $TagNegativeVotes);
             $Tags[$TagKey]['id']= $TagID;
             $Tags[$TagKey]['userid']= $TagUserID;
-            $Tags[$TagKey]['username']= $TagUsername;
+            
+            $Tags[$TagKey]['username']= anon_username_ifmatch($TagUsername, $Username, $IsAnon) ;
             $Tags[$TagKey]['uses']= $TagUses;
 
             $TagVoteUsernames = explode('|',$TagVoteUsernames);
             $TagVoteWays = explode('|',$TagVoteWays);
             $VoteMsgs=array();
             $VoteMsgs[]= "$TagName (" . str_plural('use' , $TagUses).')';
-            $VoteMsgs[]= "added by $TagUsername";
+            $VoteMsgs[]= "added by ".anon_username_ifmatch($TagUsername, $Username, $IsAnon);
             foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
                 if (!$TagVoteUsername) continue;
-                $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+                $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " (". anon_username_ifmatch($TagVoteUsername, $Username, $IsAnon).")";
             }
             $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs) ;
         }
@@ -254,7 +258,7 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
     }
 
     // grab authorID from torrent details
-    list(, , , , , , , , , , , $UserID) = $TorrentList[0];
+    //list(, , , , , , , , , , , $UserID) = $TorrentList[0];
     $IsUploader =  $UserID == $LoggedUser['ID']; 
 /*
                                 <li style="font-size:1.1em;">

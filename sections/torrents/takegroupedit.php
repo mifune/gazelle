@@ -18,12 +18,30 @@ $GroupID = (int)$_REQUEST['groupid'];
 
 //check user has permission to edit
 $CanEdit = check_perms('torrents_edit');
+/*
 if(!$CanEdit) { 
     $DB->query("SELECT UserID FROM torrents WHERE GroupID='$GroupID'");
     list($AuthorID) = $DB->next_record();
     $CanEdit = $AuthorID == $LoggedUser['ID'];
-}
+} */
 
+if (!$CanEdit){ 
+    
+    $DB->query("SELECT UserID, Time FROM torrents WHERE GroupID='$GroupID'");
+    list($AuthorID, $AddedTime) = $DB->next_record();
+    
+    //$CanEdit = $AuthorID == $LoggedUser['ID'];
+    
+    if ($LoggedUser['ID'] == $AuthorID) {
+        
+        if ( check_perms ('site_edit_override_timelock') || time_ago($AddedTime)< TORRENT_EDIT_TIME ) {
+            $CanEdit = true;
+        } else {
+            error("Sorry - you only have ". date('z\d\a\y\s i\m\i\n\s', TORRENT_EDIT_TIME). "  to edit your torrent before it is automatically locked.");
+        }
+    }
+    
+}
     //check user has permission to edit
 if(!$CanEdit) { error(403); }
 

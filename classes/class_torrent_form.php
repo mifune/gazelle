@@ -254,9 +254,22 @@ class TORRENT_FORM {
 
 	function foot() {
 		$Torrent = $this->Torrent;
-?> 
+        
+        if(check_perms('site_upload_anon')) {
+?>        
+                    <tr>
+                        <td class="label">Upload Anonymously</td>
+                        <td>
+
+                            <input name="anonymous" value="0" type="radio"<? if($Torrent['Anonymous']!=1) echo ' checked="checked"';?>/> Show uploader name&nbsp;&nbsp;
+                            <input name="anonymous" value="1" type="radio"<? if($Torrent['Anonymous']==1) echo ' checked="checked"';?>/> Hide uploader name (Upload Anonymously)&nbsp;&nbsp;
+<br/><em><strong>note:</strong> uploader names are always hidden from lower ranked users, see user classes article in help for more info</em>
+                        </td>
+                    </tr>
 	 
 <?		 
+        }
+        
         if(check_perms('torrents_freeleech')) {
 ?>
 			<tr id="freetorrent" class="uploadbody">

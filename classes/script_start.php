@@ -1700,6 +1700,39 @@ function make_hash($Str, $Secret) {
     return md5(md5($Secret) . md5($Str));
 }
 
+
+function anon_username_ifmatch($Username, $UsernameCheck, $IsAnon = false) { 
+    return anon_username($Username, $IsAnon && $Username===$UsernameCheck);
+}
+
+function anon_username($Username, $IsAnon = false) { 
+    // if not anon then just return username
+    if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return $Username;
+    // if anon ...
+    if(check_perms('users_view_anon_uploaders')) {
+        return "anonymous [$Username]";
+    } else {
+        return 'anonymous';
+    }
+}
+
+
+function torrent_username($UserID, $Username, $IsAnon = false) { 
+    // if not anon then just return username
+    if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return format_username($UserID, $Username);
+    // if anon ...
+    if(check_perms('users_view_anon_uploaders')) {
+        return '<span class="anon_name"><a href="user.php?id=' . $UserID . '" title="' . $Username . '">anonymous</a></span>';
+    } elseif (!$IsAnon) {
+        return '<span class="anon_name" title="your userclass is too low to see uploader info">anonymous</span>';
+    } else {
+        return '<span class="anon_name" title="this uploader has chosen to hide their username">anonymous</span>';
+    }
+}
+
+
+
+
 /*
   Returns a username string for display
   $Class and $Title can be omitted for an abbreviated version
@@ -2348,7 +2381,7 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 		if ($Torrents) {          
             
             $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
-                                        Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount 
+                                        Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount, t.Anonymous
                           FROM torrents AS t 
                           JOIN users_main AS um ON t.UserID=um.ID
                      LEFT JOIN (SELECT TorrentID, count(*) as ReportCount FROM reportsv2 

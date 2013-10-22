@@ -751,7 +751,8 @@ $Bookmarks = all_bookmarks('torrent');
             <td><?= number_format($Data['Snatched']) ?></td>
             <td<?= ($Data['Seeders'] == 0) ? ' class="r00"' : '' ?>><?= number_format($Data['Seeders']) ?></td>
             <td><?= number_format($Data['Leechers']) ?></td>
-            <td class="user"><a href="user.php?id=<?= $Data['UserID'] ?>" class="user"><?= $Data['Username'] ?></a></td>
+            <td class="user"><?=torrent_username($Data['UserID'], $Data['Username'], $Data['Anonymous']) ?></td>
+          <? /* <td class="user"><a href="user.php?id=<?= $Data['UserID'] ?>" class="user"><?= $Data['Username'] ?></a></td> */ ?>
         </tr>
         <?
     }

@@ -8,9 +8,11 @@
  ********************************************************************************/
  
  $PermissionsArray = array(
+	'site_force_anon_uploaders' =>'Hide all uploader info from this user', 
+    
 	'site_leech' => 'Can leech (Does this work?).',
 	'site_upload' => 'Upload torrent access.',
-     
+    
 	'use_templates' => 'Can use templates.',
 	'make_private_templates' => 'Can make/delete private upload templates.',
 	'make_public_templates' => 'Can make public upload templates.',
@@ -127,6 +129,13 @@
     'users_set_suppressconncheck' => 'Can set Suppress ConnCheck prompt for users.',
     'users_view_language' => 'Can view user language(s) on user profile',
      
+    'users_view_anon_uploaders' => 'Can view anonymous uploaders names.',
+     
+     
+     //-------------------------
+     
+	'torrents_edit_override_timelock' => 'Can edit own torrents after edit timelock.',
+     
 	'torrents_edit' => 'Can edit any torrent.',
         'torrents_review' => 'Can mark torrents for deletion.',
         'torrents_review_override' => 'Can overide ongoing marked for deletion process.',
@@ -185,68 +194,72 @@ function permissions_form(){ ?>
 			</tr>
 			<tr>
 				<td>
-					<? display_perm('site_leech','Can leech.'); ?>
-					<? display_perm('site_upload','Can upload.'); ?>
+					<? display_perm('site_force_anon_uploaders','Hide all uploader info from this user','Hide all uploader info from this user (forces uploader anonymity for untrusted users).'); ?>
+                    
+					<? display_perm('site_leech','Can leech'); ?>
+					<? display_perm('site_upload','Can upload'); ?>
+					<? display_perm('site_upload_anon', 'Can upload anonymously'); ?>
+					<? display_perm('site_edit_override_timelock', 'Can edit own torrents after edit timelock'); ?>
                             
-					<? display_perm('use_templates','Can use templates.'); ?>
-					<? display_perm('make_private_templates','Can make/delete private upload templates.'); ?>
-					<? display_perm('make_public_templates','Can make public upload templates.'); ?>
-					<? display_perm('delete_any_template','Can delete any upload templates.'); ?>
+					<? display_perm('use_templates','Can use templates'); ?>
+					<? display_perm('make_private_templates','Can make/delete private upload templates'); ?>
+					<? display_perm('make_public_templates','Can make public upload templates'); ?>
+					<? display_perm('delete_any_template','Can delete any upload templates'); ?>
 
-                              <? display_perm('site_view_stats' , 'View the site stats page.'); ?> 
-                              <? display_perm('site_stats_advanced', 'View selected site stats.'); ?> 
+                              <? display_perm('site_view_stats' , 'View the site stats page'); ?> 
+                              <? display_perm('site_stats_advanced', 'View selected site stats'); ?> 
       
-					<? display_perm('site_vote','Can vote on requests.'); ?>
-					<? display_perm('site_submit_requests','Can submit requests.'); ?>
-					<? display_perm('site_see_old_requests','Can see old requests.'); ?>
+					<? display_perm('site_vote','Can vote on requests'); ?>
+					<? display_perm('site_submit_requests','Can submit requests'); ?>
+					<? display_perm('site_see_old_requests','Can see old requests'); ?>
                     
-					<? display_perm('site_staff_page','Can see the Staff page.'); ?>
+					<? display_perm('site_staff_page','Can see the Staff page'); ?>
     
-					<? display_perm('site_advanced_search','Can use advanced search.'); ?>
-					<? display_perm('site_top10','Can access top 10.'); ?>
-					<? display_perm('site_torrents_notify','Can access torrents notifications system.'); ?>
-					<? display_perm('site_collages_create','Can create collages.'); ?>
-					<? display_perm('site_collages_delete','Can delete collages.'); ?>
-					<? display_perm('site_collages_subscribe','Can access collage subscriptions.'); ?>
-					<? display_perm('site_collages_personal','Can have a personal collage.'); ?>
-					<? display_perm('site_collages_renamepersonal','Can rename own personal collages.'); ?>
-					<? display_perm('site_advanced_top10','Can access advanced top 10.'); ?>
-					<? display_perm('site_make_bookmarks','Can make bookmarks.'); ?>
-					<? display_perm('site_can_invite_always', 'Can invite users even when invites are closed.'); ?>
-					<? display_perm('site_send_unlimited_invites', 'Can send unlimited invites.'); ?>
-                              <?            display_perm('site_advanced_tags', 'Can use advanced bbcode tags.'); ?>
-                              <?            display_perm('site_edit_own_posts', 'Can edit own posts in forum after edit lock time limit.'); ?>
+					<? display_perm('site_advanced_search','Can use advanced search'); ?>
+					<? display_perm('site_top10','Can access top 10'); ?>
+					<? display_perm('site_torrents_notify','Can access torrents notifications system'); ?>
+					<? display_perm('site_collages_create','Can create collages'); ?>
+					<? display_perm('site_collages_delete','Can delete collages'); ?>
+					<? display_perm('site_collages_subscribe','Can access collage subscriptions'); ?>
+					<? display_perm('site_collages_personal','Can have a personal collage'); ?>
+					<? display_perm('site_collages_renamepersonal','Can rename own personal collages'); ?>
+					<? display_perm('site_advanced_top10','Can access advanced top 10'); ?>
+					<? display_perm('site_make_bookmarks','Can make bookmarks'); ?>
+					<? display_perm('site_can_invite_always', 'Can invite users even when invites are closed'); ?>
+					<? display_perm('site_send_unlimited_invites', 'Can send unlimited invites'); ?>
+                              <?            display_perm('site_advanced_tags', 'Can use advanced bbcode tags'); ?>
+                              <?            display_perm('site_edit_own_posts', 'Can edit own posts in forum after edit lock time limit'); ?>
                                 <? display_perm('site_ignore_floodcheck', 'Can post more often than floodcheck allows', 'Allows multiple posting immediately - no complaints if you double post!') ; ?> 
-                              <? display_perm('site_moderate_requests', 'Can moderate any request.'); ?>
-					<? display_perm('forums_polls_create','Can create polls in the forums.') ?>
-					<? display_perm('forums_polls_moderate','Can feature and close polls.') ?>
+                              <? display_perm('site_moderate_requests', 'Can moderate any request'); ?>
+					<? display_perm('forums_polls_create','Can create polls in the forums') ?>
+					<? display_perm('forums_polls_moderate','Can feature and close polls') ?>
 					<? display_perm('site_moderate_forums', 'Can moderate the forums', 'Can moderate the forums (lock/sticky/rename/move threads).'); ?>
-					<? display_perm('site_admin_forums', 'Can administrate the forums.','Can administrate the forums (merge/delete threads).'); ?>
-					<? display_perm('site_view_flow', 'Can view site stats and data pools.'); ?>
-					<? display_perm('site_view_full_log', 'Can view the full site log.'); ?>
-					<? display_perm('site_view_torrent_snatchlist', 'Can view torrent snatchlists.'); ?>
+					<? display_perm('site_admin_forums', 'Can administrate the forums','Can administrate the forums (merge/delete threads).'); ?>
+					<? display_perm('site_view_flow', 'Can view site stats and data pools'); ?>
+					<? display_perm('site_view_full_log', 'Can view the full site log'); ?>
+					<? display_perm('site_view_torrent_snatchlist', 'Can view torrent snatchlists'); ?>
                     
-					<? display_perm('site_view_torrent_peerlist', 'Can view torrent peerlists.'); ?>
+					<? display_perm('site_view_torrent_peerlist', 'Can view torrent peerlists'); ?>
     
-                                          <? display_perm('site_vote_tag', 'Can vote on tags.'); ?>
-                                          <? display_perm('site_add_tag', 'Can add tags.'); ?>
-            <? display_perm('site_add_multiple_tags','Can add multiple tags at once.'); ?>
-					<? display_perm('site_delete_tag', 'Can delete tags.'); ?>
+                                          <? display_perm('site_vote_tag', 'Can vote on tags'); ?>
+                                          <? display_perm('site_add_tag', 'Can add tags'); ?>
+            <? display_perm('site_add_multiple_tags','Can add multiple tags at once'); ?>
+					<? display_perm('site_delete_tag', 'Can delete tags'); ?>
 					<? display_perm('site_vote_tag_enhanced', 'Has extra tag voting power (&plusmn;'. ENHANCED_VOTE_POWER . ')','extra tag voting power is defined in config'); ?>
  
-                                         
-					<? display_perm('site_disable_ip_history', 'Disable IP history.'); ?>
-					<? display_perm('zip_downloader', 'Download multiple torrents at once.'); ?>
-					<? display_perm('site_debug', 'View site debug tables.'); ?>
-					<? display_perm('site_proxy_images', 'Proxy images through the server.'); ?>
-					<? display_perm('site_search_many', 'Can go past low limit of search results.'); ?>
-					<? display_perm('site_collages_manage','Can manage/edit any collage.'); ?>
-					<? display_perm('site_collages_recover', 'Can recover \'deleted\' collages.'); ?>
-					<? display_perm('site_forums_double_post', 'Can double post in the forums.'); ?>
-					<? display_perm('project_team', 'Part of the project team.'); ?>
-					<? display_perm('site_play_slots', 'Can play the slot machine.'); ?> 
-					<? display_perm('site_set_language', 'Can set own user language(s).', 'Can set own user language(s) on settings page.'); ?> 
-                    <? display_perm('site_torrent_signature', 'Can set and use a torrent signature.'); ?> 
+                    
+					<? display_perm('site_disable_ip_history', 'Disable IP history'); ?>
+					<? display_perm('zip_downloader', 'Download multiple torrents at once'); ?>
+					<? display_perm('site_debug', 'View site debug tables'); ?>
+					<? display_perm('site_proxy_images', 'Proxy images through the server'); ?>
+					<? display_perm('site_search_many', 'Can go past low limit of search results'); ?>
+					<? display_perm('site_collages_manage','Can manage/edit any collage'); ?>
+					<? display_perm('site_collages_recover', 'Can recover \'deleted\' collages'); ?>
+					<? display_perm('site_forums_double_post', 'Can double post in the forums'); ?>
+					<? display_perm('project_team', 'Part of the project team'); ?>
+					<? display_perm('site_play_slots', 'Can play the slot machine'); ?> 
+					<? display_perm('site_set_language', 'Can set own user language(s)', 'Can set own user language(s) on settings page.'); ?> 
+                    <? display_perm('site_torrent_signature', 'Can set and use a torrent signature'); ?> 
   
 				</td>
 			</tr>
@@ -259,44 +272,44 @@ function permissions_form(){ ?>
 			</tr>
 			<tr>
 				<td>
-					<? display_perm('users_edit_usernames', 'Can edit usernames.'); ?>
-					<? display_perm('users_edit_ratio', 'Can edit other\'s upload/download amounts.'); ?>
-					<? display_perm('users_edit_own_ratio', 'Can edit own upload/download amounts.'); ?>
+					<? display_perm('users_edit_usernames', 'Can edit usernames'); ?>
+					<? display_perm('users_edit_ratio', 'Can edit other\'s upload/download amounts'); ?>
+					<? display_perm('users_edit_own_ratio', 'Can edit own upload/download amounts'); ?>
 					
                                         <? display_perm('users_edit_tokens', 'Can edit other\'s FLTokens (Slots?)'); ?>
 					<? display_perm('users_edit_own_tokens', 'Can edit own FLTokens (Slots?)'); ?>
                                         <? display_perm('users_edit_pfl', 'Can edit other\'s personal freeleech'); ?>
                                         <? display_perm('users_edit_own_pfl', 'Can edit own personal freeleech'); ?>
-					<? display_perm('users_edit_credits', 'Can edit other\'s Bonus Credits.'); ?>
-					<? display_perm('users_edit_own_credits', 'Can edit own Bonus Credits.'); ?>
+					<? display_perm('users_edit_credits', 'Can edit other\'s Bonus Credits'); ?>
+					<? display_perm('users_edit_own_credits', 'Can edit own Bonus Credits'); ?>
       					
-                                        <? display_perm('users_edit_titles', 'Can edit titles.'); ?>
+                                        <? display_perm('users_edit_titles', 'Can edit titles'); ?>
 					<? display_perm('users_edit_avatars', 'Can edit avatars.'); ?>
-                                        <? display_perm('users_edit_badges', 'Can edit other\'s badges.'); ?>
-                                        <? display_perm('users_edit_own_badges', 'Can edit own badges.'); ?>
+                                        <? display_perm('users_edit_badges', 'Can edit other\'s badges'); ?>
+                                        <? display_perm('users_edit_own_badges', 'Can edit own badges'); ?>
                             
-					<? display_perm('users_edit_invites', 'Can edit invite numbers and cancel sent invites.'); ?>
-					<? display_perm('users_edit_watch_hours', 'Can edit contrib watch hours.'); ?>
-					<? display_perm('users_edit_reset_keys', 'Can reset any passkey/authkey.'); ?>
-					<? display_perm('users_edit_profiles', 'Can edit anyone\'s profile.'); ?>
-					<? display_perm('users_view_friends', 'Can view anyone\'s friends.'); ?>
-					<? display_perm('users_reset_own_keys', 'Can reset own passkey/authkey.'); ?>
+					<? display_perm('users_edit_invites', 'Can edit invite numbers and cancel sent invites'); ?>
+					<? display_perm('users_edit_watch_hours', 'Can edit contrib watch hours'); ?>
+					<? display_perm('users_edit_reset_keys', 'Can reset any passkey/authkey'); ?>
+					<? display_perm('users_edit_profiles', 'Can edit anyone\'s profile'); ?>
+					<? display_perm('users_view_friends', 'Can view anyone\'s friends'); ?>
+					<? display_perm('users_reset_own_keys', 'Can reset own passkey/authkey'); ?>
 					<? display_perm('users_edit_password', 'Can change password.'); ?>
-					<? display_perm('users_edit_email', 'Can change user email address.'); ?>
+					<? display_perm('users_edit_email', 'Can change user email address'); ?>
                     
-					<? display_perm('users_promote_below', 'Can promote users to below current level.'); ?>
-					<? display_perm('users_promote_to', 'Can promote users up to current level.'); ?>
-                                        <? display_perm('user_group_permissions', 'Can manage group permissions.', 'Can change a users group permission setting.'); ?> 
-					<? display_perm('users_view_donor', 'Can view users my donations page.','Can view detailed donation information for each user'); ?>
-					<? display_perm('users_give_donor', 'Can give donor status.','Can manually give donor status'); ?>
+					<? display_perm('users_promote_below', 'Can promote users to below current level'); ?>
+					<? display_perm('users_promote_to', 'Can promote users up to current level'); ?>
+                                        <? display_perm('user_group_permissions', 'Can manage group permissions', 'Can change a users group permission setting.'); ?> 
+					<? display_perm('users_view_donor', 'Can view users my donations page','Can view detailed donation information for each user'); ?>
+					<? display_perm('users_give_donor', 'Can give donor status','Can manually give donor status'); ?>
 					<? display_perm('users_warn', 'Can warn users.'); ?>
-					<? display_perm('users_disable_users', 'Can disable users.'); ?>
-					<? display_perm('users_disable_posts', 'Can disable users\' posting rights.'); ?>
-					<? display_perm('users_disable_any', 'Can disable any users\' rights.'); ?>
+					<? display_perm('users_disable_users', 'Can disable users'); ?>
+					<? display_perm('users_disable_posts', 'Can disable users\' posting rights'); ?>
+					<? display_perm('users_disable_any', 'Can disable any users\' rights'); ?>
 					<? display_perm('users_delete_users', 'Can delete anyone\'s account'); ?>
 					<? display_perm('users_view_invites', 'Can view who user has invited'); ?>
 					<? display_perm('users_view_seedleech', 'Can view what a user is seeding or leeching'); ?>
-                                    <? display_perm('users_view_bonuslog', 'Can view a users bonus logs.'); ?>
+                                    <? display_perm('users_view_bonuslog', 'Can view a users bonus logs'); ?>
 					<? display_perm('users_view_uploaded', 'Can view a user\'s uploads, regardless of privacy level'); ?>
 					<? display_perm('users_view_keys', 'Can view passkeys'); ?>
 					<? display_perm('users_view_ips', 'Can view IP addresses'); ?>
@@ -310,6 +323,7 @@ function permissions_form(){ ?>
                     <? display_perm('users_manage_cheats', 'Can manage watchlist', 'Can add and remove users from watchlist, and view speed reports page'); ?>
                     <? display_perm('users_set_suppressconncheck', 'Can set Suppress ConnCheck prompt for users', 'Suppress ConnCheck if set for a user stops any prompts in the header bar re: connectable status'); ?>
                     <? display_perm('users_view_language', 'Can view user language(s) on user profile', 'Can view user language(s) on user profile - to other users they can only be seen on the staff page'); ?>
+                    <? display_perm('users_view_anon_uploaders', 'Can view anonymous uploaders names', 'Can view anonymous uploaders names - viewable in tooltip, and anon links to actual user'); ?>
   
 					<br/>*Everything is only applicable to users with the same or lower class level
 				</td>
@@ -323,21 +337,21 @@ function permissions_form(){ ?>
 			</tr>
 			<tr>
 				<td>
-			
+     
 					<? display_perm('torrents_edit', 'Can edit any torrent'); ?>
-                                    <? display_perm('torrents_review', 'Can mark torrents for deletion.'); ?>
-                                    <? display_perm('torrents_review_override', 'Can overide ongoing marked for deletion process.'); ?>
-                                    <? display_perm('torrents_review_manage', 'Can set site options for marked for deletion list.'); ?>
-                                    <? display_perm('torrents_download_override', 'Can download torrents that are marked for deletion.'); ?>
+                                    <? display_perm('torrents_review', 'Can mark torrents for deletion'); ?>
+                                    <? display_perm('torrents_review_override', 'Can overide ongoing marked for deletion process'); ?>
+                                    <? display_perm('torrents_review_manage', 'Can set site options for marked for deletion list'); ?>
+                                    <? display_perm('torrents_download_override', 'Can download torrents that are marked for deletion'); ?>
  
 					<? display_perm('torrents_delete', 'Can delete torrents'); ?>
-					<? display_perm('torrents_delete_fast', 'Can delete more than 3 torrents at a time.'); ?>
+					<? display_perm('torrents_delete_fast', 'Can delete more than 3 torrents at a time'); ?>
 					<? display_perm('torrents_freeleech', 'Can make torrents freeleech'); ?>
-					<? display_perm('torrents_search_fast', 'Unlimit search frequency (for scripts).'); ?>
-					<? display_perm('edit_unknowns', 'Can edit unknown release information.'); ?>
+					<? display_perm('torrents_search_fast', 'Unlimit search frequency (for scripts)'); ?>
+					<? display_perm('edit_unknowns', 'Can edit unknown release information'); ?>
 					<? display_perm('site_add_logs', 'Can add logs to torrents after upload'); ?>
-					<? display_perm('torrents_hide_dnu', 'Hide the do not upload list by default.'); ?>
-					<? display_perm('torrents_hide_imagehosts', 'Hide the imagehost whitelist by default.'); ?>
+					<? display_perm('torrents_hide_dnu', 'Hide the do not upload list by default'); ?>
+					<? display_perm('torrents_hide_imagehosts', 'Hide the imagehost whitelist by default'); ?>
 				
                         </td> 
 			</tr>

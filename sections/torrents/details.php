@@ -32,6 +32,11 @@ $AltName=$GroupName; // Goes in the alt text of the image
 $Title=$GroupName; // goes in <title>
 //$Body = $Text->full_format($Body);
 
+
+list($TorrentID, $FileCount, $Size, $Seeders, $Leechers, $Snatched, $FreeTorrent, $DoubleSeed, $TorrentTime, 
+		$FileList, $FilePath, $UserID, $Username, $LastActive,
+		$BadTags, $BadFolders, $BadFiles, $LastReseedRequest, $LogInDB, $HasFile, $IsAnon) = $TorrentList[0];
+
 $tagsort = isset($_GET['tsort'])?$_GET['tsort']:'uses';
 if(!in_array($tagsort, array('uses','score','az','added'))) $tagsort = 'uses';
 
@@ -46,17 +51,17 @@ if ($TorrentTags != '') {
 		$Tags[$TagKey]['score'] = ($TagPositiveVotes - $TagNegativeVotes);
 		$Tags[$TagKey]['id']= $TagID;
 		$Tags[$TagKey]['userid']= $TagUserID;
-		$Tags[$TagKey]['username']= $TagUsername;
+		$Tags[$TagKey]['username']= anon_username_ifmatch($TagUsername, $Username, $IsAnon) ;
         $Tags[$TagKey]['uses']= $TagUses;
         
         $TagVoteUsernames = explode('|',$TagVoteUsernames);
         $TagVoteWays = explode('|',$TagVoteWays);
             $VoteMsgs=array();
             $VoteMsgs[]= "$TagName (" . str_plural('use' , $TagUses).')';
-            $VoteMsgs[]= "added by $TagUsername";
+            $VoteMsgs[]= "added by ".anon_username_ifmatch($TagUsername, $Username, $IsAnon);
         foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
             if (!$TagVoteUsername) continue;
-            $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
+            $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " (". anon_username_ifmatch($TagVoteUsername, $Username, $IsAnon).")";
         }
         $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
     }
@@ -64,32 +69,7 @@ if ($TorrentTags != '') {
 	uasort($Tags, "sort_{$tagsort}_desc");
 }
 
-/*
-$Tags = array();
-if ($TorrentTags != '') {
-	$TorrentTags=explode('|',$TorrentTags);
-	$TorrentTagIDs=explode('|',$TorrentTagIDs);
-	$TorrentTagUserIDs=explode('|',$TorrentTagUserIDs);
-	$TagPositiveVotes=explode('|',$TagPositiveVotes);
-	$TagNegativeVotes=explode('|',$TagNegativeVotes);
-	
-	foreach ($TorrentTags as $TagKey => $TagName) {
-		$Tags[$TagKey]['name'] = $TagName;
-		$Tags[$TagKey]['score'] = ($TagPositiveVotes[$TagKey] - $TagNegativeVotes[$TagKey]);
-		$Tags[$TagKey]['id']=$TorrentTagIDs[$TagKey];
-		$Tags[$TagKey]['userid']=$TorrentTagUserIDs[$TagKey];
-        
-        list($TagVoteUserIDs, $TagVoteUsernames, $TagVoteWays) = $TorrentTagVotes[$Tags[$TagKey]['id']];
-        $TagVoteUsernames = explode('|',$TagVoteUsernames);
-        $TagVoteWays = explode('|',$TagVoteWays);
-        $VoteMsgs=array();
-        foreach ($TagVoteUsernames as $TagVoteKey => $TagVoteUsername) {
-            $VoteMsgs[] = $TagVoteWays[$TagVoteKey] . " ($TagVoteUsername) ";
-        }
-        $Tags[$TagKey]['votes'] = implode("\n", $VoteMsgs);
-	}
-	uasort($Tags, "sort_$tagsort");
-} */
+
 //advance tagsort for link
 if($tagsort=='score') $tagsort2='az';
 else if($tagsort=='az') $tagsort2='uses';
@@ -102,15 +82,14 @@ if (empty($TokenTorrents)) {
 	$Cache->cache_value('users_tokens_'.$UserID, $TokenTorrents);
 }
 
-
+/*
 list($TorrentID, $FileCount, $Size, $Seeders, $Leechers, $Snatched, $FreeTorrent, $DoubleSeed, $TorrentTime, 
 		$FileList, $FilePath, $UserID, $Username, $LastActive,
-		$BadTags, $BadFolders, $BadFiles, $LastReseedRequest, $LogInDB, $HasFile) = $TorrentList[0];
+		$BadTags, $BadFolders, $BadFiles, $LastReseedRequest, $LogInDB, $HasFile, $IsAnon) = $TorrentList[0];  */
 
 
 $Review = get_last_review($GroupID); // ,
-            //$ReviewID, $Status, $ConvID, $StatusTime, $KillTime, $StatusDescription, $StatusUserID, $StatusUsername
-//error(print_r($Review,true));
+
 
 // Start output
 show_header($Title,'comments,status,torrent,bbcode,details,watchlist,jquery,jquery.cookie');  // ,tag_autocomplete,autocomplete
@@ -241,9 +220,15 @@ if(check_perms('torrents_review')){
 	<div id="messagebarA" class="messagebar<?=$AlertClass?>" title="<?=$ResultMessage?>"><?=$ResultMessage?></div>
                   
 	<div class="linkbox" >
-    <?	if( $CanEdit) {   ?>
+    <?	if( $CanEdit) {
+            if (check_perms('torrents_edit') || check_perms('site_edit_override_timelock') || time_ago($TorrentTime) < TORRENT_EDIT_TIME) {  ?>
                 <a href="torrents.php?action=editgroup&amp;groupid=<?=$GroupID?>">[Edit Torrent]</a>
-    <?	} ?> 
+    <?      }
+            if (check_perms('torrents_edit') || check_perms('site_upload_anon')) { ?>
+                <a href="torrents.php?action=editanon&amp;groupid=<?=$GroupID?>" title="Set if uploader info is visible for other users">[Anon status]</a>
+    <?      }
+        } ?>
+            
     <?	if($IsBookmarked) { ?>
                 <a href="#" id="bookmarklink_torrent_<?=$GroupID?>" onclick="Unbookmark('torrent', <?=$GroupID?>,'[Bookmark]');return false;">[Remove bookmark]</a>
     <?	} else { ?>
@@ -277,7 +262,7 @@ if(check_perms('torrents_review')){
                      <div id="top_info">
                          <table class="boxstat">
                             <tr>
-                            <td><?=format_username($UserID, $Username)?> &nbsp;<?=time_diff($TorrentTime);?></td>
+                            <td><?=torrent_username($UserID, $Username, $IsAnon)?> &nbsp;<?=time_diff($TorrentTime);?></td>
                             <td><?=get_size($Size)?></td>
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /> <?=number_format($Snatched)?></td>
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /> <?=number_format($Seeders)?></td>
@@ -369,7 +354,6 @@ if(check_perms('torrents_review')){
                 <tr>
                     <td width="200px"><strong>Current Status:</strong>&nbsp;&nbsp;<?=$Review['Status']?"$Review[Status]&nbsp;".get_status_icon($Review['Status']):'Not set'?></td>
                     <td><?=$Review['StatusDescription']?'<strong>Reason:</strong>&nbsp;&nbsp;'.$Review['StatusDescription']:''?>
-                            <? //$ConvID>0?'<span style="float:right;">'.($Status=='Pending'?'(user sent fixed message) &nbsp;&nbsp;':'').'<a href="staffpm.php?action=viewconv&id='.$ConvID.'">'.($Status=='Pending'?'Message sent to staff':"reply sent to $Username").'</a></span>':''?>
 <?
                          if ($Review['ConvID']>0) {
                              echo '<span style="float:right;">'.($Review['Status']=='Pending'?'(user sent fixed message) &nbsp;&nbsp;':'').'<a href="staffpm.php?action=viewconv&id='.$Review['ConvID'].'">'.($Review['Status']=='Pending'?'Message sent to staff':"reply sent to $Username").'</a></span>';
@@ -724,7 +708,7 @@ $FileTypes = "<span class=\"grey\" style=\"float:left;\">" . implode(' ', $FileT
             </tr>
             <tr>
                 <td colspan="6" class="right" style="border-top:none;border-bottom:none;border-left:none;">
-                    <em>Uploaded by   <?=format_username($UserID, $TorrentUploader)?> <?=time_diff($TorrentTime);?> </em>
+                    <em>Uploaded by   <?=torrent_username($UserID, $TorrentUploader, $IsAnon)?> <?=time_diff($TorrentTime);?> </em>
                 </td>
             </tr>
 <?
@@ -794,7 +778,7 @@ if (count($FilledRequests) > 0) {
 						<a href="torrents.php?action=masspm&amp;id=<?=$GroupID?>&amp;torrentid=<?=$TorrentID?>">[Mass PM Snatchers]</a>
 					</div>
 <? } ?>
-					<div class="linkbox"> 
+					<div class="linkbox">
 <? if(check_perms('site_view_torrent_peerlist')) { ?> 
 						<a href="#" onclick="show_peers('<?=$TorrentID?>', 0);return false;">(View Peerlist)</a>
 <? } ?>

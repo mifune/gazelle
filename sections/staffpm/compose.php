@@ -109,3 +109,7 @@ show_header('Start Conversation', 'inbox,staffpm,bbcode,jquery');
         </div>
 
 </div>
+
+<?
+show_footer();
+?>
