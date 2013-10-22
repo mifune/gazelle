@@ -931,6 +931,8 @@ if(count($PersonalCollages)>0) {
                             echo "There is no information on this torrent.";
 ?>
 <? 
+        if (!$IsAnon) {
+            
             $UserInfo = user_info($UserID);
             $TorrentSig = $UserInfo['TorrentSignature'];
             if($TorrentSig!='') {
@@ -943,6 +945,7 @@ if(count($PersonalCollages)>0) {
                 </div>
 <?
             }
+        }
 ?>
             </div>
         </div>
