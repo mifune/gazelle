@@ -14,6 +14,10 @@ if (!empty($_GET['page']) && is_number($_GET['page'])) {
     $Limit = 100;
 }
 
+$DB->query("SELECT UserID, Anonymous FROM torrents WHERE t.ID='$TorrentID' ");
+list($AuthorID, $IsAnon) = $DB->next_record();
+
+
  // swapped xu.timespent, for xu.mtime - see if that is more enlightening to the user
 
 $Result = $DB->query("SELECT SQL_CALC_FOUND_ROWS
@@ -87,7 +91,7 @@ $DB->set_query_id($Result);
         }
         ?>
         <tr>
-            <td><?= format_username($PeerUserID, $Username) ?></td>
+            <td><?= torrent_username($PeerUserID, $Username, $IsAnon && $PeerUserID == $AuthorID ) ?></td>
             <td><?= ($Active) ? '<span style="color:green">Yes</span>' : '<span style="color:red">No</span>' ?></td>
 
             <td><?
