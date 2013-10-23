@@ -1,4 +1,9 @@
 <?
+if (check_perms('site_force_anon_uploaders')) {
+    // then you dont get to see any torrents for any uploader!
+     error(403);
+}
+
 if (!empty($_GET['userid']) && is_number($_GET['userid'])) {
 	$UserID = $_GET['userid'];
 } else {
@@ -46,6 +51,9 @@ if (empty($_GET['type'])) {
 	}
 }
 
+if ($UserID!=$LoggedUser['ID'] && !check_perms('users_view_anon_uploaders')) {
+    $SQL .= " AND t.Anonymous='0'";
+}
 
 ZIP::unlimit();
 
@@ -58,7 +66,7 @@ $DB->query("SELECT
 	FROM torrents as t 
 	JOIN torrents_group AS tg ON t.GroupID=tg.ID 
 	LEFT JOIN torrents_files AS f ON t.ID=f.TorrentID
-	".$SQL."
+	".$SQL." 
 	GROUP BY t.ID");
 $Downloads = $DB->to_array(false,MYSQLI_NUM,false);
 

@@ -1700,6 +1700,11 @@ function make_hash($Str, $Secret) {
     return md5(md5($Secret) . md5($Str));
 }
 
+function is_anon($IsAnon) {
+    if(check_perms('site_force_anon_uploaders')) return true;
+    else if(check_perms('users_view_anon_uploaders')) return false;
+    else return $IsAnon;
+}
 
 function anon_username_ifmatch($Username, $UsernameCheck, $IsAnon = false) { 
     return anon_username($Username, $IsAnon && $Username===$UsernameCheck);
@@ -1710,9 +1715,9 @@ function anon_username($Username, $IsAnon = false) {
     if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return $Username;
     // if anon ...
     if(check_perms('users_view_anon_uploaders')) {
-        return "anonymous [$Username]";
+        return "anon [$Username]";
     } else {
-        return 'anonymous';
+        return 'anon ';
     }
 }
 
@@ -1722,11 +1727,11 @@ function torrent_username($UserID, $Username, $IsAnon = false) {
     if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return format_username($UserID, $Username);
     // if anon ...
     if(check_perms('users_view_anon_uploaders')) {
-        return '<span class="anon_name"><a href="user.php?id=' . $UserID . '" title="' . $Username . '">anonymous</a></span>';
+        return '<span class="anon_name"><a href="user.php?id=' . $UserID . '" title="' . $Username . '">anon</a></span>';
     } elseif (!$IsAnon) {
-        return '<span class="anon_name" title="your userclass is too low to see uploader info">anonymous</span>';
+        return '<span class="anon_name" title="anonymous upload: your userclass is too low to see uploader info">anon</span>';
     } else {
-        return '<span class="anon_name" title="this uploader has chosen to hide their username">anonymous</span>';
+        return '<span class="anon_name" title="anonymous upload: this uploader has chosen to hide their username">anon</span>';
     }
 }
 
@@ -1963,6 +1968,7 @@ function delete_group($GroupID) {
             }
         }
         
+    $DB->query("DELETE FROM group_log WHERE GroupID='$GroupID'");
 	$DB->query("DELETE FROM torrents_group WHERE ID='$GroupID'");
 	$DB->query("DELETE FROM torrents_tags WHERE GroupID='$GroupID'");
 	$DB->query("DELETE FROM torrents_tags_votes WHERE GroupID='$GroupID'");

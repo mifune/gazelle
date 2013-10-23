@@ -253,6 +253,7 @@ class TORRENT_FORM {
 
 
 	function foot() {
+        global $LoggedUser; 
 		$Torrent = $this->Torrent;
         
         if(check_perms('site_upload_anon')) {
@@ -261,12 +262,20 @@ class TORRENT_FORM {
                         <td class="label">Upload Anonymously</td>
                         <td>
 
-                            <input name="anonymous" value="0" type="radio"<? if($Torrent['Anonymous']!=1) echo ' checked="checked"';?>/> Show uploader name&nbsp;&nbsp;
-                            <input name="anonymous" value="1" type="radio"<? if($Torrent['Anonymous']==1) echo ' checked="checked"';?>/> Hide uploader name (Upload Anonymously)&nbsp;&nbsp;
-<br/><em><strong>note:</strong> uploader names are always hidden from lower ranked users, see user classes article in help for more info</em>
+                            <input onclick="$('#warnbox').hide();"  name="anonymous" value="0" type="radio"<? if($Torrent['Anonymous']!=1) echo ' checked="checked"';?>/> Show uploader name&nbsp;&nbsp;
+                            <input onclick="$('#warnbox').show();" name="anonymous" value="1" type="radio"<? if($Torrent['Anonymous']==1) echo ' checked="checked"';?>/> Hide uploader name (Upload Anonymously)&nbsp;&nbsp;
+                            <br/><em><strong>note:</strong> uploader names are always hidden from lower ranked users, see user classes article in help for more info</em>
+<?
+                            if(check_paranoia('tags', $LoggedUser['Paranoia'], 10000 )) {  ?>
+                                <div id="warnbox" class="warnbox hidden" >
+                                    NOTE: Your paranoia settings for tags is <strong>Tags: Show List</strong>. This will allow other users to see tags you have added to your own uploads in a list from which 
+                                    it might be possible to deduce your uploaded torrents. [<strong><a target="_blank" href="userhistory.php?action=tag_history&type=added&way=DESC&order=AddedBy&include=own&userid=<?=$LoggedUser['ID']?>" title="list of tags you have added">view your tag list</a></strong>]
+                                    <br/>To be absolutely anonymous you should change your paranoia settings on your user page to Tags: Hide List (you can show the count without giving anything away).
+                                    [<strong><a target="_blank" href="user.php?action=edit&userid=<?=$LoggedUser['ID']?>#paranoia" title="open user page on your paranoia settings">open paranoia settings</a></strong>]
+                                </div>
+<?                          }       ?>
                         </td>
                     </tr>
-	 
 <?		 
         }
         

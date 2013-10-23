@@ -116,7 +116,7 @@ show_header( "$User[Username]$TitleEnd" );
 
         $DB->query("SELECT SQL_CALC_FOUND_ROWS 
                             tags.ID AS TagID, tags.Name AS TagName, tt.UserID As AdderID, um1.Username AS AddedBy, 
-                            IF(tt.UserID = '$UserID',1,0) AS IsAdder, IF(t.UserID = '$UserID',1,0) AS IsOwner, 
+                            IF(tt.UserID = '$UserID',1,0) AS IsAdder, IF(t.UserID = '$UserID',1,0) AS IsOwner, t.Anonymous, 
                             tg.ID AS TorrentID, tg.Name AS TorrentName, um2.ID AS UploaderID, um2.Username AS Uploader,
                             ( tt.PositiveVotes- tt.NegativeVotes) AS Votes, ttv.Way 
                       FROM torrents_tags_votes AS ttv 
@@ -133,7 +133,7 @@ show_header( "$User[Username]$TitleEnd" );
     } else {
         $DB->query("SELECT SQL_CALC_FOUND_ROWS 
                             tags.ID AS TagID, tags.Name AS TagName, tt.UserID As AdderID, um1.Username AS AddedBy, 
-                            IF(tt.UserID = '$UserID',1,0) AS IsAdder, IF(t.UserID = '$UserID',1,0) AS IsOwner, 
+                            IF(tt.UserID = '$UserID',1,0) AS IsAdder, IF(t.UserID = '$UserID',1,0) AS IsOwner, t.Anonymous, 
                             tg.ID AS TorrentID, tg.Name AS TorrentName, um2.ID AS UploaderID, um2.Username AS Uploader,
                             ( tt.PositiveVotes- tt.NegativeVotes) AS Votes, ttv.Way 
                       FROM torrents_tags AS tt 
@@ -178,13 +178,14 @@ show_header( "$User[Username]$TitleEnd" );
         </tr>
 <?
     foreach ($Tags as $TagInfo) {
-        list($TagID, $TagName, $AdderID, $AddedBy, $IsAdder, $IsOwner, $GroupID, $TorrentName, $UploaderID, $Uploader, $Votes, $Way) = $TagInfo;
+        list($TagID, $TagName, $AdderID, $AddedBy, $IsAdder, $IsOwner, $IsAnon, $GroupID, $TorrentName, $UploaderID, $Uploader, $Votes, $Way) = $TagInfo;
         $row = $row== 'a'? 'b':'a';
 ?>
         <tr class="row<?=$row?>">
             <td><a href="torrents.php?taglist=<?=$TagName?>"><?=$TagName?></a></td>
-            <td class="right"><?if($IsAdder)echo'<img src="static/common/symbols/tick.png" title="tag was added by '.$AddedBy.'" />'; ?></td>
-            <td><a href="user.php?id=<?=$AdderID?>" title="tag was added by <?=$AddedBy?>"><?=$AddedBy?></a></td>
+            <td class="right"><?if($IsAdder && ($AdderID!=$UploaderID || !is_anon($IsAnon)))echo'<img src="static/common/symbols/tick.png" title="tag was added by '.$AddedBy.'" />'; ?></td>
+           <? /* <td><a href="user.php?id=<?=$AdderID?>" title="tag was added by <?=$AddedBy?>"><?=$AddedBy?></a></td> */ ?>
+            <td><?= torrent_username($AdderID, $AddedBy, $IsAnon && $AdderID===$UploaderID) ?></td>
             <td>
 <?              if (!$Way) echo '<span class="blue">-</span>';
                 elseif ($Way=='up') echo '<span class="green">Up</span>';
@@ -193,8 +194,10 @@ show_header( "$User[Username]$TitleEnd" );
             <td><?=$Votes?></td>
             <td><a href="torrents.php?id=<?=$GroupID?>" title="<?=$TorrentName?>"><?=cut_string($TorrentName,50)?></a></td>
             <td class="right"><?
-                if($IsOwner)echo'<img src="static/common/symbols/tick.png" title="torrent was uploaded by '.$Uploader.'" />';?></td>
-            <td><a href="user.php?id=<?=$UploaderID?>" title="torrent was uploaded by <?=$Uploader?>"><?=$Uploader?></a></td>
+                if($IsOwner && !is_anon($IsAnon))echo'<img src="static/common/symbols/tick.png" title="torrent was uploaded by '.anon_username($Uploader, $IsAnon).'" />';?></td>
+            
+          <? /*  <td><a href="user.php?id=<?=$UploaderID?>" title="torrent was uploaded by <?=$Uploader?>"><?=$Uploader?></a></td>*/ ?>
+            <td><?= torrent_username($UploaderID, $Uploader, $IsAnon) ?></td>
         </tr>
         
 <?  }    ?>

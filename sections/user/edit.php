@@ -597,7 +597,7 @@ echo $Val->GenerateJS('userform');
 					<p class="min_padding">Note: In order to be accepted as correct, your IRCKey must be between 6 and 32 characters.</p>
 				</td>
 			</tr>-->
-			<tr class="colhead">
+			<tr id="paranoia" class="colhead">
 				<td colspan="2">
 					<strong>Paranoia settings</strong>
 				</td>

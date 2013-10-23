@@ -694,6 +694,7 @@ $Bookmarks = all_bookmarks('torrent');
         }
         $TorrentTags = implode(' ', $TorrentTags);
 
+        $TorrentUsername = torrent_username($Data['UserID'], $Data['Username'], $Data['Anonymous']);
 
         // Viewing a type that does not require grouping
 
@@ -701,7 +702,7 @@ $Bookmarks = all_bookmarks('torrent');
         $OverName = mb_strlen($GroupName) <= 60 ? $GroupName : mb_substr($GroupName, 0, 56) . '...';
         //$SL = ($TotalSeeders == 0 ? "<span class=r00>" . number_format($TotalSeeders) . "</span>" : number_format($TotalSeeders)) . "/" . number_format($TotalLeechers);
         $SL = ($Data['Seeders'] == 0 ? "<span class=r00>" . number_format($Data['Seeders']) . "</span>" : number_format($Data['Seeders'])) . "/" . number_format($Data['Leechers']);
-        $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong><br />{$Data['Username']}<br /><br /><strong>Size:</strong><br />" . get_size($Data['Size']) . "<br /><br /><strong>Snatched:</strong><br />" . number_format($Data['Snatched']) . "<br /><br /><strong>Seeders/Leechers:</strong><br />" . $SL . "</td></tr></table>";
+        $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong><br />$TorrentUsername<br /><br /><strong>Size:</strong><br />" . get_size($Data['Size']) . "<br /><br /><strong>Snatched:</strong><br />" . number_format($Data['Snatched']) . "<br /><br /><strong>Seeders/Leechers:</strong><br />" . $SL . "</td></tr></table>";
  
         $AddExtra = torrent_icons($Data, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
             
@@ -751,7 +752,7 @@ $Bookmarks = all_bookmarks('torrent');
             <td><?= number_format($Data['Snatched']) ?></td>
             <td<?= ($Data['Seeders'] == 0) ? ' class="r00"' : '' ?>><?= number_format($Data['Seeders']) ?></td>
             <td><?= number_format($Data['Leechers']) ?></td>
-            <td class="user"><?=torrent_username($Data['UserID'], $Data['Username'], $Data['Anonymous']) ?></td>
+            <td class="user"><?=$TorrentUsername ?></td>
           <? /* <td class="user"><a href="user.php?id=<?= $Data['UserID'] ?>" class="user"><?= $Data['Username'] ?></a></td> */ ?>
         </tr>
         <?

@@ -618,7 +618,7 @@ list($NumTagVotes) = $DB->next_record();
 
 
 ?>
-		<div class="head colhead_dark">Community</div>
+		<div id="community" class="head colhead_dark">Community</div>
 		<div class="box">
 			<ul class="stats nobullet">
                 
@@ -730,7 +730,7 @@ list($NumTagVotes) = $DB->next_record();
 <? } elseif (check_paranoia_here('requestsvoted_bounty')) { ?>
 				<li>Requests voted: <?=get_size($TotalSpent)?> spent</li>
 <? } ?>
-<? if (check_paranoia_here('uploads')) { ?>
+<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('uploads')) { ?>
 				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View all uploads by <?=$Username?>">View</a>]
             <?  if($OwnProfile || check_perms('zip_downloader')) { ?> 
                     [<a href="torrents.php?action=redownload&amp;type=uploads&amp;userid=<?=$UserID?>" title="Download all uploaded torrents in a zip" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]

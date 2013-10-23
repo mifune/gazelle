@@ -916,7 +916,7 @@ if($Day != next_day() || $_GET['runday']){
 	}
 	echo "Old threads locked\n";
 
-	//------------- Delete dead torrents ------------------------------------//
+	//------------- Delete dead torrents   ## torrent reaper ## ------------------------------------//
 	
 	sleep(10);
 	//remove dead torrents that were never announced to -- XBTT will not delete those with a pid of 0, only those that belong to them (valid pids)
@@ -987,6 +987,9 @@ if($Day != next_day() || $_GET['runday']){
 		echo "\nDeleted $i torrents for inactivity\n";
 	}
 
+    
+    
+    
 	// Daily top 10 history.
 	$DB->query("INSERT INTO top10_history (Date, Type) VALUES ('$sqltime', 'Daily')");
 	$HistoryID = $DB->inserted_id();

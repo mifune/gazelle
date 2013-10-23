@@ -192,3 +192,8 @@ span.rbm { display: block; background: url('../rippy/rippy_middle.gif') repeat b
 span.rbb { display: block; padding: 4px 0px 18px; margin-bottom: 5px; background: url('../rippy/rippy_bottom.gif') no-repeat bottom; }
 
 .breadcrumbs { font-weight: bold; text-align: right; }
+
+
+.warnbox {
+    background-color: #f99;border: 2px solid #600;color: darkblue;font-size: 1.2em;padding:5px;
+}
