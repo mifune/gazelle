@@ -34,7 +34,7 @@ if(!empty($_GET['advanced']) && check_perms('site_advanced_top10')) {
 	$Limit = in_array($Limit, array(10, 100, 250,500)) ? $Limit : 10;
 }
 $Filtered = !empty($Where);
-show_header('Top '.$Limit.' Torrents');
+show_header('Top '.$Limit.' Torrents','overlib');
 ?>
 <div class="thin">
 	<h2> Top <?=$Limit?> Torrents </h2>
@@ -122,7 +122,8 @@ $BaseQuery = "SELECT
       u.Username, 
       t.FreeTorrent, 
       t.double_seed ,
-      t.Anonymous
+      t.Anonymous,
+      g.Image
 	FROM torrents AS t
 	LEFT JOIN torrents_group AS g ON g.ID = t.GroupID
     LEFT JOIN users_main AS u ON u.ID = t.UserID ";
@@ -277,15 +278,15 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
     $Bookmarks = all_bookmarks('torrent');
 	foreach ($Details as $Detail) {
 		list($TorrentID,$GroupID,$GroupName, $NewCategoryID, $TorrentTags,
-			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName,,,$IsAnon) = $Detail;
+			$Snatched,$Seeders,$Leechers,$Data,$Size,$UploaderID,$UploaderName,,,$IsAnon,$Image) = $Detail;
 		// highlight every other row
 		$Rank++;
 		$row = ($Rank % 2 ? 'b' : 'a');
 
         $Review = get_last_review($GroupID);
 		// generate torrent's title
-		$DisplayName = "<a href='torrents.php?id=$GroupID&amp;torrentid=$TorrentID'  title='View Torrent'>$GroupName</a>";
-		
+		//$DisplayName = "<a href='torrents.php?id=$GroupID&amp;torrentid=$TorrentID'  title='View Torrent'>$GroupName</a>"; 
+        
 		$TagList=array();
 		
 		$PrimaryTag = '';
@@ -312,8 +313,18 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
                     <div title="<?=$NewCategories[$NewCategoryID]['tag']?>"><img src="<?=$CatImg?>" /></div>
                 </td>
 		<td>
-            <?=$Icons?>
-            <strong><?=$DisplayName?></strong>
+ <?
+                if ($LoggedUser['HideFloat']){?>
+                    <?=$Icons?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
+<?              } else { 
+                    $Overlay = get_overlay_html($GroupName, anon_username($UploaderName, $IsAnon), $Image, $Seeders, $Leechers, $Size, $Snatched);
+                    ?>
+                    <script>
+                        var overlay<?=$GroupID?> = <?=json_encode($Overlay)?>
+                    </script>
+                    <?=$Icons?>
+                    <a href="torrents.php?id=<?=$GroupID?>" onmouseover="return overlib(overlay<?=$GroupID?>, FULLHTML);" onmouseout="return nd();"><?=$GroupName?></a> 
+<?              }  ?>
                     
     <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 			<?=$TorrentTags?>

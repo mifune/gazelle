@@ -183,7 +183,7 @@ $Badges.=($Warned!='0000-00-00 00:00:00') ? '<img src="'.STATIC_SERVER.'common/s
 $Badges.=($Enabled == '1' || $Enabled == '0' || !$Enabled) ? '': '<img src="'.STATIC_SERVER.'common/symbols/disabled.png" alt="Banned" />';
 
 
-show_header($Username,'jquery,jquery.cookie,user,bbcode,requests,watchlist');
+show_header($Username,'overlib,jquery,jquery.cookie,user,bbcode,requests,watchlist');
 
 ?>
 <div class="thin">

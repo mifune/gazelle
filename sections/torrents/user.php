@@ -143,7 +143,7 @@ if($UserID!=$LoggedUser['ID'] && !check_perms('users_view_anon_uploaders')) {
 }
 
 if((empty($_GET['search']) || trim($_GET['search']) == '') && $Order!='Name') {
-	$SQL = "SELECT SQL_CALC_FOUND_ROWS t.GroupID, t.ID AS TorrentID, $Time AS Time, tg.NewCategoryID
+	$SQL = "SELECT SQL_CALC_FOUND_ROWS t.GroupID, t.ID AS TorrentID, $Time AS Time, tg.NewCategoryID, tg.Image
 		FROM $From
 		JOIN torrents_group AS tg ON tg.ID=t.GroupID
 		WHERE $UserField='$UserID' $ExtraWhere $SearchWhere
@@ -155,6 +155,7 @@ if((empty($_GET['search']) || trim($_GET['search']) == '') && $Order!='Name') {
 		TorrentID int(10) unsigned not null,
 		Time int(12) unsigned not null,
                 NewCategoryID int(11) unsigned,
+                Image varchar(255),
 		Seeders int(6) unsigned,
 		Leechers int(6) unsigned,
 		Snatched int(10) unsigned,
@@ -166,6 +167,7 @@ if((empty($_GET['search']) || trim($_GET['search']) == '') && $Order!='Name') {
 		t.ID AS TorrentID, 
 		$Time AS Time, 
                 tg.NewCategoryID,
+                tg.Image,
 		t.Seeders,
 		t.Leechers,
 		t.Snatched,
@@ -181,7 +183,7 @@ if((empty($_GET['search']) || trim($_GET['search']) == '') && $Order!='Name') {
 	}
 
 	$SQL = "SELECT SQL_CALC_FOUND_ROWS 
-		GroupID, TorrentID, Time, NewCategoryID
+		GroupID, TorrentID, Time, NewCategoryID, Image
 		FROM temp_sections_torrents_user";
 	if(!empty($Words)) {
 		$SQL .= "
@@ -205,7 +207,7 @@ $User = user_info($UserID);
 
 
 
-if(!$INLINE) show_header($User['Username'].'\'s '.$Action.' torrents');
+if(!$INLINE) show_header($User['Username'].'\'s '.$Action.' torrents', 'overlib');
 
 $Pages=get_pages($Page,$TorrentCount,$TorrentsPerPage,8,'#torrents');
 
@@ -319,7 +321,7 @@ foreach($NewCategories as $Cat) {
       $row = 'a';
     $Bookmarks = all_bookmarks('torrent');
 	foreach($TorrentsInfo as $TorrentID=>$Info) {
-		list($GroupID,, $Time, $NewCategoryID) = array_values($Info);
+		list($GroupID,, $Time, $NewCategoryID, $Image) = array_values($Info);
 		
 		list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Results[$GroupID]);
 		$Torrent = $Torrents[$TorrentID];
@@ -336,8 +338,9 @@ foreach($NewCategories as $Cat) {
 		}
 		$TorrentTags = implode(' ', $TorrentTags);
 				
-		$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>'; // &amp;torrentid='.$TorrentID.'
-		
+		// $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>'; // &amp;torrentid='.$TorrentID.'
+		$DisplayName = $GroupName;
+        
         if ($Torrent['ReportCount'] > 0) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
@@ -355,8 +358,20 @@ foreach($NewCategories as $Cat) {
                 <div title="<?=$NewCategories[$NewCategoryID]['tag']?>"><img src="<?='static/common/caticons/'.$NewCategories[$NewCategoryID]['image']?>" /></div>
 			</td>
 			<td>
-                <?=$Icons?> 
-				<?=$DisplayName?>
+                <? //$Icons?> 
+				<? //$DisplayName?>
+                <?
+                if ($LoggedUser['HideFloat']){?>
+                    <?=$Icons?> <a href="torrents.php?id=<?=$GroupID?>"><?=$DisplayName?></a> 
+<?              } else { 
+                    $Overlay = get_overlay_html($GroupName, anon_username($Torrent['Username'], $Torrent['Anonymous']), $Image, $Torrent['Seeders'], $Torrent['Leechers'], $Torrent['Size'], $Torrent['Snatched']);
+                    ?>
+                    <script>
+                        var overlay<?=$GroupID?> = <?=json_encode($Overlay)?>
+                    </script>
+                    <?=$Icons?>
+                    <a href="torrents.php?id=<?=$GroupID?>" onmouseover="return overlib(overlay<?=$GroupID?>, FULLHTML);" onmouseout="return nd();"><?=$DisplayName?></a> 
+<?              }  ?>
 				<br />
           <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>                                
 				<div class="tags">

@@ -696,8 +696,8 @@ $Bookmarks = all_bookmarks('torrent');
 
         $TorrentUsername = anon_username($Data['Username'], $Data['Anonymous']);
 
-        // Viewing a type that does not require grouping
-
+        
+        /*
         $OverImage = $Image != '' ? $Image : '/static/common/noartwork/noimage.png';
         $OverName = mb_strlen($GroupName) <= 60 ? $GroupName : mb_substr($GroupName, 0, 56) . '...';
         //$SL = ($TotalSeeders == 0 ? "<span class=r00>" . number_format($TotalSeeders) . "</span>" : number_format($TotalSeeders)) . "/" . number_format($TotalLeechers);
@@ -705,7 +705,8 @@ $Bookmarks = all_bookmarks('torrent');
         //$Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong><br />$TorrentUsername<br /><br /><strong>Size:</strong><br />" . get_size($Data['Size']) . "<br /><br /><strong>Snatched:</strong><br />" . number_format($Data['Snatched']) . "<br /><br /><strong>Seeders/Leechers:</strong><br />" . $SL . "</td></tr></table>";
  
         $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $TorrentUsername<br /><br /><strong>Size:</strong> " . get_size($Data['Size']) . "<br /><br /><strong>Snatched:</strong> " . number_format($Data['Snatched']) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
- 
+        */
+        
         $AddExtra = torrent_icons($Data, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
             
         $row = ($row == 'a'? 'b' : 'a');
@@ -733,7 +734,9 @@ $Bookmarks = all_bookmarks('torrent');
                 
                 if ($LoggedUser['HideFloat']){?>
                     <?=$AddExtra?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
-<?              } else { ?>
+<?              } else { 
+                    $Overlay = get_overlay_html($GroupName, $TorrentUsername, $Image, $Data['Seeders'], $Data['Leechers'], $Data['Size'], $Data['Snatched']);
+                    ?>
                     <script>
                         var overlay<?=$GroupID?> = <?=json_encode($Overlay)?>
                     </script>

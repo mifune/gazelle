@@ -2444,9 +2444,14 @@ a.button:visited {
 }
 
 .overlay, .leftOverlay, .rightOverlay {
-    background-color: black;
-    color: #eee;
-}
+    background-color: #0d245a;
+    color: #eee;;
+} 
+/*
+.overlay, .leftOverlay, .rightOverlay {
+    background-color: #0d245a;
+    color: #fff;
+} */
 
 .overlay .leftOverlay {
     width: 150px;

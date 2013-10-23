@@ -153,8 +153,9 @@ foreach ($TorrentList as $GroupID=>$Group) {
 
         list($TorrentID, $Torrent) = each($Torrents);
 
-        $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-     
+        //$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
+        $DisplayName = $GroupName;
+        
         if ($Torrent['ReportCount'] > 0) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
@@ -171,9 +172,19 @@ foreach ($TorrentList as $GroupID=>$Group) {
                 <div title="<?=$NewCategories[$NewCategoryID]['tag']?>"><img src="<?=$CatImg?>" />
                 </div>
         </td>
-        <td>
-            <?  //print_torrent_status($TorrentID, $Torrent['Status']); ?>
-                <?=$Icons?><strong><?=$DisplayName?></strong> 
+        <td> 
+                <?
+                if ($LoggedUser['HideFloat']){?>
+                    <?=$Icons?> <a href="torrents.php?id=<?=$GroupID?>"><?=$DisplayName?></a> 
+<?              } else { 
+                    $Overlay = get_overlay_html($GroupName, anon_username($Torrent['Username'], $Torrent['Anonymous']), $Image, $Torrent['Seeders'], $Torrent['Leechers'], $Torrent['Size'], $Torrent['Snatched']);
+                    ?>
+                    <script>
+                        var overlay<?=$GroupID?> = <?=json_encode($Overlay)?>
+                    </script>
+                    <?=$Icons?>
+                    <a href="torrents.php?id=<?=$GroupID?>" onmouseover="return overlib(overlay<?=$GroupID?>, FULLHTML);" onmouseout="return nd();"><?=$DisplayName?></a> 
+<?              }  ?>
                 <? if ($LoggedUser['HideTagsInLists'] !== 1) { 
                     echo $TorrentTags;
                  } ?>
@@ -237,7 +248,7 @@ for ($i=0; $i < $NumGroups/$CollageCovers; $i++) {
 	$CollagePages[] = $CollagePage;
 }
 
-show_header($Name,'browse,collage,comments,bbcode,jquery');
+show_header($Name,'overlib,browse,collage,comments,bbcode,jquery');
 ?>
 <div class="thin">
 	<h2><?=$Name?></h2>

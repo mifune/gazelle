@@ -2337,7 +2337,6 @@ function check_perms($PermissionName, $MinClass = 0) {
 }
 
 
-
 // Function to get data and torrents for an array of GroupIDs.
 // In places where the output from this is merged with sphinx filters, it will be in a different order.
 function get_groups($GroupIDs, $Return = true, $Torrents = true) {
@@ -2598,6 +2597,32 @@ function get_tags($TagNames) {
 
     return($TagIDs);
 }
+
+
+
+
+
+function get_overlay_html($GroupName, $Username, $Image, $Seeders, $Leechers, $Size, $Snatched) {
+    
+    $OverImage = $Image != '' ? $Image : '/static/common/noartwork/noimage.png';
+    $OverName = mb_strlen($GroupName) <= 60 ? $GroupName : mb_substr($GroupName, 0, 56) . '...';
+    $SL = ($Seeders == 0 ? "<span class=r00>" . number_format($Seeders) . "</span>" : number_format($Seeders)) . " / " . number_format($Leechers);
+    //$Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $Username<br /><br /><strong>Size:</strong> " . get_size($Size) . "<br /><br /><strong>Snatched:</strong> " . number_format($Snatched) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
+    /*
+    $Overlay = '<table class=overlay><tr><td class="overlay" colspan="3"><strong>'.$OverName.'</strong></td></tr>
+                <tr><td class="leftOverlay" rowspan="5"><img style="max-width: 150px;" src="' . $OverImage . '" /></td>
+                    <td class=rightOverlay><strong>Uploader:</strong></td><td>'.$Username.'</td></tr>
+                <tr><td class=rightOverlay><strong>Size:</strong></td><td>' . get_size($Size) . '</td></tr>
+                <tr><td class=rightOverlay><strong>Snatched:</strong></td><td>' . number_format($Snatched) . '</td></tr>
+                <tr><td class=rightOverlay><strong>S/L:</strong></td><td>' . $SL . "</td></tr></table>";  */
+    
+    $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $Username<br /><br /><strong>Size:</strong> " . get_size($Size) . "<br /><br /><strong>Snatched:</strong> " . number_format($Snatched) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
+   
+    return $Overlay;
+}
+
+
+
 
 function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID,
     global $DB, $Cache, $LoggedUser, $TorrentUserStatus, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
