@@ -1236,6 +1236,15 @@ tr.rowa, .rowa {    /* original alternate row color: quite blue #E1E9F2;*/
 tr.rowb, .rowb {
     background-color: white;
 }
+tr.rowa.sticky {
+    /* background-color:#E2D244; */
+    background-color:#BACBD8;
+}
+tr.rowb.sticky {
+    /* background-color:#F4E649; */
+    background-color:#D7E2EF;
+    background-color:#c7d2dF;
+}
 
 td {
   /* border-bottom: 1px solid #dde; */

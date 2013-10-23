@@ -212,7 +212,7 @@ if (count($Forum) == 0) {
 		if($Locked) { $Read .= "_locked"; }
 		if($Sticky) { $Read .= "_sticky"; }
 ?>
-	<tr class="row<?=$Row?>">
+	<tr class="row<?=$Row; if($Sticky)echo' sticky'?>">
 		<td class="<?=$Read?>" title="<?=ucwords(str_replace('_',' ',$Read))?>"></td>
 		<td>
 			<span style="float:left;" class="last_topic">

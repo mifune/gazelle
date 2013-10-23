@@ -1038,7 +1038,13 @@ tr.rowa, .rowa {    /* original alternate row color: quite blue #E1E9F2;*/
     background-color: #222; /* lighter shade: #eff3f6;*/
 }
 tr.rowb, .rowb {
-    background-color: 0092FF;
+    background-color: #000;
+}
+tr.rowa.sticky {
+    background-color:#555;
+}
+tr.rowb.sticky {
+    background-color:#555;
 }
 
 td {

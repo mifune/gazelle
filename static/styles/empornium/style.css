@@ -1101,6 +1101,12 @@ tr.rowa, .rowa {    /* original alternate row color: quite blue #E1E9F2;*/
 tr.rowb, .rowb {
     background-color: white;
 }
+tr.rowa.sticky {
+    background-color:#BACBD8;
+}
+tr.rowb.sticky {
+    background-color:#c7d2dF;
+}
 
 td {
     border: 1px solid #98AAB1;
