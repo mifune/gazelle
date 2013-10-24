@@ -22,6 +22,19 @@ $IsAnon = ($IsAnon==1) ? '1' : '0' ;
 $DB->query("UPDATE torrents SET Anonymous='$IsAnon' WHERE GroupID='$GroupID'");
 $Cache->delete_value('torrents_details_'.$GroupID);
 
+
+//Fix Recent Uploads/Downloads for anon change
+$DB->query("SELECT DISTINCT UserID
+			FROM torrents AS t
+			JOIN torrents_group AS tg ON t.GroupID=tg.ID
+			WHERE tg.ID = $GroupID");
+
+$UserIDs = $DB->collect('UserID');
+foreach($UserIDs as $UserID) {
+    $Cache->delete_value('recent_uploads_'.$UserID);
+}
+
+
 write_group_log($GroupID, 0, $LoggedUser['ID'], "Anonymous status set to " . (($IsAnon=='1') ? 'TRUE' : 'FALSE'), 1);
 
 header('Location: torrents.php?id='.$GroupID );

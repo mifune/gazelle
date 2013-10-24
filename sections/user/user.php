@@ -750,18 +750,18 @@ if (check_paranoia_here('seeding+') || check_paranoia_here('leeching+')) {
 	$Leeching = isset($PeerCount['Leeching'][1]) ? $PeerCount['Leeching'][1] : 0; */
 }
 ?>
-<? if (check_paranoia_here('seeding')) { ?>
+<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('seeding')) { ?>
 				<li>Seeding: <?=number_format($Seeding)?> <?=($Snatched && ($OwnProfile || check_paranoia_here(false)))?'(' . 100*min(1,round($Seeding/$UniqueSnatched,2)).'%) ':''?>[<a href="torrents.php?type=seeding&amp;userid=<?=$UserID?>" title="View seeding torrents">View</a>]<? if ($OwnProfile || check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=seeding&amp;userid=<?=$UserID?>"  title="Download all seeding torrents in a zip"onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
 <? } elseif (check_paranoia_here('seeding+')) { ?>
 				<li>Seeding: <?=number_format($Seeding)?></li>
 <? } ?>
-<? if (check_paranoia_here('leeching')) { ?>
+<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('leeching')) { ?>
 				<li>Leeching: <?=number_format($Leeching)?> [<a href="torrents.php?type=leeching&amp;userid=<?=$UserID?>" title="View leeching torrents">View</a>]<?=($DisableLeech == 0 && check_perms('users_view_ips')) ? "<strong> (Disabled)</strong>" : ""?></li>
 <? } elseif (check_paranoia_here('leeching+')) { ?>
 				<li>Leeching: <?=number_format($Leeching)?></li>
 <? } 
 ?>
-<? if (check_paranoia_here('snatched')) { ?>
+<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('snatched')) { ?>
 				<li>Snatched: <span title="total snatched"><?=number_format($Snatched)?></span> 
                               <span title="total unique snatched">(<?=number_format($UniqueSnatched)?>)</span>
 				[<a href="torrents.php?type=snatched&amp;userid=<?=$UserID?>" title="View snatched torrents">View</a>]
@@ -786,7 +786,7 @@ if (check_paranoia_here('grabbed+')) {
         <li>Grabbed: <span title="total grabbed"><?=number_format($NumDownloads)?></span> 
                      <span title="total unique grabbed">(<?=number_format($UniqueDownloads)?>) </span> 
                     
-<?      if (check_paranoia_here('grabbed')) { ?> 
+<?      if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('grabbed')) { ?> 
             [<a href="torrents.php?type=downloaded&amp;userid=<?=$UserID?>" title="View grabbed torrents">View</a>]
                 <? if($OwnProfile || check_perms('zip_downloader')) { ?> 
                     [<a href="torrents.php?action=redownload&amp;type=grabbed&amp;userid=<?=$UserID?>" title="Download all grabbed torrents in a zip" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
@@ -1082,7 +1082,7 @@ if ($Snatched > 4 && check_paranoia_here('snatched')) {
 }
 
 if(!isset($Uploads)) { $Uploads = 0; }
-if ($Uploads > 0 && check_paranoia_here('uploads')) {
+if (!check_perms('site_force_anon_uploaders') && $Uploads > 0 && check_paranoia_here('uploads')) {
 	$RecentUploads = $Cache->get_value('recent_uploads_'.$UserID);
 	if(!is_array($RecentUploads)){
 		$DB->query("SELECT 
@@ -1091,7 +1091,7 @@ if ($Uploads > 0 && check_paranoia_here('uploads')) {
 		g.Image
 		FROM torrents_group AS g
 		INNER JOIN torrents AS t ON t.GroupID=g.ID
-		WHERE t.UserID='$UserID'
+		WHERE t.UserID='$UserID' AND t.Anonymous='0'
 		GROUP BY g.ID
 		ORDER BY t.Time DESC
 		LIMIT 5");

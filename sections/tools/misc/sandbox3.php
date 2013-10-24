@@ -106,8 +106,8 @@ $numtorrents = $DB->record_count();
         <div class="box pad">     
             <input type="submit" name="submit" value="Fix Titles" />
         </div>
-    </form>
 <? }  ?>
+    </form>
 </div>
 <?
 

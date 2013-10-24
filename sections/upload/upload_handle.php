@@ -537,6 +537,7 @@ update_hash($GroupID);
 //--------------- Stupid Recent Uploads ----------------------------------------//
 
 //if (trim($Properties['Image']) != "") {
+if ($Properties['Anonymous'] == "0") {
     $RecentUploads = $Cache->get_value('recent_uploads_' . $UserID);
     if (is_array($RecentUploads)) {
         do {
@@ -554,9 +555,9 @@ update_hash($GroupID);
             $Cache->cache_value('recent_uploads_' . $UserID, $RecentUploads, 0);
         } while (0);
     }
-//}
+}
 
-    
+
 //******************************************************************************//
 //--------------- possible dupe - send staff a pm ---------------------------------------//
     

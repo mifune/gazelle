@@ -1,73 +1,95 @@
-
 <?
-echo "<pre>";
+set_time_limit(50000);
 
-$sqltime= sqltime();
+$Limit = isset($_REQUEST['limit']) ? (int)$_REQUEST['limit'] : 100;
+if ($Limit <= 10) $Limit = 10;
+elseif ($Limit > 100000) $Limit = 100000;
 
-    // ---------- remove old requests (and return bounties) -------------
-    
-    // return bounties for each voter
-    $DB->query("SELECT r.ID, r.Title, v.UserID, v.Bounty
-                  FROM requests as r JOIN requests_votes as v ON v.RequestID=r.ID 
-                 WHERE TorrentID='0' AND TimeAdded < '".time_minus(3600*24*90)."'" );
-    
-	$RemoveBounties = $DB->to_array();
-    $RemoveRequestIDs = array();
-    
-        echo "remove bounties: \n" .print_r( $RemoveBounties, true);
+$View = isset($_REQUEST['view']) ? (int)$_REQUEST['view'] : 100;
+if ($View <= 10) $View = 10;
+elseif ($View > 1000) $View = 1000;
+
+$DB->query("SELECT SQL_CALC_FOUND_ROWS
+                   UserID, TorrentID, Count(TorrentID), Max( Time ) 
+              FROM users_downloads 
+          GROUP BY UserID, TorrentID
+            HAVING Count(TorrentID)>1
+          ORDER BY Count(TorrentID) DESC
+             LIMIT $Limit");
+
+$Dupes = $DB->to_array(false, MYSQLI_NUM);
+
+$DB->query("SELECT FOUND_ROWS()");
+list($NumResults) = $DB->next_record();
+
+
+$DoFix = isset($_POST['submit']) && $_POST['submit']=='Fix Dupes';
+
+if($DoFix) {
+    $total =0;
+    foreach($Dupes as $Dupe) {
+        list($UserID, $TorrentID, $Count, $Time) = $Dupe;
         
-        
-    foreach($RemoveBounties as $BountyInfo) {
-        list($RequestID, $Title, $UserID, $Bounty) = $BountyInfo;
-        // collect unique request ID's the old fashioned way
-        if (!in_array($RequestID, $RemoveRequestIDs)) $RemoveRequestIDs[] = $RequestID;
-        // return bounty and log in staff notes
-        $Title = db_string($Title);
-		$DB->query("UPDATE users_info AS ui JOIN users_main AS um ON um.ID = ui.UserID
-                       SET um.Uploaded=(um.Uploaded+'$Bounty'),
-                           ui.AdminComment = CONCAT('".$sqltime." - Bounty of " . get_size($Bounty). " returned from expired Request $RequestID ($Title).\n', ui.AdminComment)
-			         WHERE ui.UserID = '$UserID'");
-        // send users who got bounty returned a PM
-        send_pm($UserID, 0, "Bounty returned from expired request", "Your bounty of " . get_size($Bounty). " has been returned from the expired Request $RequestID ($Title).");
-     
+        $DB->query("DELETE FROM users_downloads WHERE UserID='$UserID' AND TorrentID='$TorrentID' AND Time != '$Time'");
+        $num = $DB->affected_rows();
+        $total += $num;
     }
+}
+
+show_header("Fix dupe torrent grabs");
+
+?>
+<div class="thin">
+    <h2>Fix dupe torrent grabs</h2>
     
-    if (count($RemoveRequestIDs)>0) {
-        // log and update sphinx for each request
-        $DB->query("SELECT r.ID, r.Title, Count(v.UserID), SUM( v.Bounty), r.GroupID 
-                      FROM requests as r JOIN requests_votes as v ON v.RequestID=r.ID 
-                     WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")
-                     GROUP BY r.ID" );
-
-        $RemoveRequests = $DB->to_array();
-
-        /*
-        // delete the requests
-        $DB->query("DELETE r, v, t, c
-                      FROM requests as r 
-                 LEFT JOIN requests_votes as v ON r.ID=v.RequestID 
-                 LEFT JOIN requests_tags AS t ON r.ID=t.RequestID 
-                 LEFT JOIN requests_comments AS c ON r.ID=c.RequestID
-                     WHERE r.ID IN(".implode(",", $RemoveRequestIDs).")"); 
-*/
+    <form method="post" action="" >
+        <div class="head"></div>
+        <div class="box pad">
+            <input type="hidden" name="action" value="sandbox7" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+            count torrent/user dupes: <?=$NumResults?><br/>
+            Limit (number to process at once): <input type="text" name="limit" size="3" value="<?=$Limit?>" /><br/>
+            View amount: <input type="text" name="view" size="3" value="<?=$View?>" /><br/> 
+            <input type="submit" name="submit" value="Just View" />
+        </div>
+    
+<? //if (!$DoFix) {  ?>
+        <div class="head"></div>
+        <div class="box pad">     
+            <input type="submit" name="submit" value="Fix Dupes" />
+        </div>
+<? //}  ?>
         
-        //log and update sphinx (sphinx call must be done after requests are deleted)    
-        foreach($RemoveRequests as $Request) {
-            list($RequestID, $Title, $NumUsers, $Bounty, $GroupID) = $Request;
-
-            write_log("Request $RequestID ($Title) expired - returned total of ". get_size($Bounty)." to $NumUsers users");
-
-            $Cache->delete_value('request_votes_'.$RequestID);
-            if ($GroupID) {
-                $Cache->delete_value('requests_group_'.$GroupID);
-            }
-            //update_sphinx_requests($RequestID);
-
-        }
+        <div class="head"></div>
+        <div class="box pad">
+            
+<?          if ($DoFix) {  ?>
+                Removed <?=$total?> total dupes from <?=$NumResults?> user/torrent groups<br/>
+<?          }  ?>
+                Viewing first <?=$View?> of <?=$NumResults?> records <br/><br/>
+            
+            <table>
+                <tr class="colhead">
+                    <td>UserID</td><td>TorrentID</td><td>Count</td><td>Time</td>
+                </tr>
+<?
+                $i=0;
+                foreach($Dupes as $Dupe) {
+                    list($UserID, $TorrentID, $Count, $Time) = $Dupe;
+?>
+                    <tr>
+                        <td><?=$UserID?></td><td><?=$TorrentID?></td><td><?=$Count?></td><td><?=$Time?></td>
+                    </tr>
+<?
+                    $i++;
+                    if($i>=$View) break;
+                }
+?>
+            </table>
+        </div>
         
-        echo "\n\nremove request IDs: \n" .print_r( $RemoveRequestIDs, true);
-    }
-    
-echo "</pre>";
-    
+    </form>
+</div>
+<?
+show_footer();
 ?>
