@@ -27,7 +27,7 @@ if(empty($_GET['type'])) {
 		case 'voted':
 			if(!empty($_GET['userid'])) {
 				if(is_number($_GET['userid'])) {
-					if (!check_paranoia('requestsvoted_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
+					if (!check_force_anon($_GET['userid']) || !check_paranoia('requestsvoted_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
 					$Title = "Requests voted for by ".$UserInfo['Username'];
 					$SS->set_filter('voter', array($_GET['userid']));
 				} else {
@@ -42,7 +42,7 @@ if(empty($_GET['type'])) {
 			if(empty($_GET['userid']) || !is_number($_GET['userid'])) {
 				error(404);
 			} else {
-				if (!check_paranoia('requestsfilled_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
+				if (!check_force_anon($_GET['userid']) || !check_paranoia('requestsfilled_list', $UserInfo['Paranoia'], $Perms['Class'], $_GET['userid'])) { error(PARANOIA_MSG); }
 				$Title = "Requests filled by ".$UserInfo['Username'];
 				$SS->set_filter('fillerid', array($_GET['userid']));
 			}

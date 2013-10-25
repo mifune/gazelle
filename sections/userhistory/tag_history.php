@@ -14,7 +14,7 @@ $Perms = get_permissions($User['PermissionID']);
 $UserClass = $Perms['Class'];
 
 
-if(!check_paranoia('tags', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
+if(!check_force_anon($UserID) || !check_paranoia('tags', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 
 
 

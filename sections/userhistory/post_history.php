@@ -26,6 +26,7 @@ if (isset($LoggedUser['PostsPerPage'])) {
 
 list($Page,$Limit) = page_limit($PerPage);
 
+/*
 if(($UserInfo = $Cache->get_value('user_info_'.$UserID)) === FALSE) {
 	$DB->query("SELECT
 		m.Username,
@@ -46,7 +47,16 @@ if(($UserInfo = $Cache->get_value('user_info_'.$UserID)) === FALSE) {
 	list($Username, $Enabled, $Title, $PermissionID, $CustomPermissions, $Avatar, $Donor, $Warned) = $DB->next_record(MYSQLI_BOTH,array('CustomPermissions'));
 } else {
 	extract(array_intersect_key($UserInfo, array_flip(array('Username', 'Enabled', 'Title', 'PermissionID', 'CustomPermissions', 'Avatar', 'Donor', 'Warned'))));
-}
+} */
+
+$UserInfo = user_info($UserID);
+list( ,$Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $Title) = array_values($UserInfo);
+
+$UserPermissions = get_permissions($PermissionID);
+$UserClass = $UserPermissions['Class'];
+
+if ( !check_force_anon($UserID) || 
+            !check_paranoia('torrentcomments', $Paranoia, $UserClass, $UserID)) { error(PARANOIA_MSG); }
 
 if(check_perms('site_proxy_images') && !empty($Avatar)) {
 	$Avatar = 'http'.($SSL?'s':'').'://'.SITE_URL.'/image.php?c=1&i='.urlencode($Avatar);
@@ -59,8 +69,8 @@ if($LoggedUser['CustomForums']) {
 	$RestrictedForums = implode("','", array_keys($LoggedUser['CustomForums'], 0));
 }
 
-$UserPermissions = get_permissions($PermissionID);
-$PermissionsInfo = get_permissions_for_user($UserID, $CustomPermissions, $UserPermissions);
+//$UserPermissions = get_permissions($PermissionID);
+$PermissionsInfo = get_permissions_for_user($UserID, false, $UserPermissions);
 
 $ViewingOwn = ($UserID == $LoggedUser['ID']);
 $ShowUnread = ($ViewingOwn && (!isset($_GET['showunread']) || !!$_GET['showunread']));

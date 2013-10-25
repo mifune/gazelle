@@ -2336,6 +2336,10 @@ function check_perms($PermissionName, $MinClass = 0) {
     return (isset($LoggedUser['Permissions'][$PermissionName]) && $LoggedUser['Permissions'][$PermissionName] && $LoggedUser['Class'] >= $MinClass) ? true : false;
 }
 
+function check_force_anon($UserID) {
+	global $LoggedUser;
+	return $UserID == $LoggedUser['ID'] || !check_perms('site_force_anon_uploaders')  ;
+}
 
 // Function to get data and torrents for an array of GroupIDs.
 // In places where the output from this is merged with sphinx filters, it will be in a different order.

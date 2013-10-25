@@ -295,22 +295,22 @@ if (check_perms('users_manage_cheats', $Class)) {
 		<div class="box">
 			<ul class="stats nobullet">
 				<li>Joined: <?=$JoinedDate?></li>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('lastseen')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('lastseen')) { ?>
 				<li>Last Seen: <?=$LastAccess?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('uploaded')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('uploaded')) { ?>
 				<li>Uploaded: <?=get_size($Uploaded)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('downloaded')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('downloaded')) { ?>
 				<li>Downloaded: <?=get_size($Downloaded)?></li>
 <? } ?>
 <? if (check_paranoia_here('ratio')) { ?>
 				<li>Ratio: <?=ratio($Uploaded, $Downloaded)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('requiredratio') && isset($RequiredRatio)) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('requiredratio') && isset($RequiredRatio)) { ?>
 				<li>Required ratio: <?=number_format((double)$RequiredRatio, 2)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && ($OwnProfile || check_paranoia_here(false))) { //if ($OwnProfile || check_perms('users_mod')) { ?>
+<? if (check_force_anon($UserID) && ($OwnProfile || check_paranoia_here(false))) { //if ($OwnProfile || check_perms('users_mod')) { ?>
 				<li><a href="userhistory.php?action=token_history&amp;userid=<?=$UserID?>">Slots</a>: <?=number_format($FLTokens)?></li>
 <? } ?>
 			</ul>
@@ -433,6 +433,8 @@ $OverallRank = $Rank->overall_score($UploadedRank, $DownloadedRank, $UploadsRank
 		</ul>
 	</div>
 <?	} ?>
+    
+    
 		<div class="head colhead_dark">Personal</div>
 		<div class="box">
 			<ul class="stats nobullet">
@@ -481,7 +483,7 @@ if($ParanoiaLevel == 0) {
 	$ParanoiaLevelText = 'Very high';
 }
  
-    if(!check_perms('site_force_anon_uploaders')) { ?>
+    if(check_force_anon($UserID)) { ?>
 				<li>Paranoia level: <span title="<?=$ParanoiaLevel?>"><?=$ParanoiaLevelText?></span></li>
 <?  }
 
@@ -632,7 +634,7 @@ list($NumTagVotes) = $DB->next_record();
      */
 // if (isset($_GET['tags']) ) {
     
-    if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('tags+')) { 
+    if (check_force_anon($UserID) && check_paranoia_here('tags+')) { 
 
         $UserTagCount = $Cache->get_value('user_tag_count_'.$UserID);
     
@@ -679,7 +681,7 @@ list($NumTagVotes) = $DB->next_record();
     }  
                 
     
-   if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('tags')) { ?>
+   if (check_force_anon($UserID) && check_paranoia_here('tags')) { ?>
 				<li>Tags added: <span title="Tags on other uploaders torrents added"><?=$NumOthersTags?></span> 
                                 <span title="Tags on own torrents added (<?=($NumOthersTags+$NumOwnTags)?> total)">(+<?=$NumOwnTags?>) </span> 
                                 [<a href="userhistory.php?action=tag_history&amp;type=added&amp;userid=<?=$UserID?>" title="View all tags added by <?=$Username?>">View</a>]
@@ -699,24 +701,24 @@ list($NumTagVotes) = $DB->next_record();
  //} // end if $_GET['tags'] hack
 
 ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('torrentcomments')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('torrentcomments')) { ?>
 				<li>Forum Posts: <?=number_format($ForumPosts)?> [<a href="userhistory.php?action=posts&amp;userid=<?=$UserID?>" title="View all forum posts by <?=$Username?>">View</a>]</li>
 				<li>Torrent Comments: <?=number_format($NumComments)?> [<a href="comments.php?id=<?=$UserID?>" title="View all torrent comments by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here('torrentcomments+')) { ?>
 				<li>Forum Posts: <?=number_format($ForumPosts)?></li>
 				<li>Torrent Comments: <?=number_format($NumComments)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('collages')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('collages')) { ?>
 				<li>Collages started: <?=number_format($NumCollages)?> [<a href="collages.php?userid=<?=$UserID?>" title="View all collages started by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here('collages+')) { ?>
 				<li>Collages started: <?=number_format($NumCollages)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('collagecontribs')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('collagecontribs')) { ?>
 				<li>Collages contributed to: <?=number_format($NumCollageContribs)?> [<a href="collages.php?userid=<?=$UserID?>&amp;contrib=1" title="View all collages added to by <?=$Username?>">View</a>]</li>
 <? } elseif(check_paranoia_here('collagecontribs+')) { ?>
 				<li>Collages contributed to: <?=number_format($NumCollageContribs)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('requestsfilled_list')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('requestsfilled_list')) { ?>
 				<li>Requests filled: <?=number_format($RequestsFilled)?> for <?=get_size($TotalBounty)?> [<a href="requests.php?type=filled&amp;userid=<?=$UserID?>" title="View all requests filled by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here(array('requestsfilled_count', 'requestsfilled_bounty'))) { ?>
 				<li>Requests filled: <?=number_format($RequestsFilled)?> for <?=get_size($TotalBounty)?></li>
@@ -725,7 +727,7 @@ list($NumTagVotes) = $DB->next_record();
 <? } elseif (check_paranoia_here('requestsfilled_bounty')) { ?>
 				<li>Requests filled: <?=get_size($TotalBounty)?> collected</li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('requestsvoted_list')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('requestsvoted_list')) { ?>
 				<li>Requests voted: <?=number_format($RequestsVoted)?> for <?=get_size($TotalSpent)?> [<a href="requests.php?type=voted&amp;userid=<?=$UserID?>" title="View all requests added to by <?=$Username?>">View</a>]</li>
 <? } elseif (check_paranoia_here(array('requestsvoted_count', 'requestsvoted_bounty'))) { ?>
 				<li>Requests voted: <?=number_format($RequestsVoted)?> for <?=get_size($TotalSpent)?></li>
@@ -734,7 +736,7 @@ list($NumTagVotes) = $DB->next_record();
 <? } elseif (check_paranoia_here('requestsvoted_bounty')) { ?>
 				<li>Requests voted: <?=get_size($TotalSpent)?> spent</li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('uploads')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('uploads')) { ?>
 				<li>Uploaded: <?=number_format($Uploads)?> [<a href="torrents.php?type=uploaded&amp;userid=<?=$UserID?>" title="View all uploads by <?=$Username?>">View</a>]
             <?  if($OwnProfile || check_perms('zip_downloader')) { ?> 
                     [<a href="torrents.php?action=redownload&amp;type=uploads&amp;userid=<?=$UserID?>" title="Download all uploaded torrents in a zip" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
@@ -754,18 +756,18 @@ if (check_paranoia_here('seeding+') || check_paranoia_here('leeching+')) {
 	$Leeching = isset($PeerCount['Leeching'][1]) ? $PeerCount['Leeching'][1] : 0; */
 }
 ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('seeding')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('seeding')) { ?>
 				<li>Seeding: <?=number_format($Seeding)?> <?=($Snatched && ($OwnProfile || check_paranoia_here(false)))?'(' . 100*min(1,round($Seeding/$UniqueSnatched,2)).'%) ':''?>[<a href="torrents.php?type=seeding&amp;userid=<?=$UserID?>" title="View seeding torrents">View</a>]<? if ($OwnProfile || check_perms('zip_downloader')) { ?> [<a href="torrents.php?action=redownload&amp;type=seeding&amp;userid=<?=$UserID?>"  title="Download all seeding torrents in a zip"onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]<? } ?></li>
 <? } elseif (check_paranoia_here('seeding+')) { ?>
 				<li>Seeding: <?=number_format($Seeding)?></li>
 <? } ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('leeching')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('leeching')) { ?>
 				<li>Leeching: <?=number_format($Leeching)?> [<a href="torrents.php?type=leeching&amp;userid=<?=$UserID?>" title="View leeching torrents">View</a>]<?=($DisableLeech == 0 && check_perms('users_view_ips')) ? "<strong> (Disabled)</strong>" : ""?></li>
 <? } elseif (check_paranoia_here('leeching+')) { ?>
 				<li>Leeching: <?=number_format($Leeching)?></li>
 <? } 
 ?>
-<? if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('snatched')) { ?>
+<? if (check_force_anon($UserID) && check_paranoia_here('snatched')) { ?>
 				<li>Snatched: <span title="total snatched"><?=number_format($Snatched)?></span> 
                               <span title="total unique snatched">(<?=number_format($UniqueSnatched)?>)</span>
 				[<a href="torrents.php?type=snatched&amp;userid=<?=$UserID?>" title="View snatched torrents">View</a>]
@@ -790,7 +792,7 @@ if (check_paranoia_here('grabbed+')) {
         <li>Grabbed: <span title="total grabbed"><?=number_format($NumDownloads)?></span> 
                      <span title="total unique grabbed">(<?=number_format($UniqueDownloads)?>) </span> 
                     
-<?      if (!check_perms('site_force_anon_uploaders') && check_paranoia_here('grabbed')) { ?> 
+<?      if (check_force_anon($UserID) && check_paranoia_here('grabbed')) { ?> 
             [<a href="torrents.php?type=downloaded&amp;userid=<?=$UserID?>" title="View grabbed torrents">View</a>]
                 <? if($OwnProfile || check_perms('zip_downloader')) { ?> 
                     [<a href="torrents.php?action=redownload&amp;type=grabbed&amp;userid=<?=$UserID?>" title="Download all grabbed torrents in a zip" onclick="return confirm('If you no longer have the content, your ratio WILL be affected, be sure to check the size of all torrents before redownloading.');">Download</a>]
@@ -814,7 +816,7 @@ if($OwnProfile || check_perms('users_view_donor')) {
 <?
 }
 
-if(!check_perms('site_force_anon_uploaders') && check_paranoia_here('invitedcount')) {
+if(check_force_anon($UserID) && check_paranoia_here('invitedcount')) {
 	$DB->query("SELECT COUNT(UserID) FROM users_info WHERE Inviter='$UserID'");
 	list($Invited) = $DB->next_record();
 ?>
@@ -835,7 +837,7 @@ if(!check_perms('site_force_anon_uploaders') && check_paranoia_here('invitedcoun
 		 && (time() < strtotime($RatioWatchEnds))
 		&& ($Downloaded*$RequiredRatio)>$Uploaded ) { */
         
-    if(!check_perms('site_force_anon_uploaders') &&  $RatioWatchEnds!='0000-00-00 00:00:00' 
+    if(check_force_anon($UserID) &&  $RatioWatchEnds!='0000-00-00 00:00:00' 
 		&& ($Downloaded*$RequiredRatio)>$Uploaded ) {
 ?>
         <div class="head">Ratio watch</div>
@@ -1048,7 +1050,7 @@ if ($Enabled == '1' && !$OwnProfile) {
 <?
 }
 
-if (!check_perms('site_force_anon_uploaders') && $Snatched > 4 && check_paranoia_here('snatched')) {
+if (check_force_anon($UserID) && $Snatched > 0 && check_paranoia_here('snatched')) {
         $CookieItems[] = 'snatches';
 	$RecentSnatches = $Cache->get_value('recent_snatches_'.$UserID);
 	if(!is_array($RecentSnatches)){
@@ -1086,7 +1088,7 @@ if (!check_perms('site_force_anon_uploaders') && $Snatched > 4 && check_paranoia
 }
 
 if(!isset($Uploads)) { $Uploads = 0; }
-if (!check_perms('site_force_anon_uploaders') && $Uploads > 0 && check_paranoia_here('uploads')) {
+if (check_force_anon($UserID) && $Uploads > 0 && check_paranoia_here('uploads')) {
 	$RecentUploads = $Cache->get_value('recent_uploads_'.$UserID);
 	if(!is_array($RecentUploads)){
 		$DB->query("SELECT 
@@ -1198,7 +1200,7 @@ if ((check_perms('users_view_invites')) && $Invited > 0) {
 }
 
 // Requests
-if (check_paranoia_here('requestsvoted_list')) {
+if (check_force_anon($UserID) && check_paranoia_here('requestsvoted_list')) {
         $CookieItems[] = 'requests';
 	$DB->query("SELECT
 			r.ID,
@@ -2062,7 +2064,7 @@ if (check_perms('users_mod', $Class)) {
         </form>
 <? } // end moderation panel 
 
-    //$CookieItems = "['" . implode("','", $CookieItems) . "']";
+
 ?>
             
 				<script type="text/javascript">
@@ -2071,12 +2073,12 @@ if (check_perms('users_mod', $Class)) {
                 
       <a id="torrents"></a>
 <?    
-	  if ($LoggedUser['HideUserTorrents']==0 && check_paranoia_here('uploads') && !check_perms('site_force_anon_uploaders')) { 
+	  if ($LoggedUser['HideUserTorrents']==0 && check_paranoia_here('uploads') && check_force_anon($UserID)) { 
             $INLINE=true;
             $_GET['userid'] = $UserID;
             $_GET['type'] = 'uploaded';
-		include(SERVER_ROOT.'/sections/torrents/user.php');
-        }
+            include(SERVER_ROOT.'/sections/torrents/user.php');
+      }
 ?>
 	</div>
     <div class="clear"></div>
