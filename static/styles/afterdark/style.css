@@ -2521,3 +2521,9 @@ blockquote.bbcode.error code.error {
     font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
     font-weight: bold;
 }
+
+.anon_name {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+}

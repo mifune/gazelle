@@ -623,7 +623,9 @@ if (check_perms('users_mod') || $LoggedUser['SupportFor'] !="" || $LoggedUser['D
 <?                      } if (check_perms('site_manage_tags')) { ?>
                             <li><a href="tools.php?action=official_tags">Official Tags</a></li> 
 <?                      } if (check_perms('site_convert_tags')) { ?>
-                            <li><a href="tools.php?action=official_synonyms">Official Synonyms</a></li> 
+                            <li><a href="tools.php?action=official_synonyms">Official Synonyms</a></li>
+<?                      } if (check_perms('admin_manage_site_options')) { ?>
+                            <li><a href="tools.php?action=page_log">Page Logs</a></li> 
 <?                      } if (check_perms('users_mod')) { ?>
                             <li><a href="torrents.php?action=allcomments">Recent Comments</a></li> 
 <?                      } if (check_perms('admin_manage_languages')) { ?>

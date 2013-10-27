@@ -66,6 +66,7 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/managers/site_options.php');
         break;
     case 'take_site_options':
+        if (!check_perms('admin_manage_site_options')) error(403); 
         $remove_freeleech = $_POST['remove_freeleech'];
         //$freeleech = $_POST['freeleech'];
         if ($remove_freeleech == 'on') {
@@ -91,6 +92,45 @@ switch ($_REQUEST['action']) {
 
         header('Location: tools.php?action=site_options');
         break;
+        
+    case 'change_logging':
+        if (!check_perms('admin_manage_site_options')) error(403);
+        
+        if($_POST['submit']=="Change logging status"){
+            
+            $logging_status = (int)$_POST['logging'];
+            if ($logging_status< 0 || $logging_status > 3) $logging_status =0;
+
+            $DB->query("UPDATE site_options SET FullLogging='$logging_status'");
+            
+        } elseif($_POST['submit']=="Delete some"){
+            
+            $WHERE = array();
+            if ($_POST['id_under']) {
+                $under = (int)$_POST['under'];
+                $WHERE[] = "id < '$under'";
+            }
+            if ($_POST['id_over']) {
+                $over = (int)$_POST['over'];
+                $WHERE[] = "id > '$over'";
+            }
+            if (count($WHERE)>0){
+                $DB->query("DELETE FROM full_log WHERE " . implode(' OR ', $WHERE));
+            }
+            
+        } elseif($_POST['submit']=="Delete all"){
+            
+            $DB->query("TRUNCATE TABLE full_log");
+        } 
+        
+        header('Location: tools.php?action=page_log');
+        break;
+
+    case 'page_log':
+        include(SERVER_ROOT . '/sections/tools/data/page_log.php');
+        break;
+        
+        
 
     case 'languages':
         include(SERVER_ROOT . '/sections/tools/managers/languages_list.php');

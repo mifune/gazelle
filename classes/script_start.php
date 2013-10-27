@@ -282,20 +282,32 @@ if (isset($LoginCookie)) {
 $Debug->set_flag('end user handling');
 
 // -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
-$DB->query('SELECT FreeLeech FROM site_options');
-list($Sitewide_Freeleech) = $DB->next_record();
+$DB->query('SELECT FreeLeech, FullLogging FROM site_options');
+list($Sitewide_Freeleech, $FullLogging) = $DB->next_record();
 $Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
 
 
 
 
-/*
-// full logging for analysing bots!
-$DB->query("INSERT INTO full_log (userID, time, ip, request) 
-                          VALUES ( '$LoggedUser[ID]' , '".time()."', '$RealIP', '' )");
-
-*/
-
+// full logging for analysing bots! 
+if ($FullLogging!='0') {
+    $uri = $_SERVER['REQUEST_URI'];
+    if($FullLogging=='3' ||
+       ($FullLogging=='2' && !in_array($uri, array( "/torrents.php?action=resort_tags", "/torrents.php?action=update_status"))) ||
+       ($FullLogging=='1' && substr($uri, 0, 9)=='/user.php') ) {
+        $vars = implode("|", $_REQUEST);
+        if ($vars) {
+            $keys = implode("|", array_keys($_REQUEST));
+            $vars = "~$keys~$vars";
+        }
+        $DB->query("INSERT INTO full_log (userID, time, ip, ipnum, request, variables) 
+                         VALUES ( '$LoggedUser[ID]' , '".db_string(sqltime())."', '".db_string($RealIP)."', '" . ip2unsigned($RealIP) . "',
+                                  '".db_string($uri)."', '".db_string($_SERVER['REQUEST_METHOD']. $vars )."' )");
+    }
+}
+unset($RealIP);
+unset($keys);
+unset($vars);
 
 
 $TorrentUserStatus = $Cache->get_value('torrent_user_status_'.$LoggedUser['ID']);

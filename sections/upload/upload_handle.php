@@ -628,7 +628,7 @@ $Item = $Feed->torrent($Title,
                         $TorrentSize,
                         $TotalSize,
                         get_size($TotalSize),
-                        $LoggedUser['Username'], 
+                        ($Properties['Anonymous']=='1'?'anon':$LoggedUser['Username']), 
                         "torrents.php?filter_cat[".$_POST['category']."]=1",
                         $NewCategories[(int)$_POST['category']]['name'],
                         implode($Tags, ' '));

@@ -2717,3 +2717,9 @@ blockquote.bbcode.error code.error {
 .indent {
     margin-left: 20px;
 }
+
+.anon_name {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+}

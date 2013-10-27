@@ -17,6 +17,34 @@ show_header('Manage Site Options', 'jquery');
     <h2>Manage Site Options</h2>
 
     <div class="head">
+        Logging
+    </div>
+    <div class="box">
+        <form action="tools.php" method="post">
+            <input type="hidden" name="action" value="change_logging" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+            <table class="shadow">
+                <tr>
+                    <td class="label">Page Request Logging:</td>
+                    <td>
+                        <select name="logging">
+                            <option value="0" <? if ($FullLogging=='0') echo 'selected="selected"' ;?>>Off</option>
+                            <option value="1" <? if ($FullLogging=='1') echo 'selected="selected"' ;?>>Only user.php</option>
+                            <option value="2" <? if ($FullLogging=='2') echo 'selected="selected"' ;?>>Nearly All (excludes some common known ajax calls)</option>
+                            <option value="3" <? if ($FullLogging=='3') echo 'selected="selected"' ;?>>Absolutely All</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Save Changes" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div class="head">
         Sitewide Freeleech
     </div>
     <div class="box">	
