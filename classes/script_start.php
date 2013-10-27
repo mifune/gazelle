@@ -205,6 +205,7 @@ if (isset($LoginCookie)) {
     //Change necessary triggers in external components
     $Cache->CanClear = check_perms('admin_clear_cache');
 
+    $RealIP = $_SERVER['REMOTE_ADDR'];
     // Because we <3 our staff
     if (check_perms('site_disable_ip_history')) {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
@@ -278,8 +279,24 @@ if (isset($LoginCookie)) {
     }
 }
 
-
 $Debug->set_flag('end user handling');
+
+// -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
+$DB->query('SELECT FreeLeech FROM site_options');
+list($Sitewide_Freeleech) = $DB->next_record();
+$Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
+
+
+
+
+/*
+// full logging for analysing bots!
+$DB->query("INSERT INTO full_log (userID, time, ip, request) 
+                          VALUES ( '$LoggedUser[ID]' , '".time()."', '$RealIP', '' )");
+
+*/
+
+
 
 $TorrentUserStatus = $Cache->get_value('torrent_user_status_'.$LoggedUser['ID']);
 if ($TorrentUserStatus === false) {
@@ -292,10 +309,6 @@ if ($TorrentUserStatus === false) {
     $Cache->cache_value('torrent_user_status_'.$LoggedUser['ID'], $TorrentUserStatus, 600);
 }
 
-// -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
-$DB->query('SELECT FreeLeech FROM site_options');
-list($Sitewide_Freeleech) = $DB->next_record();
-$Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
 
 
 $Debug->set_flag('start function definitions');

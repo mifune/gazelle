@@ -10,7 +10,7 @@ info.php
 ######################
 # if we want to upload the db files we need to edit this #
 *.log
-*.sql
+#*.sql
 *.sqlite
 
 ##  specific db and import files ##

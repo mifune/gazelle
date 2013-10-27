@@ -1,6 +1,6 @@
 <?
 
-if (check_perms('site_force_anon_uploaders')) {
+if (check_force_anon($_GET['userid'])) {
     // then you dont get to see any torrents for any uploader!
      error(403);
 }
