@@ -279,9 +279,6 @@ if (isset($LoginCookie)) {
     }
 }
 
-if ($LoggedUser['ID']=='0' || empty($LoggedUser['Username'])) {
-        logout(); // Ghost
-}
 
 $Debug->set_flag('end user handling');
 
