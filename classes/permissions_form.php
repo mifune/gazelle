@@ -12,6 +12,8 @@
     
 	'site_leech' => 'Can leech (Does this work?).',
 	'site_upload' => 'Upload torrent access.',
+	'site_upload_anon' => 'Can upload anonymously',
+	'site_edit_override_timelock' => 'Can edit own torrents after edit timelock',
     
 	'use_templates' => 'Can use templates.',
 	'make_private_templates' => 'Can make/delete private upload templates.',
