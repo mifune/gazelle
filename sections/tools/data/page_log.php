@@ -131,7 +131,7 @@ list($NumResults) = $DB->next_record();
 ?>
 		<tr class="row<?=$Row?>">
 			<td class="nobr"><span style="color:grey"><?=$id?></span></td>
-			<td class="nobr"><?=format_username($userid,$UserInfo['Username'])?></td>
+			<td class="nobr"><?=("$userid &nbsp;".format_username($userid,$UserInfo['Username']))?></td>
 			<td class="nobr"><?=time_diff($time,2,true,false,1)?></td>
 			<td class="nobr"><?=$ip?></td>
 			<td class="nobr"><?=$parts[0]?></td>

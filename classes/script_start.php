@@ -279,14 +279,18 @@ if (isset($LoginCookie)) {
     }
 }
 
+if ($LoggedUser['ID']=='0' || empty($LoggedUser['Username'])) {
+        logout(); // Ghost
+}
+
 $Debug->set_flag('end user handling');
+
+
 
 // -- may as well set $Global_Freeleech_On here as its tested in private_header & browse etc
 $DB->query('SELECT FreeLeech, FullLogging FROM site_options');
 list($Sitewide_Freeleech, $FullLogging) = $DB->next_record();
 $Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
-
-
 
 
 // full logging for analysing bots! 
