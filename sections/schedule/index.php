@@ -735,7 +735,7 @@ if($Day != next_day() || $_GET['runday']){
 
         // Take users off ratio watch 
         $UserQuery = $DB->query("SELECT m.ID, torrent_pass FROM users_info AS i JOIN users_main AS m ON m.ID=i.UserID
-                WHERE m.Downloaded=0 OR m.Uploaded/m.Downloaded >= m.RequiredRatio
+                WHERE ( m.Downloaded=0 OR m.Uploaded/m.Downloaded >= m.RequiredRatio )
                 AND i.RatioWatchEnds!='0000-00-00 00:00:00'
                 AND m.Enabled='1'");
         $OffRatioWatch = $DB->collect('ID');
