@@ -1034,6 +1034,7 @@ CREATE TABLE IF NOT EXISTS `reportsv2` (
   KEY `Status` (`Status`),
   KEY `Type` (`Type`(1)),
   KEY `LastChangeTime` (`LastChangeTime`),
+  KEY `ReporterID` (`ReporterID`),
   KEY `TorrentID` (`TorrentID`),
   KEY `ResolverID` (`ResolverID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
