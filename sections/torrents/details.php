@@ -75,11 +75,12 @@ if($tagsort=='score') $tagsort2='az';
 else if($tagsort=='az') $tagsort2='uses';
 else $tagsort2='score';
 
-$TokenTorrents = $Cache->get_value('users_tokens_'.$UserID);
+$LoggedUserID = $LoggedUser['ID'];
+$TokenTorrents = $Cache->get_value('users_tokens_'.$LoggedUserID);
 if (empty($TokenTorrents)) {
-	$DB->query("SELECT TorrentID, FreeLeech, DoubleSeed FROM users_slots WHERE UserID=$UserID");
+	$DB->query("SELECT TorrentID, FreeLeech, DoubleSeed FROM users_slots WHERE UserID=$LoggedUserID");
 	$TokenTorrents = $DB->to_array('TorrentID');
-	$Cache->cache_value('users_tokens_'.$UserID, $TokenTorrents);
+	$Cache->cache_value('users_tokens_'.$LoggedUserID, $TokenTorrents);
 }
 
 /*
