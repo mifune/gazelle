@@ -2932,7 +2932,7 @@ function disable_users($UserIDs, $AdminComment, $BanReason = 1) {
 		i.BanReason='" . $BanReason . "',
 		i.RatioWatchDownload=" . ($BanReason == 2 ? 'm.Downloaded' : "'0'") . "
 		WHERE m.ID IN(" . implode(',', $UserIDs) . ") ");
-    $Cache->decrement('stats_user_count', $DB->affected_rows());
+    $Cache->decrement('stats_user_count', $DB->affected_rows() / 2); # Two tables are affected, meaning affected_rows() is actually twice the number of disabled users.
     foreach ($UserIDs as $UserID) {
         /*
           $Cache->cache_value('enabled_'.$UserID, 2, 2592000);
