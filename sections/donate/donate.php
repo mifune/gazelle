@@ -78,7 +78,7 @@ show_header('Donate','bitcoin');
             
             foreach ($DonateLevels as $level=>$rate) {
                 ?>
-                    <li>If you donate &euro;<?=$level?> you will get <?=number_format($level * $rate)?> GB removed from your <u>download</u>   <strong>(rate: <?=$rate?>gb per &euro;) &nbsp; ( <?=number_format($level/$eur_rate,3)?> bitcoins)</strong></li>  
+                    <li>If you donate &euro;<?=$level?> you will get <?=number_format($level * $rate)?> GB removed from your <u>download</u>   <strong>(rate: <?=$rate?>gb per &euro;) &nbsp; ( <?=number_format($level/$eur_rate,6)?> bitcoins)</strong></li>  
             
                 <?
             }
