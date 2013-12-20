@@ -172,7 +172,7 @@ else {
 
 	// Function to log a user's login attempt
 	function log_attempt($UserID) {
-		global $DB, $AttemptID, $Attempts, $Bans, $BannedUntil, $Time;
+		global $DB, $Cache, $AttemptID, $Attempts, $Bans, $BannedUntil, $Time;
                 
                 // The user exists in the database, inform the user about the failed login attempt.
                 if ($UserID > 0) {
