@@ -1,5 +1,5 @@
 <?
-if (check_force_anon($_GET['userid'])) {
+if (!check_force_anon($_GET['userid'])) {
     // then you dont get to see any torrents for any uploader!
      error(403);
 }
