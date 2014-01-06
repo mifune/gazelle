@@ -130,16 +130,26 @@ function validate_btc_address($address) {
 
 
 function check_bitcoin_balance($address, $numtransactions=6) {
-    
-    return file_get_contents("http://blockexplorer.com/q/getreceivedbyaddress/$address/$numtransactions");
- 
+
+    $satoshis = intval(file_get_contents("http://blockchain.info/q/getreceivedbyaddress/{$address}?confirmations={$numtransactions}"));
+    $btc = $satoshis / 100000000.0;
+    if ($btc > 0) {
+        return sprintf('%.8F', $btc);
+    } else {
+        return '0';
+    }
 }
 
 
 
 function check_bitcoin_activation($address) {
     
-    return file_get_contents("http://blockexplorer.com/q/addressfirstseen/$address");  
+    $timestamp = intval(file_get_contents("http://blockchain.info/q/addressfirstseen/$address"));
+    if ($timestamp > 0) {
+        return date('Y-m-d H:i:s', $timestamp);
+    } else {
+        return "Never seen";
+    }
 }
 
 
