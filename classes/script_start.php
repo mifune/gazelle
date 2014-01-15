@@ -1684,7 +1684,7 @@ function is_valid_tag($Tag){
     $len = strlen($Tag);
     if ( $len < 2 || $len > 32) return false;
     if ( $len == 2 ) {  
-        if(!$Good2charTags) $Good2charTags = array('hd','dp','bj','ts','sd','69','mf','3d','hj','bi','tv','dv','da');
+        if(!$Good2charTags) $Good2charTags = array('hd','dp','bj','ts','sd','69','mf','3d','hj','bi','tv','dv','da', '4k');
         if ( !in_array($Tag, $Good2charTags) ) return false;
     }
     return true;
