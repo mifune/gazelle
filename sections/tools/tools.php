@@ -90,6 +90,8 @@ if (check_perms('admin_donor_addresses')) { ?>
 			<tr><td><a href="tools.php?action=special_users">Special Users</a></td></tr>
 <? } if (check_perms('admin_manage_site_options')) { ?>
             <tr><td><a href="tools.php?action=page_log">Page Logs</a></td></tr> 
+<? } if (check_perms('admin_data_viewer')) { ?>
+            <tr><td><a href="tools.php?action=data_viewer">Data Viewer</a></td></tr> 
 
 <? } ?>
 		</table>

@@ -826,6 +826,10 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/data/special_users.php');
         break;
 
+    case 'data_viewer':
+        include(SERVER_ROOT . '/sections/tools/data/data_viewer.php');
+        break;
+
 
     case 'browser_support':
         include(SERVER_ROOT . '/sections/tools/data/browser_support.php');

@@ -178,6 +178,7 @@
 	'admin_login_watch' => 'Can manage login watch.',
 	'admin_manage_wiki' => 'Can manage wiki access.',
 	'admin_update_geoip' => 'Can update geoip data.',
+	'admin_data_viewer' => 'Can access data viewer.',
 	'site_collages_manage' => 'Can manage any collage.',
  	'site_collages_recover' => 'Can recover \'deleted\' collages.',
  	'edit_unknowns' => 'Can edit unknown release information.',
@@ -400,6 +401,7 @@ function permissions_form(){ ?>
 					<? display_perm('admin_login_watch', 'Can manage login watch.'); ?>
 					<? display_perm('admin_manage_wiki', 'Can manage wiki access.'); ?>
 					<? display_perm('admin_update_geoip', 'Can update geoip data.'); ?>
+					<? display_perm('admin_data_viewer', 'Can access data viewer.'); ?>
 				</td>
 			</tr>
 		</table>
