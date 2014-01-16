@@ -51,6 +51,8 @@ list($Page,$Limit) = page_limit(ROWS_PER_PAGE);
 if ($selected_query) {
 	$sql = $data_viewer_queries[$selected_query]['sql'];
 
+$DB->query("SET group_concat_max_len=16777216");
+
 $RS = $DB->query("{$sql} LIMIT $Limit");
 $DB->query("SELECT FOUND_ROWS()");
 list($Results) = $DB->next_record();
