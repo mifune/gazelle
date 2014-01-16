@@ -83,6 +83,25 @@ GROUP BY
 ORDER BY
 	p.Level"
 	),
+        'users_dupe_email' => array(
+                'title' => 'Users: Possible duplicate emails (SLOW)',
+                'description' => '<strong>This query is slow, please use it sparingly.</strong><br />Tries to detect e-mail addresses that are effectively duplicates by processing it in various ways.<br />Results where every single account is already disabled are excluded.',
+                'sql' => "
+SELECT SQL_CALC_FOUND_ROWS
+        CONCAT(REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(um.Email, '@', 1), '+', 1), '.', ''), '@', REPLACE(REPLACE(REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(um.Email, '@', -1), '.', 1), 'googlemail', 'gmail'), 'live', 'hotmail'), 'outlook', 'hotmail')) AS Cleaned_up_address,
+        COUNT(*) AS Number,
+        GROUP_CONCAT(IF(um.Enabled='1','','<del>'),'<a href=\"/user.php?id=', um.ID, '\">', um.username, '</a>', IF(um.Enabled='1','','</del>'), ' ', um.Email, ' [', um.IP, '] ' SEPARATOR '<br />') AS Accounts
+FROM
+        users_main AS um
+GROUP BY
+        Cleaned_up_address
+HAVING
+        Number >= 2
+        AND MAX(IF(um.Enabled='1',1,0)) = 1
+ORDER BY
+        Number DESC
+"
+        ),
 	'users_monthly' => array(
 		'title' => 'Users: Monthly stats',
 		'description' => "This query shows  the number of users joined as well as disabled each month.",
