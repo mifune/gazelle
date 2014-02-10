@@ -101,7 +101,7 @@ function ajax_error($Error){
     die();
 }
 
-function get_result($Result, $BetAmount, $Win, $Pos0, $Pos1, $Pos2, $Pos3){
+function get_result(&$Result, $BetAmount, &$Win, $Pos0, $Pos1, $Pos2, $Pos3){
     global $Reel, $Payout, $Reels;
 
     if ($Reel[0][$Pos0]!='X' && $Reel[0][$Pos0]==$Reel[1][$Pos1] && $Reel[1][$Pos1]==$Reel[2][$Pos2]){
