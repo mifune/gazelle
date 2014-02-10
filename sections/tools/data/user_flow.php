@@ -97,7 +97,6 @@ $RS = $DB->query("SELECT
 		LIMIT $Limit");
 $DB->query("SELECT FOUND_ROWS()");
 list($Results) = $DB->next_record();
-$DB->set_query_id($RS);
 
 show_header('User Flow');
 ?>
@@ -124,6 +123,7 @@ echo $Pages;
 			<td>Net Growth</td>
 		</tr>
 <?
+	$DB->set_query_id($RS);
 	while(list($Date, $Month, $Joined, $Manual, $Ratio, $Inactivity)=$DB->next_record()) {
 	$TotalOut = $Ratio + $Inactivity + $Manual;
 	$TotalGrowth = $Joined - $TotalOut;
