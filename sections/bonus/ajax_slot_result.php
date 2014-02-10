@@ -54,12 +54,12 @@ $Reels=array();     // how many reels match in each line (for interface)
 $Win=0;             // total winnings for this spin
 
 // middle line
-get_result(&$Result,$BetAmount, &$Win,($Pos[0]+1)%20,($Pos[1]+1)%20,($Pos[2]+1)%20,($Pos[3]+1)%20);
+get_result($Result,$BetAmount, $Win,($Pos[0]+1)%20,($Pos[1]+1)%20,($Pos[2]+1)%20,($Pos[3]+1)%20);
 if($NumBets>1) {    // bottom line
-    get_result(&$Result,$BetAmount, &$Win,$Pos[0],$Pos[1],$Pos[2],$Pos[3]);
+    get_result($Result,$BetAmount, $Win,$Pos[0],$Pos[1],$Pos[2],$Pos[3]);
 }
 if($NumBets>2) {    // top line
-     get_result(&$Result,$BetAmount, &$Win,($Pos[0]+2)%20,($Pos[1]+2)%20,($Pos[2]+2)%20,($Pos[3]+2)%20);
+     get_result($Result,$BetAmount, $Win,($Pos[0]+2)%20,($Pos[1]+2)%20,($Pos[2]+2)%20,($Pos[3]+2)%20);
 }
 
 // record spins
@@ -101,7 +101,7 @@ function ajax_error($Error){
     die();
 }
 
-function get_result(&$Result, $BetAmount, &$Win, $Pos0, $Pos1, $Pos2, $Pos3){
+function get_result($Result, $BetAmount, $Win, $Pos0, $Pos1, $Pos2, $Pos3){
     global $Reel, $Payout, $Reels;
 
     if ($Reel[0][$Pos0]!='X' && $Reel[0][$Pos0]==$Reel[1][$Pos1] && $Reel[1][$Pos1]==$Reel[2][$Pos2]){
