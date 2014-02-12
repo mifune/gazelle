@@ -1438,6 +1438,8 @@ class TEXT {
         } // Hax prevention
         $Str = '';
 
+	$anon_url = (defined('ANONYMIZER_URL')) ? ANONYMIZER_URL : 'http://anonym.to/?';
+
         foreach ($Array as $Block) {
             if (is_string($Block)) {
                 $Str.=$this->smileys($Block);
@@ -1564,7 +1566,7 @@ class TEXT {
                         $NoName = false;
                     }
                     //remove the local host/anonym.to from address if present
-                    $Block['Attr'] = str_replace(array('http://' . SITE_URL, 'http://anonym.to/?'), '', $Block['Attr']);
+                    $Block['Attr'] = str_replace(array('http://' . SITE_URL, $anon_url), '', $Block['Attr']);
 
                     // first test if is in format /local.php or #anchorname
                     if (preg_match('/^#[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+$|^\/[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+\.php[a-zA-Z0-9\?\-\_.,%\@~&=:;()+*\^$!#|]*$/', $Block['Attr'])) {
@@ -1582,7 +1584,7 @@ class TEXT {
                             $Str.='<a href="' . $LocalURL . '">' . $Block['Val'] . '</a>';
                         } else {
                             if (!$LoggedUser['NotForceLinks']) $target = 'target="_blank"';
-                            if (!preg_match(INTERNAL_URLS_REGEX, $Block['Attr'])) $anonto = 'http://anonym.to/?';
+                            if (!preg_match(INTERNAL_URLS_REGEX, $Block['Attr'])) $anonto = $anon_url;
                             $Str.='<a rel="noreferrer" ' . $target . ' href="' . $anonto . $Block['Attr'] . '">' . $Block['Val'] . '</a>';
                         }
                     }
@@ -1819,7 +1821,7 @@ class TEXT {
                     break;
 
                 case 'inlineurl':
-                    $Block['Attr'] = str_replace('http://anonym.to/?', '', $Block['Attr']);
+                    $Block['Attr'] = str_replace($anon_url, '', $Block['Attr']);
                     if (!$this->valid_url($Block['Attr'], '', true)) {
                         $Array = $this->parse($Block['Attr']);
                         $Block['Attr'] = $Array;
@@ -1832,7 +1834,7 @@ class TEXT {
                             if (!$LoggedUser['NotForceLinks'])
                                 $target = 'target="_blank"';
                             if (!preg_match(INTERNAL_URLS_REGEX, $Block['Attr']))
-                                $anonto = 'http://anonym.to/?';
+                                $anonto = $anon_url;
                             $Str.='<a rel="noreferrer" ' . $target . ' href="' . $anonto . $Block['Attr'] . '">' . $Block['Attr'] . '</a>';
                         }
                     }

@@ -143,6 +143,7 @@ define('AUTO_FREELEECH_SIZE', 30*1024*1024*1024);
 
 define('BTC_ADDRESS_REGEX', "/^[13]{1}[a-km-zA-HJ-NP-Z1-9]{26,34}$/");
 define('BONUS_TORRENTS_CAP', 300);
+define('ANONYMIZER_URL', 'http://anonym.to/?');
 
 $ExcludeForums = array( 9 ); // exclude games forum from latest topics (user option) - array instead of define in case we end up with +1 games forums
  
