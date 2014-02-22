@@ -98,7 +98,7 @@ show_header('My Donations','bitcoin,bbcode');
     <? 
         if ($eur_rate=='0'){   ?>
             <span class="red">The site was unable to get an exchange rate - you will not be able to submit a donation at this time</span><br/>
-            Hopefully this is a temporary issue with the MtGox webservice, if it persists please 
+            Hopefully this is a temporary issue with the coindesk webservice, if it persists please 
             <a href="/staffpm.php?action=user_inbox&show=1&msg=nobtcrate">message an admin.</a><br/><br/>
     <?  } else { ?>
             <span style="font-size: 1.1em" title="rate is Mt.Gox weighted average: <?=$eur_rate?>">
