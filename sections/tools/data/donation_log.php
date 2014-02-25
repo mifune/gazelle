@@ -135,7 +135,7 @@ show_header('Donation log','bitcoin');
     <div class="box pad">
         <? 
         if ($eur_rate=='0'){   ?>
-            <span class="red">The site was unable to get an exchange rate</span> - hopefully this is a temporary issue with the MtGox webservice, 
+            <span class="red">The site was unable to get an exchange rate</span> - hopefully this is a temporary issue with the coindesk webservice, 
                 if it persists we will have to find another way to get/set the exchange rate!
     <?  } else { ?>
             <span style="font-size: 1.1em" title="rate is Mt.Gox weighted average: <?=$eur_rate?>">
