@@ -153,6 +153,9 @@ if ($IsBookmarked)
     $Icons .= '<img src="static/styles/'.$LoggedUser['StyleName'].'/images/star16.png" alt="bookmarked" title="You have this torrent bookmarked" />&nbsp;';
 $Icons .= '&nbsp;';
  
+// For now we feed this function some 'false' information to prevent certain icons from occuring that are already present elsewhere on the page
+$ExtraIcons = torrent_icons(array('FreeTorrent'=>false, 'double_seed'=>false), $TorrentID, $Review, false);
+
 ?>
 <div class="details thin">
     <h2><span class="arrow" style="float:left"><a href="torrents.php?id=<?=$GroupID?>&action=prev" title="goto previous torrent"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/arrow_left.png" alt="prev" title="goto previous torrent" /></a></span><?="$Icons$DisplayName"?><span class="arrow" style="float:right"><a href="torrents.php?id=<?=$GroupID?>&action=next" title="goto next torrent"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/arrow_right.png" alt="next" title="goto next torrent" /></a></span></h2>
@@ -268,12 +271,7 @@ if(check_perms('torrents_review')){
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /> <?=number_format($Snatched)?></td>
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/seeders.png" alt="Seeders" title="Seeders" /> <?=number_format($Seeders)?></td>
                             <td><img src="static/styles/<?=$LoggedUser['StyleName'] ?>/images/leechers.png" alt="Leechers" title="Leechers" /> <?=number_format($Leechers)?></td>
-                 <?
-                    if ($Review['Status']) { // == 'Warned'
-                        // not sure if we want to display 'okay' status but for the moment its in
-                        echo '<td>'.get_status_icon($Review['Status']).'</td>';
-                    }
-                 ?>
+                            <td><?=$ExtraIcons ?></td>
                             </tr>
                          </table>
                        </div>
