@@ -862,6 +862,15 @@ table.boxstat td:first-child {
     background: url(images/diskup.png) no-repeat center center;
 }
 
+.icon_disk_grabbed {
+   background: url(images/diskgrabbed.png) no-repeat center center;
+}
+
+.icon_disk_snatched {
+   background: url(images/disksnatched.png) no-repeat center center;
+}
+
+
 #top_info .icon_warning {
     background: url(images/warning.gif) no-repeat center center;
 }
@@ -2153,13 +2162,6 @@ text-decoration: underline;
     padding-top: 5px;
    overflow: hidden;
    border-top: #ccc solid 1px;
-}
-
-.icon_disk_grabbed {
-   background: url(images/diskup.png) no-repeat center center;
-}
-.icon_disk_snatched {
-   background: url(images/diskup.png) no-repeat center center;
 }
 
 #user_dropdown {
