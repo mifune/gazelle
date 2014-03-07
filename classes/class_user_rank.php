@@ -91,7 +91,7 @@ class USER_RANK {
 		$TotalScore += $Requests*2;
 		$TotalScore += $Posts;
 		$TotalScore += $Bounty;
-		$TotalScore /= (15+8+25+2+1+1+1);
+		$TotalScore /= (15+8+25+2+1+1);
 		$TotalScore *= $Ratio;
 		return $TotalScore;
 		
