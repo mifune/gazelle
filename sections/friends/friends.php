@@ -1,4 +1,5 @@
  <?
+
 /************************************************************************
 //------------// Main friends page //----------------------------------//
 This page lists a user's friends. 
@@ -31,6 +32,7 @@ $DB->query("SELECT
 	m.Uploaded,
 	m.Downloaded,
 	m.PermissionID,
+	p.Level,
 	m.GroupPermissionID,
 	m.Enabled,
 	m.Paranoia,
@@ -42,10 +44,11 @@ $DB->query("SELECT
 	FROM friends AS f
 	JOIN users_main AS m ON f.FriendID=m.ID
 	JOIN users_info AS i ON f.FriendID=i.UserID
+	JOIN permissions AS p ON p.ID=m.PermissionID
 	WHERE f.UserID='$UserID'
         AND f.Type='$FType'
 	ORDER BY Username LIMIT $Limit");
-$Friends = $DB->to_array(false, MYSQLI_BOTH, array(7));
+$Friends = $DB->to_array(false, MYSQLI_BOTH, array(9)); # This number should be the proper idx for m.Paranoia!
 
 // Number of results (for pagination)
 $DB->query('SELECT FOUND_ROWS()');
@@ -79,7 +82,7 @@ if($Results == 0) {
 } else {
     // Start printing out friends
     foreach($Friends as $Friend) {
-          list($FriendID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $GroupPermID, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $Friend;
+          list($FriendID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $Level, $GroupPermID, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $Friend;
     ?>
     <form action="friends.php" method="post">
           <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
@@ -87,20 +90,20 @@ if($Results == 0) {
                 <tr>
                       <td class="colhead" colspan="3">
                             <span style="float:left;"><?=format_username($FriendID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true, $GroupPermID)?>
-    <?	if(check_paranoia('ratio', $Paranoia, $Class, $FriendID)) { ?>
+    <?	if(check_paranoia('ratio', $Paranoia, $Level, $FriendID)) { ?>
                             &nbsp;Ratio: <strong><?=ratio($Uploaded, $Downloaded)?></strong>
     <?	} ?>
-    <?	if(check_paranoia('uploaded', $Paranoia, $Class, $FriendID)) { ?>
+    <?	if(check_paranoia('uploaded', $Paranoia, $Level, $FriendID)) { ?>
                             &nbsp;Up: <strong><?=get_size($Uploaded)?></strong>
     <?	} ?>
-    <?	if(check_paranoia('downloaded', $Paranoia, $Class, $FriendID)) { ?>
+    <?	if(check_paranoia('downloaded', $Paranoia, $Level, $FriendID)) { ?>
                             &nbsp;Down: <strong><?=get_size($Downloaded)?></strong>
     <?	} ?>
                             </span>
 
                             <span style="float:right;">&nbsp;&nbsp;<a href="#" class="togglelink" onclick="$('#friend<?=$FriendID?>').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span>&nbsp;
 
-    <?	if(check_paranoia('lastseen', $Paranoia, $Class, $FriendID)) { ?>
+    <?	if(check_paranoia('lastseen', $Paranoia, $Level, $FriendID)) { ?>
                             <span style="float:right;"><?=time_diff($LastAccess)?></span>
     <?	} ?>
                       </td>
