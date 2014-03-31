@@ -2635,6 +2635,15 @@ function get_tags($TagNames) {
 function get_overlay_html($GroupName, $Username, $Image, $Seeders, $Leechers, $Size, $Snatched) {
     
     $OverImage = $Image != '' ? $Image : '/static/common/noartwork/noimage.png';
+
+    # Temporary solution for image load on fapping - TODO proper permanent solution, this is ugly
+    $matches = array();
+    if (preg_match('#^(http://fapping\.empornium\.sx/images/.*)\.(gif|jpg|png)$#', $OverImage, $matches)) {
+        if (substr($matches[1], -3) != '.th') {
+            $OverImage = $matches[1].'.th.'.$matches[2];
+        }
+    }
+
     $OverName = mb_strlen($GroupName) <= 60 ? $GroupName : mb_substr($GroupName, 0, 56) . '...';
     $SL = ($Seeders == 0 ? "<span class=r00>" . number_format($Seeders) . "</span>" : number_format($Seeders)) . " / " . number_format($Leechers);
     //$Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $Username<br /><br /><strong>Size:</strong> " . get_size($Size) . "<br /><br /><strong>Snatched:</strong> " . number_format($Snatched) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
