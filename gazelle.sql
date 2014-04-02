@@ -1952,9 +1952,9 @@ CREATE TABLE IF NOT EXISTS `users_downloads` (
   `UserID` int(10) NOT NULL,
   `TorrentID` int(10) NOT NULL,
   `Time` datetime NOT NULL,
-  PRIMARY KEY (`UserID`,`TorrentID`,`Time`),
+  PRIMARY KEY (`UserID`,`TorrentID`),
   KEY `TorrentID` (`TorrentID`),
-  KEY `UserID` (`UserID`)
+  KEY `Time` (`Time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
