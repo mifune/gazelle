@@ -44,14 +44,14 @@ if(isset($_GET['avatar'])) {
 	$UserID = $_GET['avatar'];
 
 	$Height = image_height($Type, $Data);
-	if(strlen($Data)>512*1024 || $Height>400) {
+	if(strlen($Data)>1024*1024 || $Height>400) {
 		// Sometimes the cached image we have isn't the actual image
 		if($Cached) {
 			$Data2 = @file_get_contents($URL,0,stream_context_create(array('http'=>array('timeout'=>15))));
 		} else {
 			$Data2 = $Data;
 		}
-		if(strlen($Data2)>512*1024 || image_height($Type, $Data2)>400) {
+		if(strlen($Data2)>1024*1024 || image_height($Type, $Data2)>400) {
 			require_once(SERVER_ROOT.'/classes/class_mysql.php');
 			require_once(SERVER_ROOT.'/classes/class_time.php'); //Require the time class
 
@@ -69,7 +69,7 @@ if(isset($_GET['avatar'])) {
 
 			send_pm($UserID,0,"Your avatar has been automatically reset","The following avatar rules have been in effect for months now:
 
-[b]Avatars must not exceed 512kB or be vertically longer than 400px. [/b]
+[b]Avatars must not exceed 1MB or be vertically longer than 400px. [/b]
 
 Your avatar at $DBURL has been found to exceed these rules. As such, it has been automatically reset. You are welcome to reinstate your avatar once it has been resized down to an acceptable size.");
 
