@@ -60,6 +60,10 @@ class TEXT {
         'imgalt' => 1, 
         'article' =>1
     );
+
+    private $AdvancedTagOnly = array(
+        'mcom' => 1
+    );
     
     private $Smileys = array(
         ':smile1:' => 'smile1.gif',
@@ -974,6 +978,13 @@ class TEXT {
                     $i = $TagPos + strlen($Tag[0][0]);
                     ++$ArrayPos;
                     continue;
+                }
+
+                // Check if user is allowed to use moderator tags (different from Advanced, which is determined
+                // by the original post author).
+                // We're using ShowErrors as a proxy for figuring out if we're editing or just viewing
+                if ($this->ShowErrors && $this->AdvancedTagOnly[$TagName] && !check_perms('site_advanced_tags')) {
+                    $this->Errors[] = "<span class=\"error_label\">illegal tag [$TagName]</span>";
                 }
 
                 $MaxAttribs = $this->ValidTags[$TagName];
@@ -2190,6 +2201,15 @@ class TEXT {
         }
         echo '</div>';
         reset($this->Smileys);
+    }
+
+    function clean_bbcode ($Str, $Advanced) {
+        // Change mcom tags into quote tags for non-mod users
+        if (!$Advanced) {
+            $Str = preg_replace('/\[mcom\]/i', '[quote]', $Str);
+            $Str = preg_replace('/\[\/mcom\]/i', '[/quote]', $Str);
+        }
+        return $Str;
     }
 
 }

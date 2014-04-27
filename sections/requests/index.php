@@ -57,6 +57,10 @@ if(!isset($_REQUEST['action'])) {
 			if($LoggedUser['DisablePosting']) {
 				error('Your posting rights have been removed.');
 			}
+
+            include(SERVER_ROOT.'/classes/class_text.php');
+            $Text = new TEXT;
+            $Text->validate_bbcode($_POST['body'],  get_permissions_advtags($LoggedUser['ID']));
 			
 			$RequestID = $_POST['requestid'];
 			if(!$RequestID) { error(404); }
@@ -95,13 +99,13 @@ if(!isset($_REQUEST['action'])) {
 			$DB->query("SELECT Body FROM requests_comments WHERE ID='$PostID'");
 			list($Body) = $DB->next_record(MYSQLI_NUM);
 			
+                  include(SERVER_ROOT.'/classes/class_text.php');
+                  $Text = new TEXT;
+                  $Body = $Text->clean_bbcode($Body, get_permissions_advtags($LoggedUser['ID']));
+
                   if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
                   	echo trim($Body); 
                   } else {
-                        include(SERVER_ROOT.'/classes/class_text.php');
-                   
-                        $Text = new TEXT;
-
                         $Text->display_bbcode_assistant("editbox$PostID", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); 
 
 ?>					
@@ -118,6 +122,7 @@ if(!isset($_REQUEST['action'])) {
 			include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 
 			$Text = new TEXT;
+			$Text->validate_bbcode($_POST['body'],  get_permissions_advtags($LoggedUser['ID']));
 		
 			// Quick SQL injection check
 			if(!$_POST['post'] || !is_number($_POST['post'])) { error(0); }
