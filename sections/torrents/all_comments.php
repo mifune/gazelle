@@ -6,6 +6,7 @@ if (!check_perms('users_mod')) error(403);
 //---------- Things to sort out before it can start printing/generating content
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
  
 if (isset($LoggedUser['PostsPerPage'])) {
@@ -69,8 +70,7 @@ foreach($Comments as $Key => $Post){
 			<span style="float:left;"><a class="post_id" href="torrents.php?id=<?=$GroupID?>&amp;postid=<?=$PostID?>#post<?=$PostID?>">#<?=$PostID?></a>
 				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true)?> <?=time_diff($AddedTime)?> <a href="reports.php?action=report&amp;type=torrents_comment&amp;id=<?=$PostID?>">[Report]</a>
 
-<? if ( ($AuthorID == $LoggedUser['ID'] && ( time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME ) ) 
-                                                                || check_perms('site_moderate_forums') ){ ?>
+<? if (can_edit_comment($AuthorID, $EditedUserID, $AddedTime, $EditedTime)) { ?>
                         - <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a><? }
   if (check_perms('site_admin_forums')){ ?> 
                         - <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>

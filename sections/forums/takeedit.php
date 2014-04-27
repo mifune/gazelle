@@ -16,6 +16,7 @@ It will be accompanied with:
 \*********************************************************************/
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 $Text = new TEXT;
 
 // Quick SQL injection check
@@ -41,6 +42,7 @@ $DB->query("SELECT
 		t.ForumID,
 		f.MinClassWrite,
         p.EditedTime,
+        p.EditedUserID,
 		CEIL((SELECT COUNT(ID) 
 			FROM forums_posts 
 			WHERE forums_posts.TopicID = p.TopicID 
@@ -50,7 +52,7 @@ $DB->query("SELECT
 		JOIN forums_topics as t on p.TopicID = t.ID
 		JOIN forums as f ON t.ForumID=f.ID 
 		WHERE p.ID='$PostID'");
-list($OldBody, $AuthorID, $TopicID, $AddedTime, $IsLocked, $ForumID, $MinClassWrite, $EditedTime, $Page) = $DB->next_record();
+list($OldBody, $AuthorID, $TopicID, $AddedTime, $IsLocked, $ForumID, $MinClassWrite, $EditedTime, $EditedUserID, $Page) = $DB->next_record();
 
 // Make sure they aren't trying to edit posts they shouldn't
 // We use die() here instead of error() because whatever we spit out is displayed to the user in the box where his forum post is
@@ -58,15 +60,7 @@ if(!check_forumperm($ForumID, 'Write') || ($IsLocked && !check_perms('site_moder
 	error('Either the thread is locked, or you lack the permission to edit this post.',true);
 }
 
-if (!check_perms('site_moderate_forums')){ 
-    if ($UserID != $AuthorID){
-        error(403,true);
-    } else if (!check_perms ('site_edit_own_posts') 
-            && time_ago($AddedTime)>(USER_EDIT_POST_TIME+600)  && time_ago($EditedTime)>(USER_EDIT_POST_TIME+300) ) { // give them an extra 15 mins in the backend because we are nice
-        error("Sorry - you only have ". date('i\m s\s', USER_EDIT_POST_TIME). "  to edit your post before it is automatically locked." ,true);
-    } 
-}
- 
+validate_edit_comment($AuthorID, $EditedUserID, $AddedTime, $EditedTime);
 
 if($LoggedUser['DisablePosting']) {
 	error('Your posting rights have been removed.',true);

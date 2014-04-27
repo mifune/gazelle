@@ -2,6 +2,7 @@
 authorize();
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 $Text = new TEXT;
 
 // Quick SQL injection check
@@ -37,13 +38,8 @@ list($OldBody, $AuthorID, $CollageID, $AddedTime, $PostNum) = $DB->next_record()
 //if($UserID!=$AuthorID && !check_perms('site_moderate_forums')) {
 //	die('Permission denied');
 //}    
-if (!check_perms('site_moderate_forums')){ 
-    if ($LoggedUser['ID'] != $AuthorID){
-        error(403,true);
-    } else if (!check_perms ('site_edit_own_posts') && time_ago($AddedTime)>(USER_EDIT_POST_TIME+600)  ) { // give them an extra 15 mins in the backend because we are nice
-        error("Sorry - you only have ". date('i\m s\s', USER_EDIT_POST_TIME). "  to edit your comment before it is automatically locked." ,true);
-    } 
-}
+
+validate_edit_comment($AuthorID, null, $AddedTime, $AddedTime); // FIXME no info about who edited comment or when
 
 // Perform the update
 $DB->query("UPDATE collages_comments SET

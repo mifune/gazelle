@@ -115,6 +115,8 @@ if(!isset($_REQUEST['action'])) {
 			authorize();
 
 			include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+			include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
+
 			$Text = new TEXT;
 		
 			// Quick SQL injection check
@@ -126,25 +128,20 @@ if(!isset($_REQUEST['action'])) {
 				rc.AuthorID,
 				rc.RequestID,
 				rc.AddedTime,
-				rc.EditedTime
+				rc.EditedTime,
+				rc.EditedUserID
 				FROM requests_comments AS rc
 				WHERE rc.ID='".db_string($_POST['post'])."'");
 			if ($DB->record_count()==0) { error(404); }
-			list($OldBody, $AuthorID,$RequestID,$AddedTime,$EditedTime)=$DB->next_record();
+			list($OldBody, $AuthorID,$RequestID,$AddedTime,$EditedTime,$EditedUserID)=$DB->next_record();
 			
 			$DB->query("SELECT ceil(COUNT(ID) / ".POSTS_PER_PAGE.") AS Page FROM requests_comments WHERE RequestID = $RequestID AND ID <= $_POST[post]");
 			list($Page) = $DB->next_record();
 			
 			//if ($LoggedUser['ID']!=$AuthorID && !check_perms('site_moderate_forums')) { error(404); }
 			//if ($DB->record_count()==0) { error(404); }
-            if (!check_perms('site_moderate_forums')){ 
-                if ($LoggedUser['ID'] != $AuthorID){
-                    error(403,true);
-                } else if (!check_perms ('site_edit_own_posts') 
-                        && time_ago($AddedTime)>(USER_EDIT_POST_TIME+600)  && time_ago($EditedTime)>(USER_EDIT_POST_TIME+300) ) { // give them an extra 15 mins in the backend because we are nice
-                    error("Sorry - you only have ". date('i\m s\s', USER_EDIT_POST_TIME). "  to edit your comment before it is automatically locked." ,true);
-                } 
-            }
+
+            validate_edit_comment($AuthorID, null, $AddedTime, $EditedTime);
 		
 			// Perform the update
 			$DB->query("UPDATE requests_comments SET
