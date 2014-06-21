@@ -81,7 +81,19 @@ class BENCODE {
 	function decode($Type, $Key){
 		if(is_number($Type)) { // Element is a string
 			// Get length of string
-			$StrLen = $Type;
+			// Lanz: Some torrents contains two integers for the length, one that is 0 and a second one with the correct length, eg "0:33:"
+			//		This fix makes the bencoder here work correctly and fixes the problem with "invalid path in torrent" in uTorrent 3.4+
+			//		BUT it will not affect torrents uploaded before this fix since they are stored in a decoded format in the database. This is important since
+			//		the info_hash will be different on fixed torrents.
+			if ($Type == 0) {
+				$this->Pos += 2;
+				$StrLen = $this->Str[$this->Pos];
+				if (!is_number($StrLen)) {
+					die('Invalid torrent file');
+				}
+			} else {
+				$StrLen = $Type;
+			}
 			while($this->Str[$this->Pos+1]!=':'){
 				$this->Pos++;
 				$StrLen.=$this->Str[$this->Pos];
