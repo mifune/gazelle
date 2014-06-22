@@ -124,6 +124,7 @@ if($Properties['tempfileid']) {
     
 }
 
+$Tor->use_strict_bencode_specification(); // Fix torrents that do not follow the bencode specification.
 $Tor->set_announce_url('ANNOUNCE_URL'); // We just use the string "ANNOUNCE_URL"
 
 // $Private is true or false. true means that the uploaded torrent was private, false means that it wasn't.
