@@ -8,7 +8,8 @@ class TEXT {
         'codeblock' => 1, 
         'you' => 0, 
         'h5v' => 1, 
-        'yt' => 1, 
+        'yt' => 1,
+        'vimeo' => 1,
         'video' => 1, 
         'flash' => 1, 
         'banner' => 0, 
@@ -608,8 +609,7 @@ class TEXT {
         $Str = preg_replace('/\[tr\=/i', '[trr=', $Str);
         $Str = preg_replace('/\[th\=/i', '[thh=', $Str);
 
-        $URLPrefix = '(\[url\]|\[url\=|\[vide|\[img\=|\[img\]|\[thum|\[bann|\[h5v\]|\[h5v\=|\[bgg\=|\[tdd\=|\[trr\=|\[tabl|\[imgn|\[imga)';  // |\[h5v\]   |\[h5v\=
-        //$URLPrefix = '(\[url\]|\[url\=|\[vid\=|\[img\=|\[img\]|\[thu\]|\[ban\]|\[h5v\]|\[h5v\=|\[bgg\=|\[tabl)';  // |\[h5v\]   |\[h5v\=
+        $URLPrefix = '(\[url\]|\[url\=|\[vide|\[vime|\[img\=|\[img\]|\[thum|\[bann|\[h5v\]|\[h5v\=|\[bgg\=|\[tdd\=|\[trr\=|\[tabl|\[imgn|\[imga)';  // |\[h5v\]   |\[h5v\=        //$URLPrefix = '(\[url\]|\[url\=|\[vid\=|\[img\=|\[img\]|\[thu\]|\[ban\]|\[h5v\]|\[h5v\=|\[bgg\=|\[tabl)';  // |\[h5v\]   |\[h5v\=
         $Str = preg_replace('/' . $URLPrefix . '\s+/i', '$1', $Str);
         $Str = preg_replace('/(?<!' . $URLPrefix . ')http(s)?:\/\//i', '$1[inlineurl]http$2://', $Str);
         // For anonym.to and archive.org links, remove any [inlineurl] in the middle of the link
@@ -836,6 +836,7 @@ class TEXT {
         $remove[] = '/\[you\]/i';
         
         $remove[] = '/\[yt.*?\]/i';
+        $remove[] = '/\[vimeo.*?\]/i';
 
         $Str = preg_replace($remove, '', $Str);
         $Str = preg_replace('/[\r\n]+/', ' ', $Str);
@@ -997,7 +998,7 @@ class TEXT {
             if ($TagName == 'img' && !empty($Tag[3][0])) { //[img=...]
                 $Block = ''; // Nothing inside this tag
                 // Don't need to touch $i
-            } elseif ($TagName == 'video' || $TagName == 'yt') {
+            } elseif ($TagName == 'video' || $TagName == 'yt' || $TagName == 'vimeo') {
                 $Block = '';
             } elseif ($TagName == 'inlineurl') { // We did a big replace early on to turn http:// into [inlineurl]http://
                 // Let's say the block can stop at a newline or a space
@@ -1111,8 +1112,9 @@ class TEXT {
                 case 'h5v': // html5 video tag
                     $Array[$ArrayPos] = array('Type' => 'h5v', 'Attr' => $Attrib, 'Val' => $Block);
                     break;
-                case 'video': // youtube only
+                case 'video': // youtube and vimeo only
                 case 'yt':
+                case 'vimeo':
                     $Array[$ArrayPos] = array('Type' => 'video', 'Attr' => $Attrib, 'Val' => '');
                     break;
                 case 'flash':
@@ -1344,9 +1346,48 @@ class TEXT {
             if ($attributes) {
                 $InlineStyle = ' style="';
                 foreach ($attributes as $att) {
-                    if ($AllowColor && $this->is_color_attrib($att)) {
+                    if ($AllowColor && substr($att, 0, 9) == 'gradient:') {
+                        $InlineStyle .= 'background: linear-gradient(';
+                        $LinearArr = explode(';', substr($att, 9));
+                        $LinearAttr = array();
+                        // Check integrity
+                        if (sizeof($LinearArr) < 2) return '';
+                        foreach($LinearArr as $arr) {
+                            // Check so that the gradient is using the correct attributes
+                            if (preg_match('/^to left bottom|right bottom|bottom left|bottom right|'.
+                                         'left top|right top|top left|top right|left|right|top|bottom$/', $arr) ||
+                                    preg_match('/^[0-9]{1,3}deg$/', $arr) ||
+                                    $this->is_color_attrib($arr)) {
+                                $LinearAttr[] = $arr;
+                            // People love shortcuts..
+                            } elseif (preg_match('/^lb|rb|bl|br|lt|rt|tl|tr|l|r|t|b$/', $arr)) {
+                                $arr = preg_replace('/^lb$/', 'to left bottom', $arr);
+                                $arr = preg_replace('/^rb$/', 'to right bottom', $arr);
+                                $arr = preg_replace('/^bl$/', 'to left bottom', $arr);
+                                $arr = preg_replace('/^br$/', 'to right bottom', $arr);
+                                $arr = preg_replace('/^lt$/', 'to left top', $arr);
+                                $arr = preg_replace('/^rt$/', 'to right top', $arr);
+                                $arr = preg_replace('/^tl$/', 'to left top', $arr);
+                                $arr = preg_replace('/^tr$/', 'to right top', $arr);
+                                $arr = preg_replace('/^l$/', 'to left', $arr);
+                                $arr = preg_replace('/^r$/', 'to right', $arr);
+                                $arr = preg_replace('/^t$/', 'to top', $arr);
+                                $arr = preg_replace('/^b$/', 'to bottom', $arr);
+                                $LinearAttr[] = $arr;
+                            } else {
+                                // Is the attribute using color stops? (#rgb xx%)
+                                $split = explode(' ', $arr);
+                                if (sizeof($split) == 2 && $this->is_color_attrib($split[0]) && preg_match('/^[0-9]{1,3}%$/', $split[1])) {
+                                    $LinearAttr[] = implode(' ', $split);
+                                } else {
+                                    return '';
+                                }
+                            }
+                        }
+                        $InlineStyle .= implode(',', $LinearAttr) . ');';
+                    }
+                    elseif ($AllowColor && $this->is_color_attrib($att)) {
                         $InlineStyle .= 'background-color:' . $att . ';';
-                        
                     } elseif ($AllowImage && $this->valid_url($att) ) {
                         $InlineStyle .= "background-image: url(".$att.");";
                         //$InlineStyle .= "background: url('$att') no-repeat center center;";
@@ -1506,12 +1547,14 @@ class TEXT {
                         $Str.='[you]';
                     break;
                 case 'video':
-                    //actually a youtube only tag inherited from emp
-                    if (!preg_match('/^http:\/\/www\.youtube\.com\/.*v=(.*)$/i', $Block['Attr'], $matches)) {
-                        $Str.='[video=' . $Block['Attr'] . ']';
-                    } else {
+                    // Supports youtube and vimeo for now.
+                    if (preg_match('/^https?:\/\/www\.youtube\.com\/.*v=(.*)$/i', $Block['Attr'], $matches)) {
                         $vidurl = "http://www.youtube.com/v/{$matches[1]}";
-                        $Str.='<object height="385" width="640"><param name="movie" value="' . $vidurl . '"><param name="allowFullScreen" value="true"><param name="allowscriptaccess" value="always"><embed src="' . $vidurl . '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" height="385" width="640"></object>';
+                        $Str.='<object height="385" width="640"><param name="movie" value="' . $vidurl . '"><param name="allowFullScreen" value="true"><param name="allowscriptaccess" value="always"><embed src="' . $vidurl . '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" height="385" width="640"></object>';                        
+                    } elseif (preg_match('/^https?:\/\/vimeo.com\/([0-9]+)$/i', $Block['Attr'], $matches))  {
+                        $Str .= '<object type="application/x-shockwave-flash" width="640" height="385" data="http://www.vimeo.com/moogaloop.swf?clip_id='.$matches[1].'"><param name="quality" value="best" /><param name="allowfullscreen" value="true" /><param name="scale" value="showAll" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' . $matches[1] . '" /></object>';
+                    } else {
+                        $Str.='[video=' . $Block['Attr'] . ']';
                     }
                     break;
                 case 'h5v':
