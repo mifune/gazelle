@@ -2,136 +2,136 @@
 if (!check_perms('site_stats_advanced')) error(403);
 
 if (!list($Countries,$Rank,$CountryUsers,$CountryMax,$CountryMin,$LogIncrements,$CountryUsersNum,$CountryName) = $Cache->get_value('geodistribution')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	$DB->query('SELECT Code, Users, country FROM users_geodistribution AS ug LEFT JOIN countries AS c ON c.cc=ug.Code ORDER BY Users DESC');
-	$Data = $DB->to_array();
-	$Count = $DB->record_count()-1;
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
+    $DB->query('SELECT Code, Users, country FROM users_geodistribution AS ug LEFT JOIN countries AS c ON c.cc=ug.Code ORDER BY Users DESC');
+    $Data = $DB->to_array();
+    $Count = $DB->record_count()-1;
 
-	if($Count<30) {
-		$CountryMinThreshold = $Count;
-	} else {
-		$CountryMinThreshold = 30;
-	}
+    if ($Count<30) {
+        $CountryMinThreshold = $Count;
+    } else {
+        $CountryMinThreshold = 30;
+    }
 
-	$CountryMax = ceil(log(Max(1,$Data[0][1]))/log(2))+1;
-	$CountryMin = floor(log(Max(1,$Data[$CountryMinThreshold][1]))/log(2));
+    $CountryMax = ceil(log(Max(1,$Data[0][1]))/log(2))+1;
+    $CountryMin = floor(log(Max(1,$Data[$CountryMinThreshold][1]))/log(2));
 
-	$CountryRegions = array('RS' => array('RS-KM')); // Count Kosovo as Serbia as it doesn't have a TLD
+    $CountryRegions = array('RS' => array('RS-KM')); // Count Kosovo as Serbia as it doesn't have a TLD
     $i=0;
-	foreach ($Data as $Key => $Item) {
-		list($Country,$UserCount,$CName) = $Item;
-		$Countries[$i] = $Country;
-		$CountryUsers[$i] = number_format((((log($UserCount)/log(2))-$CountryMin)/($CountryMax-$CountryMin))*100,2);
-		$Rank[$i] = round((1-($Key/$Count))*100);
+    foreach ($Data as $Key => $Item) {
+        list($Country,$UserCount,$CName) = $Item;
+        $Countries[$i] = $Country;
+        $CountryUsers[$i] = number_format((((log($UserCount)/log(2))-$CountryMin)/($CountryMax-$CountryMin))*100,2);
+        $Rank[$i] = round((1-($Key/$Count))*100);
         $CountryUsersNum[$i] = $UserCount;
         $CountryName[$i] = $CName;
-		if(isset($CountryRegions[$Country])) {
-			foreach($CountryRegions[$Country] as $Region) {
+        if (isset($CountryRegions[$Country])) {
+            foreach ($CountryRegions[$Country] as $Region) {
                 $i++;
-				$Countries[$i] = $Region;
-				$Rank[$i] = end($Rank);
-			}
-		}
+                $Countries[$i] = $Region;
+                $Rank[$i] = end($Rank);
+            }
+        }
         $i++;
-	}
-	reset($Rank);
+    }
+    reset($Rank);
 
-	for ($i=$CountryMin;$i<=$CountryMax;$i++) {
-		$LogIncrements[] = human_format(pow(2,$i));
-	}
-	$Cache->cache_value('geodistribution',array($Countries,$Rank,$CountryUsers,$CountryMax,$CountryMin,$LogIncrements,$CountryUsersNum,$CountryName),0);
+    for ($i=$CountryMin;$i<=$CountryMax;$i++) {
+        $LogIncrements[] = human_format(pow(2,$i));
+    }
+    $Cache->cache_value('geodistribution',array($Countries,$Rank,$CountryUsers,$CountryMax,$CountryMin,$LogIncrements,$CountryUsersNum,$CountryName),0);
 }
 
-if(!$ClassDistribution = $Cache->get_value('class_distribution')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID WHERE m.Enabled='1' GROUP BY p.Name ORDER BY Users DESC");
-	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	foreach($ClassSizes as $ClassSize) {
-		list($Label,$Users) = $ClassSize;
-		$Pie->add($Label,$Users);
-	}
-	$Pie->transparent();
-	$Pie->color('FF11aa');
-	$Pie->generate();
-	$ClassDistribution = $Pie->url();
-	$Cache->cache_value('class_distribution',$ClassDistribution,3600*36); // 24*14
+if (!$ClassDistribution = $Cache->get_value('class_distribution')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
+    $DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID WHERE m.Enabled='1' GROUP BY p.Name ORDER BY Users DESC");
+    $ClassSizes = $DB->to_array();
+    $Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    foreach ($ClassSizes as $ClassSize) {
+        list($Label,$Users) = $ClassSize;
+        $Pie->add($Label,$Users);
+    }
+    $Pie->transparent();
+    $Pie->color('FF11aa');
+    $Pie->generate();
+    $ClassDistribution = $Pie->url();
+    $Cache->cache_value('class_distribution',$ClassDistribution,3600*36); // 24*14
 }
-if(!$ClassDistributionWeek = $Cache->get_value('class_distribution_wk')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID
+if (!$ClassDistributionWeek = $Cache->get_value('class_distribution_wk')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
+    $DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID
                 WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*7, true)."' GROUP BY p.Name ORDER BY Users DESC");
-	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	foreach($ClassSizes as $ClassSize) {
-		list($Label,$Users) = $ClassSize;
-		$Pie->add($Label,$Users);
-	}
-	$Pie->transparent();
-	$Pie->color('FF11aa');
-	$Pie->generate();
-	$ClassDistributionWeek = $Pie->url();
-	$Cache->cache_value('class_distribution_wk',$ClassDistributionWeek,3600*36); // 24*14
+    $ClassSizes = $DB->to_array();
+    $Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    foreach ($ClassSizes as $ClassSize) {
+        list($Label,$Users) = $ClassSize;
+        $Pie->add($Label,$Users);
+    }
+    $Pie->transparent();
+    $Pie->color('FF11aa');
+    $Pie->generate();
+    $ClassDistributionWeek = $Pie->url();
+    $Cache->cache_value('class_distribution_wk',$ClassDistributionWeek,3600*36); // 24*14
 }
-if(!$ClassDistributionMonth = $Cache->get_value('class_distribution_month')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
-	$DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID
+if (!$ClassDistributionMonth = $Cache->get_value('class_distribution_month')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
+    $DB->query("SELECT p.Name, COUNT(m.ID) AS Users FROM users_main AS m JOIN permissions AS p ON m.PermissionID=p.ID
                 WHERE m.Enabled='1' AND m.LastAccess>'".time_minus(3600*24*30, true)."' GROUP BY p.Name ORDER BY Users DESC");
-	$ClassSizes = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
-	foreach($ClassSizes as $ClassSize) {
-		list($Label,$Users) = $ClassSize;
-		$Pie->add($Label,$Users);
-	}
-	$Pie->transparent();
-	$Pie->color('FF11aa');
-	$Pie->generate();
-	$ClassDistributionMonth = $Pie->url();
-	$Cache->cache_value('class_distribution_month',$ClassDistributionMonth,3600*36); // 24*14
+    $ClassSizes = $DB->to_array();
+    $Pie = new PIE_CHART(750,400,array('Other'=>0.01,'Percentage'=>1));
+    foreach ($ClassSizes as $ClassSize) {
+        list($Label,$Users) = $ClassSize;
+        $Pie->add($Label,$Users);
+    }
+    $Pie->transparent();
+    $Pie->color('FF11aa');
+    $Pie->generate();
+    $ClassDistributionMonth = $Pie->url();
+    $Cache->cache_value('class_distribution_month',$ClassDistributionMonth,3600*36); // 24*14
 }
-if(!$PlatformDistribution = $Cache->get_value('platform_distribution')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
+if (!$PlatformDistribution = $Cache->get_value('platform_distribution')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
 
-	$DB->query("SELECT OperatingSystem, COUNT(UserID) AS Users FROM users_sessions GROUP BY OperatingSystem ORDER BY Users DESC");
+    $DB->query("SELECT OperatingSystem, COUNT(UserID) AS Users FROM users_sessions GROUP BY OperatingSystem ORDER BY Users DESC");
 
-	$Platforms = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
-	foreach($Platforms as $Platform) {
-		list($Label,$Users) = $Platform;
-		$Pie->add($Label,$Users);
-	}
-	$Pie->transparent();
-	$Pie->color('8A00B8');
-	$Pie->generate();
-	$PlatformDistribution = $Pie->url();
-	$Cache->cache_value('platform_distribution',$PlatformDistribution,3600*36);
+    $Platforms = $DB->to_array();
+    $Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+    foreach ($Platforms as $Platform) {
+        list($Label,$Users) = $Platform;
+        $Pie->add($Label,$Users);
+    }
+    $Pie->transparent();
+    $Pie->color('8A00B8');
+    $Pie->generate();
+    $PlatformDistribution = $Pie->url();
+    $Cache->cache_value('platform_distribution',$PlatformDistribution,3600*36);
 }
 
-if(!$BrowserDistribution = $Cache->get_value('browser_distribution')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
+if (!$BrowserDistribution = $Cache->get_value('browser_distribution')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
 
-	$DB->query("SELECT Browser, COUNT(UserID) AS Users FROM users_sessions GROUP BY Browser ORDER BY Users DESC");
+    $DB->query("SELECT Browser, COUNT(UserID) AS Users FROM users_sessions GROUP BY Browser ORDER BY Users DESC");
 
-	$Browsers = $DB->to_array();
-	$Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
-	foreach($Browsers as $Browser) {
-		list($Label,$Users) = $Browser;
-		$Pie->add($Label,$Users);
-	}
-	$Pie->transparent();
-	$Pie->color('008AB8');
-	$Pie->generate();
-	$BrowserDistribution = $Pie->url();
-	$Cache->cache_value('browser_distribution',$BrowserDistribution,3600*36);
+    $Browsers = $DB->to_array();
+    $Pie = new PIE_CHART(750,400,array('Other'=>1,'Percentage'=>1));
+    foreach ($Browsers as $Browser) {
+        list($Label,$Users) = $Browser;
+        $Pie->add($Label,$Users);
+    }
+    $Pie->transparent();
+    $Pie->color('008AB8');
+    $Pie->generate();
+    $BrowserDistribution = $Pie->url();
+    $Cache->cache_value('browser_distribution',$BrowserDistribution,3600*36);
 }
 
 // clients we can get from current peers
-if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
-	include_once(SERVER_ROOT.'/classes/class_charts.php');
+if (!$ClientDistribution = $Cache->get_value('client_distribution')) {
+    include_once(SERVER_ROOT.'/classes/class_charts.php');
 
-	$DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
+    $DB->query("SELECT useragent, Count(uid) AS Users FROM xbt_files_users GROUP BY useragent ORDER BY Users DESC");
 
-	$Clients = $DB->to_array();
+    $Clients = $DB->to_array();
     $Pies = array();
     //we will split the results to get minor/major/client only versions of the pie charts
     $Pies[0]  = new PIE_CHART(750,400,array('Other'=>CLIENT_GRAPH_OTHER_PERCENT,'Percentage'=>1));
@@ -139,10 +139,10 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
     $Pies[2]  = new PIE_CHART(750,400,array('Other'=>0.1,'Percentage'=>1));
     $Results2=array();
     $Results3=array();
-	foreach($Clients as $Client) {
-		list($Label,$Users) = $Client;
+    foreach ($Clients as $Client) {
+        list($Label,$Users) = $Client;
         // minor version (ie. the whole client info)
-		$Pies[0]->add($Label,$Users);
+        $Pies[0]->add($Label,$Users);
         // break down versions - matches formats "name/mv22/0101" or "name/v1234(mv4444)" or "name/v2345" or "name v.1.0"
         if (preg_match('#^(?|([^/]*)\/([^/]*)\/([^/]*)|([^/]*)\/([^/\(]*)\((.*)\)|([^/]*)\/([^/]*)|([^\s]*)\s(.*))$#', $Label, $matches)) {
             $Label2 = $matches[1] .'/'.$matches[2];
@@ -156,23 +156,23 @@ if(!$ClientDistribution = $Cache->get_value('client_distribution')) {
         else $Results2[$Label2] += $Users;
         if (!isset($Results3[$Label3])) $Results3[$Label3] = $Users;
         else $Results3[$Label3] += $Users;
-	}
-	foreach($Results2 as $Label=>$Users) {
-        // major version (ie. client/vXXX)
-		$Pies[1]->add($Label,$Users);
     }
-	foreach($Results3 as $Label=>$Users) {
+    foreach ($Results2 as $Label=>$Users) {
+        // major version (ie. client/vXXX)
+        $Pies[1]->add($Label,$Users);
+    }
+    foreach ($Results3 as $Label=>$Users) {
         // client info only (ie. client)
-		$Pies[2]->add($Label,$Users);
+        $Pies[2]->add($Label,$Users);
     }
     $ClientDistribution=array();
-	foreach($Pies as $Pie) {
+    foreach ($Pies as $Pie) {
         $Pie->transparent();
         $Pie->color('00D025');
         $Pie->generate();
         $ClientDistribution[] = $Pie->url();
     }
-	$Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
+    $Cache->cache_value('client_distribution',$ClientDistribution,3600*36);
 }
 
 if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
@@ -208,19 +208,19 @@ if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
                  LIMIT 365");
     $TimelineOut = $DB->to_array('YearDay');
 
-	$UsersTimeline = array();
-	foreach($TimelineIn as $day) {
-		list($Key, $Label, $UsersIn) = $day;
+    $UsersTimeline = array();
+    foreach ($TimelineIn as $day) {
+        list($Key, $Label, $UsersIn) = $day;
         $UsersOut = $TimelineOut["$Key"][2];
         if(!$UsersOut) $UsersOut = 0;
-		$UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
-	}
-	foreach($TimelineOut as $day) {
-		list($Key, $Label, $UsersOut) = $day;
-        if(!isset($UsersTimeline["$Key"])) {
+        $UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
+    }
+    foreach ($TimelineOut as $day) {
+        list($Key, $Label, $UsersOut) = $day;
+        if (!isset($UsersTimeline["$Key"])) {
             $UsersTimeline["$Key"] = array($Label, 0, $UsersOut);
         }
-	}
+    }
     $title = "$_POST[year1]-$_POST[month1]-$_POST[day1] to $_POST[year2]-$_POST[month2]-$_POST[day2]";
     ksort($UsersTimeline);
 }
@@ -250,19 +250,19 @@ if ($UsersTimeline === false) {
                  LIMIT 365");
     $TimelineOut = $DB->to_array('YearDay');
 
-	$UsersTimeline = array();
-	foreach($TimelineIn as $day) {
-		list($Key, $Label, $UsersIn) = $day;
+    $UsersTimeline = array();
+    foreach ($TimelineIn as $day) {
+        list($Key, $Label, $UsersIn) = $day;
         $UsersOut = $TimelineOut["$Key"][2];
         if(!$UsersOut) $UsersOut = 0;
-		$UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
-	}
-	foreach($TimelineOut as $day) {
-		list($Key, $Label, $UsersOut) = $day;
-        if(!isset($UsersTimeline["$Key"])) {
+        $UsersTimeline["$Key"] = array($Label, $UsersIn, $UsersOut);
+    }
+    foreach ($TimelineOut as $day) {
+        list($Key, $Label, $UsersOut) = $day;
+        if (!isset($UsersTimeline["$Key"])) {
             $UsersTimeline["$Key"] = array($Label, 0, $UsersOut);
         }
-	}
+    }
     ksort($UsersTimeline);
     $Cache->cache_value('users_timeline',$UsersTimeline, 3600*12 );
 }
@@ -279,7 +279,7 @@ if (count($UsersTimeline)>0) {
 
     $rows = array();
     //reset($SiteStats);
-    foreach ($UsersTimeline as $data)  {
+    foreach ($UsersTimeline as $data) {
         list($Label, $UsersIn, $UsersOut) = $data;
         $rows[] = " {c:[{v: '$Label'}, {v: $UsersIn}, {v: $UsersOut}]} ";
     }
@@ -294,11 +294,11 @@ show_header('User Statistics', 'charts,jquery');
 ?>
 <div class="thin">
     <h2>User graphs</h2>
-	<div class="linkbox">
-		<strong><a href="stats.php?action=users">[User graphs]</a></strong>
-		<a href="stats.php?action=site">[Site stats]</a>
-		<a href="stats.php?action=torrents">[Torrent stats]</a>
-	</div>
+    <div class="linkbox">
+        <strong><a href="stats.php?action=users">[User graphs]</a></strong>
+        <a href="stats.php?action=site">[Site stats]</a>
+        <a href="stats.php?action=torrents">[Torrent stats]</a>
+    </div>
     <br/>
     <div class="head">User Flow</div>
     <table class="">
@@ -342,7 +342,7 @@ show_header('User Statistics', 'charts,jquery');
 
 <?php
     if (check_perms('site_stats_advanced')) {
-        if (isset($_POST['year1'])){
+        if (isset($_POST['year1'])) {
             $start = array ($_POST['year1'],$_POST['month1'],$_POST['day1']);
             $end = array ($_POST['year2'],$_POST['month2'],$_POST['day2']);
         } else {
@@ -437,7 +437,7 @@ show_header('User Statistics', 'charts,jquery');
 <?php
     $len = count($Countries);
     $numrows = ceil($len/6);
-	for ($i=0;$i<$numrows;$i++) {
+    for ($i=0;$i<$numrows;$i++) {
 ?>
               <tr>
 <?php
@@ -460,7 +460,7 @@ show_header('User Statistics', 'charts,jquery');
 ?>
               </tr>
 <?php
-	}
+    }
 ?>
           </table>
           <br /><br />

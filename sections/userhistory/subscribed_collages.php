@@ -16,24 +16,24 @@ $ShowAll = !empty($_GET['showall']);
 if (!$ShowAll) {
     $sql = "SELECT c.ID,
                c.Name,
-			   c.NumTorrents,
-			   s.LastVisit
-		FROM collages AS c
-		JOIN users_collage_subs AS s ON s.CollageID = c.ID
-		JOIN collages_torrents AS ct ON ct.CollageID = c.ID
-		WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
-		  AND ct.AddedOn > s.LastVisit
-		GROUP BY c.ID";
+               c.NumTorrents,
+               s.LastVisit
+        FROM collages AS c
+        JOIN users_collage_subs AS s ON s.CollageID = c.ID
+        JOIN collages_torrents AS ct ON ct.CollageID = c.ID
+        WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
+          AND ct.AddedOn > s.LastVisit
+        GROUP BY c.ID";
 } else {
     $sql = "SELECT c.ID,
                c.Name,
-			   c.NumTorrents,
-			   s.LastVisit
-		FROM collages AS c
-		JOIN users_collage_subs AS s ON s.CollageID = c.ID
-		LEFT JOIN collages_torrents AS ct ON ct.CollageID = c.ID
-		WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
-		GROUP BY c.ID";
+               c.NumTorrents,
+               s.LastVisit
+        FROM collages AS c
+        JOIN users_collage_subs AS s ON s.CollageID = c.ID
+        LEFT JOIN collages_torrents AS ct ON ct.CollageID = c.ID
+        WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
+        GROUP BY c.ID";
 }
 
 $DB->query($sql);
@@ -77,13 +77,13 @@ $CollageSubs = $DB->to_array();
 
             list($CollageID, $CollageName, $CollageSize, $LastVisit) = $Collage;
             $RS = $DB->query("SELECT ct.GroupID,
-								tg.Image,
-								tg.NewCategoryID
-		            FROM collages_torrents AS ct
-					JOIN torrents_group AS tg ON ct.GroupID = tg.ID
-					WHERE ct.CollageID = $CollageID
-					  AND ct.AddedOn > '$LastVisit'
-					ORDER BY ct.AddedOn");
+                                tg.Image,
+                                tg.NewCategoryID
+                    FROM collages_torrents AS ct
+                    JOIN torrents_group AS tg ON ct.GroupID = tg.ID
+                    WHERE ct.CollageID = $CollageID
+                      AND ct.AddedOn > '$LastVisit'
+                    ORDER BY ct.AddedOn");
             $NewTorrentCount = $DB->record_count();
             //$NewTorrents = $DB->to_array();
 
@@ -108,7 +108,7 @@ $CollageSubs = $DB->to_array();
 
                 $TorrentTags = array();
                 $numtags=0;
-                foreach($TagList as $Tag) {
+                foreach ($TagList as $Tag) {
                     if ($numtags++>=$LoggedUser['MaxTags'])  break;
                     if (!isset($Tags[$Tag])) {
                         $Tags[$Tag] = array('name' => $Tag, 'count' => 1);

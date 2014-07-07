@@ -1,15 +1,15 @@
 <?php
-if(!check_perms('site_manage_awards')){ error(403); }
+if (!check_perms('site_manage_awards')) { error(403); }
 
 authorize();
 
-if(isset($_REQUEST['numadd'])){ // set num add forms to be same as current
-    $numAdds = (int)$_REQUEST['numadd'];
+if (isset($_REQUEST['numadd'])) { // set num add forms to be same as current
+    $numAdds = (int) $_REQUEST['numadd'];
     if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
     $UrlExtra = "&numadd=$numAdds";
 }
 
-if(isset($_POST['createcats'])) {
+if (isset($_POST['createcats'])) {
 
     $SQL_values = array();
     $Results = array();
@@ -33,7 +33,7 @@ if(isset($_POST['createcats'])) {
     foreach ($Badges as $BadgeInfo) {
             list($BadgeId,$Badge,$Rank)=$BadgeInfo;
             $Badge = strtolower($Badge);
-            if(isset( $Cats[$Badge])) {
+            if (isset( $Cats[$Badge])) {
                 $CatId = $Cats[$Badge];
                 if($Rank==1)$Value=50;
                 elseif($Rank==2)$Value=100;
@@ -46,23 +46,23 @@ if(isset($_POST['createcats'])) {
     }
 
     $numinsert = count($SQL_values);
-    if( $numinsert>0 ){   //Create
+    if ($numinsert>0) {   //Create
             $DB->query("DELETE FROM badges_auto WHERE CategoryID!=0");
 
             $SQL_values = implode(',', $SQL_values);
-		$DB->query("INSERT INTO badges_auto
-			(BadgeID, Action, Active, SendPM, Value, CategoryID)
-			VALUES $SQL_values");
+        $DB->query("INSERT INTO badges_auto
+            (BadgeID, Action, Active, SendPM, Value, CategoryID)
+            VALUES $SQL_values");
             $ReturnID = $DB->inserted_id(); // return user to first saved item on return
     }
 
-    if (count($Results)>1){
+    if (count($Results)>1) {
         $Results[0] = "Wrote $numinsert schedule items.";
         $Results[] = '<br/><br/><a href="tools.php?action=awards_auto'.$UrlExtra.'">back to awards schedule mamager</a>';
         error(implode("<br/>", $Results));
     }
 
-} elseif(isset($_POST['delselected'])) {
+} elseif (isset($_POST['delselected'])) {
 
     $AwardIDs = $_POST['deleteids'];
     if (!is_array($AwardIDs)) error("Nothing selected to delete");
@@ -91,7 +91,7 @@ if(isset($_POST['createcats'])) {
     $Val->SetFields('value', '1','number','The value must be a valid number.', array('allowcomma'=>1));
 
     $Err=$Val->ValidateForm($_POST); // Validate the form
-    if($Err){ error($Err); }
+    if ($Err) { error($Err); }
 
     $SQL_values = array();
     foreach ($AwardIDs as $AwardID) {
@@ -102,18 +102,18 @@ if(isset($_POST['createcats'])) {
 
         if ( !in_array($_POST['type'][$AwardID], $AutoAwardTypes) ) { error(0); }
 
-        $BadgeId = (int)$_POST['badgeid'][$AwardID];
+        $BadgeId = (int) $_POST['badgeid'][$AwardID];
         $Action=db_string($_POST['type'][$AwardID]);
         $Active=$_POST['active'][$AwardID]==1?1:0;
         $SendPm=$_POST['sendpm'][$AwardID]==1?1:0;
-        $Value=(int)$_POST['value'][$AwardID];
-        $CatId=(int)$_POST['catid'][$AwardID];
+        $Value=(int) $_POST['value'][$AwardID];
+        $CatId=(int) $_POST['catid'][$AwardID];
 
-        if( isset($_POST['create']) ) {    // create
+        if ( isset($_POST['create']) ) {    // create
 
-		$SQL_values[] = "('$BadgeId','$Action','$Active','$SendPm','$Value','$CatId')" ;
+        $SQL_values[] = "('$BadgeId','$Action','$Active','$SendPm','$Value','$CatId')" ;
 
-        } elseif( isset($_POST['saveall']) ) { //Edit
+        } elseif ( isset($_POST['saveall']) ) { //Edit
 
             $DB->query("UPDATE badges_auto SET
                               BadgeID='$BadgeId',
@@ -126,11 +126,11 @@ if(isset($_POST['createcats'])) {
         }
     }
 
-    if( isset($_POST['create']) && count($SQL_values)>0 ){   //Create
+    if ( isset($_POST['create']) && count($SQL_values)>0 ) {   //Create
             $SQL_values = implode(',', $SQL_values);
-		$DB->query("INSERT INTO badges_auto
-			(BadgeID, Action, Active, SendPM, Value, CategoryID)
-			VALUES $SQL_values");
+        $DB->query("INSERT INTO badges_auto
+            (BadgeID, Action, Active, SendPM, Value, CategoryID)
+            VALUES $SQL_values");
             $ReturnID = $DB->inserted_id(); // return user to first saved item on return
     }
 

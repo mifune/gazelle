@@ -16,14 +16,14 @@ list($Page,$Limit) = page_limit(FRIENDS_PER_PAGE);
 
 // Main query
 $DB->query("SELECT
-	g.ID,
-	g.Name,
-	g.Comment,
-	g.Log,
-	Count(u.ID)
-	FROM groups AS g
-	LEFT JOIN users_groups AS u ON u.GroupID=g.ID
-	GROUP BY g.ID");
+    g.ID,
+    g.Name,
+    g.Comment,
+    g.Log,
+    Count(u.ID)
+    FROM groups AS g
+    LEFT JOIN users_groups AS u ON u.GroupID=g.ID
+    GROUP BY g.ID");
 
 // Start printing stuff
 ?>
@@ -64,14 +64,14 @@ $DB->query("SELECT
                 <td width="120px"></td>
         </tr>
 <?php
-if ($DB->record_count()==0){
+if ($DB->record_count()==0) {
 ?>
         <tr>
             <td colspan="3">No groups</td>
         </tr>
 <?php
 } else {
-    while(list($ID, $Name, $Comment, $Log, $Count) = $DB->next_record()){
+    while (list($ID, $Name, $Comment, $Log, $Count) = $DB->next_record()) {
         $Row = ($Row === 'a' ? 'b' : 'a');
 ?>
         <tr class="row<?=$Row?>">
@@ -96,7 +96,8 @@ if ($DB->record_count()==0){
     </table>
 
 <script type="text/javascript">
-        function Toggle_All(open){
+        function Toggle_All(open)
+        {
             if (open) {
                 $('.friendinfo').show(); // weirdly the $ selector chokes when trying to set multiple elements innerHTML with a class selector
                 jQuery('.togglelink').html('(Hide)');
@@ -104,6 +105,7 @@ if ($DB->record_count()==0){
                 $('.friendinfo').hide();
                 jQuery('.togglelink').html('(View)');
             }
+
             return false;
         }
 </script>

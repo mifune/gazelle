@@ -18,7 +18,7 @@ foreach ($input_addresses as $Key => &$address) {
     $address = trim($address, "'\"");
     if (!$address) {
         unset($input_addresses[$Key]);
-    } else if (validate_btc_address($address)) {
+    } elseif (validate_btc_address($address)) {
         $sql_addresses[] = db_string($address);
         $sql_values[] = "('". db_string($address)."','$LoggedUser[ID]')";
     } else {  // not in a valid format
@@ -49,7 +49,7 @@ if (count($invalid_addresses)==0) {
         <br/>
         <div class="donate_details">
 <?php
-        foreach($input_addresses as $baddress) {
+        foreach ($input_addresses as $baddress) {
             if (in_array($baddress, $invalid_addresses)) {
                 echo "<span style=\"color:red\">$baddress</span><br/>";
             } else {

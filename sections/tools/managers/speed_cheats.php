@@ -1,7 +1,7 @@
 <?php
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
 
-if(!check_perms('users_manage_cheats')) { error(403); }
+if (!check_perms('users_manage_cheats')) { error(403); }
 
 $Action = 'speed_cheats';
 
@@ -22,13 +22,13 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
 $DB->query("SELECT DeleteRecordsMins, KeepSpeed FROM site_options ");
 list($DeleteRecordsMins, $KeepSpeed) = $DB->next_record();
 
-$ViewSpeed = isset($_GET['viewspeed'])?(int)$_GET['viewspeed']:$KeepSpeed;
-$BanSpeed = isset($_GET['banspeed'])?(int)$_GET['banspeed']:$KeepSpeed;
+$ViewSpeed = isset($_GET['viewspeed'])?(int) $_GET['viewspeed']:$KeepSpeed;
+$BanSpeed = isset($_GET['banspeed'])?(int) $_GET['banspeed']:$KeepSpeed;
 
 $WHERE = '';
 $ViewInfo = ">= ".get_size($ViewSpeed);
 
-if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+if (isset($_GET['viewbanned']) && $_GET['viewbanned']) {
     $ViewInfo .= ' (all)';
 } else {
     $WHERE .= " AND um.Enabled='1' ";
@@ -41,13 +41,13 @@ show_header('Speed Cheats','watchlist');
 <div class="thin">
     <h2>(possible) cheaters</h2>
 
-	<div class="linkbox">
-		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
-		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
-		<a href="tools.php?action=speed_records">[Speed Records]</a>
-		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
-		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tools.php?action=speed_watchlist">[Watch-list]</a>
+        <a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
+        <a href="tools.php?action=speed_records">[Speed Records]</a>
+        <a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+        <a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
+    </div>
 <?php
 
     $CanManage = check_perms('admin_manage_cheats');
@@ -78,10 +78,10 @@ show_header('Speed Cheats','watchlist');
                         <option value="262144"<?=($ViewSpeed==262144?' selected="selected"':'');?>>&nbsp;<?=get_size(262144);?>/s&nbsp;&nbsp;</option>
                         <option value="524288"<?=($ViewSpeed==524288?' selected="selected"':'');?>>&nbsp;<?=get_size(524288);?>/s&nbsp;&nbsp;</option>
                         <option value="1048576"<?=($ViewSpeed==1048576?' selected="selected"':'');?>>&nbsp;<?=get_size(1048576);?>/s&nbsp;&nbsp;</option>
-<?php                       for($i=2;$i<=20;$i+=2){
+<?php                       for ($i=2;$i<=20;$i+=2) {
                             print_speed_option($i * 1048576 , $ViewSpeed );
                         }
-                        for($i=30;$i<=200;$i+=10){
+                        for ($i=30;$i<=200;$i+=10) {
                             print_speed_option($i * 1048576 , $ViewSpeed );
                         }
                         ?>
@@ -125,10 +125,10 @@ show_header('Speed Cheats','watchlist');
                 <td class="center">
                     <label for="banspeed" title="Ban Speed">Ban users with upload speed over </label>
                     <select id="banspeed" name="banspeed" title="Ban users who have recorded speeds over this"  onchange="preview_users()">
-    <?php                       for($i=4;$i<=20;$i+=2){
+    <?php                       for ($i=4;$i<=20;$i+=2) {
                                 print_speed_option($i * 1048576 , $BanSpeed );
                             }
-                            for($i=30;$i<=200;$i+=10){
+                            for ($i=30;$i<=200;$i+=10) {
                                 print_speed_option($i * 1048576 , $BanSpeed );
                             }
                             ?>
@@ -149,17 +149,16 @@ list($Page,$Limit) = page_limit(25);
 
 $GroupBy = '';
 $Having = '';
-if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed']){
+if (isset($_GET['viewptnupspeed']) && $_GET['viewptnupspeed']) {
     $GroupBy .= ", xbt.upspeed";
     $Having = 'HAVING Count(xbt.id)>1';
     if (!$_GET['viewptnzero']) $WHERE .= " AND xbt.upspeed!=0 ";
 }
-if (isset($_GET['viewptnupload']) && $_GET['viewptnupload']){
+if (isset($_GET['viewptnupload']) && $_GET['viewptnupload']) {
     $GroupBy .= ", xbt.uploaded";
     $Having = 'HAVING Count(xbt.id)>1';
     if (!$_GET['viewptnzero']) $WHERE .= " AND xbt.uploaded!=0 ";
 }
-
 
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                              uid, Username, Count(xbt.id) as count, MAX(upspeed) as upspeed, MAX(xbt.uploaded) as uploaded, MAX(mtime) as time,
@@ -186,7 +185,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
 
 ?>
 
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 
     <div class="head"><?=$NumResults?> users with speed over <?=get_size($ViewSpeed).'/s'?></div>
         <table>
@@ -202,7 +201,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
             </tr>
 <?php
             $row = 'a';
-            if($NumResults==0){
+            if ($NumResults==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="8">no speed records</td>
@@ -231,7 +230,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
                     $bantype=1; //'ban_speed_cheat';
                     $viewlink='';
                     $pattern=0;
-                    if ($_GET['viewptnupspeed']==1){
+                    if ($_GET['viewptnupspeed']==1) {
                         $viewlink="&matchspeed=$MaxUpSpeed";
                         $bantype=2; //'ban_pattern_cheat';
                         $pattern=$CountRecords;
@@ -257,8 +256,8 @@ $Pages=get_pages($Page,$NumResults,25,9);
  ?>                        </div>
                            <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?php
-                            if ($Enabled=='1'){
-                                if($bantype==1) { ?>
+                            if ($Enabled=='1') {
+                                if ($bantype==1) { ?>
                                 <a href="tools.php?action=ban_speed_cheat<?=$pattern?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (speeding)"><img src="static/common/symbols/ban.png" alt="ban" /></a>
 <?php                               } else {?>
                                 <a href="tools.php?action=ban_pattern_cheat<?=$pattern?>&banuser=1&returnto=cheats&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (pattern matching)"><img src="static/common/symbols/ban2.png" alt="ban" /></a>
@@ -282,12 +281,12 @@ $Pages=get_pages($Page,$NumResults,25,9);
                         <td class="center"><?=get_size($MaxUploaded)?></td>
                         <td class="center"><?=$CountRecords?></td>
                         <td class="center"><?php
-                            foreach($PeerIDs as $PeerID) {
+                            foreach ($PeerIDs as $PeerID) {
                         ?>  <span style="color:#555"><?=substr($PeerID,0,8)  ?></span> <br/>
                         <?php   } ?>
                         </td>
                         <td class="center"><?php
-                            foreach($IPs as $IP) {
+                            foreach ($IPs as $IP) {
                                 $ipcc = geoip($IP);
                                 echo display_ip($IP, $ipcc)."<br/>";
                             }
@@ -303,7 +302,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
             <table width="100%" class="border">
 <?php
             $i = 0;
-            foreach($IPDupes AS $IPDupe) {
+            foreach ($IPDupes AS $IPDupe) {
                 list($EUserID, $IP) = $IPDupe;
                 $i++;
                 $DupeInfo = user_info($EUserID);
@@ -323,7 +322,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
 <?php
                     if ( !array_key_exists($EUserID, $Dupes) ) {
 ?>
-						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>" title="link this user to <?=$Username?>">link</a>]
+                        [<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>" title="link this user to <?=$Username?>">link</a>]
 <?php
                     }
 ?>
@@ -343,7 +342,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
             }
             ?>
         </table>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 </div>
 <?php
 show_footer();

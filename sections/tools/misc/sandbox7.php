@@ -1,11 +1,11 @@
 <?php
 set_time_limit(50000);
 
-$Limit = isset($_REQUEST['limit']) ? (int)$_REQUEST['limit'] : 100;
+$Limit = isset($_REQUEST['limit']) ? (int) $_REQUEST['limit'] : 100;
 if ($Limit <= 10) $Limit = 10;
 elseif ($Limit > 100000) $Limit = 100000;
 
-$View = isset($_REQUEST['view']) ? (int)$_REQUEST['view'] : 100;
+$View = isset($_REQUEST['view']) ? (int) $_REQUEST['view'] : 100;
 if ($View <= 10) $View = 10;
 elseif ($View > 1000) $View = 1000;
 
@@ -22,12 +22,11 @@ $Dupes = $DB->to_array(false, MYSQLI_NUM);
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
 
-
 $DoFix = isset($_POST['submit']) && $_POST['submit']=='Fix Dupes';
 
-if($DoFix) {
+if ($DoFix) {
     $total =0;
-    foreach($Dupes as $Dupe) {
+    foreach ($Dupes as $Dupe) {
         list($UserID, $TorrentID, $Count, $Time) = $Dupe;
 
         $DB->query("DELETE FROM users_downloads WHERE UserID='$UserID' AND TorrentID='$TorrentID' AND Time != '$Time'");
@@ -74,7 +73,7 @@ show_header("Fix dupe torrent grabs");
                 </tr>
 <?php
                 $i=0;
-                foreach($Dupes as $Dupe) {
+                foreach ($Dupes as $Dupe) {
                     list($UserID, $TorrentID, $Count, $Time) = $Dupe;
 ?>
                     <tr>

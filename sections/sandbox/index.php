@@ -13,8 +13,8 @@ show_header('Sandbox', 'bbcode');
 <div class="thin">
     <h2>Sandbox</h2>
 
-	<div class="head"></div>
-	<form action="" method="post" id="messageform">
+    <div class="head"></div>
+    <form action="" method="post" id="messageform">
             <div class="box pad">
                 <h3 class="center">Practice your bbCode skills here</h3>
                 <br/>

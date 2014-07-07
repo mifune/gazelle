@@ -1,13 +1,13 @@
 <?php
 if (isset($LoggedUser['PostsPerPage'])) {
-	$PerPage = $LoggedUser['PostsPerPage'];
+    $PerPage = $LoggedUser['PostsPerPage'];
 } else {
-	$PerPage = POSTS_PER_PAGE;
+    $PerPage = POSTS_PER_PAGE;
 }
 
 list($Page,$Limit) = page_limit($PerPage);
 
-$UserID = (int)$LoggedUser['ID'];
+$UserID = (int) $LoggedUser['ID'];
 
 $DB->query("SELECT RestrictedForums, PermittedForums FROM users_info WHERE UserID = $UserID");
 list($RestrictedForums, $PermittedForums) = $DB->next_record();
@@ -47,22 +47,22 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
 <div class="thin">
     <?php  print_latest_forum_topics(); ?>
 
-	<div class="linkbox pager">
-		<?=$Pages?>
-	</div>
+    <div class="linkbox pager">
+        <?=$Pages?>
+    </div>
     <div class="head"><a href="forums.php">Forums</a> &gt; Unread Posts</div>
     <table class="forum_index">
-		<tr class="colhead">
-			<td style="width:2%;"></td>
-			<td style="width:25%;">Forum</td>
-			<td>Topic</td>
-			<td style="text-align: center;width:7%;">Replies</td>
-			<td style="text-align: center;width:7%;">Views</td>
-		</tr>
+        <tr class="colhead">
+            <td style="width:2%;"></td>
+            <td style="width:25%;">Forum</td>
+            <td>Topic</td>
+            <td style="text-align: center;width:7%;">Replies</td>
+            <td style="text-align: center;width:7%;">Views</td>
+        </tr>
 <?php  if ($Results == 0) { ?>
             <tr>
                 <td colspan="5" class="center">
-			No unread posts
+            No unread posts
                 </td>
             </tr>
 <?php  } else {
@@ -77,8 +77,8 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
                 $Read = 'unread';
 
                 // Removed per request, as distracting
-                if($Locked) { $Read .= "_locked"; }
-                if($Sticky) { $Read .= "_sticky"; }
+                if ($Locked) { $Read .= "_locked"; }
+                if ($Sticky) { $Read .= "_sticky"; }
 
 ?>
                 <tr class="row<?=$Row?>">
@@ -103,11 +103,11 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
 <?php           }
       }
 ?>
-	</table>
-	<div class="linkbox pager">
-		<?=$Pages?>
-	</div>
-	<div class="linkbox">[<a href="forums.php?action=catchup&amp;forumid=all&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up all</a>]</div>
+    </table>
+    <div class="linkbox pager">
+        <?=$Pages?>
+    </div>
+    <div class="linkbox">[<a href="forums.php?action=catchup&amp;forumid=all&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up all</a>]</div>
 </div>
 
 <?php

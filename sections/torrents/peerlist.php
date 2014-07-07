@@ -17,32 +17,31 @@ if (!empty($_GET['page']) && is_number($_GET['page'])) {
 $DB->query("SELECT UserID, Anonymous FROM torrents WHERE ID='$TorrentID' ");
 list($AuthorID, $IsAnon) = $DB->next_record();
 
-
  // swapped xu.timespent, for xu.mtime - see if that is more enlightening to the user
 
 $Result = $DB->query("SELECT SQL_CALC_FOUND_ROWS
-	xu.uid,
-	t.Size,
-	um.Username,
-	xu.active,
-	IF(ucs.Status IS NULL,'unset',ucs.Status) AS Status,
-	xu.uploaded,
-	xu.remaining,
-	xu.useragent,
+    xu.uid,
+    t.Size,
+    um.Username,
+    xu.active,
+    IF(ucs.Status IS NULL,'unset',ucs.Status) AS Status,
+    xu.uploaded,
+    xu.remaining,
+    xu.useragent,
       IF(xu.remaining=0,1,0) AS IsSeeder,
-	xu.timespent,
-	xu.upspeed,
-	xu.downspeed,
+    xu.timespent,
+    xu.upspeed,
+    xu.downspeed,
     xu.IP,
     xu.Port
-	FROM xbt_files_users AS xu
-	LEFT JOIN users_main AS um ON um.ID=xu.uid
+    FROM xbt_files_users AS xu
+    LEFT JOIN users_main AS um ON um.ID=xu.uid
     LEFT JOIN users_connectable_status AS ucs ON ucs.UserID=xu.uid AND xu.ip=ucs.IP
-	JOIN torrents AS t ON t.ID=xu.fid
-	WHERE xu.fid='$TorrentID'
-	AND um.Visible='1'
-	ORDER BY IsSeeder DESC, xu.uploaded DESC
-	LIMIT $Limit");
+    JOIN torrents AS t ON t.ID=xu.fid
+    WHERE xu.fid='$TorrentID'
+    AND um.Visible='1'
+    ORDER BY IsSeeder DESC, xu.uploaded DESC
+    LIMIT $Limit");
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
 $DB->set_query_id($Result);
@@ -53,7 +52,7 @@ $DB->set_query_id($Result);
     <?php  } ?>
 <table>
     <?php
-    if ($NumResults==0){
+    if ($NumResults==0) {
             ?>
             <tr class="smallhead">
                 <td colspan="11">There are no peers for this torrent</td>
@@ -63,7 +62,6 @@ $DB->set_query_id($Result);
     $LastIsSeeder = -1;
     while (list($PeerUserID, $Size, $Username, $Active, $Connectable, $Uploaded, $Remaining, $UserAgent,
             $IsSeeder, $Timespent, $UpSpeed, $DownSpeed, $IP, $Port) = $DB->next_record()) {
-
 
         if ($IsSeeder != $LastIsSeeder) {
             ?>

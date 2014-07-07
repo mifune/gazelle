@@ -12,13 +12,13 @@ if (!list($Category, $Title, $Body, $Time, $MinClass, $SubCat) = $DB->next_recor
 $Body = $Text->full_format($Body, true); // true so regardless of author permissions articles can use adv tags
 $Body = replace_special_tags($Body);
 
-if($MinClass>0) { // check permissions
+if ($MinClass>0) { // check permissions
         // should there be a way for FLS to see these... perm setting maybe?
     if ( $StaffClass < $MinClass ) error(403);
 }
 
 $Articles = $Cache->get_value("articles_$Category");
-if($Articles===false) {
+if ($Articles===false) {
         $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass
                   FROM articles
                  WHERE Category='$Category'
@@ -28,7 +28,7 @@ if($Articles===false) {
 }
 
 $TopArticles = $Cache->get_value("articles_sub_{$Category}_$SubCat");
-if($TopArticles===false) {
+if ($TopArticles===false) {
         $DB->query("SELECT TopicID, Title, Description, SubCat, MinClass
                     FROM articles
                     WHERE Category='$Category' AND SubCat='$SubCat'

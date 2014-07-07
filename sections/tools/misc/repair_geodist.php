@@ -6,13 +6,13 @@ set_time_limit(0);
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
-$num_users = isset($_REQUEST['numusers'])?(int)$_REQUEST['numusers']:10;
+$num_users = isset($_REQUEST['numusers'])?(int) $_REQUEST['numusers']:10;
 
 if($num_users<=0)$num_users=1;
 
 $done='';
 
-if ($_REQUEST['submit']=='process'){
+if ($_REQUEST['submit']=='process') {
     $done= 'done';
     $DB->query("SELECT ID, IP, Username FROM users_main
                  WHERE Enabled='1'
@@ -26,7 +26,7 @@ if ($_REQUEST['submit']=='process'){
         list($UserID, $IP, $Username) = $User;
 
         // auto set if we have an ip to work with and data is missing
-        if($IP) {
+        if ($IP) {
             $ipcc = geoip($IP);
             $DB->query("UPDATE users_main SET ipcc='$ipcc' WHERE ID='$UserID'");
             $Results[] = "| " . str_pad($UserID, 7)."| ". str_pad($Username, 14)."| ".str_pad($ipcc,2)." |"; //  ($IP)
@@ -43,8 +43,7 @@ if ($_REQUEST['submit']=='process'){
     $ret .= implode("\n", $Results)."\n";
     $ret .= "+--------+---------------+----+\n";
     $ret .="[/code][/spoiler]\n";
-}
-else if ($_REQUEST['submit2']=='fill users_geo_distribution'){
+} elseif ($_REQUEST['submit2']=='fill users_geo_distribution') {
 
     $done= 'filled users_geo_distribution';
 
@@ -58,7 +57,7 @@ else if ($_REQUEST['submit2']=='fill users_geo_distribution'){
 
     $numinserted = $DB->affected_rows();
     $ret = "[b]inserted $numinserted records[/b]";
-	$Cache->delete_value('geodistribution');
+    $Cache->delete_value('geodistribution');
 }
 
 show_header('Repair Geo-Distribution','bbcode');
@@ -108,6 +107,3 @@ show_header('Repair Geo-Distribution','bbcode');
 
 <?php
 show_footer();
-
-
-

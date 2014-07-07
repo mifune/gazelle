@@ -12,14 +12,12 @@ $ForumCats = get_forum_cats();
 //This variable contains all our lovely forum data
 $Forums = get_forums_info();
 
-
 show_header('Donation Drives', 'bitcoin,user,bbcode,jquery');
 ?>
 
 <div class="thin">
 
     <h2>Donation Drives</h2>
-
 
     <div class="head">new drive</div>
     <table>
@@ -102,7 +100,7 @@ show_header('Donation Drives', 'bitcoin,user,bbcode,jquery');
                         &nbsp;&nbsp;&nbsp;<input type="radio" name="autodate" value="1" title="if selected a valid date must be supplied" />
                         Specify the start date manually:
                         <input type="text" name="starttime" value="<?= date("Y-m-d H:i:s") ?>" title="start time is used to calculate the donation total so far" />
-                <?php   }  elseif ($state == 'active')  { ?>
+                <?php   } elseif ($state == 'active') { ?>
                         <input type="text" name="starttime" value="<?= $start_time ?>" title="start time is used to calculate the donation total so far" <?= $disabled_html ?> />
                 <?php   } else {  ?>
                         <?= time_diff($start_time, 3, true, false, 1)  ?>
@@ -140,9 +138,9 @@ show_header('Donation Drives', 'bitcoin,user,bbcode,jquery');
                         Thread already discussing this topic:
                         <input type="text" name="threadid" size="8" value="<?= display_str($threadid) ?>" />
                         &nbsp;(must be a valid thread id)
-                  <?php  }  else { ?>
+                  <?php  } else { ?>
                         <input type="text" name="threadid" size="8" value="<?= display_str($threadid) ?>" <?= $disabled_html ?> />
-                        &nbsp; <?php  if($threadid && is_number($threadid)) {   ?>
+                        &nbsp; <?php  if ($threadid && is_number($threadid)) {   ?>
                             <a href="/forums.php?action=viewthread&threadid=<?=$threadid?>" target="_blank">View thread</a>
                   <?php     }
                      }  ?>

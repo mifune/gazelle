@@ -7,7 +7,6 @@ if (!empty($_REQUEST['userid']) && is_numeric($_REQUEST['userid']))
 else
     $UserID = $LoggedUser['ID'];
 
-
 $OwnProfile = $UserID == $LoggedUser['ID'];
 
 if(!$OwnProfile && !check_perms('users_view_donor')) error(403);
@@ -16,7 +15,7 @@ $eur_rate = get_current_btc_rate();
 
 $Title = "My Donations";
 
-if(!$OwnProfile) {
+if (!$OwnProfile) {
     $UserInfo = user_info($UserID);
     $Title .= " " . format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, true);
 }
@@ -83,7 +82,7 @@ show_header('My Donations','bitcoin,bbcode');
     ?>
             <p><span class="warning"><?=$Err?></span></p>
     <?php
-        } else if (count($user_addresses)==0) {
+        } elseif (count($user_addresses)==0) {
 
     ?>
             <p><a style="font-weight: bold;" href="donate.php?action=my_donations&new=1">click here to get a personal donation address</a></p>
@@ -94,7 +93,7 @@ show_header('My Donations','bitcoin,bbcode');
         Once you have transferred some bitcoin to your donation address it can take a few hours for the transfer to be fully verified on the bitcoin network (6 transactions).<br/>
         When your transfer is verified you must return to this page and choose how to submit your donation (for -gb or <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="love" />)<br/><br/>
     <?php
-        if ($eur_rate=='0'){   ?>
+        if ($eur_rate=='0') {   ?>
             <span class="red">The site was unable to get an exchange rate - you will not be able to submit a donation at this time</span><br/>
             Hopefully this is a temporary issue with the coindesk webservice, if it persists please
             <a href="/staffpm.php?action=user_inbox&show=1&msg=nobtcrate">message an admin.</a><br/><br/>
@@ -102,10 +101,10 @@ show_header('My Donations','bitcoin,bbcode');
             <span style="font-size: 1.1em" title="rate is Mt.Gox weighted average: <?=$eur_rate?>">
                                 The current bitcoin exchange rate is 1 bitcoin = &euro;<?=number_format($eur_rate,2);?></span><br/><br/>
     <?php  }
-            foreach($user_addresses as $address) {
+            foreach ($user_addresses as $address) {
                 list($ID, $public, $time) = $address;
                 $balance1 = check_bitcoin_balance($public, 1);
-                if ($balance1>0){
+                if ($balance1>0) {
                     $amount_euro = number_format($balance1*$eur_rate,2);
                     $balance2 = check_bitcoin_balance($public, 6);
                     $activetime = check_bitcoin_activation($public);
@@ -157,7 +156,7 @@ show_header('My Donations','bitcoin,bbcode');
                     <tr>
                         <td colspan="3" style="text-align:right;">
                         <?php
-                            $DB->query("SELECT Title FROM badges WHERE Type='Donor' AND Cost<='".(int)round($amount_euro)."' ORDER BY Cost DESC LIMIT 1");
+                            $DB->query("SELECT Title FROM badges WHERE Type='Donor' AND Cost<='".(int) round($amount_euro)."' ORDER BY Cost DESC LIMIT 1");
                             if ($DB->record_count()>0) {
                                 list($title) = $DB->next_record();
                                 echo "&euro;$amount_euro => $title";
@@ -194,7 +193,7 @@ show_header('My Donations','bitcoin,bbcode');
     <?php
         } else {
 
-            foreach($donation_records as $record) {
+            foreach ($donation_records as $record) {
                 list($ID, $state, $public, $time, $userID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment) = $record;
                 $addybbcode = "[font=Courier New]" .substr_replace($public, "#######################", -23)."[/font]" .
                         "[spoiler= ]Do not use this address again, if you want to make another donation please request a new address above[br]your old address: [font=Courier New]{$public}[/font][/spoiler]";
@@ -208,7 +207,7 @@ show_header('My Donations','bitcoin,bbcode');
                         <td title="Do not reuse old donation addresses. If you want to make a new donation please use a new address (issued above)"><?=$Text->full_format($addybbcode, true)?></td><td><?=$bitcoin_rate?></td><td><?=time_diff($received)?></td><td><?=$amount_bitcoin?></td><td>&euro;<?=$amount_euro?></td>
                     </tr>
                     <tr>
-                        <td colspan="4"><?=$comment?></td><td colspan="1"><? if (check_perms('admin_donor_log'))echo "<em>$state</em>";?></td>
+                        <td colspan="4"><?=$comment?></td><td colspan="1"><?php if (check_perms('admin_donor_log'))echo "<em>$state</em>";?></td>
                     </tr>
                 </table>
             </div>

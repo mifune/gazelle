@@ -3,21 +3,21 @@
 $Title =  db_string(trim($_POST['title']));
 $Image =  db_string(trim($_POST['image']));
 $Body =  db_string(trim($_POST['body']));
-$Category = (int)$_POST['category'];
+$Category = (int) $_POST['category'];
 $TagList = db_string(trim($_POST['tags']));
 
-$TemplateID = (int)$_POST['templateID'];
+$TemplateID = (int) $_POST['templateID'];
 
 //TODO: add max number of templates?
 
-if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
+if ($Title=='' && $Image=='' && $Body=='' && $TagList=='') {
 
     $Result = array(0, "Cannot save a template with no content!");
 
-} elseif(is_number($TemplateID)&& $TemplateID>0) {
+} elseif (is_number($TemplateID)&& $TemplateID>0) {
         //get existing template to write over
         $DB->query("SELECT Name, UserID, Public FROM upload_templates WHERE ID='$TemplateID'");
-        if($DB->record_count()==0) {
+        if ($DB->record_count()==0) {
             //error
             $Result = array(0, "Could not find template #$TemplateID to overwrite!");
         } else {
@@ -46,7 +46,7 @@ if ($Title=='' && $Image=='' && $Body=='' && $TagList=='' ) {
 } else {
     $Name = db_string(trim($_POST['name']));
     $Public = $_POST['ispublic']==1?1:0;
-    $UserID = (int)$LoggedUser['ID'];
+    $UserID = (int) $LoggedUser['ID'];
 
     if ($Name=='') {
 

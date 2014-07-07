@@ -12,43 +12,43 @@ the front page.
 \*********************************************************************/
 //
 // Quick SQL injection check
-if(!is_number($_POST['threadid'])) { error(404); }
+if (!is_number($_POST['threadid'])) { error(404); }
 
 // End injection check
 // Make sure they are moderators
-if(!check_perms('site_moderate_forums')) { error(403); }
+if (!check_perms('site_moderate_forums')) { error(403); }
 authorize();
 
 // Variables for database input
 
-$TopicID = (int)$_POST['threadid'];
+$TopicID = (int) $_POST['threadid'];
 $Sticky = (isset($_POST['sticky'])) ? 1 : 0;
 $Locked = (isset($_POST['locked'])) ? 1 : 0;
 $Title =  ($_POST['title']);
-$ForumID = (int)$_POST['forumid'];
-$Page = (int)$_POST['page'];
+$ForumID = (int) $_POST['forumid'];
+$Page = (int) $_POST['page'];
 
 if ($Locked == 1) {
-	$DB->query("DELETE FROM forums_last_read_topics WHERE TopicID='$TopicID'");
+    $DB->query("DELETE FROM forums_last_read_topics WHERE TopicID='$TopicID'");
 }
 
 $DB->query("SELECT
-	t.ForumID,
+    t.ForumID,
           t.Title,
-	f.MinClassWrite,
-	COUNT(p.ID) AS Posts,
+    f.MinClassWrite,
+    COUNT(p.ID) AS Posts,
           Max(p.ID) AS LastPostID,
             t.StickyPostID,
         f.Name
-	FROM forums_topics AS t
-	LEFT JOIN forums_posts AS p ON p.TopicID=t.ID
-	LEFT JOIN forums AS f ON f.ID=.t.ForumID
-	WHERE t.ID='$TopicID'
-	GROUP BY p.TopicID");
+    FROM forums_topics AS t
+    LEFT JOIN forums_posts AS p ON p.TopicID=t.ID
+    LEFT JOIN forums AS f ON f.ID=.t.ForumID
+    WHERE t.ID='$TopicID'
+    GROUP BY p.TopicID");
 if ($DB->record_count()==0) error("Error: Could not find thread with id=$TopicID");
 list($OldForumID, $OldTitle, $MinClassWrite, $Posts, $OldLastPostID, $OldStickyPostID, $OldForumName) = $DB->next_record();
 
-if( !check_forumperm($OldForumID, 'Write') ) { error(403); }
+if ( !check_forumperm($OldForumID, 'Write') ) { error(403); }
 
 // If we're moving
 $Cache->delete_value('forums_'.$ForumID);
@@ -64,7 +64,7 @@ if (isset($_POST['split'])) {
     if (!is_array($PostIDs) || $NumSplitPosts==0) error("No posts selected to split");
     if ( $NumSplitPosts>=$Posts) error("You cannot split ALL the posts from a thread");
     sort($PostIDs);
-    foreach($PostIDs as $pID){
+    foreach ($PostIDs as $pID) {
         if( !is_number($pID)) error(0);
         // while we are looping these may as well reset the current stickyID (prevents a nasty looking bug - null stickypost!)
         if ($OldStickyPostID == $pID) $OldStickyPostID=0;
@@ -78,10 +78,10 @@ if (isset($_POST['split'])) {
     $DB->query("SELECT AuthorID, AddedTime FROM forums_posts WHERE ID='$lastpostID'");
     list($LastAuthorID, $LastAddedTime) = $DB->next_record();
 
-    if ( $_POST['splitoption'] == 'mergesplit' ) {
+    if ($_POST['splitoption'] == 'mergesplit') {
         // merge into an exisiting thread
         if(!is_number($_POST['splitintothreadid'])) error("split into thread id is not a number!");
-        $SplitTopicID = (int)$_POST['splitintothreadid'];
+        $SplitTopicID = (int) $_POST['splitintothreadid'];
         if($SplitTopicID == $TopicID) error("Split failed: split into thread id cannot be the same as source thread!");
 
         $DB->query("SELECT
@@ -98,7 +98,7 @@ if (isset($_POST['split'])) {
         if ($DB->record_count()==0) error("Split failed: Could not find thread with id=$SplitTopicID");
         list($ForumID, $MergeTitle, $NFMinClassWrite, $NFPosts, $NFLastPostID) = $DB->next_record();
 
-        if( !check_forumperm($ForumID, 'Write') ) { error(403); }
+        if ( !check_forumperm($ForumID, 'Write') ) { error(403); }
 
         $Title = "$MergeTitle (merged with posts from $OldTitle)";
         $NewLastPostID = ($lastpostID>$NFLastPostID)? $lastpostID : $NFLastPostID;
@@ -200,7 +200,7 @@ if (isset($_POST['split'])) {
 
     update_forum_info($ForumID, $numtopics,false);
 
-    if($OldForumID!=$ForumID) {    // If we're moving posts into a new forum, change the new forum stats
+    if ($OldForumID!=$ForumID) {    // If we're moving posts into a new forum, change the new forum stats
 
         update_forum_info($OldForumID, 0,false);
     }
@@ -214,13 +214,13 @@ if (isset($_POST['split'])) {
     $Cache->delete_value('thread_'.$SplitTopicID.'_info');
 
     $CatalogueID = floor($Posts/THREAD_CATALOGUE);
-    for($i=0;$i<=$CatalogueID;$i++) {
+    for ($i=0;$i<=$CatalogueID;$i++) {
         $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
     }
 
     if ($SplitTopicID>0) {
         $CatalogueID = floor( ($NumSplitPosts+1) /THREAD_CATALOGUE);
-        for($i=0;$i<=$CatalogueID;$i++) {
+        for ($i=0;$i<=$CatalogueID;$i++) {
             $Cache->delete_value('thread_'.$SplitTopicID.'_catalogue_'.$i);
         }
     }
@@ -237,7 +237,7 @@ if (isset($_POST['split'])) {
     if(!check_perms('site_moderate_forums')) error(403);
 
     if(!is_number($_POST['mergethreadid'])) error("merge thread id is not a number!");
-    $MergeTopicID = (int)$_POST['mergethreadid'];
+    $MergeTopicID = (int) $_POST['mergethreadid'];
     if($MergeTopicID == $TopicID) error("Merge failed: merge thread id cannot be the same as source thread!");
 
     $DB->query("SELECT
@@ -254,7 +254,7 @@ if (isset($_POST['split'])) {
     if ($DB->record_count()==0) error("Merge failed: Could not find thread with id=$MergeTopicID");
     list($NewForumID, $MergeTitle, $NFMinClassWrite, $NFPosts, $NFLastPostID) = $DB->next_record();
 
-    if( !check_forumperm($NewForumID, 'Write') ) { error(403); }
+    if ( !check_forumperm($NewForumID, 'Write') ) { error(403); }
 
     $MergeTitle = "$MergeTitle (merged with $OldTitle)";
     if($OldLastPostID>$NFLastPostID) $NFLastPostID = $OldLastPostID;
@@ -271,7 +271,7 @@ if (isset($_POST['split'])) {
     $Cache->begin_transaction('forums_list');
 
     update_forum_info($OldForumID, '-1',false);
-    if($NewForumID!=$OldForumID) {    // If we're moving posts into a new forum, change the new forum stats
+    if ($NewForumID!=$OldForumID) {    // If we're moving posts into a new forum, change the new forum stats
 
         update_forum_info($NewForumID, 0,false);
         $Cache->delete_value('forums_'.$NewForumID);
@@ -282,7 +282,7 @@ if (isset($_POST['split'])) {
     $Cache->delete_value('thread_'.$MergeTopicID.'_info');
 
     $CatalogueID = floor($Posts/THREAD_CATALOGUE);
-    for($i=0;$i<=$CatalogueID;$i++) {
+    for ($i=0;$i<=$CatalogueID;$i++) {
         $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
         $Cache->delete_value('thread_'.$MergeTopicID.'_catalogue_'.$i);
     }
@@ -291,26 +291,26 @@ if (isset($_POST['split'])) {
     header("Location: forums.php?action=viewthread&threadid=$MergeTopicID");
 
 // If we're deleting a thread
-} elseif(isset($_POST['delete'])) {
-	if(check_perms('site_admin_forums')) {
-		$DB->query("DELETE FROM forums_posts WHERE TopicID='$TopicID'");
-		$DB->query("DELETE FROM forums_topics WHERE ID='$TopicID'");
+} elseif (isset($_POST['delete'])) {
+    if (check_perms('site_admin_forums')) {
+        $DB->query("DELETE FROM forums_posts WHERE TopicID='$TopicID'");
+        $DB->query("DELETE FROM forums_topics WHERE ID='$TopicID'");
             $DB->query("DELETE FROM forums_polls WHERE TopicID='$TopicID'");
             $DB->query("DELETE FROM forums_polls_votes WHERE TopicID='$TopicID'");
 
-		update_forum_info($ForumID, '-1');
+        update_forum_info($ForumID, '-1');
 
-		$Cache->delete_value('thread_'.$TopicID.'_info');
+        $Cache->delete_value('thread_'.$TopicID.'_info');
 
         update_latest_topics();
-		header('Location: forums.php?action=viewforum&forumid='.$ForumID);
-	} else {
-		error(403);
-	}
+        header('Location: forums.php?action=viewforum&forumid='.$ForumID);
+    } else {
+        error(403);
+    }
 
 // If we're just editing it/moving it/trashing it
 } else {
-    if($_POST['title'] == ''){ error(0); }
+    if ($_POST['title'] == '') { error(0); }
 
     $SET_NUMPOSTS = '';
 
@@ -332,77 +332,77 @@ if (isset($_POST['split'])) {
 
         $Cache->delete_value('forums_'.$ForumID);
         $CatalogueID = floor(($NumPosts+1)/THREAD_CATALOGUE);
-        for($i=0;$i<=$CatalogueID;$i++) {
+        for ($i=0;$i<=$CatalogueID;$i++) {
             $Cache->delete_value('thread_'.$TopicID.'_catalogue_'.$i);
         }
 
     }
 
-	$Cache->begin_transaction('thread_'.$TopicID.'_info');
-	$UpdateArray = array(
-		'IsSticky'=>$Sticky,
-		'IsLocked'=>$Locked,
-		'Title'=>cut_string($Title, 150, 1, 0),
-		'ForumID'=>$ForumID
-		);
+    $Cache->begin_transaction('thread_'.$TopicID.'_info');
+    $UpdateArray = array(
+        'IsSticky'=>$Sticky,
+        'IsLocked'=>$Locked,
+        'Title'=>cut_string($Title, 150, 1, 0),
+        'ForumID'=>$ForumID
+        );
     if ($SET_NUMPOSTS != '') $UpdateArray['NumPosts'] = '+1';
-	$Cache->update_row(false, $UpdateArray);
-	$Cache->commit_transaction(0);
+    $Cache->update_row(false, $UpdateArray);
+    $Cache->commit_transaction(0);
 
-	$DB->query("UPDATE forums_topics SET
-		IsSticky = '$Sticky',
-		IsLocked = '$Locked',
-		Title = '".db_string($Title)."',
-		ForumID ='$ForumID'
+    $DB->query("UPDATE forums_topics SET
+        IsSticky = '$Sticky',
+        IsLocked = '$Locked',
+        Title = '".db_string($Title)."',
+        ForumID ='$ForumID'
         $SET_NUMPOSTS
-		WHERE ID='$TopicID'");
+        WHERE ID='$TopicID'");
 
-	if($ForumID!=$OldForumID) { // If we're moving a thread, change the forum stats
+    if ($ForumID!=$OldForumID) { // If we're moving a thread, change the forum stats
 
-            if( !check_forumperm($ForumID, 'Write') ) { error(403); }
+            if ( !check_forumperm($ForumID, 'Write') ) { error(403); }
 
-		$DB->query("SELECT MinClassRead, MinClassWrite, Name FROM forums WHERE ID='$ForumID'");
-		list($MinClassRead, $MinClassWrite, $ForumName) = $DB->next_record();
-		$Cache->begin_transaction('thread_'.$TopicID.'_info');
-		$UpdateArray = array(
-			'ForumName'=>$ForumName,
-			'MinClassRead'=>$MinClassRead,
-			'MinClassWrite'=>$MinClassWrite
-			);
-		$Cache->update_row(false, $UpdateArray);
-		$Cache->commit_transaction(3600*24*5);
+        $DB->query("SELECT MinClassRead, MinClassWrite, Name FROM forums WHERE ID='$ForumID'");
+        list($MinClassRead, $MinClassWrite, $ForumName) = $DB->next_record();
+        $Cache->begin_transaction('thread_'.$TopicID.'_info');
+        $UpdateArray = array(
+            'ForumName'=>$ForumName,
+            'MinClassRead'=>$MinClassRead,
+            'MinClassWrite'=>$MinClassWrite
+            );
+        $Cache->update_row(false, $UpdateArray);
+        $Cache->commit_transaction(3600*24*5);
 
-		$Cache->begin_transaction('forums_list');
-		// Forum we're moving from
-		update_forum_info($OldForumID, '-1', false);
-		// Forum we're moving to
-		update_forum_info($ForumID, '+1', false);
-		$Cache->commit_transaction(0);
+        $Cache->begin_transaction('forums_list');
+        // Forum we're moving from
+        update_forum_info($OldForumID, '-1', false);
+        // Forum we're moving to
+        update_forum_info($ForumID, '+1', false);
+        $Cache->commit_transaction(0);
 
-	} else { // Editing
-		$DB->query("SELECT LastPostTopicID FROM forums WHERE ID='$ForumID'");
-		list($LastTopicID) = $DB->next_record();
-		if($LastTopicID == $TopicID) {
-			$UpdateArray = array(
-				'Title'=>$_POST['title'],
-				'IsLocked'=>$Locked,
-				'IsSticky'=>$Sticky
-			);
-			$Cache->begin_transaction('forums_list');
-			$Cache->update_row($ForumID, $UpdateArray);
-			$Cache->commit_transaction(0);
-		}
-	}
-	if($Locked) {
-		$CatalogueID = floor($NumPosts/THREAD_CATALOGUE);
-		for($i=0;$i<=$CatalogueID;$i++) {
-			$Cache->expire_value('thread_'.$TopicID.'_catalogue_'.$i,3600*24*7);
-		}
-		$Cache->expire_value('thread_'.$TopicID.'_info',3600*24*7);
+    } else { // Editing
+        $DB->query("SELECT LastPostTopicID FROM forums WHERE ID='$ForumID'");
+        list($LastTopicID) = $DB->next_record();
+        if ($LastTopicID == $TopicID) {
+            $UpdateArray = array(
+                'Title'=>$_POST['title'],
+                'IsLocked'=>$Locked,
+                'IsSticky'=>$Sticky
+            );
+            $Cache->begin_transaction('forums_list');
+            $Cache->update_row($ForumID, $UpdateArray);
+            $Cache->commit_transaction(0);
+        }
+    }
+    if ($Locked) {
+        $CatalogueID = floor($NumPosts/THREAD_CATALOGUE);
+        for ($i=0;$i<=$CatalogueID;$i++) {
+            $Cache->expire_value('thread_'.$TopicID.'_catalogue_'.$i,3600*24*7);
+        }
+        $Cache->expire_value('thread_'.$TopicID.'_info',3600*24*7);
 
-		$DB->query('UPDATE forums_polls SET Closed=\'0\' WHERE TopicID=\''.$TopicID.'\'');
-		$Cache->delete_value('polls_'.$TopicID);
-	}
+        $DB->query('UPDATE forums_polls SET Closed=\'0\' WHERE TopicID=\''.$TopicID.'\'');
+        $Cache->delete_value('polls_'.$TopicID);
+    }
       update_latest_topics();
-	header('Location: forums.php?action=viewthread&threadid='.$TopicID.'&page='.$Page);
+    header('Location: forums.php?action=viewthread&threadid='.$TopicID.'&page='.$Page);
 }

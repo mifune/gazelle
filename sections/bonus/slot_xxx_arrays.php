@@ -62,9 +62,9 @@ $Reel[1] = array('C', 'X', 'A', 'A', 'X', 'D', 'D', 'X', 'B', 'B', 'X', 'E', 'B'
 $Reel[2] = array('B', 'X', 'F', 'C', 'B', 'C', 'E', 'C', 'X', 'B', 'B', 'D', 'X', 'A', 'A', 'X', 'A', 'A', 'E', 'D');
 $Reel[3] = array('D', 'X', 'B', 'D', 'B', 'X', 'E', 'X', 'A', 'B', 'X', 'C', 'A', 'X', 'A', 'B', 'A', 'F', 'X', 'C');
 
-
 // draw payout
-function print_payout_table($BetAmount) {
+function print_payout_table($BetAmount)
+{
     global $Payout;
     ?>
     <div>

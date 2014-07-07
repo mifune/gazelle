@@ -1,12 +1,12 @@
 <?php
-if(!check_perms('site_manage_badges')) { error(403); }
+if (!check_perms('site_manage_badges')) { error(403); }
 
 // get all images in badges directory for drop down
 $imagefiles = scandir(STATIC_SERVER.'common/badges');
 $imagefiles= array_diff($imagefiles, array('.','..'));
 
-
-function print_select_image($ElementID, $CurrentImage=''){
+function print_select_image($ElementID, $CurrentImage='')
+{
     global $imagefiles;
 ?>
     <select name="image[<?=$ElementID?>]" id="imagesrc<?=$ElementID?>" onchange="Select_Image('<?=$ElementID?>')" title="Select Image">
@@ -47,14 +47,14 @@ show_header('Badges','badges');
             </tr>
             <?php
 
-            $numAdds = isset($_REQUEST['numadd'])?(int)$_REQUEST['numadd']:5;
+            $numAdds = isset($_REQUEST['numadd'])?(int) $_REQUEST['numadd']:5;
             if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
 
             foreach ($BadgeTypes as $valtype) {
                 $badge_select_html .= '<option value="'.$valtype.'">'.$valtype.'&nbsp;&nbsp;</option>';
             }
 
-            for($i = 0; $i < $numAdds; $i++) {
+            for ($i = 0; $i < $numAdds; $i++) {
                 $ID = "new$i";
             ?>
                 <tr class="rowb">
@@ -179,7 +179,7 @@ show_header('Badges','badges');
             $DB->query("SELECT ID, Badge, Rank, Type, Display, Sort, Cost, Title, Description, Image
                   FROM badges ORDER BY Display, Sort, Rank");
 
-            while(list($ID, $Badge, $Rank, $Type, $Display, $Sort, $Cost, $Title, $Description, $Image) = $DB->next_record()){
+            while (list($ID, $Badge, $Rank, $Type, $Display, $Sort, $Cost, $Title, $Description, $Image) = $DB->next_record()) {
                 $Row = ($Row === 'a' ? 'b' : 'a');
 ?>
                 <tr class="rowb" style="border-top: 1px solid;">

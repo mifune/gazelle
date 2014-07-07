@@ -17,7 +17,6 @@ include(SERVER_ROOT . '/sections/torrents/functions.php');
 enforce_login();
 authorize();
 
-
 $Validate = new VALIDATE;
 $Feed = new FEED;
 $Text = new TEXT;
@@ -58,14 +57,14 @@ $HideWL = true;
 
 if (isset($_POST['tempfileid']) && is_number($_POST['tempfileid'])) {
     $Properties['tempfilename'] = $_POST['tempfilename'];
-    $Properties['tempfileid'] = (int)$_POST['tempfileid'];
+    $Properties['tempfileid'] = (int) $_POST['tempfileid'];
 } else {
     $Properties['tempfilename'] = false;
     $Properties['tempfileid'] = null;
 }
 $FileName = '';
 
-if($Properties['tempfileid']) {
+if ($Properties['tempfileid']) {
 
     //******************************************************************************//
     //--------------- Get already loaded torrent file ----------------------------------------//
@@ -93,7 +92,7 @@ if($Properties['tempfileid']) {
 
     if (!is_uploaded_file($TorrentName) || !filesize($TorrentName)) {
         $Err = 'No torrent file uploaded, or file is empty.';
-    } else if (substr(strtolower($File['name']), strlen($File['name']) - strlen(".torrent")) !== ".torrent") {
+    } elseif (substr(strtolower($File['name']), strlen($File['name']) - strlen(".torrent")) !== ".torrent") {
         $Err = "You seem to have put something other than a torrent file into the upload field. (" . $File['name'] . ").";
     }
 
@@ -120,7 +119,6 @@ $Private = $Tor->make_private();
 
 //******************************************************************************//
 //--------------- Check this torrent file does not already exist ----------------------------------------//
-
 
 $InfoHash = pack("H*", sha1($Tor->Val['info']->enc()));
 $DB->query("SELECT ID FROM torrents WHERE info_hash='" . db_string($InfoHash) . "'");
@@ -165,7 +163,7 @@ foreach ($FileList as $File) {
         $Err = 'The torrent contains one or more .torrent files inside the torrent. Please remove all .torrent files from your upload and recreate the .torrent file.';
     }
     if (!preg_match('/\./i', $Name)) {
-    //if ( strpos($Name, '.')===false)  {
+    //if ( strpos($Name, '.')===false) {
         $Err = "The torrent contains one or more files without a file extension. Please remove or rename the files as appropriate and recreate the .torrent file.<br/><strong>note: this can also be caused by selecting 'create encrypted' in some clients</strong> in which case please recreate the .torrent file without encryption selected.";
     }
     // Add file and size to array
@@ -182,11 +180,11 @@ if ($Err) { // Show the upload form, with the data the user entered
 // do dupe check & return to upload page if detected
 $DupeResults = check_size_dupes($FileList);
 
-if(empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // Show the upload form, with the data the user entered
+if (empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // Show the upload form, with the data the user entered
 
     //******************************************************************************//
     //--------------- Temp store torrent file -------------------------------------------//
-    if(!$Properties['tempfileid']) {
+    if (!$Properties['tempfileid']) {
         $DB->query("INSERT INTO torrents_files_temp (filename, file, time)
                          VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')");
         $Properties['tempfileid'] = $DB->inserted_id();
@@ -222,14 +220,14 @@ $Validate->SetFields('desc', '1', 'desc', 'Description', array('regex' => $white
 
 $Err = $Validate->ValidateForm($_POST, $Text); // Validate the form
 
-if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)){
+if (!$Err && !$Text->validate_bbcode($_POST['desc'],  get_permissions_advtags($LoggedUser['ID']), false)) {
         $Err = "There are errors in your bbcode (unclosed tags)";
 }
 
 if ($Err || isset($_POST['checkonly'])) { // Show the upload form, with the data the user entered
     //******************************************************************************//
     //--------------- Temp store torrent file -------------------------------------------//
-    if(!$Properties['tempfileid']) {
+    if (!$Properties['tempfileid']) {
         $DB->query("INSERT INTO torrents_files_temp (filename, file, time)
                          VALUES ('".db_string($FileName)."', '" . db_string($Tor->dump_data()) . "', '$sqltime')");
         $Properties['tempfileid'] = $DB->inserted_id();
@@ -273,14 +271,14 @@ $LogName = $Properties['Title'];
 
 // Create torrent group
 $DB->query("
-	INSERT INTO torrents_group
-	(NewCategoryID, Name, Time, Body, Image, SearchText) VALUES
-	( " . $T['Category'] . ", " . $T['Title'] . ", '$sqltime', '" . db_string($Body) . "', $T[Image], '$SearchText')");
+    INSERT INTO torrents_group
+    (NewCategoryID, Name, Time, Body, Image, SearchText) VALUES
+    ( " . $T['Category'] . ", " . $T['Title'] . ", '$sqltime', '" . db_string($Body) . "', $T[Image], '$SearchText')");
 $GroupID = $DB->inserted_id();
 $Cache->increment('stats_group_count');
 
 // Use this section to control freeleeches
-if ($Properties['FreeLeech']==='1' || $TotalSize >= AUTO_FREELEECH_SIZE) {        // (20*1024*1024*1024)){
+if ($Properties['FreeLeech']==='1' || $TotalSize >= AUTO_FREELEECH_SIZE) {        // (20*1024*1024*1024)) {
     $Properties['FreeTorrent']='1';
 } else {
     $Properties['FreeTorrent']='0';
@@ -288,20 +286,20 @@ if ($Properties['FreeLeech']==='1' || $TotalSize >= AUTO_FREELEECH_SIZE) {      
 
 // Torrent
 $DB->query("
-	INSERT INTO torrents
-		(GroupID, UserID, info_hash, FileCount, FileList, FilePath, Size, Time, FreeTorrent, Anonymous)
-	VALUES
-		( $GroupID, " . $LoggedUser['ID'] . ", '" . db_string($InfoHash) . "', " . $NumFiles . ", " . $FileString . ", '" . $FilePath . "', " . $TotalSize . ",
-		'$sqltime', '" . $Properties['FreeTorrent'] . "', '" . $Properties['Anonymous'] . "')");
+    INSERT INTO torrents
+        (GroupID, UserID, info_hash, FileCount, FileList, FilePath, Size, Time, FreeTorrent, Anonymous)
+    VALUES
+        ( $GroupID, " . $LoggedUser['ID'] . ", '" . db_string($InfoHash) . "', " . $NumFiles . ", " . $FileString . ", '" . $FilePath . "', " . $TotalSize . ",
+        '$sqltime', '" . $Properties['FreeTorrent'] . "', '" . $Properties['Anonymous'] . "')");
 
 $Cache->increment('stats_torrent_count');
 $TorrentID = $DB->inserted_id();
 
-if($TorrentID>$GroupID) {
+if ($TorrentID>$GroupID) {
     $DB->query("UPDATE torrents_group SET ID='$TorrentID' WHERE ID='$GroupID'");
     $DB->query("UPDATE torrents SET GroupID='$TorrentID' WHERE ID='$TorrentID'");
     $GroupID = $TorrentID;
-} elseif($GroupID>$TorrentID) {
+} elseif ($GroupID>$TorrentID) {
     $DB->query("UPDATE torrents SET ID='$GroupID' WHERE ID='$TorrentID'");
     $TorrentID = $GroupID;
 }
@@ -309,7 +307,7 @@ if($TorrentID>$GroupID) {
 // in case of comma delineators.
 $Tags = str_replace(',', ' ', $Properties['TagList']);
 // insert the category tag here.
-$Tags = explode(' ', strtolower($NewCategories[(int)$_POST['category']]['tag']." ".$Tags));
+$Tags = explode(' ', strtolower($NewCategories[(int) $_POST['category']]['tag']." ".$Tags));
 
 $TagsAdded=array();
 foreach ($Tags as $Tag) {
@@ -328,7 +326,7 @@ foreach ($Tags as $Tag) {
                             ON DUPLICATE KEY UPDATE Uses=Uses+1;");
     $TagID = $DB->inserted_id();
 
-    if (empty($LoggedUser['NotVoteUpTags'])){
+    if (empty($LoggedUser['NotVoteUpTags'])) {
 
         $UserVote = check_perms('site_vote_tag_enhanced') ? ENHANCED_VOTE_POWER : 1;
         $VoteValue = $UserVote + 8;
@@ -355,7 +353,7 @@ update_tracker('add_torrent', array('id' => $TorrentID, 'info_hash' => rawurlenc
 //******************************************************************************//
 //--------------- Delete any temp torrent file -------------------------------------------//
 
-if(is_number($Properties['tempfileid']) && $Properties['tempfileid'] > 0) {
+if (is_number($Properties['tempfileid']) && $Properties['tempfileid'] > 0) {
     $DB->query("DELETE FROM torrents_files_temp WHERE ID='$Properties[tempfileid]'");
 }
 
@@ -395,7 +393,7 @@ if ($Properties['Anonymous'] == "0") {
 //******************************************************************************//
 //--------------- possible dupe - send staff a pm ---------------------------------------//
 
-if(!empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // means uploader has ignored dupe warning...
+if (!empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // means uploader has ignored dupe warning...
     $NumDupes = count($DupeResults['DupeResults']);
     $UniqueResults = $DupeResults['UniqueMatches'];
     $NumChecked = $DupeResults['NumChecked'];
@@ -403,7 +401,7 @@ if(!empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // means uplo
     $Subject = db_string("Possible dupe was uploaded: $LogName by $LoggedUser[Username]");
     $Message = "[table][tr][th]Name[/th][th]duped file?[/th][/tr]";
     foreach ($DupeResults['DupeResults'] as $ID => $dupedata) {
-        if(isset($dupedata['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
+        if (isset($dupedata['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
 
             $Message .= "[tr][td]This could match many files because it is $dupedata[excluded][br]Please make sure you have searched carefully to ensure this is not a dupe.";
             $Message .= "[br]Try [url=/torrents.php?action=advanced&taglist=".urlencode(implode($Tags, ' ')) ."]searching tags[/url]";
@@ -418,14 +416,14 @@ if(!empty($_POST['ignoredupes']) && $DupeResults['DupeResults']) { // means uplo
     $Message = db_string("Possible dupe was uploaded:[br][size=2][b][url=/torrents.php?id=$GroupID]{$LogName}[/url] (" . get_size($TotalSize) . ") was uploaded by $LoggedUser[Username][/b][/size]
 [br]{$Message}[br][br]($UniqueResults/$NumChecked files with matches, $NumDupes possible matches overall)[br][br][url=/torrents.php?id=$GroupID&action=dupe_check][size=2][b]View detailed possible dupelist for this torrent[/b][/size][/url]");
 
-	$DB->query("INSERT INTO staff_pm_conversations
-				 (Subject, Status, Level, UserID, Date)
-			VALUES ('$Subject', 'Unanswered', '0', '0', '".sqltime()."')");
-	// New message
-	$ConvID = $DB->inserted_id();
-	$DB->query("INSERT INTO staff_pm_messages
-				 (UserID, SentDate, Message, ConvID)
-			VALUES ('0', '".sqltime()."', '$Message', $ConvID)");
+    $DB->query("INSERT INTO staff_pm_conversations
+                 (Subject, Status, Level, UserID, Date)
+            VALUES ('$Subject', 'Unanswered', '0', '0', '".sqltime()."')");
+    // New message
+    $ConvID = $DB->inserted_id();
+    $DB->query("INSERT INTO staff_pm_messages
+                 (UserID, SentDate, Message, ConvID)
+            VALUES ('0', '".sqltime()."', '$Message', $ConvID)");
 
 }
 
@@ -456,14 +454,14 @@ $Item = $Feed->torrent($Title,
                         get_size($TotalSize),
                         ($Properties['Anonymous']=='1'?'anon':$LoggedUser['Username']),
                         "torrents.php?filter_cat[".$_POST['category']."]=1",
-                        $NewCategories[(int)$_POST['category']]['name'],
+                        $NewCategories[(int) $_POST['category']]['name'],
                         implode($Tags, ' '));
 
 //Notifications
 $SQL = "SELECT unf.ID, unf.UserID, torrent_pass
-	FROM users_notify_filters AS unf
-	JOIN users_main AS um ON um.ID=unf.UserID
-	WHERE um.Enabled='1'";
+    FROM users_notify_filters AS unf
+    JOIN users_main AS um ON um.ID=unf.UserID
+    WHERE um.Enabled='1'";
 
 reset($Tags);
 $TagSQL = array();
@@ -479,7 +477,7 @@ $TagSQL[] = "Tags=''";
 $SQL.=implode(' OR ', $TagSQL);
 
 $SQL.= ") AND !(" . implode(' OR ', $NotTagSQL) . ")";
-$SQL.=" AND (Categories LIKE '%|" . db_string($NewCategories[(int)$_POST['category']]['name']) . "|%' OR Categories='') ";
+$SQL.=" AND (Categories LIKE '%|" . db_string($NewCategories[(int) $_POST['category']]['name']) . "|%' OR Categories='') ";
 $SQL .= ") AND UserID != '" . $LoggedUser['ID'] . "' ";
 
 $DB->query($SQL);
@@ -507,9 +505,9 @@ if ($DB->record_count() > 0) {
 
 // RSS for bookmarks
 $DB->query("SELECT u.ID, u.torrent_pass
-			FROM users_main AS u
-			JOIN bookmarks_torrents AS b ON b.UserID = u.ID
-			WHERE b.GroupID = $GroupID");
+            FROM users_main AS u
+            JOIN bookmarks_torrents AS b ON b.UserID = u.ID
+            WHERE b.GroupID = $GroupID");
 while (list($UserID, $Passkey) = $DB->next_record()) {
     $Feed->populate('torrents_bookmarks_t_' . $Passkey, $Item);
 }

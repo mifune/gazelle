@@ -9,16 +9,16 @@ $Text = new TEXT;
 $Validate = new VALIDATE;
 
 // Quick SQL injection check
-if(!$_REQUEST['groupid'] || !is_number($_REQUEST['groupid'])) {
-	error(404);
+if (!$_REQUEST['groupid'] || !is_number($_REQUEST['groupid'])) {
+    error(404);
 }
 // End injection check
-$GroupID = (int)$_REQUEST['groupid'];
+$GroupID = (int) $_REQUEST['groupid'];
 
 //check user has permission to edit
 $CanEdit = check_perms('torrents_edit');
 
-if (!$CanEdit){
+if (!$CanEdit) {
     $DB->query("SELECT UserID, Time FROM torrents WHERE GroupID='$GroupID'");
     list($AuthorID, $AddedTime) = $DB->next_record();
     if ($LoggedUser['ID'] == $AuthorID) {
@@ -31,11 +31,11 @@ if (!$CanEdit){
 }
 
 //check user has permission to edit
-if(!$CanEdit) { error(403); }
+if (!$CanEdit) { error(403); }
 
 // Variables for database input - with edit, the variables are passed with POST
-$OldCategoryID = (int)$_POST['oldcategoryid'];
-$CategoryID = (int)$_POST['categoryid'];
+$OldCategoryID = (int) $_POST['oldcategoryid'];
+$CategoryID = (int) $_POST['categoryid'];
 $Body = $_POST['body'];
 $Image = $_POST['image'];
 
@@ -60,7 +60,7 @@ if ($Err) { // Show the upload form, with the data the user entered
 }
 
 // Trickery
-if(!preg_match("/^".URL_REGEX."$/i", $Image)) {
+if (!preg_match("/^".URL_REGEX."$/i", $Image)) {
         $Image = '';
 }
 
@@ -73,11 +73,11 @@ $Body =  db_string($Body);
 
 // Update torrents table
 $DB->query("UPDATE torrents_group SET
-	NewCategoryID='$CategoryID',
+    NewCategoryID='$CategoryID',
         Body='$Body',
-	Image='$Image',
+    Image='$Image',
         SearchText='$SearchText'
-	WHERE ID='$GroupID'");
+    WHERE ID='$GroupID'");
 
 // The category has been changed, update the category tag
 if ($OldCategoryID != $CategoryID) {
@@ -102,7 +102,7 @@ if ($OldCategoryID != $CategoryID) {
 
     $TagID = $DB->inserted_id();
 
-    if (empty($LoggedUser['NotVoteUpTags'])){
+    if (empty($LoggedUser['NotVoteUpTags'])) {
 
         $DB->query("INSERT INTO torrents_tags
                     (TagID, GroupID, UserID, PositiveVotes) VALUES
@@ -123,65 +123,65 @@ if ($OldCategoryID != $CategoryID) {
 // There we go, all done!
 $Cache->delete_value('torrents_details_'.$GroupID);
 $DB->query("SELECT CollageID FROM collages_torrents WHERE GroupID='$GroupID'");
-if($DB->record_count()>0) {
-	while(list($CollageID) = $DB->next_record()) {
-		$Cache->delete_value('collage_'.$CollageID);
-	}
+if ($DB->record_count()>0) {
+    while (list($CollageID) = $DB->next_record()) {
+        $Cache->delete_value('collage_'.$CollageID);
+    }
 }
 
 update_hash($GroupID);
 
 //Fix Recent Uploads/Downloads for image change
 $DB->query("SELECT DISTINCT UserID
-			FROM torrents AS t
-			LEFT JOIN torrents_group AS tg ON t.GroupID=tg.ID
-			WHERE tg.ID = $GroupID");
+            FROM torrents AS t
+            LEFT JOIN torrents_group AS tg ON t.GroupID=tg.ID
+            WHERE tg.ID = $GroupID");
 
 $UserIDs = $DB->collect('UserID');
-foreach($UserIDs as $UserID) {
-	$RecentUploads = $Cache->get_value('recent_uploads_'.$UserID);
-	if(is_array($RecentUploads)) {
-		foreach($RecentUploads as $Key => $Recent) {
-			if($Recent['ID'] == $GroupID) {
-				if($Recent['Image'] != $Image) {
-					$Recent['Image'] = $Image;
-					$Cache->begin_transaction('recent_uploads_'.$UserID);
-					$Cache->update_row($Key, $Recent);
-					$Cache->commit_transaction(0);
-				}
-			}
-		}
-	}
+foreach ($UserIDs as $UserID) {
+    $RecentUploads = $Cache->get_value('recent_uploads_'.$UserID);
+    if (is_array($RecentUploads)) {
+        foreach ($RecentUploads as $Key => $Recent) {
+            if ($Recent['ID'] == $GroupID) {
+                if ($Recent['Image'] != $Image) {
+                    $Recent['Image'] = $Image;
+                    $Cache->begin_transaction('recent_uploads_'.$UserID);
+                    $Cache->update_row($Key, $Recent);
+                    $Cache->commit_transaction(0);
+                }
+            }
+        }
+    }
 }
 
 $DB->query("SELECT ID FROM torrents WHERE GroupID = ".$GroupID);
 $TorrentIDs = implode(",", $DB->collect('ID'));
 $DB->query("SELECT DISTINCT uid FROM xbt_snatched WHERE fid IN (".$TorrentIDs.")");
 $Snatchers = $DB->collect('uid');
-foreach($Snatchers as $UserID) {
-	$RecentSnatches = $Cache->get_value('recent_snatches_'.$UserID);
-	if(is_array($RecentSnatches)) {
-		foreach($RecentSnatches as $Key => $Recent) {
-			if($Recent['ID'] == $GroupID) {
-				if($Recent['Image'] != $Image) {
-					$Recent['Image'] = $Image;
-					$Cache->begin_transaction('recent_snatches_'.$UserID);
-					$Cache->update_row($Key, $Recent);
-					$Cache->commit_transaction(0);
-				}
-			}
-		}
-	}
+foreach ($Snatchers as $UserID) {
+    $RecentSnatches = $Cache->get_value('recent_snatches_'.$UserID);
+    if (is_array($RecentSnatches)) {
+        foreach ($RecentSnatches as $Key => $Recent) {
+            if ($Recent['ID'] == $GroupID) {
+                if ($Recent['Image'] != $Image) {
+                    $Recent['Image'] = $Image;
+                    $Cache->begin_transaction('recent_snatches_'.$UserID);
+                    $Cache->update_row($Key, $Recent);
+                    $Cache->commit_transaction(0);
+                }
+            }
+        }
+    }
 }
 
 $DB->query("SELECT NewCategoryID, Name, Body, Image FROM torrents_group WHERE ID=$GroupID");
 list($OrigCatID, $OrigName, $OrigBody, $OrigImage) = $DB->next_record();
 
-if($CategoryID != $OrigCatID) {
+if ($CategoryID != $OrigCatID) {
     $LogDetails = "Category";
     $Concat = ', ';
 }
-if($Body != $OrigBody) {
+if ($Body != $OrigBody) {
     $LogDetails .= "{$Concat}Description";
     $Concat = ', ';
 }

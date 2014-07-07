@@ -6,28 +6,28 @@ $Ways = array('ASC'=>'Ascending', 'DESC'=>'Descending');
 if (isset($_GET['userid'])) $UserID = $_GET['userid'];
 else $UserID = $LoggedUser['ID'];
 
-if(!is_number($UserID)) { error(0); }
+if (!is_number($UserID)) { error(0); }
 
 $User = user_info($UserID);
 $Perms = get_permissions($User['PermissionID']);
 $UserClass = $Perms['Class'];
 
-if(!check_force_anon($UserID) || !check_paranoia('tags', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
+if (!check_force_anon($UserID) || !check_paranoia('tags', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 
-function header_link($SortKey,$DefaultWay="DESC") {
-	global $Order,$Way,$Document;
-	if($SortKey==$Order) {
-		if($Way=="DESC") { $NewWay="ASC"; }
-		else { $NewWay="DESC"; }
-	} else { $NewWay=$DefaultWay; }
+function header_link($SortKey,$DefaultWay="DESC")
+{
+    global $Order,$Way,$Document;
+    if ($SortKey==$Order) {
+        if ($Way=="DESC") { $NewWay="ASC"; } else { $NewWay="DESC"; }
+    } else { $NewWay=$DefaultWay; }
 
-	return "$Document.php?way=".$NewWay."&amp;order=".$SortKey."&amp;".get_url(array('way','order'));
+    return "$Document.php?way=".$NewWay."&amp;order=".$SortKey."&amp;".get_url(array('way','order'));
 }
 
-if(!empty($_GET['include']) && in_array($_GET['include'], $Includes)) {
-	$Include = $_GET['include'];
+if (!empty($_GET['include']) && in_array($_GET['include'], $Includes)) {
+    $Include = $_GET['include'];
 } else {
-	$Include = 'all';
+    $Include = 'all';
 }
 
 if ($Include == 'own') $AND_WHERE = " AND t.UserID = '$UserID'";
@@ -35,30 +35,30 @@ elseif ($Include == 'other') $AND_WHERE = " AND t.UserID != '$UserID'";
 else  $AND_WHERE = '';
 
 if (isset($LoggedUser['TorrentsPerPage'])) {
-	$TorrentsPerPage = $LoggedUser['TorrentsPerPage'];
+    $TorrentsPerPage = $LoggedUser['TorrentsPerPage'];
 } else {
-	$TorrentsPerPage = TORRENTS_PER_PAGE;
+    $TorrentsPerPage = TORRENTS_PER_PAGE;
 }
 
-if(!empty($_GET['page']) && is_number($_GET['page'])) {
-	$Page = $_GET['page'];
-	$Limit = ($Page-1)*$TorrentsPerPage.', '.$TorrentsPerPage;
+if (!empty($_GET['page']) && is_number($_GET['page'])) {
+    $Page = $_GET['page'];
+    $Limit = ($Page-1)*$TorrentsPerPage.', '.$TorrentsPerPage;
 } else {
-	$Page = 1;
-	$Limit = $TorrentsPerPage;
+    $Page = 1;
+    $Limit = $TorrentsPerPage;
 }
 
-if(!empty($_GET['order']) && in_array($_GET['order'], $Orders) ) {
-	$Order = $_GET['order'];
+if (!empty($_GET['order']) && in_array($_GET['order'], $Orders) ) {
+    $Order = $_GET['order'];
 } else {
-	$Order = 'None';
+    $Order = 'None';
     $_GET['order'] = $Order;
 }
 
-if(!empty($_GET['way']) && array_key_exists($_GET['way'], $Ways)) {
-	$Way = $_GET['way'];
+if (!empty($_GET['way']) && array_key_exists($_GET['way'], $Ways)) {
+    $Way = $_GET['way'];
 } else {
-	$Way = 'DESC';
+    $Way = 'DESC';
 }
 
 if ($Order == 'None') $ORDERBY = '';
@@ -75,8 +75,8 @@ show_header( "$User[Username]$TitleEnd" );
 ?>
 
 <div class="thin">
-	<h2><?=format_username($UserID, $User['Username']).$TitleEnd;?></h2>
-	<div class="linkbox">
+    <h2><?=format_username($UserID, $User['Username']).$TitleEnd;?></h2>
+    <div class="linkbox">
 
         [<a href="userhistory.php?action=tag_history&amp;type=added&amp;<?=get_url(array('action','type','page'))?>" title="View <?=$User['Username']?>'s added tags">Tags added</a>]
   &nbsp;[<a href="userhistory.php?action=tag_history&amp;type=votes&amp;<?=get_url(array('action','type','page'))?>" title="View <?=$User['Username']?>'s added tags">Tags voted on</a>]
@@ -98,7 +98,7 @@ show_header( "$User[Username]$TitleEnd" );
     </table>
     <br/>
 <?php
-    if($_GET['type']=='votes') {
+    if ($_GET['type']=='votes') {
 
         $DB->query("SELECT SQL_CALC_FOUND_ROWS
                             tags.ID AS TagID, tags.Name AS TagName, tt.UserID As AdderID, um1.Username AS AddedBy,
@@ -143,7 +143,7 @@ show_header( "$User[Username]$TitleEnd" );
     $Pages=get_pages($Page,$TagCount,$TorrentsPerPage,8);
 
 ?>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
     <div class="head"><?=$TagCount?> tags</div>
     <table>
         <tr class="colhead">
@@ -186,9 +186,8 @@ show_header( "$User[Username]$TitleEnd" );
 
 <?php   }    ?>
     </table>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 
 </div>
 <?php
 show_footer();
-

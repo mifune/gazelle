@@ -1,30 +1,29 @@
 </div>
 <div id="footer">
 <?php if (!empty($Options['disclaimer'])) { ?>
-	<br /><br />
-	<div id="disclaimer_container" class="thin" style="text-align:center; margin-bottom:20px;">
-		None of the files shown here are actually hosted on this server. The links are provided solely by this site's users. These BitTorrent files are meant for the distribution of backup files. By downloading the BitTorrent file, you are claiming that you own the original file. The administrator of this site (http://<?=NONSSL_SITE_URL?>) holds NO RESPONSIBILITY if these files are misused in any way and cannot be held responsible for what its users post, or any other actions of it.
-	</div>
+    <br /><br />
+    <div id="disclaimer_container" class="thin" style="text-align:center; margin-bottom:20px;">
+        None of the files shown here are actually hosted on this server. The links are provided solely by this site's users. These BitTorrent files are meant for the distribution of backup files. By downloading the BitTorrent file, you are claiming that you own the original file. The administrator of this site (http://<?=NONSSL_SITE_URL?>) holds NO RESPONSIBILITY if these files are misused in any way and cannot be held responsible for what its users post, or any other actions of it.
+    </div>
 <?php
-	}
-	if (count($UserSessions)>1) {
-		foreach ($UserSessions as $ThisSessionID => $Session) {
-			if ($ThisSessionID != $SessionID) {
-				$LastActive = $Session;
-				break;
-			}
-		}
-	}
+    }
+    if (count($UserSessions)>1) {
+        foreach ($UserSessions as $ThisSessionID => $Session) {
+            if ($ThisSessionID != $SessionID) {
+                $LastActive = $Session;
+                break;
+            }
+        }
+    }
 
 ?>
-	<p>
-		Site and design &copy; <?=date("Y")?> <?=SITE_NAME?>
-	</p>
-	<?php if(!empty($LastActive)){ ?><p><a href="user.php?action=sessions" title="Manage Sessions">Last activity <?=time_diff($LastActive['LastUpdate'])?> from <?=$LastActive['IP']?>.</a></p><?php } ?>
+    <p>
+        Site and design &copy; <?=date("Y")?> <?=SITE_NAME?>
+    </p>
+    <?php if (!empty($LastActive)) { ?><p><a href="user.php?action=sessions" title="Manage Sessions">Last activity <?=time_diff($LastActive['LastUpdate'])?> from <?=$LastActive['IP']?>.</a></p><?php } ?>
 
     <?php
-if (check_perms('users_mod'))
-    {
+if (check_perms('users_mod')) {
         $Load = sys_getloadavg(); ?>
         <p>
                 <strong>Time:</strong> <?=number_format(((microtime(true)-$ScriptStartTime)*1000),5)?> ms
@@ -61,8 +60,8 @@ if (check_perms('users_mod'))
 </div>
 
 <?php if (DEBUG_MODE || check_perms('site_debug')) { ?>
-	<!-- Begin Debugging -->
-	<div id="site_debug">
+    <!-- Begin Debugging -->
+    <div id="site_debug">
 <?php
 $Debug->flag_table();
 $Debug->error_table();
@@ -71,8 +70,8 @@ $Debug->query_table();
 $Debug->cache_table();
 $Debug->vars_table();
 ?>
-	</div>
-	<!-- End Debugging -->
+    </div>
+    <!-- End Debugging -->
 <?php } ?>
 
 </div>

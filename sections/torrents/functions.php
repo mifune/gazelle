@@ -1,30 +1,30 @@
 <?php
-function get_group_info($GroupID, $Return = true) {
-	global $Cache, $DB;
+function get_group_info($GroupID, $Return = true)
+{
+    global $Cache, $DB;
 
-    $GroupID=(int)$GroupID;
+    $GroupID=(int) $GroupID;
 
-	$TorrentCache=$Cache->get_value('torrents_details_'.$GroupID);
+    $TorrentCache=$Cache->get_value('torrents_details_'.$GroupID);
 
-	//TODO: Remove LogInDB at a much later date.
-	if(!is_array($TorrentCache) || !isset($TorrentCache[1][0]['LogInDB'])) {
-		// Fetch the group details
+    //TODO: Remove LogInDB at a much later date.
+    if (!is_array($TorrentCache) || !isset($TorrentCache[1][0]['LogInDB'])) {
+        // Fetch the group details
 
-		$SQL = "SELECT
+        $SQL = "SELECT
                 g.Body,
                 g.Image,
                 g.ID,
                 g.Name,
                 g.NewCategoryID,
                 g.Time
-			FROM torrents_group AS g
-			WHERE g.ID='$GroupID' ";
+            FROM torrents_group AS g
+            WHERE g.ID='$GroupID' ";
 
-		$DB->query($SQL);
-		$TorrentDetails=$DB->to_array();
+        $DB->query($SQL);
+        $TorrentDetails=$DB->to_array();
 
-
-		$DB->query("
+        $DB->query("
             SELECT
                 tags.Name,
                 tt.TagID,
@@ -36,19 +36,19 @@ function get_group_info($GroupID, $Return = true) {
                 GROUP_CONCAT(ttv.UserID SEPARATOR '|'),
                 GROUP_CONCAT(um2.Username SEPARATOR '|'),
                 GROUP_CONCAT(ttv.Way SEPARATOR '|')
-			FROM torrents_tags AS tt
-			LEFT JOIN tags ON tags.ID=tt.TagID
+            FROM torrents_tags AS tt
+            LEFT JOIN tags ON tags.ID=tt.TagID
             LEFT JOIN torrents_tags_votes AS ttv ON ttv.GroupID=tt.GroupID AND ttv.TagID=tt.TagID
-			LEFT JOIN users_main AS um1 ON um1.ID=tt.UserID
-			LEFT JOIN users_main AS um2 ON um2.ID=ttv.UserID
+            LEFT JOIN users_main AS um1 ON um1.ID=tt.UserID
+            LEFT JOIN users_main AS um2 ON um2.ID=ttv.UserID
             WHERE tt.GroupID='$GroupID'
             GROUP BY tt.TagID    ");
-		$TagDetails=$DB->to_array(false, MYSQLI_NUM);
+        $TagDetails=$DB->to_array(false, MYSQLI_NUM);
 
-		// Fetch the individual torrents
+        // Fetch the individual torrents
 
-		$DB->query("
-			SELECT
+        $DB->query("
+            SELECT
                 t.ID,
                 t.FileCount,
                 t.Size,
@@ -71,26 +71,25 @@ function get_group_info($GroupID, $Return = true) {
                 t.ID AS HasFile ,
                 t.Anonymous
 
-			FROM torrents AS t
+            FROM torrents AS t
             LEFT JOIN users_main AS um ON um.ID=t.UserID
-			LEFT JOIN torrents_bad_tags AS tbt ON tbt.TorrentID=t.ID
-			LEFT JOIN torrents_bad_folders AS tbf on tbf.TorrentID=t.ID
-			LEFT JOIN torrents_bad_files AS tfi on tfi.TorrentID=t.ID
-			LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
-			WHERE t.GroupID='".db_string($GroupID)."'
-			AND flags != 1
-			ORDER BY t.ID");
+            LEFT JOIN torrents_bad_tags AS tbt ON tbt.TorrentID=t.ID
+            LEFT JOIN torrents_bad_folders AS tbf on tbf.TorrentID=t.ID
+            LEFT JOIN torrents_bad_files AS tfi on tfi.TorrentID=t.ID
+            LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
+            WHERE t.GroupID='".db_string($GroupID)."'
+            AND flags != 1
+            ORDER BY t.ID");
 
-
-		$TorrentList = $DB->to_array();
-		if(count($TorrentList) == 0) {
-			if(isset($_GET['torrentid']) && is_number($_GET['torrentid'])) {
-				header("Location: log.php?search=Torrent+".$_GET['torrentid']);
-			} else {
-				header("Location: log.php?search=Torrent+".$GroupID);
-			}
-			die();
-		}
+        $TorrentList = $DB->to_array();
+        if (count($TorrentList) == 0) {
+            if (isset($_GET['torrentid']) && is_number($_GET['torrentid'])) {
+                header("Location: log.php?search=Torrent+".$_GET['torrentid']);
+            } else {
+                header("Location: log.php?search=Torrent+".$GroupID);
+            }
+            die();
+        }
 
         foreach ($TorrentList as &$Torrent) {
             $CacheTime = $Torrent['Seeders']==0 ? 120 : 900;
@@ -98,13 +97,13 @@ function get_group_info($GroupID, $Return = true) {
             $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime);
         }
 
-		// Store it all in cache
+        // Store it all in cache
         $Cache->cache_value('torrents_details_'.$GroupID,array($TorrentDetails,$TorrentList,$TagDetails), 3600);
 
-	} else { // If we're reading from cache
-		$TorrentDetails=$TorrentCache[0];
-		$TorrentList=$TorrentCache[1];
-		$TagDetails=$TorrentCache[2];
+    } else { // If we're reading from cache
+        $TorrentDetails=$TorrentCache[0];
+        $TorrentList=$TorrentCache[1];
+        $TagDetails=$TorrentCache[2];
         foreach ($TorrentList as &$Torrent) {
             $TorrentPeerInfo = get_peers($Torrent['ID']);
             $Torrent[3]=$TorrentPeerInfo['Seeders'];
@@ -114,79 +113,93 @@ function get_group_info($GroupID, $Return = true) {
             $Torrent['Leechers']=$TorrentPeerInfo['Leechers'];
             $Torrent['Snatched']=$TorrentPeerInfo['Snatched'];
         }
-	}
+    }
 
-	if($Return) {
-		return array($TorrentDetails,$TorrentList,$TagDetails);
-	}
+    if ($Return) {
+        return array($TorrentDetails,$TorrentList,$TagDetails);
+    }
 }
 
 //Check if a givin string can be validated as a torrenthash
-function is_valid_torrenthash($Str) {
-	//6C19FF4C 6C1DD265 3B25832C 0F6228B2 52D743D5
-	$Str = str_replace(' ', '', $Str);
-	if(preg_match('/^[0-9a-fA-F]{40}$/', $Str))
-		return $Str;
-	return false;
+function is_valid_torrenthash($Str)
+{
+    //6C19FF4C 6C1DD265 3B25832C 0F6228B2 52D743D5
+    $Str = str_replace(' ', '', $Str);
+    if(preg_match('/^[0-9a-fA-F]{40}$/', $Str))
+
+        return $Str;
+    return false;
 }
 
-function get_group_requests($GroupID) {
-	global $DB, $Cache;
+function get_group_requests($GroupID)
+{
+    global $DB, $Cache;
 
-	$Requests = $Cache->get_value('requests_group_'.$GroupID);
-	if ($Requests === FALSE) {
-		$DB->query("SELECT ID FROM requests WHERE GroupID = $GroupID AND TimeFilled = '0000-00-00 00:00:00'");
-		$Requests = $DB->collect('ID');
-		$Cache->cache_value('requests_group_'.$GroupID, $Requests, 0);
-	}
-	$Requests = get_requests($Requests);
-	return $Requests['matches'];
+    $Requests = $Cache->get_value('requests_group_'.$GroupID);
+    if ($Requests === FALSE) {
+        $DB->query("SELECT ID FROM requests WHERE GroupID = $GroupID AND TimeFilled = '0000-00-00 00:00:00'");
+        $Requests = $DB->collect('ID');
+        $Cache->cache_value('requests_group_'.$GroupID, $Requests, 0);
+    }
+    $Requests = get_requests($Requests);
+
+    return $Requests['matches'];
 }
 
-function get_group_requests_filled($TorrentID) {
-	global $DB, $Cache;
+function get_group_requests_filled($TorrentID)
+{
+    global $DB, $Cache;
 
-	$Requests = $Cache->get_value('requests_torrent_'.$TorrentID);
-	if ($Requests === FALSE) {
-		$DB->query("SELECT ID FROM requests WHERE TorrentID = $TorrentID");
-		$Requests = $DB->collect('ID');
-		$Cache->cache_value('requests_torrent_'.$TorrentID, $Requests, 0);
-	}
-	$Requests = get_requests($Requests);
-	return $Requests['matches'];
+    $Requests = $Cache->get_value('requests_torrent_'.$TorrentID);
+    if ($Requests === FALSE) {
+        $DB->query("SELECT ID FROM requests WHERE TorrentID = $TorrentID");
+        $Requests = $DB->collect('ID');
+        $Cache->cache_value('requests_torrent_'.$TorrentID, $Requests, 0);
+    }
+    $Requests = get_requests($Requests);
+
+    return $Requests['matches'];
 }
 
 // tag sorting functions
-function sort_uses_desc($X, $Y){
-	return($Y['uses'] - $X['uses']);
+function sort_uses_desc($X, $Y)
+{
+    return($Y['uses'] - $X['uses']);
 }
-function sort_score_desc($X, $Y){
+function sort_score_desc($X, $Y)
+{
     if ($Y['score'] == $X['score'])
         return ($Y['uses'] - $X['uses']);
     else
         return($Y['score'] - $X['score']);
 }
-function sort_added_desc($X, $Y){
-	return($X['id'] - $Y['id']);
+function sort_added_desc($X, $Y)
+{
+    return($X['id'] - $Y['id']);
 }
-function sort_az_desc($X, $Y){
-	return( strcmp($X['name'], $Y['name']) );
+function sort_az_desc($X, $Y)
+{
+    return( strcmp($X['name'], $Y['name']) );
 }
 
-function sort_uses_asc($X, $Y){
-	return($X['uses'] - $Y['uses']);
+function sort_uses_asc($X, $Y)
+{
+    return($X['uses'] - $Y['uses']);
 }
-function sort_score_asc($X, $Y){
+function sort_score_asc($X, $Y)
+{
     if ($Y['score'] == $X['score'])
         return ($X['uses'] - $Y['uses']);
     else
         return($X['score'] - $Y['score']);
 }
-function sort_added_asc($X, $Y){
-	return($Y['id'] - $X['id']);
+function sort_added_asc($X, $Y)
+{
+    return($Y['id'] - $X['id']);
 }
-function sort_az_asc($X, $Y){
-	return( strcmp($Y['name'], $X['name']) );
+function sort_az_asc($X, $Y)
+{
+    return( strcmp($Y['name'], $X['name']) );
 }
 
 /**
@@ -195,7 +208,8 @@ function sort_az_asc($X, $Y){
  * @param int $GroupID The group id of the torrent
  * @return the html for the taglist
  */
-function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
+function get_taglist_html($GroupID, $tagsort, $order = 'desc')
+{
     global $LoggedUser;
 
     $TorrentCache = get_group_info($GroupID, true);
@@ -243,12 +257,12 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
                 <ul class="stats nobullet">
 
 <?php
-            foreach($Tags as $TagKey=>$Tag) {
+            foreach ($Tags as $TagKey=>$Tag) {
 ?>
                                 <li id="tlist<?=$Tag['id']?>">
                                       <a href="torrents.php?taglist=<?=$Tag['name']?>" style="float:left; display:block;" title="<?=$Tag['votes']?>"><?=display_str($Tag['name'])?></a>
                                       <div style="float:right; display:block; letter-spacing: -1px;">
-        <?php 		if(check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid'])){  ?>
+        <?php 		if (check_perms('site_vote_tag') || ($IsUploader && $LoggedUser['ID']==$Tag['userid'])) {  ?>
                                       <a title="Vote down tag '<?=$Tag['name']?>'" href="#tags" onclick="return Vote_Tag(<?="'{$Tag['name']}',{$Tag['id']},$GroupID,'down'"?>)" style="font-family: monospace;" >[-]</a>
                                       <span id="tagscore<?=$Tag['id']?>" style="width:10px;text-align:center;display:inline-block;"><?=$Tag['score']?></span>
                                       <a title="Vote up tag '<?=$Tag['name']?>'" href="#tags" onclick="return Vote_Tag(<?="'{$Tag['name']}',{$Tag['id']},$GroupID,'up'"?>)" style="font-family: monospace;">[+]</a>
@@ -259,10 +273,10 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
                                       <span style="font-family: monospace;" >&nbsp;&nbsp;&nbsp;</span>
 
         <?php 		} ?>
-        <?php 		if(check_perms('users_warn')){ ?>
+        <?php 		if (check_perms('users_warn')) { ?>
                                       <a title="Tag '<?=$Tag['name']?>' added by <?=$Tag['username']?>" href="user.php?id=<?=$Tag['userid']?>" >[U]</a>
         <?php 		} ?>
-        <?php 		if(check_perms('site_delete_tag') ) { ?>
+        <?php 		if (check_perms('site_delete_tag') ) { ?>
                                    <a title="Delete tag '<?=$Tag['name']?>'" href="#tags" onclick="return Del_Tag(<?="'{$Tag['id']}',$GroupID,'$tagsort'"?>)"   style="font-family: monospace;">[X]</a>
         <?php 		} else { ?>
                                       <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;</span>
@@ -284,7 +298,7 @@ function get_taglist_html($GroupID, $tagsort, $order = 'desc') {
 function update_staff_checking($location="cyberspace",$dontactivate=false) { // logs the staff in as 'checking'
     global $Cache, $DB, $LoggedUser;
 
-    if ($dontactivate){
+    if ($dontactivate) {
         // if not already active dont activate
         $DB->query("SELECT UserID FROM staff_checking
                      WHERE UserID='$LoggedUser[ID]' AND TimeOut > '".time()."' AND IsChecking='1'" );
@@ -300,11 +314,12 @@ function update_staff_checking($location="cyberspace",$dontactivate=false) { // 
     $Cache->delete_value('staff_lastchecked');
 }
 
-function print_staff_status() {
+function print_staff_status()
+{
     global $Cache, $DB, $LoggedUser;
 
     $Checking = $Cache->get_value('staff_checking');
-    if($Checking===false){
+    if ($Checking===false) {
         // delete old ones every 4 minutes
         $DB->query("UPDATE staff_checking SET IsChecking='0' WHERE TimeOut <= '".time()."' " );
         $DB->query("SELECT s.UserID, u.Username, s.TimeStarted , s.TimeOut , s.Location
@@ -319,8 +334,8 @@ function print_staff_status() {
     ob_start();
     $UserOn = false;
     $active=0;
-    if (count($Checking)>0){
-        foreach($Checking as $Status) {
+    if (count($Checking)>0) {
+        foreach ($Checking as $Status) {
             list( $UserID, $Username, $TimeStart, $TimeOut ,$Location ) =  $Status;
             $Own = $UserID==$LoggedUser['ID'];
             if ($Own) $UserOn = true;
@@ -351,7 +366,7 @@ function print_staff_status() {
 
     if ($active==0) { // if no staff are checking now
             $LastChecked = $Cache->get_value('staff_lastchecked');
-            if($LastChecked===false){
+            if ($LastChecked===false) {
                 $DB->query("SELECT s.UserID, u.Username, s.TimeOut , s.Location
                               FROM staff_checking AS s
                               JOIN users_main AS u ON u.ID=s.UserID
@@ -374,7 +389,7 @@ function print_staff_status() {
 <?php
     }
 
-    if(!$UserOn){
+    if (!$UserOn) {
 ?>
         <span class="staffstatus status_notchecking statusown"  title="Status: not checking">
             <a onclick="change_status('1')"> <?=$LoggedUser['Username']?> </a>
@@ -384,5 +399,6 @@ function print_staff_status() {
 
     $html = ob_get_contents();
     ob_end_clean();
+
     return $html;
 }

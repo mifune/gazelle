@@ -21,7 +21,7 @@ show_header('Reports', 'bbcode,inbox,reports,jquery');
 if ($_GET['id'] && is_number($_GET['id'])) {
     $View = "Single report";
     $Where = "r.ID = " . $_GET['id'];
-} else if (empty($_GET['view'])) {
+} elseif (empty($_GET['view'])) {
     $View = "New";
     $Where = "Status='New'";
 } else {
@@ -46,20 +46,20 @@ if (!check_perms('admin_reports')) {
 }
 
 $Reports = $DB->query("SELECT SQL_CALC_FOUND_ROWS
-		r.ID,
-		r.UserID,
-		um.Username,
-		r.ThingID,
-		r.Type,
-		r.ReportedTime,
-		r.Reason,
-		r.Status,
+        r.ID,
+        r.UserID,
+        um.Username,
+        r.ThingID,
+        r.Type,
+        r.ReportedTime,
+        r.Reason,
+        r.Status,
             r.Comment
-	FROM reports AS r
-		JOIN users_main AS um ON r.UserID=um.ID
-	WHERE " . $Where . "
-	ORDER BY ReportedTime
-	DESC LIMIT " . $Limit);
+    FROM reports AS r
+        JOIN users_main AS um ON r.UserID=um.ID
+    WHERE " . $Where . "
+    ORDER BY ReportedTime
+    DESC LIMIT " . $Limit);
 
 // Number of results (for pagination)
 $DB->query('SELECT FOUND_ROWS()');
@@ -402,4 +402,3 @@ $DB->set_query_id($Reports);
 </div>
 <?php
 show_footer();
-

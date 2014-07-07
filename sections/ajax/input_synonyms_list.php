@@ -1,23 +1,28 @@
 <?php
 if (!check_perms('site_manage_tags')) error(403, true);
 
-function get_rejected_message4($Tag, $Item, $Reason){
+function get_rejected_message4($Tag, $Item, $Reason)
+{
     $Result = "<span class=\"red\">[rejected]</span> '$Tag'";
     if($Item!== $Tag) $Result .= "&nbsp; <--&nbsp; '$Item'";
     $Result .= "&nbsp; $Reason<br />";
+
     return $Result ;
 }
 
-function get_rejected_message3($Tag, $Item, $NumUses, $Reason){
+function get_rejected_message3($Tag, $Item, $NumUses, $Reason)
+{
     $Result = "<span class=\"red\">[rejected]</span> '$Tag'";
     if($Item!== $Tag) $Result .= "&nbsp; <--&nbsp; '$Item'";
     $Result .= "&nbsp; ($NumUses) $Reason<br />";
+
     return $Result ;
 }
 
 // ======================================
 
-function Add_Synonyms($ParentTagItem, $TagsItems, &$Result) {
+function Add_Synonyms($ParentTagItem, $TagsItems, &$Result)
+{
     global $DB, $LoggedUser;
 
     if (!is_array($ParentTagItem)) return;

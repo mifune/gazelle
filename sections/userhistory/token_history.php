@@ -9,7 +9,8 @@ Nonmods and empty userid show $LoggedUser['ID']'s history
 ************************************************************************/
 
 // The "order by x" links on columns headers
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -20,6 +21,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
     } else {
         $NewWay = $DefaultWay;
     }
+
     return "userhistory.php?action=token_history&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
 
@@ -38,9 +40,9 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Torrent', 'S
 }
 
 if (isset($_GET['userid'])) {
-	$UserID = $_GET['userid'];
+    $UserID = $_GET['userid'];
 } else {
-	$UserID = $LoggedUser['ID'];
+    $UserID = $LoggedUser['ID'];
 }
 if (!is_number($UserID)) { error(404); }
 
@@ -48,23 +50,23 @@ $UserInfo = user_info($UserID);
 $Perms = get_permissions($UserInfo['PermissionID']);
 $UserClass = $Perms['Class'];
 
-if($LoggedUser['ID'] != $UserID && !check_paranoia(false, $User['Paranoia'], $UserClass, $UserID)) {
-	error(PARANOIA_MSG);
+if ($LoggedUser['ID'] != $UserID && !check_paranoia(false, $User['Paranoia'], $UserClass, $UserID)) {
+    error(PARANOIA_MSG);
 }
 
 if (isset($_GET['expire'])) {
-	if (!check_perms('users_mod')) { error(403); }
-	$UserID = $_GET['userid'];
-	$TorrentID = $_GET['torrentid'];
+    if (!check_perms('users_mod')) { error(403); }
+    $UserID = $_GET['userid'];
+    $TorrentID = $_GET['torrentid'];
 
-	if (!is_number($UserID) || !is_number($TorrentID)) { error(403); }
-	$DB->query("SELECT info_hash FROM torrents where ID = $TorrentID");
-	if (list($InfoHash) = $DB->next_record(MYSQLI_NUM, FALSE)) {
-		$DB->query("DELETE FROM users_slots WHERE UserID=$UserID AND TorrentID=$TorrentID");
-		$Cache->delete_value('users_tokens_'.$UserID);
-		update_tracker('remove_tokens', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID));
-	}
-	header("Location: userhistory.php?action=token_history&userid=$UserID");
+    if (!is_number($UserID) || !is_number($TorrentID)) { error(403); }
+    $DB->query("SELECT info_hash FROM torrents where ID = $TorrentID");
+    if (list($InfoHash) = $DB->next_record(MYSQLI_NUM, FALSE)) {
+        $DB->query("DELETE FROM users_slots WHERE UserID=$UserID AND TorrentID=$TorrentID");
+        $Cache->delete_value('users_tokens_'.$UserID);
+        update_tracker('remove_tokens', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID));
+    }
+    header("Location: userhistory.php?action=token_history&userid=$UserID");
 }
 
 show_header('Current slots in use');
@@ -72,18 +74,18 @@ show_header('Current slots in use');
 list($Page,$Limit) = page_limit(50);
 
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
-			   us.TorrentID,
-			   t.GroupID,
+               us.TorrentID,
+               t.GroupID,
                t.Size,
                tg.Time,
-			   us.FreeLeech,
+               us.FreeLeech,
                us.DoubleSeed,
-			   tg.Name as Torrent
-			FROM users_slots AS us
-			JOIN torrents AS t ON t.ID = us.TorrentID
-			JOIN torrents_group AS tg ON tg.ID = t.GroupID
-		   WHERE us.UserID = $UserID
-		ORDER BY $OrderBy $OrderWay
+               tg.Name as Torrent
+            FROM users_slots AS us
+            JOIN torrents AS t ON t.ID = us.TorrentID
+            JOIN torrents_group AS tg ON tg.ID = t.GroupID
+           WHERE us.UserID = $UserID
+        ORDER BY $OrderBy $OrderWay
            LIMIT $Limit");
 $Tokens = $DB->to_array();
 

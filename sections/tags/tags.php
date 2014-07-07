@@ -2,7 +2,8 @@
 define('RESULTS_PER_PAGE', 100);
 
 // The "order by x" links on columns headers
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -13,6 +14,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
     } else {
         $NewWay = $DefaultWay;
     }
+
     return "tags.php?order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
 
@@ -37,10 +39,10 @@ show_header('Tags');
 <div class="thin">
     <h2>Tags</h2>
 
-	<div class="linkbox">
-		<a style="font-weight: bold" href="tags.php">[Tags & Search]</a>
-		<a href="tags.php?action=synonyms">[Synonyms]</a>
-	</div>
+    <div class="linkbox">
+        <a style="font-weight: bold" href="tags.php">[Tags & Search]</a>
+        <a href="tags.php?action=synonyms">[Synonyms]</a>
+    </div>
 
     <div class="">
 <?php
@@ -49,7 +51,7 @@ show_header('Tags');
         $Searchtext = trim($_REQUEST['searchtags']);
         $Searchtext_esc = db_string($Searchtext);
 
-        if($Searchtext) {
+        if ($Searchtext) {
             $title = "search results";
             $WHERE1=''; $WHERE2='';
             if($_GET['search_type']=='both' || $_GET['search_type']=='tags')
@@ -62,11 +64,11 @@ show_header('Tags');
             $WHERE1=''; $WHERE2='';
         }
 
-        if(!$WHERE1 && !$WHERE2 && $Page==1) { // lets cache front page results for a few hours
+        if (!$WHERE1 && !$WHERE2 && $Page==1) { // lets cache front page results for a few hours
 
             $CacheResults = $Cache->get_value("tagslist_{$OrderBy}_$OrderWay");
 
-            if($CacheResults===false) {
+            if ($CacheResults===false) {
 
                 $DB->query("SELECT SQL_CALC_FOUND_ROWS
                                        t.Name as Tag, Uses, IF(TagType='genre','*','') as TagType,
@@ -86,14 +88,14 @@ show_header('Tags');
                 $DB->query("SELECT FOUND_ROWS()");
                 list($NumAllTags) = $DB->next_record();
 
-                if($NumAllTags>0 ) {
+                if ($NumAllTags>0) {
                     // get the syns for the tag results
                     $DB->query("SELECT Count(ID) as Synonyms , GROUP_CONCAT( Synomyn  SEPARATOR ', ' ) as SynText, TagID
                                   FROM tag_synomyns
                                  WHERE TagID IN ( $TagIDs )
                               GROUP BY TagID ");
                     $Syns = $DB->to_array('TagID', MYSQLI_ASSOC) ;
-                    foreach($Tags as $tID=>$TagInfo) {
+                    foreach ($Tags as $tID=>$TagInfo) {
                         if(isset($Syns[$tID])) $Tags[$tID] = array_merge($Syns[$tID], $TagInfo);
                     }
                 }
@@ -107,7 +109,7 @@ show_header('Tags');
         } else {
             $NumAllTags=false;
 
-            if($WHERE2  == "" || $_GET['search_type']=='tags') {
+            if ($WHERE2  == "" || $_GET['search_type']=='tags') {
 
                 if($WHERE1) $WHERE1 = "WHERE $WHERE1";
                 $DB->query("SELECT SQL_CALC_FOUND_ROWS
@@ -121,7 +123,6 @@ show_header('Tags');
                               GROUP BY t.ID
                               ORDER BY $OrderBy $OrderWay
                                  LIMIT $Limit");
-
 
             } elseif ($_GET['search_type']=='syns') {
 
@@ -174,20 +175,20 @@ show_header('Tags');
             $TagIDs = $DB->collect('TagID');
             $TagIDs = implode(', ', $TagIDs);
 
-            if($NumAllTags===false) {
+            if ($NumAllTags===false) {
                 $DB->query("SELECT FOUND_ROWS()");
                 list($NumAllTags) = $DB->next_record();
             }
 
 
-            if($NumAllTags>0 ) {
+            if ($NumAllTags>0) {
                 // get the syns for the tag results
                 $DB->query("SELECT Count(ID) as Synonyms , GROUP_CONCAT( Synomyn  SEPARATOR ', ' ) as SynText, TagID
                               FROM tag_synomyns
                              WHERE TagID IN ( $TagIDs )
                           GROUP BY TagID ");
                 $Syns = $DB->to_array('TagID', MYSQLI_ASSOC) ;
-                foreach($Tags as $tID=>$TagInfo) {
+                foreach ($Tags as $tID=>$TagInfo) {
                     if(isset($Syns[$tID])) $Tags[$tID] = array_merge($Syns[$tID], $TagInfo);
                 }
             }
@@ -239,7 +240,7 @@ show_header('Tags');
             $NumTags = count($Tags);
             $i=0;
             //for ($i = 0; $i < $NumTags ; $i++) {
-            foreach($Tags as $TagItem) {
+            foreach ($Tags as $TagItem) {
 
                 $Tag = $TagItem['Tag'];
                 $NumSyns =  $TagItem['Synonyms'];
@@ -264,7 +265,7 @@ show_header('Tags');
                     <td class="votes left"><?= "-$TagItem[NegVotes]"?></td>
                     <td class="center"><?=($NumSyns?$NumSyns:'')?>
 <?php                if ($NumSyns>0) {
-                    if($Synonyms==$SynonymsShow){
+                    if ($Synonyms==$SynonymsShow) {
                         $hiddencss = 'hidden ';
                         $hideicon = '[+]';
                     } else {

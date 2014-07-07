@@ -1,6 +1,6 @@
 <?php
-class TEXT {
-
+class text
+{
     // tag=>max number of attributes 'link'=>1,
     private $ValidTags = array(
         'ratiolist'=>0,
@@ -561,7 +561,8 @@ class TEXT {
     private $Errors = array();
 
     //public $Smilies = array(); // for testing only
-    function __construct() {
+    public function __construct()
+    {
         foreach ($this->Smileys as $Key => $Val) {
             $this->Smileys[$Key] = '<img src="' . STATIC_SERVER . 'common/smileys/' . $Val . '" alt="' . $Key . '" />';
             //$this->Smilies[] = $Val;
@@ -574,15 +575,18 @@ class TEXT {
         reset($this->Icons);
     }
 
-    function has_errors() {
+    public function has_errors()
+    {
         return count($this->Errors) > 0;
     }
 
-    function get_errors() {
+    public function get_errors()
+    {
         return $this->Errors;
     }
 
-    function full_format($Str, $AdvancedTags = false, $ShowErrors = false) {
+    public function full_format($Str, $AdvancedTags = false, $ShowErrors = false)
+    {
         $this->Advanced = $AdvancedTags;
         $this->ShowErrors = $ShowErrors;
         $this->Errors = array();
@@ -617,18 +621,20 @@ class TEXT {
         $HTML = $this->to_html($Str);
 
         $HTML = nl2br($HTML);
+
         return $HTML;
     }
 
     /**
      * Validates the bbcode for bad tags (uncloesd/mixed tags)
      *
-     * @param string $Str The text to be validated
-     * @param boolean $AdvancedTags Whether AdvancedTags are allowed (this is only for the preview if errorout=true)
-     * @param boolean $ErrorOut If $ErrorOut=true then on errors the error page will be displayed with a preview of the errors (If false the function just returns the validate result)
+     * @param  string  $Str          The text to be validated
+     * @param  boolean $AdvancedTags Whether AdvancedTags are allowed (this is only for the preview if errorout=true)
+     * @param  boolean $ErrorOut     If $ErrorOut=true then on errors the error page will be displayed with a preview of the errors (If false the function just returns the validate result)
      * @return boolean True if there are no bad tags and false otherwise
      */
-    function validate_bbcode($Str, $AdvancedTags = false, $ErrorOut = true) {
+    public function validate_bbcode($Str, $AdvancedTags = false, $ErrorOut = true)
+    {
         $preview = $this->full_format($Str, $AdvancedTags, true);
         if ($this->has_errors()) {
             if ($ErrorOut) {
@@ -639,12 +645,15 @@ class TEXT {
                         <div class=\"box\"><div class=\"post_content\">$preview</div></div><br/>
                         <div style=\"font-style:italic;text-align:center;cursor:pointer;\"><a onclick=\"window.history.go(-1);\">click here or use the back button in your browser to return to your message</a></div>");
             }
+
             return false;
         }
+
         return true;
     }
 
-    function strip_bbcode($Str) {
+    public function strip_bbcode($Str)
+    {
         $Str = display_str($Str);
 
         //Inline links
@@ -653,23 +662,26 @@ class TEXT {
         $Str = $this->raw_text($Str);
 
         $Str = nl2br($Str);
+
         return $Str;
     }
 
     // how much readable text is in string
-    function text_count($Str) {
+    public function text_count($Str)
+    {
         //remove tags
         $Str = $this->db_clean_search($Str);
         //remove endofline
         $Str = str_replace(array("\r\n", "\n", "\r"), '', $Str);
         $Str = trim($Str);
+
         return mb_strlen($Str);
     }
 
     // I took a shortcut here and made this function instead of using strip_bbcode since it's purpose is a bit
     // different.
-    function db_clean_search($Str) {
-
+    public function db_clean_search($Str)
+    {
         foreach ($this->Smileys as $key => $value) {
             $remove[] = "/$key/i";
         }
@@ -815,7 +827,8 @@ class TEXT {
         return $Str;
     }
 
-    function valid_url($Str, $Extension = '', $Inline = false) {
+    public function valid_url($Str, $Extension = '', $Inline = false)
+    {
         $Regex = '/^';
         $Regex .= '(https?|ftps?|irc):\/\/'; // protocol
         $Regex .= '(\w+(:\w+)?@)?'; // user:pass@
@@ -843,14 +856,15 @@ class TEXT {
         return preg_match($Regex, $Str, $Matches);
     }
 
-    function local_url($Str) {
+    public function local_url($Str)
+    {
         $URLInfo = parse_url($Str);
         if (!$URLInfo) {
             return false;
         }
         $Host = $URLInfo['host'];
         // If for some reason your site does not require subdomains or contains a directory in the SITE_URL, revert to the line below.
-        //if($Host == NONSSL_SITE_URL || $Host == SSL_SITE_URL || $Host == 'www.'.NONSSL_SITE_URL) {
+        //if ($Host == NONSSL_SITE_URL || $Host == SSL_SITE_URL || $Host == 'www.'.NONSSL_SITE_URL) {
         if (preg_match('/(\S+\.)*' . NONSSL_SITE_URL . '/', $Host)) {
             $URL = $URLInfo['path'];
             if (!empty($URLInfo['query'])) {
@@ -859,6 +873,7 @@ class TEXT {
             if (!empty($URLInfo['fragment'])) {
                 $URL.='#' . $URLInfo['fragment'];
             }
+
             return $URL;
         } else {
             return false;
@@ -903,7 +918,8 @@ class TEXT {
 
      */
 
-    function parse($Str) {
+    public function parse($Str)
+    {
         $i = 0; // Pointer to keep track of where we are in $Str
         $Len = strlen($Str);
         $Array = array();
@@ -1067,7 +1083,6 @@ class TEXT {
                     }
                 } while ($NumInOpens > $NumInCloses);
 
-
                 // Find the internal block inside the tag
                 if (!$Block)
                     $Block = substr($Str, $i, $CloseTag - $i); // 5c) Get the contents between [open] and [/close] and call it the block.
@@ -1217,12 +1232,12 @@ class TEXT {
 
             $ArrayPos++; // 7) Increment array pointer, start again (past the end of the [/close] tag)
         }
+
         return $Array;
     }
 
-
-
-    function get_allowed_colors() {
+    public function get_allowed_colors()
+    {
         static $ColorAttribs;
         if (!$ColorAttribs) { // only define it once per page
             // now with more colors!
@@ -1239,10 +1254,12 @@ class TEXT {
                 'sandybrown','seagreen','seashell','sienna','silver','skyblue','slateblue','slategray','slategrey','snow','springgreen','steelblue','tan','teal','thistle',
                 'tomato','turquoise','violet','wheat','white','whitesmoke','yellow','yellowgreen' );
         }
+
         return $ColorAttribs;
     }
 
-    function is_color_attrib(&$Attrib) {
+    public function is_color_attrib(&$Attrib)
+    {
         global $ClassNames;
 
         $Att = strtolower($Attrib);
@@ -1258,7 +1275,7 @@ class TEXT {
         // check and capture #rgba format
         if (preg_match('/^#(?|([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})|([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1}))$/', $Att, $matches) ) {
             // capture #rgba hex and convert into rgba(r,g,b,a) format (from base 16 to base 10 0->255)
-            for($i=1;$i<4;$i++){
+            for ($i=1;$i<4;$i++) {
                 if (strlen($matches[$i])==1) $matches[$i] = "$matches[$i]$matches[$i]";
                 $matches[$i] = base_convert($matches[$i], 16, 10);
             }
@@ -1267,6 +1284,7 @@ class TEXT {
             $matches[4] = number_format( base_convert($matches[4], 16, 10) /255 , 2);
             // attribute is in rgb(r,g,b,a) format for alpha channel
             $Attrib = "rgba($matches[1],$matches[2],$matches[3],$matches[4])";
+
             return true;
         }
 
@@ -1274,10 +1292,8 @@ class TEXT {
         return in_array($Att, $this->get_allowed_colors());
     }
 
-
-
-    function extract_attributes($Attrib, $MaxNumber=-1) {
-
+    public function extract_attributes($Attrib, $MaxNumber=-1)
+    {
         $Elements=array();
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
@@ -1298,11 +1314,12 @@ class TEXT {
                 $InlineStyle .= '"';
             }
         }
+
         return $Elements;
     }
 
-
-    function get_css_attributes($Attrib, $AllowMargin=true, $AllowColor=true, $AllowWidth=true, $AllowNoBorder=true, $AllowImage=true) {
+    public function get_css_attributes($Attrib, $AllowMargin=true, $AllowColor=true, $AllowWidth=true, $AllowNoBorder=true, $AllowImage=true)
+    {
         $InlineStyle = '';
         if (isset($Attrib) && $Attrib) {
             $attributes = explode(",", $Attrib);
@@ -1315,7 +1332,7 @@ class TEXT {
                         $LinearAttr = array();
                         // Check integrity
                         if (sizeof($LinearArr) < 2) return '';
-                        foreach($LinearArr as $arr) {
+                        foreach ($LinearArr as $arr) {
                             // Check so that the gradient is using the correct attributes
                             if (preg_match('/^to left bottom|right bottom|bottom left|bottom right|'.
                                          'left top|right top|top left|top right|left|right|top|bottom$/', $arr) ||
@@ -1348,8 +1365,7 @@ class TEXT {
                             }
                         }
                         $InlineStyle .= implode(',', $LinearAttr) . ');';
-                    }
-                    elseif ($AllowColor && $this->is_color_attrib($att)) {
+                    } elseif ($AllowColor && $this->is_color_attrib($att)) {
                         $InlineStyle .= 'background-color:' . $att . ';';
                     } elseif ($AllowImage && $this->valid_url($att) ) {
                         $InlineStyle .= "background-image: url(".$att.");";
@@ -1378,24 +1394,22 @@ class TEXT {
                         }
                     } elseif ($AllowNoBorder && in_array($att, array('nball', 'nb', 'noborder'))) { //  'nball',
                         $InlineStyle .= 'border:none;';
-
                     } elseif ($AllowMargin && in_array($att, array('nopad'))) {
                         $InlineStyle .= 'padding:0px;';
-
-                    } //elseif (!in_array($att, array('nopad', 'nball')) ) {
-                       // return FALSE;
-                    //}
+                    }
                 }
                 $InlineStyle .= '"';
             }
         }
+
         return $InlineStyle;
     }
 
-    function get_css_classes($Attrib, $MatchClasses) {
+    public function get_css_classes($Attrib, $MatchClasses)
+    {
         if ($Attrib == '') return '';
         $classes='';
-        foreach($MatchClasses as $class){
+        foreach ($MatchClasses as $class) {
             if ( is_array($class)) {
                 $class_match = $class[0];
                 $class_replace = $class[1];
@@ -1405,10 +1419,12 @@ class TEXT {
             }
             if (stripos($Attrib, $class_match) !== FALSE) $classes .= " $class_replace";
         }
+
         return $classes;
     }
 
-    function remove_text_between_tags($Array, $MatchTagRegex = false) {
+    public function remove_text_between_tags($Array, $MatchTagRegex = false)
+    {
         $count = count($Array);
         for ($i = 0; $i <= $count; $i++) {
             if (is_string($Array[$i])) {
@@ -1417,10 +1433,12 @@ class TEXT {
                 $Array[$i] = '';
             }
         }
+
         return $Array;
     }
 
-    function get_size_attributes($Attrib) {
+    public function get_size_attributes($Attrib)
+    {
         if ($Attrib == '') {
             return '';
         }
@@ -1429,12 +1447,15 @@ class TEXT {
                 if (!$matches[1]) $matches[1] = 640;
                 if (!$matches[2]) $matches[2] = 385;
             }
+
             return ' width="' . $matches[1] . '" height="' . $matches[2] . '" ';
         }
+
         return '';
     }
 
-    function to_html($Array) {
+    public function to_html($Array)
+    {
         global $LoggedUser;
         $this->Levels++;
         if ($this->Levels > 20) {
@@ -1442,7 +1463,7 @@ class TEXT {
         } // Hax prevention
         $Str = '';
 
-	$anon_url = (defined('ANONYMIZER_URL')) ? ANONYMIZER_URL : 'http://anonym.to/?';
+    $anon_url = (defined('ANONYMIZER_URL')) ? ANONYMIZER_URL : 'http://anonym.to/?';
 
         foreach ($Array as $Block) {
             if (is_string($Block)) {
@@ -1507,7 +1528,7 @@ class TEXT {
                     if (preg_match('/^https?:\/\/www\.youtube\.com\/.*v=(.*)$/i', $Block['Attr'], $matches)) {
                         $vidurl = "http://www.youtube.com/v/{$matches[1]}";
                         $Str.='<object height="385" width="640"><param name="movie" value="' . $vidurl . '"><param name="allowFullScreen" value="true"><param name="allowscriptaccess" value="always"><embed src="' . $vidurl . '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" height="385" width="640"></object>';
-                    } elseif (preg_match('/^https?:\/\/vimeo.com\/([0-9]+)$/i', $Block['Attr'], $matches))  {
+                    } elseif (preg_match('/^https?:\/\/vimeo.com\/([0-9]+)$/i', $Block['Attr'], $matches)) {
                         $Str .= '<object type="application/x-shockwave-flash" width="640" height="385" data="http://www.vimeo.com/moogaloop.swf?clip_id='.$matches[1].'"><param name="quality" value="best" /><param name="allowfullscreen" value="true" /><param name="scale" value="showAll" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' . $matches[1] . '" /></object>';
                     } else {
                         $Str.='[video=' . $Block['Attr'] . ']';
@@ -1519,7 +1540,7 @@ class TEXT {
 
                     if ( ($Block['Attr'] != '' && count($Attributes)==0) || $Block['Val'] == '' ) {
                         $Str.='[h5v' . ($Block['Attr'] != ''?'='. $Block['Attr']:'')  . ']' . $this->to_html($Block['Val']) . '[/h5v]';
-                    } else  {
+                    } else {
                         $parameters = '';
                         if (isset($Attributes['number']) && count($Attributes['number']) >= 2) {
                             $parameters = ' width="'.$Attributes['number'][0].'" height="'.$Attributes['number'][1].'" ';
@@ -1529,7 +1550,7 @@ class TEXT {
                         }
                         $Sources = explode(',', $Block['Val']);
                         $Str .= '<video '.$parameters.' controls>';
-                        foreach( $Sources as $Source) {
+                        foreach ($Sources as $Source) {
                             $lastdot = strripos($Source, '.');
                             $mime = substr($Source, $lastdot+1);
                             if($mime=='ogv')$mime='ogg'; // all others are same as ext (webm=webm, mp4=mp4, ogg=ogg)
@@ -1909,10 +1930,12 @@ class TEXT {
             }
         }
         $this->Levels--;
+
         return $Str;
     }
 
-    function raw_text($Array, $StripURL = false) {
+    public function raw_text($Array, $StripURL = false)
+    {
         $Str = '';
         foreach ($Array as $Block) {
             if (is_string($Block)) {
@@ -1994,15 +2017,18 @@ class TEXT {
                     break;
             }
         }
+
         return $Str;
     }
 
-    function smileys($Str) {
+    public function smileys($Str)
+    {
         global $LoggedUser;
         if (!empty($LoggedUser['DisableSmileys'])) {
             return $Str;
         }
         $Str = strtr($Str, $this->Smileys);
+
         return $Str;
     }
 
@@ -2019,7 +2045,8 @@ class TEXT {
       // they will not get that benefit
      */
 
-    function display_bbcode_assistant($textarea, $AllowAdvancedTags, $start_num_smilies = 0, $load_increment = 240, $load_increment_first = 30) {
+    public function display_bbcode_assistant($textarea, $AllowAdvancedTags, $start_num_smilies = 0, $load_increment = 240, $load_increment_first = 30)
+    {
         global $LoggedUser;
         if ($load_increment_first == -1) {
             $load_increment_first = $load_increment;
@@ -2073,7 +2100,6 @@ class TEXT {
                             <img class="bb_icon" src="<?= get_symbol_url('text_lowercase.png') ?>" onclick="text('low', '<?= $textarea; ?>')" title="To Lowercase" alt="Low" />
                         </div>
 
-
                         <div class="bb_buttons_left">
                             <select class="bb_button" name="fontfont" id="fontfont<?= $textarea; ?>" onchange="font('font',this.value,'<?= $textarea; ?>');" title="Font: [font=fontfamily]text[/font]">
                                 <option value="-1">Font Type</option>
@@ -2107,12 +2133,10 @@ class TEXT {
                             <a class="bb_button" onclick="insert('[plot]', '<?= $textarea; ?>')" title="Plot icon: [plot]" alt="plot">plot</a>
                             <a class="bb_button" onclick="insert('[screens]', '<?= $textarea; ?>')" title="Screens icon: [screens]" alt="screens">screens</a>
 
-
         <?php if (check_perms('site_moderate_forums')) { ?>
                                 <a class="bb_button" style="border: 2px solid #600;" onclick="tag('mcom', '<?= $textarea; ?>')" title="Staff Comment: [mcom]text[/mcom]" alt="Mod comment">Mod</a>
         <?php } ?>
                         </div>
-
 
                     </td>
                 </tr>
@@ -2125,7 +2149,7 @@ class TEXT {
         } ?>
                         </div>
                         <div class="overflow_button">
-                            <a href="#" id="open_overflow<?= $textarea; ?>" onclick="if(this.isopen){Close_Smilies('<?= $textarea; ?>');}else{Open_Smilies(<?= "$start_num_smilies,$load_increment_first,'$textarea'" ?>);};return false;">Show smilies</a>
+                            <a href="#" id="open_overflow<?= $textarea; ?>" onclick="if (this.isopen) {Close_Smilies('<?= $textarea; ?>');} else {Open_Smilies(<?= "$start_num_smilies,$load_increment_first,'$textarea'" ?>);};return false;">Show smilies</a>
                             <a href="#" id="open_overflow_more<?= $textarea; ?>" onclick="Open_Smilies(<?= "$start_num_smilies,$load_increment,'$textarea'" ?>);return false;"></a>
                             <span id="smiley_count<?= $textarea; ?>" class="number" style="float:right;"></span>
                             <span id="smiley_max<?= $textarea; ?>" class="number" style="float:left;"></span>
@@ -2135,7 +2159,8 @@ class TEXT {
     }
 
     // output smiley data in xml (we dont just draw the html because we want maxsmilies in js)
-    function draw_smilies_from_XML($indexfrom = 0, $indexto = -1) {
+    public function draw_smilies_from_XML($indexfrom = 0, $indexto = -1)
+    {
         $count = 0;
         echo "<smilies>";
         foreach ($this->Smileys as $Key => $Val) {
@@ -2155,7 +2180,8 @@ class TEXT {
 </smilies>';
     }
 
-    function draw_smilies_from($indexfrom = 0, $indexto = -1, $textarea) {
+    public function draw_smilies_from($indexfrom = 0, $indexto = -1, $textarea)
+    {
         $count = 0;
         foreach ($this->Smileys as $Key => $Val) {
             if ($indexto >= 0 && $count >= $indexto) {
@@ -2169,7 +2195,8 @@ class TEXT {
         reset($this->Smileys);
     }
 
-    function draw_all_smilies($Sort = true, $AZ = true) {
+    public function draw_all_smilies($Sort = true, $AZ = true)
+    {
         $count = 0;
         if ($Sort) {
             if ($AZ)
@@ -2193,8 +2220,8 @@ class TEXT {
 
 /*
   //Uncomment this part to test the class via command line:
-  function display_str($Str) {return $Str;}
-  function check_perms($Perm) {return true;}
+  public function display_str($Str) {return $Str;}
+  public function check_perms($Perm) {return true;}
   $Str = "hello
   [pre]http://anonym.to/?http://whatshirts.portmerch.com/
   ====hi====

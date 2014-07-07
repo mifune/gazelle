@@ -10,7 +10,8 @@ $images = array_diff($images, array('.', '..'));
 ?>
 
 <script type="text/javascript">//<![CDATA[
-    function change_image(display_image, flag_image) {
+    public function change_image(display_image, flag_image)
+    {
         jQuery(display_image).html('<img src="/static/common/flags/iso16/'+jQuery(flag_image).val()+'.png"/>');
     }
     //]]></script>
@@ -60,7 +61,7 @@ $images = array_diff($images, array('.', '..'));
                         <select id="flag_image<?=$id?>" name="flag" onchange="change_image('#lang_image<?=$id?>', '#flag_image<?=$id?>');">
                                     <option value="">none</option>
                             <?php  foreach ($images as $key => $value) {
-                                    if (strlen($value)==6){
+                                    if (strlen($value)==6) {
                                         $value = substr($value, 0, strlen($value)-4  ); // remove .png extension  ?>
                                         <option value="<?= display_str($value) ?>" <?php  if($flag_cc==$value) echo 'selected="selected"';?>><?= $value ?></option>
                             <?php       }
@@ -112,7 +113,7 @@ $images = array_diff($images, array('.', '..'));
                     <select id="flag_image0" name="flag" onchange="change_image('#lang_image0', '#flag_image0');">
                                     <option value="">none</option>
                         <?php  foreach ($images as $key => $value) {
-                                if (strlen($value)==6){
+                                if (strlen($value)==6) {
                                     $value = substr($value, 0, strlen($value)-4  ); // remove .png extension  ?>
                                     <option value="<?= display_str($value) ?>"><?= $value ?></option>
                         <?php       }

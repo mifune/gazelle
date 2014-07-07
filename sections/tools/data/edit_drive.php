@@ -31,12 +31,11 @@ $name = db_string($_REQUEST['drivename']);
 $description = db_string($_REQUEST['body']);
 if ($state == 'notstarted') $SET_SQL[] = "description='$description'";
 
-
 if ($_REQUEST['submit']=='Start Donation Drive') {
     if($state!='notstarted') error("haX0r?");
 
     $DB->query("SELECT name FROM donation_drives WHERE state='active'" );
-    if($DB->record_count()>0) {
+    if ($DB->record_count()>0) {
         list($old)=$DB->next_record();
         error("There is already an active drive!<br/><br/>You must close the '$old' donation drive before you can start this one");
     }

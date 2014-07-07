@@ -1,10 +1,11 @@
 <?php
-if(!check_perms('users_view_ips')) { error(403); }
+if (!check_perms('users_view_ips')) { error(403); }
 
 define('USERS_PER_PAGE', 50);
 define('IP_OVERLAPS', 5);
 
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -57,25 +58,25 @@ show_header('Dupe IPs','dupeip');
 
 ?>
 <div class="thin">
-	<h2>Dupe IPs</h2>
-	<div class="linkbox">
-		<strong><a href="tools.php?action=dupe_ips">[Dupe IP's]</a></strong>
-		<a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a>
-	</div>
+    <h2>Dupe IPs</h2>
+    <div class="linkbox">
+        <strong><a href="tools.php?action=dupe_ips">[Dupe IP's]</a></strong>
+        <a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a>
+    </div>
 
-	<div class="linkbox"> <?=$Pages; ?> </div>
+    <div class="linkbox"> <?=$Pages; ?> </div>
 
-	<div class="head">Duped IP's</div>
-	<table width="100%">
-		<tr class="colhead">
-			<td><a href="<?=header_link('IP') ?>">IP</a></td>
-			<td class="center">Host</td>
-			<td class="center"><a href="<?=header_link('NumUsers') ?>">Num Users</a></td>
-			<td class="center"><a href="<?=header_link('StartTime') ?>">Last Start Time</a></td>
+    <div class="head">Duped IP's</div>
+    <table width="100%">
+        <tr class="colhead">
+            <td><a href="<?=header_link('IP') ?>">IP</a></td>
+            <td class="center">Host</td>
+            <td class="center"><a href="<?=header_link('NumUsers') ?>">Num Users</a></td>
+            <td class="center"><a href="<?=header_link('StartTime') ?>">Last Start Time</a></td>
             <td class="center"><a href="<?=header_link('EndTime') ?>">Last End Time</a></td>
-		</tr>
+        </tr>
 <?php
-        if($NumResults==0){
+        if ($NumResults==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="5">no duped ips</td>
@@ -102,8 +103,8 @@ show_header('Dupe IPs','dupeip');
 <?php           }
         }
 ?>
-	</table>
-	<div class="linkbox"> <?=$Pages; ?> </div>
+    </table>
+    <div class="linkbox"> <?=$Pages; ?> </div>
 </div>
 <?php
 show_footer();

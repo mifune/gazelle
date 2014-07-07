@@ -13,16 +13,15 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
 ?>
 
 <div class="thin">
-	<h2>Medals and Awards</h2>
+    <h2>Medals and Awards</h2>
     <div class="box pad">
 
         <pre>
 <?php
         $LastBadge='';
 
-        foreach($Awards as $Award) {
+        foreach ($Awards as $Award) {
             list($Name, $Type, $Desc, $Cost, $Image, $Badge, $Rank) = $Award;
-
 
             if ($LastBadge != $Badge) {
 

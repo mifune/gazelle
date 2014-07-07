@@ -15,6 +15,6 @@ echo '<div class="head">
                 <strong>'. display_str($Title).' </strong> - posted Just now
         </div>
         <div class="box vertical_space">
-		<div class="pad">'.$Body.'</div>
-	  </div>
+        <div class="pad">'.$Body.'</div>
+      </div>
       <br />';

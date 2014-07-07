@@ -5,7 +5,7 @@ if (!is_number($_POST['template']) || !check_perms('use_templates') ) {
 }
 
 // delete a template
-$TemplateID = (int)$_POST['template'];
+$TemplateID = (int) $_POST['template'];
 $Template = $Cache->get_value('template_' . $TemplateID);
 
 if ($Template === FALSE) { //it should really be cached from upload page
@@ -21,19 +21,19 @@ if ($Template === FALSE) { //it should really be cached from upload page
 
 $candelete=true;
 
-if (!check_perms('delete_any_template')){
-        if($Template['Public'] == 1) {
+if (!check_perms('delete_any_template')) {
+        if ($Template['Public'] == 1) {
 
             $Result = array(0, "You cannot delete public templates");
             $candelete=false;
 
-        } elseif($Template['UserID'] != $LoggedUser['ID']) {  // naughty
+        } elseif ($Template['UserID'] != $LoggedUser['ID']) {  // naughty
             $Result = array(0, "You do not have permission to delete that template");
             $candelete=false;
         }
 }
 
-if($candelete){
+if ($candelete) {
         $DB->query("DELETE FROM upload_templates WHERE ID='$TemplateID'");
         $Cache->delete_value('template_' . $TemplateID);
 

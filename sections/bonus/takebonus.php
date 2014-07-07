@@ -13,7 +13,7 @@ if($UserID != $LoggedUser['ID'])  error(0);
 
 $ShopItem = get_shop_item($ItemID);
 
-if(!empty($ShopItem) && is_array($ShopItem)){
+if (!empty($ShopItem) && is_array($ShopItem)) {
 
     list($ItemID, $Title, $Description, $Action, $Value, $Cost) = $ShopItem;
 
@@ -21,12 +21,12 @@ if(!empty($ShopItem) && is_array($ShopItem)){
 
     // if we need to have otherID get it from passed username
     $forother = strpos($Action, 'give');
-    if ($forother!==false){
+    if ($forother!==false) {
         $Othername = empty($P['othername']) ? '' : $P['othername'];
-        if($Othername){
+        if ($Othername) {
 
             $DB->query("SELECT ID From users_main WHERE Username='$Othername'");
-            if(($DB->record_count()) > 0) {
+            if (($DB->record_count()) > 0) {
                 list($OtherID) = $DB->next_record();
                 //$OtherUserStats = get_user_stats($OtherID);
             } else {
@@ -106,7 +106,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
 
             case 'gb':
                 $ValueBytes = get_bytes($Value.'gb');
-                if($LoggedUser['BytesDownloaded'] <= 0){
+                if ($LoggedUser['BytesDownloaded'] <= 0) {
                     $ResultMessage= "You have no download to deduct from!";
                 } else {
                     $Summary = sqltime().' - '.ucfirst("user bought -$Value gb. Cost: $Cost credits");
@@ -185,7 +185,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
             case 'title':
                 //get the unescaped title for len test
                 $NewTitle = empty($_POST['title']) ? '' : $_POST['title'];
-                if(!$NewTitle){
+                if (!$NewTitle) {
                     $ResultMessage = "Title was not set";
                 } else {
                     $tlen = mb_strlen($NewTitle, "UTF-8");
@@ -206,9 +206,9 @@ if(!empty($ShopItem) && is_array($ShopItem)){
 
             case 'ufl':
 
-                $GroupID = empty($_POST['torrentid']) ? '' : (int)$_POST['torrentid'];
+                $GroupID = empty($_POST['torrentid']) ? '' : (int) $_POST['torrentid'];
 
-                if(!$GroupID){
+                if (!$GroupID) {
                     $ResultMessage = "TorrentID was not set";
                 } else {
 
@@ -217,15 +217,15 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                         $ResultMessage = "Could not find any torrent with ID=$GroupID";
                     else {
                         list($OwnerID, $TName, $FreeTorrent, $Sizebytes) = $DB->next_record();
-                        if($OwnerID != $LoggedUser['ID']) {
+                        if ($OwnerID != $LoggedUser['ID']) {
 
                             $ResultMessage = "You are not the owner of torrent with ID=$GroupID - only the uploader can buy Universal Freeleech for their torrent";
 
-                        } else if ($FreeTorrent == '1') {
+                        } elseif ($FreeTorrent == '1') {
 
                             $ResultMessage = "Torrent $TName is already freeleech!";
 
-                        } else if ($Sizebytes < get_bytes($Value.'gb') ) {
+                        } elseif ($Sizebytes < get_bytes($Value.'gb') ) {
 
                             $ResultMessage = "Torrent $TName (" . get_size($Sizebytes, 2). ") is too small for a > $Value gb freeleech!";
 
@@ -251,7 +251,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
                break;
         }
 
-        if($UpdateSetOther){
+        if ($UpdateSetOther) {
             $SET = implode(', ', $UpdateSetOther);
             $sql = "UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$OtherID'";
             $DB->query($sql);
@@ -260,7 +260,7 @@ if(!empty($ShopItem) && is_array($ShopItem)){
             $Cache->delete_value('user_info_' . $OtherID);
         }
 
-        if($UpdateSet){
+        if ($UpdateSet) {
             $SET = implode(', ', $UpdateSet);
             $sql = "UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$UserID'";
             $DB->query($sql);

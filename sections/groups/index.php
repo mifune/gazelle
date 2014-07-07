@@ -7,7 +7,7 @@ if (!empty($_REQUEST['groupid'])) {
     $GroupID = (int) $_REQUEST['groupid'];
 }
 
-if(empty($_POST['action'])) {
+if (empty($_POST['action'])) {
 
     if ($GroupID > 0)
         include(SERVER_ROOT . '/sections/groups/group.php');
@@ -19,7 +19,7 @@ if(empty($_POST['action'])) {
     $ApplyTo = isset($_POST['applyto'])?$_POST['applyto']:'';
     if (!in_array($ApplyTo, array('user','group'))) error(0);
 
-    if($ApplyTo == 'user'){
+    if ($ApplyTo == 'user') {
         if (!empty($_REQUEST['userid'])) {
             $UserID = (int) $_REQUEST['userid'];
         }
@@ -115,15 +115,15 @@ if(empty($_POST['action'])) {
             // split on both whitespace and commas
             $Preitems = str_replace('\n', ' ',$P['userlist']);
             $Preitems = explode(",", $Preitems);
-            foreach($Preitems as $pitem){
+            foreach ($Preitems as $pitem) {
                 $Items = array_merge($Items, explode(" ", $pitem));
             }
             $IDs = array();
-            foreach($Items as $item){
+            foreach ($Items as $item) {
                 $item = trim($item);
                 if ($item == '') continue;
-                if(is_number($item)){
-                    $UserID = (int)$item;
+                if (is_number($item)) {
+                    $UserID = (int) $item;
                     if(in_array($UserID, $IDs)) continue;
                     $DB->query("SELECT Username FROM users_main WHERE ID=$UserID");
                     if ($DB->record_count()==0)
@@ -159,9 +159,9 @@ if(empty($_POST['action'])) {
             if (!$P['userids']) error("No users in list");
 
             $IDs = explode(",", $P['userids']);
-            foreach($IDs as &$id) {
+            foreach ($IDs as &$id) {
                 if (!is_number($id)) error(0);
-                $id=(int)$id;
+                $id=(int) $id;
             }
 
             $Values = "('".$GroupID."', '".implode("', '". sqltime()."', '".$LoggedUser['ID']."'), ('".$GroupID."', '", $IDs)."', '".sqltime()."', '".$LoggedUser['ID']."')";
@@ -170,7 +170,7 @@ if(empty($_POST['action'])) {
             $IDs = implode(',', $IDs);
             $DB->query("SELECT ID, Username FROM users_main WHERE ID IN ($IDs)");
             $Log = ''; $Div ='';
-            while(list($Uid, $Username) = $DB->next_record()){
+            while (list($Uid, $Username) = $DB->next_record()) {
                 $Log .= "{$Div}[url=/user.php?id=$Uid]{$Username}[/url]";
                 $Div =', ';
             }
@@ -194,7 +194,7 @@ if(empty($_POST['action'])) {
             if ($DB->record_count()>0) {
 
                 $Log = ''; $Div ='';
-                while(list($Uid, $Username) = $DB->next_record()){
+                while (list($Uid, $Username) = $DB->next_record()) {
                     $Log .= "{$Div}[url=/user.php?id=$Uid]{$Username}[/url]";
                     $Div =', ';
                 }
@@ -236,7 +236,7 @@ if(empty($_POST['action'])) {
                 $AdjustCredits = $_POST['credits'];
                 if ( $AdjustCredits[0]=='+') $AdjustCredits = substr($AdjustCredits, 1);
                 if ( !is_number($AdjustCredits)) error(0);
-                $AdjustCredits = (int)$AdjustCredits;
+                $AdjustCredits = (int) $AdjustCredits;
                 if ($AdjustCredits>0) $AdjustCredits = "+$AdjustCredits";
 
                 $Users = $DB->collect('UserID');
@@ -274,7 +274,7 @@ if(empty($_POST['action'])) {
                 $AdjustDownload = $_POST['download'];
                 if ( $AdjustDownload[0]=='+') $AdjustDownload = substr($AdjustDownload, 1);
                 if ( !is_number($AdjustDownload)) error(0);
-                $AdjustDownload = (int)$AdjustDownload;
+                $AdjustDownload = (int) $AdjustDownload;
                 $AdjustDownload = get_bytes("{$AdjustDownload}gb");
                 $StrDownload = get_size($AdjustDownload);
                 if ($AdjustDownload>0) $AdjustDownload = "+$AdjustDownload";
@@ -300,7 +300,6 @@ if(empty($_POST['action'])) {
             $DB->query("UPDATE groups SET Log=CONCAT_WS( '\n', '$Log', Log) WHERE ID='$GroupID'");
 
             header('Location: groups.php?groupid=' . $GroupID );
-
 
             break;
 

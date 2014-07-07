@@ -2,10 +2,8 @@
 include(SERVER_ROOT . '/classes/class_text.php');
 $Text = new TEXT;
 
-
 show_header('Start Conversation', 'inbox,staffpm,bbcode,jquery');
 ?>
-
 
 <div class="thin">
     <h2>Start Staff Conversation</h2>
@@ -76,7 +74,7 @@ show_header('Start Conversation', 'inbox,staffpm,bbcode,jquery');
                                 <td class="label"><label for="user">Send to</label></td>
                                 <td>
 <?php
-                                    if($Username) {  ?>
+                                    if ($Username) {  ?>
                                         <input type="hidden" name="toid" value="<?=$_GET['toid']?>" />
                                         <input class="long" type="text" name="user" id="user" disabled="disabled" value="<?= display_str($Username) ?>" />
 <?php                                   } else { ?>

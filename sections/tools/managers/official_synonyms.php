@@ -16,10 +16,10 @@ show_header('Official Synonyms Manager','tagmanager,bbcode');
 <div class="thin">
     <h2>Synonyms Manager</h2>
 
-	<div class="linkbox">
-		<a href="tools.php?action=official_tags">[Tags Manager]</a>
-		<a style="font-weight: bold" href="tools.php?action=official_synonyms">[Synonyms Manager]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tools.php?action=official_tags">[Tags Manager]</a>
+        <a style="font-weight: bold" href="tools.php?action=official_synonyms">[Synonyms Manager]</a>
+    </div>
 <?php
     if (isset($_GET['rst']) && is_number($_GET['rst'])) {
         $Result = (int) $_GET['rst'];
@@ -41,7 +41,6 @@ show_header('Official Synonyms Manager','tagmanager,bbcode');
 
                 <input type="hidden" name="action" value="official_synonyms_alter" />
                 <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" />
-
 
                 <input type="text" name="newsynname"style="width:200px" />&nbsp;&nbsp;
                 <input type="submit" name="addsynomyn" value="Add new synonym for " title="add new synonym" />&nbsp;&nbsp;
@@ -168,7 +167,7 @@ show_header('Official Synonyms Manager','tagmanager,bbcode');
                     <table class="noborder">
 <?php
                     $AtoZ = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','other');
-                    foreach($AtoZ as $char) {
+                    foreach ($AtoZ as $char) {
 ?>
                       <tr>
                         <td style="width:100px"><?=$char?></td>

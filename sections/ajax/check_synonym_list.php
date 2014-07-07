@@ -1,22 +1,26 @@
 <?php
 if (!check_perms('site_manage_tags')) error(403,true);
 
-function get_rejected_message2($Tag, $Item, $Reason){
+function get_rejected_message2($Tag, $Item, $Reason)
+{
     $Result = "<span class=\"red\">[rejected]</span> '$Tag'";
     if($Item!== $Tag) $Result .= "&nbsp; <--&nbsp; '$Item'";
     $Result .= "&nbsp; $Reason<br />";
+
     return $Result ;
 }
 
-function get_rejected_message($Tag, $Item, $NumUses, $Reason){
+function get_rejected_message($Tag, $Item, $NumUses, $Reason)
+{
     $Result = "<span class=\"red\">[rejected]</span> '$Tag'";
     if($Item!== $Tag) $Result .= "&nbsp; <--&nbsp; '$Item'";
     $Result .= "&nbsp; ($NumUses) $Reason<br />";
+
     return $Result ;
 }
 
-function process_taglist($ParentTag, $TagInfos, &$Result) {
-
+function process_taglist($ParentTag, $TagInfos, &$Result)
+{
     if (is_array($ParentTag)) {
         // process current taglist
 
@@ -24,7 +28,7 @@ function process_taglist($ParentTag, $TagInfos, &$Result) {
         if($ParentTag[1]!== $ParentTag[0]) $Result .= "  <--&nbsp; <span class=\"redd\">($ParentTag[1])</span>";
         $Result .= "<br />";
 
-        foreach($TagInfos as $tagitem) {
+        foreach ($TagInfos as $tagitem) {
             $Result .= "[synonym] <span class=\"green\">$tagitem[0] ($tagitem[2])</span> ";
             if($tagitem[1]!==$tagitem[0]) $Result .= "  <--&nbsp; ($tagitem[1])";
             if ($tagitem[2]>$ParentTag[2]) $Result .= " &nbsp; <span class=\"red\">[warning: uses > parent uses]</span>";
@@ -48,7 +52,7 @@ $ParentTag = '';
 $numparents = 0;
 $numtags=0;
 
-foreach($ListInput as $item) {
+foreach ($ListInput as $item) {
 
     $StartingNewList = false;
     $Tag = trim($item);
@@ -91,7 +95,7 @@ foreach($ListInput as $item) {
         continue;
     }
 
-    if($StartingNewList) {
+    if ($StartingNewList) {
 
         // set new parent tag
         $AllTags[] = $Tag;

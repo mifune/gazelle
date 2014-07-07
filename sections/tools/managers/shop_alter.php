@@ -1,12 +1,12 @@
 <?php
-if(!check_perms('site_manage_shop')){ error(403); }
+if (!check_perms('site_manage_shop')) { error(403); }
 
 authorize();
 
-if($_POST['submit'] == 'Delete') {
+if ($_POST['submit'] == 'Delete') {
 
-	if(!is_number($_POST['id']) || $_POST['id'] == ''){ error(0); }
-	$DB->query('DELETE FROM bonus_shop_actions WHERE ID='.$_POST['id']);
+    if (!is_number($_POST['id']) || $_POST['id'] == '') { error(0); }
+    $DB->query('DELETE FROM bonus_shop_actions WHERE ID='.$_POST['id']);
       $Cache->delete_value('shop_items');
       $Cache->delete_value('shop_items_other');
       $Cache->delete_value('shop_items_ufl');
@@ -15,10 +15,10 @@ if($_POST['submit'] == 'Delete') {
 } elseif ($_POST['autosynch'] == 'autosynch') {
 
       // Auto update shop items with applicable badge items
-      if ($_POST['delete']=='1'){
+      if ($_POST['delete']=='1') {
             $DB->query("DELETE FROM bonus_shop_actions WHERE Action='badge'");
       }
-      $Sort=(int)$_POST['sort'];
+      $Sort=(int) $_POST['sort'];
 
       $SQL = 'INSERT INTO bonus_shop_actions (Title, Description, Action, Value, Cost, Sort) VALUES';
       $Div = '';
@@ -30,7 +30,7 @@ if($_POST['submit'] == 'Delete') {
                   FROM badges
                  WHERE Type='Shop'
                  ORDER BY Sort");
-      while(list($ID, $Cost, $Name, $Description, $Image)=$DB->next_record()) {
+      while (list($ID, $Cost, $Name, $Description, $Image)=$DB->next_record()) {
             $SQL .= "$Div ('$Name', '$Description', 'badge', '$ID', '$Cost', '$Sort')";
             $Div = ',';
             $Sort++;
@@ -42,22 +42,22 @@ if($_POST['submit'] == 'Delete') {
 
 } else {
 
-	$Val->SetFields('name', '1','string','The name must be set, and has a max length of 64 characters', array('maxlength'=>64, 'minlength'=>1));
-	$Val->SetFields('desc', '1','string','The description must be set, and has a max length of 255 characters', array('maxlength'=>255, 'minlength'=>1));
+    $Val->SetFields('name', '1','string','The name must be set, and has a max length of 64 characters', array('maxlength'=>64, 'minlength'=>1));
+    $Val->SetFields('desc', '1','string','The description must be set, and has a max length of 255 characters', array('maxlength'=>255, 'minlength'=>1));
     $Val->SetFields('shopaction', '1','inarray','Invalid shop action was set.',array('inarray'=>$ShopActions));
-	$Err=$Val->ValidateForm($_POST); // Validate the form
-	if($Err){ error($Err); }
+    $Err=$Val->ValidateForm($_POST); // Validate the form
+    if ($Err) { error($Err); }
 
       $Name=db_string($_POST['name']);
       $Desc=db_string($_POST['desc']);
       $Action=db_string($_POST['shopaction']);
-      $Value=(int)$_POST['value'];
-      $Cost=(int)$_POST['cost'];
-      $Sort=(int)$_POST['sort'];
+      $Value=(int) $_POST['value'];
+      $Cost=(int) $_POST['cost'];
+      $Sort=(int) $_POST['sort'];
 
-	if($_POST['submit'] == 'Edit'){ //Edit
-		if(!is_number($_POST['id']) || $_POST['id'] == ''){ error(0); }
-		$DB->query("UPDATE bonus_shop_actions SET
+    if ($_POST['submit'] == 'Edit') { //Edit
+        if (!is_number($_POST['id']) || $_POST['id'] == '') { error(0); }
+        $DB->query("UPDATE bonus_shop_actions SET
                               Title='$Name',
                               Description='$Desc',
                               Action='$Action',
@@ -66,11 +66,11 @@ if($_POST['submit'] == 'Delete') {
                               Sort='$Sort'
                               WHERE ID='{$_POST['id']}'");
            $Cache->delete_value('shop_item_'.$_POST['id']);
-	} else { //Create
-		$DB->query("INSERT INTO bonus_shop_actions
-			(Title, Description, Action, Value, Cost, Sort) VALUES
-			('$Name','$Desc','$Action','$Value','$Cost','$Sort')");
-	}
+    } else { //Create
+        $DB->query("INSERT INTO bonus_shop_actions
+            (Title, Description, Action, Value, Cost, Sort) VALUES
+            ('$Name','$Desc','$Action','$Value','$Cost','$Sort')");
+    }
     $Cache->delete_value('shop_items');
     $Cache->delete_value('shop_items_other');
     $Cache->delete_value('shop_items_ufl');

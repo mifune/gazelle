@@ -16,9 +16,8 @@ if (!$GroupID) error(0);
 //$AddBadges = $_POST['addbadge'];
 //if (!is_array($AddBadges)) error(0);
 
-$BadgeID = (int)$_POST['addbadge'];
+$BadgeID = (int) $_POST['addbadge'];
 if (!$BadgeID) error(0);
-
 
 $DB->query("SELECT Name, Comment FROM groups WHERE ID=$GroupID");
 if ($DB->record_count() == 0) error(0);
@@ -29,7 +28,6 @@ $DB->query("SELECT Badge, Rank, Title, Image
              WHERE ID=$BadgeID");
 if ($DB->record_count() == 0) error(0);
 list($Badge, $Rank, $Name, $Image) = $DB->next_record();
-
 
 $DB->query("SELECT UserID FROM users_groups
              WHERE GroupID=$GroupID
@@ -58,7 +56,7 @@ if ($CountUsers > 0) {
                      WHERE ub.UserID IN ($SQL_IN)
                        AND b.Badge='$Badge' AND b.Rank<$Rank");
 
-    foreach($UserIDs as $UserID) {
+    foreach ($UserIDs as $UserID) {
         send_pm($UserID, 0, "Congratulations you have been awarded the $Name",
                             "[center][br][br][img]http://".SITE_URL.'/'.STATIC_SERVER."common/badges/{$Image}[/img][br][br][size=5][color=white][bg=#0261a3][br]{$Description}[br][br][/bg][/color][/size][/center]");
 

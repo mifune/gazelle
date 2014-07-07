@@ -5,7 +5,7 @@ if (isset($_POST['submit'])) {
 	authorize();
 
 	if ($_POST['submit'] == 'Delete') { //Delete
-		if(!is_number($_POST['id']) || $_POST['id'] == ''){ error(0); }
+		if(!is_number($_POST['id']) || $_POST['id'] == '') { error(0); }
 		$DB->query('DELETE FROM ip_bans WHERE ID='.$_POST['id']);
 		//$Bans = $Cache->delete_value('ip_bans');
         $Cache->delete_value('ip_bans');
@@ -123,7 +123,6 @@ if(!empty($_REQUEST['ip']) && preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/',
 $sql .= " ORDER BY  $OrderBy $OrderWay";
 $sql .= " LIMIT $Limit";
 
-//$Bans = $DB->query($sql);
 $DB->query($sql);
 $Bans = $DB->to_array();
 
@@ -133,8 +132,6 @@ list($Results) = $DB->next_record();
 $PageLinks=get_pages($Page,$Results,BANS_PER_PAGE,11);
 
 show_header('IP Bans','bbcode');
-//$DB->set_query_id($Bans);
-
 
 $userid = $_GET['userid'];
 if($userid){

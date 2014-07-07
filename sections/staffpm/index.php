@@ -27,7 +27,6 @@ switch ($_REQUEST['action']) {
         if (empty($_POST['message']) || $_POST['message'] == '') error("No message!");
         if (empty($_POST['subject']) || $_POST['subject'] == '') error("No Subject!");
 
-
         include(SERVER_ROOT . '/classes/class_text.php');
         $Text = new TEXT;
         $Text->validate_bbcode($_POST['message'], get_permissions_advtags($LoggedUser['ID']));
@@ -51,54 +50,54 @@ switch ($_REQUEST['action']) {
 
     case 'compose':
         if (!$IsStaff) error(403);
-        require('compose.php');
+        require 'compose.php';
         break;
     case 'viewconv':
-        require('viewconv.php');
+        require 'viewconv.php';
         break;
     case 'takepost':
-        require('takepost.php');
+        require 'takepost.php';
         break;
     case 'resolve':
-        require('resolve.php');
+        require 'resolve.php';
         break;
     case 'unresolve':
-        require('unresolve.php');
+        require 'unresolve.php';
         break;
     case 'multiresolve':
-        require('multiresolve.php');
+        require 'multiresolve.php';
         break;
     case 'assign':
-        require('assign.php');
+        require 'assign.php';
         break;
     case 'make_donor':
-        require('makedonor.php');
+        require 'makedonor.php';
         break;
     case 'responses':
-        require('common_responses.php');
+        require 'common_responses.php';
         break;
     case 'get_response':
-        require('ajax_get_response.php');
+        require 'ajax_get_response.php';
         break;
     case 'delete_response':
-        require('ajax_delete_response.php');
+        require 'ajax_delete_response.php';
         break;
     case 'edit_response':
-        require('ajax_edit_response.php');
+        require 'ajax_edit_response.php';
         break;
     case 'preview':
-        require('ajax_preview_response.php');
+        require 'ajax_preview_response.php';
         break;
 
     case 'user_inbox': // so staff can access the user interface too
-        require('user_inbox.php');
+        require 'user_inbox.php';
         break;
     case 'staff_inbox': //
     default:
         if ($IsStaff || $IsFLS) {
-            require('staff_inbox.php');
+            require 'staff_inbox.php';
         } else {
-            require('user_inbox.php');
+            require 'user_inbox.php';
         }
         break;
 }

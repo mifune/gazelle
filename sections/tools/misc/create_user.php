@@ -44,9 +44,8 @@ if (!empty($_POST['submit'])) {
 
     //Give them a row in users_info
     $DB->query("INSERT INTO users_info
-		(UserID,StyleID,AuthKey,JoinDate,RunHour) VALUES
-		('" . db_string($UserID) . "','" . db_string($StyleID) . "','" . db_string($AuthKey) . "', '" . sqltime() . "', FLOOR( RAND() * 24 ))");
-
+        (UserID,StyleID,AuthKey,JoinDate,RunHour) VALUES
+        ('" . db_string($UserID) . "','" . db_string($StyleID) . "','" . db_string($AuthKey) . "', '" . sqltime() . "', FLOOR( RAND() * 24 ))");
 
     $Body = get_article("intro_pm");
     if($Body) send_pm($UserID, 0, db_string("Welcome to ". SITE_NAME) , db_string($Body));

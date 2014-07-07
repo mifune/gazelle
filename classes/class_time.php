@@ -3,7 +3,8 @@ if (!extension_loaded('date')) {
     error('Date Extension not loaded.');
 }
 
-function time_ago($TimeStamp) {
+function time_ago($TimeStamp)
+{
     if (!is_number($TimeStamp)) { // Assume that $TimeStamp is SQL timestamp
         if ($TimeStamp == '0000-00-00 00:00:00') {
             return false;
@@ -13,10 +14,12 @@ function time_ago($TimeStamp) {
     if ($TimeStamp == 0) {
         return false;
     }
+
     return time() - $TimeStamp;
 }
 
-function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFormat=-1) {
+function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFormat=-1)
+{
     global $LoggedUser;
 
     if (!is_number($TimeStamp)) { // Assume that $TimeStamp is SQL timestamp
@@ -35,8 +38,9 @@ function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFo
         $TimeFormat = $LoggedUser['TimeStyle'];
     }
 
-    if ($TimeFormat == 1 && !$Span) { // shortcut if only need plain date time format returned 
+    if ($TimeFormat == 1 && !$Span) { // shortcut if only need plain date time format returned
         $TimeNow = date('M d Y, H:i', $TimeStamp - (int) $LoggedUser['TimeOffset']);
+
         return $TimeNow;
     }
 
@@ -151,10 +155,12 @@ function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFo
 
     if ($TimeFormat == 1) {
         $TimeNow = date('M d Y, H:i', $TimeStamp - (int) $LoggedUser['TimeOffset']);
+
         return '<span class="time" title="' . $TimeAgo . '">' . $TimeNow . '</span>';
     } else {
         if ($Span) {
             $TimeNow = date('M d Y, H:i', $TimeStamp - (int) $LoggedUser['TimeOffset']);
+
             return '<span class="time" title="' . $TimeNow . '">' . $TimeAgo . '</span>';
         } else {
             return $TimeAgo;
@@ -167,7 +173,8 @@ function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFo
  *    @param string $origin_tz origin timezone. If null the servers current timezone is used as the origin.
  *    @return int;
  */
-function get_timezone_offset($remote_tz, $origin_tz = null) {
+function get_timezone_offset($remote_tz, $origin_tz = null)
+{
     if ($origin_tz === null) {
         $origin_tz = "UTC";
     }
@@ -176,16 +183,19 @@ function get_timezone_offset($remote_tz, $origin_tz = null) {
     $origin_dt = new DateTime("now", $origin_dtz);
     $remote_dt = new DateTime("now", $remote_dtz);
     $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+
     return $offset;
 }
 
 /* SQL utility functions */
 
-function time_plus($Offset) {
+function time_plus($Offset)
+{
     return date('Y-m-d H:i:s', time() + $Offset);
 }
 
-function time_minus($Offset, $Fuzzy = false) {
+function time_minus($Offset, $Fuzzy = false)
+{
     if ($Fuzzy) {
         return date('Y-m-d 00:00:00', time() - $Offset);
     } else {
@@ -193,14 +203,17 @@ function time_minus($Offset, $Fuzzy = false) {
     }
 }
 
-function sqltime($timestamp = false) {
+function sqltime($timestamp = false)
+{
     if ($timestamp === false) {
         $timestamp = time();
     }
+
     return date('Y-m-d H:i:s', $timestamp);
 }
 
-function validDate($DateString) {
+function validDate($DateString)
+{
     $DateTime = explode(" ", $DateString);
     if (count($DateTime) != 2)
         return false;
@@ -219,12 +232,12 @@ function validDate($DateString) {
     if (count($SplitDate) != 3)
         return false;
     list($Y, $M, $D) = $SplitDate;
+
     return checkDate($M, $D, $Y);
 }
 
-
-function time_span($TimeStamp, $Levels=2, $Lowercase=false) {
-
+function time_span($TimeStamp, $Levels=2, $Lowercase=false)
+{
     if (!is_number($TimeStamp)) { // Assume that $TimeStamp is SQL timestamp
         if ($TimeStamp == '0000-00-00 00:00:00') {
             return 'None';
@@ -258,7 +271,6 @@ function time_span($TimeStamp, $Levels=2, $Lowercase=false) {
     $Seconds = $Remain;
 
     $TimeAgo = '';
-
 
     if ($Weeks > 0 && $Levels > 0) {
         if ($TimeAgo != "") {
@@ -319,9 +331,11 @@ function time_span($TimeStamp, $Levels=2, $Lowercase=false) {
     return $TimeAgo;
 }
 
-function hoursdays($TotalHours) {
+function hoursdays($TotalHours)
+{
     $Days = (int) floor($TotalHours / 24);
     $Days = ($Days > 0) ? "$Days days" : '';
     $Hours = modulos($TotalHours, 24.0);
+
     return "$Days $Hours hrs";
 }

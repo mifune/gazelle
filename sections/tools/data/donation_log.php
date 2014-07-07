@@ -1,32 +1,32 @@
 <?php
-if(!check_perms('admin_donor_log')) { error(403); }
+if (!check_perms('admin_donor_log')) { error(403); }
 
 include(SERVER_ROOT.'/sections/donate/functions.php');
 define('DONATIONS_PER_PAGE', 50);
 
 // generate a graph of monthly donations (last 18 months)
 if ( !isset($_GET['page']) && !$DonationTimeline = $Cache->get_value('donation_timeline')) {
-	include(SERVER_ROOT.'/classes/class_charts.php');
+    include(SERVER_ROOT.'/classes/class_charts.php');
 
     $DB->query("SELECT DATE_FORMAT(received,'%b \'%y') AS Month, SUM(amount_euro)
                        FROM bitcoin_donations WHERE state!='unused'
                        GROUP BY Month ORDER BY received DESC LIMIT 18");
 
-	$Timeline = $DB->to_array(false,MYSQLI_NUM);
-	//$Timeline[] = array('', '0');
-	$Timeline = array_reverse($Timeline);
+    $Timeline = $DB->to_array(false,MYSQLI_NUM);
+    //$Timeline[] = array('', '0');
+    $Timeline = array_reverse($Timeline);
     $Area = new AREA_GRAPH(880,160); // ,array('Break'=>1)
-	foreach($Timeline as $Entry) {
-		list($Label,$Amount) = $Entry;
-		$Area->add($Label,$Amount);
-	}
-	$Area->transparent();
-	$Area->grid_lines();
-	$Area->color('3d7930');
-	$Area->lines(2);
-	$Area->generate();
-	$DonationTimeline = $Area->url();
-	$Cache->cache_value('donation_timeline',$DonationTimeline,mktime(0,0,0,date('n')+1,2));
+    foreach ($Timeline as $Entry) {
+        list($Label,$Amount) = $Entry;
+        $Area->add($Label,$Amount);
+    }
+    $Area->transparent();
+    $Area->grid_lines();
+    $Area->color('3d7930');
+    $Area->lines(2);
+    $Area->generate();
+    $DonationTimeline = $Area->url();
+    $Cache->cache_value('donation_timeline',$DonationTimeline,mktime(0,0,0,date('n')+1,2));
 }
 
 $view = $_GET['view'];
@@ -92,14 +92,14 @@ show_header('Donation log','bitcoin');
 
     <h2><?=  ucfirst($view); // ($unused?'Issued Addresses':'Submitted Donations')?> Donations</h2>
 
-	<div class="linkbox">
+    <div class="linkbox">
         <?php  if (check_perms('admin_donor_addresses')) { ?>
-		<a href="tools.php?action=btc_address_input">[Unused address pool]</a>
+        <a href="tools.php?action=btc_address_input">[Unused address pool]</a>
         <?php  } ?>
-		<a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
-		<a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
-		<a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
-	</div>
+        <a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
+        <a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
+        <a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
+    </div>
     <br/>
 
     <?php
@@ -115,7 +115,7 @@ show_header('Donation log','bitcoin');
     <div class="head"></div>
     <div class="box pad">
         <?php
-        if ($eur_rate=='0'){   ?>
+        if ($eur_rate=='0') {   ?>
             <span class="red">The site was unable to get an exchange rate</span> - hopefully this is a temporary issue with the coindesk webservice,
                 if it persists we will have to find another way to get/set the exchange rate!
     <?php   } else { ?>
@@ -129,7 +129,7 @@ show_header('Donation log','bitcoin');
                 <tr>
                     <td colspan="2"></td>
                     <td colspan="<?=($unused?'4':'6')?>" style="text-align:right;">
-    <?php                   if ($numthispage>0){      ?>
+    <?php                   if ($numthispage>0) {      ?>
                             <span title="query all btc balances on this page (dont hammer the webservice too much though)">
                             <a style="cursor: pointer;" onclick="CheckAddressLoadNext('1','<?=$eur_rate?>','6','<?=$numthispage?>','<?=($unused?'0':'1')?>');"><img src="<?= STATIC_SERVER ?>common/symbols/reload1.gif" alt="query" /></a> &nbsp;
                             <a style="cursor: pointer;" onclick="CheckAddressLoadNext('1','<?=$eur_rate?>','6','<?=$numthispage?>','<?=($unused?'0':'1')?>');">query all btc balances</a>
@@ -142,20 +142,20 @@ show_header('Donation log','bitcoin');
                     <td>address</td>
     <?php
                     $admin_addresses = check_perms('admin_donor_addresses');
-                    if ($admin_addresses){      ?>
+                    if ($admin_addresses) {      ?>
                         <td>issued by</td>
     <?php               }                   ?>
                     <td><?=$timeheader?></td>
                     <td>btc <?=($unused?'balance':'(submitted)')?></td>
                     <td>&euro; <?=($unused?' (estimated)':' (submitted)')?></td>
-    <?php               if (!$unused){      ?>
+    <?php               if (!$unused) {      ?>
                         <td>btc (now)</td>
                         <td>&euro; (now)</td>
     <?php               }                   ?>
                 </tr>
     <?php
             $i=0;
-            foreach($Donations as $Donation) {
+            foreach ($Donations as $Donation) {
                 list($ID, $state, $public, $activetime, $UserID, $bitcoin_rate, $received, $amount_bitcoin, $amount_euro, $comment,
                         $staffID, $staffname, $Username, $PermissionID, $Enabled, $Donor, $Warned) = $Donation;
                 $i++;
@@ -170,12 +170,12 @@ show_header('Donation log','bitcoin');
                     <td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?>
                             <a style="font-style: italic;font-size:0.8em;" href="donate.php?action=my_donations&userid=<?=$UserID?>" target="_blank" title="view users my donations page">[view log]</a></td>
                     <td><span class="address" id="address_<?=$i?>" <?=$add_title?>><?=$public?></span></td>
-    <?php               if ($admin_addresses){      ?>
+    <?php               if ($admin_addresses) {      ?>
                         <td><?=$staffname?></td>
     <?php               }                   ?>
                     <td><?=$time?></td>
 
-    <?php                   if (!$unused){       ?>
+    <?php                   if (!$unused) {       ?>
                             <td><?=$amount_bitcoin?></td>
                             <td><?=$amount_euro?></td>
     <?php                   }                   ?>

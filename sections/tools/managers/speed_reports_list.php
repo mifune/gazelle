@@ -1,7 +1,7 @@
 <?php
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
 
-if(!check_perms('users_manage_cheats')) { error(403); }
+if (!check_perms('users_manage_cheats')) { error(403); }
 
 $Action = 'speed_records';
 
@@ -23,7 +23,7 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
 $DB->query("SELECT DeleteRecordsMins, KeepSpeed FROM site_options ");
 list($DeleteRecordsMins, $KeepSpeed) = $DB->next_record();
 
-$ViewSpeed = isset($_GET['viewspeed'])?(int)$_GET['viewspeed']:$KeepSpeed;
+$ViewSpeed = isset($_GET['viewspeed'])?(int) $_GET['viewspeed']:$KeepSpeed;
 
 show_header('Speed Reports','watchlist');
 
@@ -32,13 +32,13 @@ show_header('Speed Reports','watchlist');
 ?>
 <div class="thin">
     <h2>Speed Reports</h2>
-	<div class="linkbox">
-		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
-		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
-		<a href="tools.php?action=speed_records">[Speed Records]</a>
-		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
-		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tools.php?action=speed_watchlist">[Watch-list]</a>
+        <a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
+        <a href="tools.php?action=speed_records">[Speed Records]</a>
+        <a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+        <a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
+    </div>
     <?php
 
     //---------- torrrent watch
@@ -70,7 +70,7 @@ show_header('Speed Reports','watchlist');
         </tr>
 <?php
         $row = 'a';
-        if(count($TWatchlist)==0){
+        if (count($TWatchlist)==0) {
 ?>
             <tr class="rowb">
                 <td class="center" colspan="6">no torrents on watch list</td>
@@ -110,18 +110,18 @@ show_header('Speed Reports','watchlist');
     //---------- options
 
     if (is_number($_GET['userid']) && $_GET['userid']>0) {
-        $_GET['userid'] = (int)$_GET['userid'];
+        $_GET['userid'] = (int) $_GET['userid'];
         $WHERE = " AND xbt.uid='$_GET[userid]' ";
         $ViewInfo = "User ($_GET[userid]) ". $Watchlist[$_GET['userid']]['Username'] .' &nbsp;&nbsp; ';
     } elseif (is_number($_GET['torrentid']) && $_GET['torrentid']>0) {
-        $_GET['torrentid'] = (int)$_GET['torrentid'];
+        $_GET['torrentid'] = (int) $_GET['torrentid'];
         $WHERE = " AND xbt.fid='$_GET[torrentid]' ";
         $ViewInfo = "Torrent ($_GET[torrentid]) &nbsp;&nbsp; ". $TWatchlist[$_GET['torrentid']]['Name'] .' &nbsp;&nbsp; ';
     } else {
         //$ViewInfo = 'all over speed specified';
         $ViewInfo = ">= ".get_size($ViewSpeed);
     }
-    if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+    if (isset($_GET['viewbanned']) && $_GET['viewbanned']) {
         $ViewInfo .= ' (all)';
     } else {
         $WHERE .= " AND um.Enabled='1'";
@@ -141,14 +141,14 @@ show_header('Speed Reports','watchlist');
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
                 <td class="center">
                             <label for="delrecordmins">Delete unwatched records after </label>
-<?php  if($CanManage) { ?>
+<?php  if ($CanManage) { ?>
                             <select id="delrecordmins" name="delrecordmins" title="Delete unwatched records after this time">
                                 <option value="0"<?=($DeleteRecordsMins==0?' selected="selected"':'');?>>&nbsp;asap&nbsp;&nbsp;</option>
-<?php                               for($i=1;$i<5;$i++){
+<?php                               for ($i=1;$i<5;$i++) {
                                     $mins = $i * 15;  ?>
                                     <option value="<?=$mins?>" <?=($DeleteRecordsMins==$mins?' selected="selected"':'');?>>&nbsp;<?=time_span($mins*60);?>&nbsp;&nbsp;</option>
 <?php                               }
-                                for($i=1;$i<25;$i++){
+                                for ($i=1;$i<25;$i++) {
                                     $mins = $i * 120;  ?>
                                     <option value="<?=$mins?>" <?=($DeleteRecordsMins==$mins?' selected="selected"':'');?>>&nbsp;<?=time_span($mins*60);?>&nbsp;&nbsp;</option>
 <?php                               }  ?>
@@ -159,10 +159,10 @@ show_header('Speed Reports','watchlist');
                 </td>
                 <td  class="center">
                             <label for="keepspeed" title="Keep Speed">Keep unwatched records with upload speed over </label>
-<?php  if($CanManage) { ?>
+<?php  if ($CanManage) { ?>
                             <select id="keepspeed" name="keepspeed" title="Keep unwatched records over this speed">
                                 <option value="524288"<?=($KeepSpeed==524288?' selected="selected"':'');?>>&nbsp;<?=get_size(524288);?>/s&nbsp;&nbsp;</option>
-<?php                               for($i=1;$i<21;$i++){
+<?php                               for ($i=1;$i<21;$i++) {
                                     $speed = $i * 1048576;  ?>
                                     <option value="<?=$speed?>" <?=($KeepSpeed==$speed?' selected="selected"':'');?>>&nbsp;<?=get_size($speed);?>/s&nbsp;&nbsp;</option>
 <?php                               } ?>
@@ -171,7 +171,7 @@ show_header('Speed Reports','watchlist');
                             <input type="text" name="keepspeed" style="width:130px;color:black;" disabled="disabled" value="<?=get_size($KeepSpeed);?>/s" title="Keep unwatched records over this speed" />
 <?php  }  ?>
                 </td>
-<?php  if($CanManage){ ?>
+<?php  if ($CanManage) { ?>
                 <td  class="center">
                     <input type="submit" value="Save Changes" />
                 </td>
@@ -196,7 +196,7 @@ show_header('Speed Reports','watchlist');
                         <option value="0"<?=($ViewSpeed==0?' selected="selected"':'');?>>&nbsp;0&nbsp;&nbsp;</option>
                         <option value="262144"<?=($ViewSpeed==262144?' selected="selected"':'');?>>&nbsp;<?=get_size(262144);?>/s&nbsp;&nbsp;</option>
                         <option value="524288"<?=($ViewSpeed==524288?' selected="selected"':'');?>>&nbsp;<?=get_size(524288);?>/s&nbsp;&nbsp;</option>
-<?php                       for($i=1;$i<21;$i++){
+<?php                       for ($i=1;$i<21;$i++) {
                             $speed = $i * 1048576;  ?>
                             <option value="<?=$speed?>" <?=($ViewSpeed==$speed?' selected="selected"':'');?>>&nbsp;<?=get_size($speed);?>/s&nbsp;&nbsp;</option>
 <?php                       } ?>
@@ -204,7 +204,7 @@ show_header('Speed Reports','watchlist');
                 </td>
             </tr>
         </form>
-<?php  if($CanManage){   ?>
+<?php  if ($CanManage) {   ?>
     <form action="tools.php" method="post">
         <input type="hidden" name="action" value="test_delete_schedule" />
         <input type="hidden" name="viewspeed" value="<?=$ViewSpeed?>" />
@@ -222,9 +222,9 @@ show_header('Speed Reports','watchlist');
 //---------- print records
 
 if (isset($_GET['matchspeed']) && is_number($_GET['matchspeed']))
-    $WHERESTART = "upspeed='".(int)$_GET['matchspeed']."'";
+    $WHERESTART = "upspeed='".(int) $_GET['matchspeed']."'";
 elseif (isset($_GET['matchuploaded']) && is_number($_GET['matchuploaded']))
-    $WHERESTART = "xbt.uploaded='".(int)$_GET['matchuploaded']."'";
+    $WHERESTART = "xbt.uploaded='".(int) $_GET['matchuploaded']."'";
 else
     $WHERESTART = "upspeed>='$ViewSpeed'";
 
@@ -256,7 +256,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
 
 ?>
 
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 
     <div class="head"><?=" $NumResults / $TotalResults"?> records</div>
         <table>
@@ -287,7 +287,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
         <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 <?php
             $row = 'a';
-            if($NumResults==0){
+            if ($NumResults==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="12">no speed records</td>
@@ -316,7 +316,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
 ?>                          </div>
                               <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from watchlist"><img src="static/common/symbols/trash.png" alt="del records" /></a>
 <?php
-                            if ($Enabled=='1'){ ?>
+                            if ($Enabled=='1') { ?>
                                 <a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat"><img src="static/common/symbols/ban.png" alt="ban" /></a>
 <?php                           }  ?>
                         </td>
@@ -361,7 +361,7 @@ $Pages=get_pages($Page,$NumResults,25,9);
             </tr>
     </form>
         </table>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 </div>
 <?php
 show_footer();

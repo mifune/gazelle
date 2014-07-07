@@ -3,7 +3,7 @@ error("dont press that!");
 
 set_time_limit(0);
 
-$start = isset($_REQUEST['start'])?(int)$_REQUEST['start']:0;
+$start = isset($_REQUEST['start'])?(int) $_REQUEST['start']:0;
 
 $range = 100000;
 
@@ -30,9 +30,9 @@ $Values= array();
 $startrange='';
 $endrange='';
 $lastcode='';
-while(list($startip, $endip, $code) = $DB->next_record()) {
+while (list($startip, $endip, $code) = $DB->next_record()) {
 
-    if ( $code != $lastcode ) {
+    if ($code != $lastcode) {
         if ($lastcode != '') {
             if (!$endrange)$endrange='0';
             $Values[] = "( '$startrange', '$endrange', '$lastcode' )";
@@ -47,7 +47,7 @@ while(list($startip, $endip, $code) = $DB->next_record()) {
     }
 }
 
-if ( $code == $lastcode ) {
+if ($code == $lastcode) {
     if ($lastcode != '') {
         if (!$endrange)$endrange='0';
         $Values[] = "( '$startrange', '$endrange', '$lastcode' )";

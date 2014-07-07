@@ -10,11 +10,11 @@ $UserID = (int) $_REQUEST['userid'];
 $amount = round($_REQUEST['amount'], 2);
 
 $public = '';
-for($i==0;$i<10;$i++){
+for ($i==0;$i<10;$i++) {
     $try = 'DO_NOT_USE_'. make_secret(30);
     // strictly speaking we should check this 50 char random string is unique...
     $DB->query("SELECT ID FROM bitcoin_donations WHERE public='$try'");
-    if($DB->record_count()<1){
+    if ($DB->record_count()<1) {
         $public = $try;
         break;
     }
@@ -32,7 +32,7 @@ if ($_REQUEST['donategb']) {
 } else {
     $comment .= "love";
 
-    $DB->query("SELECT ID, Title, Badge, Rank, Image, Description FROM badges WHERE Type='Donor' AND Cost<='" . (int)round($amount) . "' ORDER BY Cost DESC LIMIT 1");
+    $DB->query("SELECT ID, Title, Badge, Rank, Image, Description FROM badges WHERE Type='Donor' AND Cost<='" . (int) round($amount) . "' ORDER BY Cost DESC LIMIT 1");
     if ($DB->record_count() > 0) {
         list($badgeid, $title, $badge, $rank, $image, $description) = $DB->next_record();
         $comment .= " (received badge: $title)";
@@ -100,10 +100,10 @@ if ($_REQUEST['donategb']) {
                              WHERE UserID='$UserID'");
 }
 
-if (isset($_REQUEST['convid']) && is_number($_REQUEST['convid'])){
-	$ConvID = (int)$_REQUEST['convid'];
+if (isset($_REQUEST['convid']) && is_number($_REQUEST['convid'])) {
+    $ConvID = (int) $_REQUEST['convid'];
     $DB->query("UPDATE staff_pm_conversations SET Status='Resolved', ResolverID='$LoggedUser[ID]' WHERE ID=$ConvID");
-	$Cache->delete_value('staff_pm_new_'.$LoggedUser['ID']);
+    $Cache->delete_value('staff_pm_new_'.$LoggedUser['ID']);
 }
 
 $Cache->delete_value('user_info_' . $UserID);

@@ -9,10 +9,10 @@ show_header('Official Tags Manager','tagmanager');
 ?>
 <div class="thin">
     <h2>Tags Manager</h2>
-	<div class="linkbox">
-		<a style="font-weight: bold" href="tools.php?action=official_tags">[Tags Manager]</a>
-		<a href="tools.php?action=official_synonyms">[Synonyms Manager]</a>
-	</div>
+    <div class="linkbox">
+        <a style="font-weight: bold" href="tools.php?action=official_tags">[Tags Manager]</a>
+        <a href="tools.php?action=official_synonyms">[Synonyms Manager]</a>
+    </div>
 <?php
     if (isset($_GET['rst']) && is_number($_GET['rst'])) {
         $Result = (int) $_GET['rst'];

@@ -1,15 +1,17 @@
 <?php
 error_reporting(E_ALL);
 
-require('classes/config.php');
+require 'classes/config.php';
 
-function make_secret2($Length = 32) {
+function make_secret2($Length = 32)
+{
     $Secret = '';
     $Chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     for ($i = 0; $i < $Length; $i++) {
         $Rand = mt_rand(0, strlen($Chars) - 1);
         $Secret .= substr($Chars, $Rand, 1);
     }
+
     return str_shuffle($Secret);
 }
 
@@ -49,7 +51,7 @@ while (($row = mysqli_fetch_assoc($result))) {
     $count++;
     if ($count % 100 == 0) {
         $sql = "INSERT INTO users_main
-                    (id, torrent_pass) 
+                    (id, torrent_pass)
                 VALUES " . implode(',', $passkey_rows) .
                 " ON DUPLICATE KEY UPDATE torrent_pass=VALUES(torrent_pass)";
         $passkey_rows = array();
@@ -63,7 +65,7 @@ echo "\n";
 // Flush the last ones if any..
 if (count($passkey_rows) > 0) {
     $sql = "INSERT INTO users_main
-                (id, torrent_pass) 
+                (id, torrent_pass)
             VALUES " . implode(',', $passkey_rows) .
             " ON DUPLICATE KEY UPDATE torrent_pass=VALUES(torrent_pass)";
     mysqli_query($link, $sql) or die(mysqli_error($link) . "\n");

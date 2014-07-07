@@ -2,7 +2,6 @@
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
-
 if ($_REQUEST['action']=='forward') { // forwarding a msg
 
     $Header = "Forward";
@@ -12,7 +11,7 @@ if ($_REQUEST['action']=='forward') { // forwarding a msg
     } else {
         $ToUsername = $_POST['receivername'];
         $DB->query("SELECT ID FROM users_main WHERE Username='".db_string($ToUsername)."'");
-        if ($DB->record_count()==0){
+        if ($DB->record_count()==0) {
             error("Could not find user '$ToUsername' to forward to");
         }
         list($ToID) = $DB->next_record();
@@ -20,7 +19,7 @@ if ($_REQUEST['action']=='forward') { // forwarding a msg
 
     if ($_POST['forwardmessage']=='conversation') {
         $MsgType = 'conversation';
-        $ConvID = (int)$_POST['convid'];
+        $ConvID = (int) $_POST['convid'];
         $DB->query("SELECT pm.Subject, IFNULL(um.Username,'system'), m.Body
                 FROM pm_messages as m
                 JOIN pm_conversations AS pm ON pm.ID=m.ConvID
@@ -30,7 +29,7 @@ if ($_REQUEST['action']=='forward') { // forwarding a msg
         $FwdBody = "conv#$ConvID";
 
     } else {
-        $msgID = (int)$_POST['forwardmessage'];
+        $msgID = (int) $_POST['forwardmessage'];
         $MsgType = 'message';
         $DB->query("SELECT pm.Subject, IFNULL(um.Username,'system'), m.Body
                 FROM pm_messages as m
@@ -43,8 +42,8 @@ if ($_REQUEST['action']=='forward') { // forwarding a msg
         $msgID = " (msg#$msgID)";
     }
 
-    while(list($Sub, $Sendername, $Body) = $DB->next_record()) {
-        if(!$Subheader){
+    while (list($Sub, $Sendername, $Body) = $DB->next_record()) {
+        if (!$Subheader) {
             $Subheader = $Sub;
             $FwdBody = "[bg=#d3e3f3]FWD: $Subheader          [color=grey]{$FwdBody}[/color][/bg]\n";
         }
@@ -55,24 +54,24 @@ if ($_REQUEST['action']=='forward') { // forwarding a msg
 
 } else { // composing a new msg
     $Header = "Send";
-	$ToID = $_GET['to'];
+    $ToID = $_GET['to'];
     $MsgType = 'message';
 }
 
-if(!$ToID || !is_number($ToID)) { error(404); }
+if (!$ToID || !is_number($ToID)) { error(404); }
 
-if(!empty($LoggedUser['DisablePM']) && !isset($StaffIDs[$ToID])) {
-	error("Your PM rights have been disabled.");
+if (!empty($LoggedUser['DisablePM']) && !isset($StaffIDs[$ToID])) {
+    error("Your PM rights have been disabled.");
 }
 
-if($ToID == $LoggedUser['ID']) {
-		error("You cannot start a conversation with yourself!");
+if ($ToID == $LoggedUser['ID']) {
+        error("You cannot start a conversation with yourself!");
 }
 
 if (!$ToUsername) {
     $DB->query("SELECT Username FROM users_main WHERE ID='$ToID'");
     list($ToUsername) = $DB->next_record();
-    if(!$ToUsername) { error(404); }
+    if (!$ToUsername) { error(404); }
 }
 
 show_header('Compose', 'inbox,bbcode');
@@ -94,7 +93,7 @@ show_header('Compose', 'inbox,bbcode');
         <?php
     }
 
-    if(isset($StaffIDs[$ToID])){
+    if (isset($StaffIDs[$ToID])) {
 ?>
         <div class="box pad shadow">
             You are sending a PM to a member of staff. IF this is regarding a staffing issue
@@ -122,10 +121,10 @@ show_header('Compose', 'inbox,bbcode');
                         <textarea id="body" name="body" class="long" rows="10"><?=(!empty($Body) ? $Body : '')?></textarea>
             </div>
         </div>
-		<div class="center">
-			 <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" />
-			 <input type="submit" value="Send <?php  if($FwdBody) echo 'forwarded ';?>message" />
-		</div>
+        <div class="center">
+             <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" />
+             <input type="submit" value="Send <?php  if($FwdBody) echo 'forwarded ';?>message" />
+        </div>
     </form>
 </div>
 

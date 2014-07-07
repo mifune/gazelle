@@ -1,6 +1,7 @@
 <?php
 // The "order by x" links on columns headers
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $Action, $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -15,7 +16,8 @@ function header_link($SortKey, $DefaultWay = "desc") {
     return "tools.php?action=$Action&amp;order_way=$NewWay&amp;order_by=$SortKey&amp;" . get_url(array('action', 'order_way', 'order_by'));
 }
 
-function format_torrentid($torrentID, $name, $maxlen = 20) {
+function format_torrentid($torrentID, $name, $maxlen = 20)
+{
     if ($torrentID == 0) return 'None';
     if ($name == '') $tname = $torrentID;
     else $tname = $name;
@@ -23,24 +25,26 @@ function format_torrentid($torrentID, $name, $maxlen = 20) {
     if ($name == '') $str = "torrent not found [$str]";
     return $str;
 }
-function size_span($speed, $text) {
+function size_span($speed, $text)
+{
     return '<span style="color:'.($speed>0?'black':'lightgrey').'">'.$text.'</span>';
 }
-function speed_span($speed, $highlightlimit, $color, $text) {
+function speed_span($speed, $highlightlimit, $color, $text)
+{
     if ($speed>=$highlightlimit) $scolor = $color;
     elseif ($speed>0) $scolor = 'black';
     else $scolor = 'lightgrey';
     return '<span style="color:'.$scolor.'">'.$text.'</span>';
 }
 
-
-function print_speed_option($speed, $selected_speed){
+function print_speed_option($speed, $selected_speed)
+{
 ?>
     <option value="<?=$speed?>" <?=($selected_speed==$speed?' selected="selected"':'');?>>&nbsp;<?=get_size($speed);?>/s&nbsp;&nbsp;</option>
 <?php }
 
-function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
-
+function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help)
+{
 ?>
         <div class="head"><?=$Title?> &nbsp;<img src="static/common/symbols/<?=$TitleIcon?>.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#<?=$ListType?>').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(hide)</a></span>&nbsp;</div>
         <table id="<?=$ListType?>" class="">
@@ -59,7 +63,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
                 <td class="center" width="120px"></td>
             </tr>
 <?php             $row = 'a';
-            if(count($Userlist)==0){
+            if (count($Userlist)==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="7">no users on <?=$Title?></td>
@@ -74,9 +78,9 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
                     <tr class="row<?=$row?>">
                             <td class="center">
                                 <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
-<?                          if ($ListType=='watchlist' && $Enabled=='1'){ ?>
+<?php                          if ($ListType=='watchlist' && $Enabled=='1') { ?>
                                 &nbsp;<a href="tools.php?action=ban_speed_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat cheat (speeding)"><img src="static/common/symbols/ban.png" alt="ban" /></a>
-<?                          }  ?>
+<?php                          }  ?>
                             </td>
                             <td class="center"><?=format_username($UserID, $Username, $IsDonor, $Warned, $Enabled, $ClassID, false, false)?></td>
                             <td class="center"><?=time_diff($Time, 2, true, false, 1)?></td>
@@ -88,14 +92,14 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
                             <td class="center">
                               <a onclick="remove_records('<?=$UserID?>');return false;" href="#" title="Remove all speed records belonging to <?=$Username?> from stored records"><img src="static/common/symbols/trash.png" alt="del records" /></a>
                               &nbsp;&nbsp;
-<?                          if ($ListType=='watchlist') {  ?>
+<?php                          if ($ListType=='watchlist') {  ?>
                               <input type="button" onclick="watchlist_remove('<?=$UserID?>',true);return false;" value="Remove" title="Remove user from watchlist" />
-<?                          } else {?>
+<?php                          } else {?>
                               <input type="button" onclick="excludelist_remove('<?=$UserID?>',true);return false;" value="Remove" title="Remove user from exclude list" />
-<?                          } ?>
+<?php                          } ?>
                             </td>
                     </tr>
-<?              }
+<?php              }
             }
 ?>
     </table>

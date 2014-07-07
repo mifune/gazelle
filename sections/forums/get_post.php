@@ -12,28 +12,28 @@ $_GET['post'], which is the ID of the post.
 \*********************************************************************/
 
 // Quick SQL injection check
-if(!$_GET['post'] || !is_number($_GET['post'])){
-	error(0);
+if (!$_GET['post'] || !is_number($_GET['post'])) {
+    error(0);
 }
 
 // Variables for database input
-$PostID = (int)$_GET['post'];
+$PostID = (int) $_GET['post'];
 
 // Mainly
 $DB->query("SELECT
-		p.Body, t.ForumID
-		FROM forums_posts as p JOIN forums_topics as t on p.TopicID = t.ID
-		WHERE p.ID='$PostID'");
+        p.Body, t.ForumID
+        FROM forums_posts as p JOIN forums_topics as t on p.TopicID = t.ID
+        WHERE p.ID='$PostID'");
 list($Body, $ForumID) = $DB->next_record(MYSQLI_NUM);
 
 // Is the user allowed to view the post?
-if(!check_forumperm($ForumID)) {
-	error(0);
+if (!check_forumperm($ForumID)) {
+    error(0);
 }
 
 // This gets sent to the browser, which echoes it wherever
 
-if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
+if (isset($_REQUEST['body']) && $_REQUEST['body']==1) {
     echo trim($Body);
 } else {
     include(SERVER_ROOT.'/classes/class_text.php');

@@ -1,11 +1,11 @@
 <?php
-if(!check_perms('admin_reports')) {
-	error(403);
+if (!check_perms('admin_reports')) {
+    error(403);
 }
 
 $IDs = explode(',', $_GET['id']);
-foreach($IDs as $ID){
-    if(!is_number($ID)) {
+foreach ($IDs as $ID) {
+    if (!is_number($ID)) {
         error(0);
     }
 }

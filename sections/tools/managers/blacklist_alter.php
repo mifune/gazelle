@@ -31,9 +31,9 @@ if ($_POST['submit'] == 'Delete') {
             $DB->query("SELECT peer_id FROM xbt_client_blacklist WHERE id = " . $_POST['id']);
             list($OldPeerID) = $DB->next_record();
             $DB->query("UPDATE xbt_client_blacklist SET
-				vstring='" . $Client . "',
-				peer_id='" . $PeerID . "'
-				WHERE ID=" . $_POST['id']);
+                vstring='" . $Client . "',
+                peer_id='" . $PeerID . "'
+                WHERE ID=" . $_POST['id']);
             update_tracker('edit_blacklist', array('old_peer_id' => $OldPeerID, 'new_peer_id' => $PeerID));
         }
     } else { //Create

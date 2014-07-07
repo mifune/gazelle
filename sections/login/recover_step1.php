@@ -1,6 +1,6 @@
 <?php
 show_header('Recover Password','validate');
-if(empty($_POST['submit']) || empty($_POST['username'])) {
+if (empty($_POST['submit']) || empty($_POST['username'])) {
 
         echo $Validate->GenerateJS('recoverform');
         ?>
@@ -8,8 +8,8 @@ if(empty($_POST['submit']) || empty($_POST['username'])) {
               <div style="width:320px;">
                     <font class="titletext">Reset your password - Step 1</font><br /><br />
         <?php
-        if(empty($Sent) || (!empty($Sent) && $Sent!=1)) {
-              if(!empty($Err)) {
+        if (empty($Sent) || (!empty($Sent) && $Sent!=1)) {
+              if (!empty($Err)) {
         ?>
                     <font color="red"><strong><?=$Err ?></strong></font><br /><br />
         <?php 	} ?>
@@ -43,8 +43,8 @@ if(empty($_POST['submit']) || empty($_POST['username'])) {
 
         $nick = $_POST['username'];
         $nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
-        if(strlen($nick) == 0) {
-		$nick = "EmpGuest?";
+        if (strlen($nick) == 0) {
+        $nick = "EmpGuest?";
         }
         $nick = "nologin_$nick";
 

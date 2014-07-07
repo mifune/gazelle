@@ -23,13 +23,13 @@ show_header('Exclude list','watchlist');
 <div class="thin">
     <h2>Exclude list</h2>
 
-	<div class="linkbox">
-		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
-		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
-		<a href="tools.php?action=speed_records">[Speed Records]</a>
-		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
-		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tools.php?action=speed_watchlist">[Watch-list]</a>
+        <a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
+        <a href="tools.php?action=speed_records">[Speed Records]</a>
+        <a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+        <a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
+    </div>
 <?php
     list($Page,$Limit) = page_limit(50);
 
@@ -50,14 +50,14 @@ show_header('Exclude list','watchlist');
     $Pages=get_pages($Page,$NumResults,50,9);
 
 ?>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 <?php
 
     print_user_list($Userlist,'excludelist',"Exclude users list ($NumResults users)",'watchedgreen',
             'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
 
 ?>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 
 </div>
 <?php

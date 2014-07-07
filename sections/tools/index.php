@@ -11,7 +11,7 @@
 
 if (isset($argv[1])) {
     if ($argv[1] == "cli_sandbox") {
-        include("misc/cli_sandbox.php");
+        include 'misc/cli_sandbox.php';
         die();
     }
 
@@ -59,7 +59,6 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/services/get_cc.php');
         break;
 
-
     //Managers
     case 'site_options':
         include(SERVER_ROOT . '/sections/tools/managers/site_options.php');
@@ -95,29 +94,29 @@ switch ($_REQUEST['action']) {
     case 'change_logging':
         if (!check_perms('admin_manage_site_options')) error(403);
 
-        if($_POST['submit']=="Change logging status"){
+        if ($_POST['submit']=="Change logging status") {
 
-            $logging_status = (int)$_POST['logging'];
+            $logging_status = (int) $_POST['logging'];
             if ($logging_status< 0 || $logging_status > 3) $logging_status =0;
 
             $DB->query("UPDATE site_options SET FullLogging='$logging_status'");
 
-        } elseif($_POST['submit']=="Delete some"){
+        } elseif ($_POST['submit']=="Delete some") {
 
             $WHERE = array();
             if ($_POST['id_under']) {
-                $under = (int)$_POST['under'];
+                $under = (int) $_POST['under'];
                 $WHERE[] = "id < '$under'";
             }
             if ($_POST['id_over']) {
-                $over = (int)$_POST['over'];
+                $over = (int) $_POST['over'];
                 $WHERE[] = "id > '$over'";
             }
-            if (count($WHERE)>0){
+            if (count($WHERE)>0) {
                 $DB->query("DELETE FROM full_log WHERE " . implode(' OR ', $WHERE));
             }
 
-        } elseif($_POST['submit']=="Delete all"){
+        } elseif ($_POST['submit']=="Delete all") {
 
             $DB->query("TRUNCATE TABLE full_log");
         }
@@ -129,17 +128,12 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/data/page_log.php');
         break;
 
-
-
     case 'languages':
         include(SERVER_ROOT . '/sections/tools/managers/languages_list.php');
         break;
     case 'languages_alter':
         include(SERVER_ROOT . '/sections/tools/managers/languages_alter.php');
         break;
-
-
-
 
     case 'speed_watchlist':
         include(SERVER_ROOT . '/sections/tools/managers/speed_watchlist.php');
@@ -157,7 +151,6 @@ switch ($_REQUEST['action']) {
     case 'speed_zerocheats':
         include(SERVER_ROOT . '/sections/tools/managers/speed_zerocheats.php');
         break;
-
 
     case 'ban_zero_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
@@ -193,7 +186,6 @@ switch ($_REQUEST['action']) {
     case 'ban_speed_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
 
-
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
 
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
@@ -211,9 +203,9 @@ switch ($_REQUEST['action']) {
                          WHERE um.Enabled='1' AND nc.UserID IS NULL AND xbt.upspeed >='$_POST[banspeed]' ");
 
             list($UserIDs) = $DB->next_record();
-            if ($UserIDs ) {
+            if ($UserIDs) {
                 $UserIDs = explode('|', $UserIDs);
-                if( count($UserIDs)>0 ) {
+                if ( count($UserIDs)>0 ) {
                     //error(print_r($UserIDs, true));
                     disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 4);
                 }
@@ -345,8 +337,6 @@ switch ($_REQUEST['action']) {
         header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
         break;
 
-
-
     case 'forum':
         include(SERVER_ROOT . '/sections/tools/managers/forum_list.php');
         break;
@@ -390,7 +380,6 @@ switch ($_REQUEST['action']) {
     case 'iw_alter':
         include(SERVER_ROOT . '/sections/tools/managers/imagehost_alter.php');
         break;
-
 
     case 'shop_list':
         include(SERVER_ROOT . '/sections/tools/managers/shop_list.php');
@@ -499,7 +488,7 @@ switch ($_REQUEST['action']) {
                     VALUES ('" . (int) $_POST['category'] . "', '" . (int) $_POST['subcat'] . "', '" . db_string($TopicID) . "', '" . db_string($_POST['title']) . "', '" . db_string($_POST['description']) . "', '" . db_string($_POST['body']) . "', '" . sqltime() . "','" . db_string($_POST['level']) . "')");
         $NewID = $DB->inserted_id();
         $Cache->delete_value("articles_$_POST[category]");
-        $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);
+        $Cache->delete_value("articles_sub_".(int) $_POST['category']."_".(int) $_POST['subcat']);
         //header("Location: tools.php?action=editarticle&amp;id=$NewID");
         header('Location: tools.php?action=articles');
         break;
@@ -566,7 +555,7 @@ switch ($_REQUEST['action']) {
         enforce_login();
         authorize();
 
-        include('managers/mfd_functions.php');
+        include 'managers/mfd_functions.php';
 
         if (!check_perms('torrents_review'))
             error(403);
@@ -588,8 +577,6 @@ switch ($_REQUEST['action']) {
         }
         include(SERVER_ROOT . '/sections/tools/managers/mfd_manager.php');
         break;
-
-
 
     case 'permissions':
         if (!check_perms('admin_manage_permissions')) {
@@ -616,7 +603,6 @@ switch ($_REQUEST['action']) {
             } else {
                 $IsUserClass = isset($_REQUEST['isclass']) && $_REQUEST['isclass'] == 1 ? '1' : '0';
             }
-
 
             if (!empty($_POST['submit'])) {
                 $Values = array();
@@ -658,7 +644,6 @@ switch ($_REQUEST['action']) {
                 if (!$Err)
                     $Err = $Val->ValidateForm($_POST);
 
-
                 foreach ($_REQUEST as $Key => $Perms) {
                     if (substr($Key, 0, 5) == "perm_") {
                         $Values[substr($Key, 5)] = (int) $Perms;
@@ -683,7 +668,7 @@ switch ($_REQUEST['action']) {
                 }
             }
 
-            include('managers/permissions_alter.php');
+            include 'managers/permissions_alter.php';
         } else {
             if (!empty($_REQUEST['removeid']) && is_numeric($_REQUEST['removeid'])) {
 
@@ -737,7 +722,6 @@ switch ($_REQUEST['action']) {
 
         $DB->query("DELETE FROM bitcoin_addresses WHERE ID IN ($AddressIDs)");
 
-
         header("Location: tools.php?action=btc_address_input");
         break;
 
@@ -756,7 +740,6 @@ switch ($_REQUEST['action']) {
         header("Location: tools.php?action=donation_drives");
         break;
 
-
     case 'edit_drive':
         include(SERVER_ROOT . '/sections/tools/data/edit_drive.php');
         break;
@@ -768,7 +751,6 @@ switch ($_REQUEST['action']) {
     case 'donation_drives':
         include(SERVER_ROOT . '/sections/tools/data/donation_drives.php');
         break;
-
 
     case 'upscale_pool':
         include(SERVER_ROOT . '/sections/tools/data/upscale_pool.php');
@@ -809,7 +791,6 @@ switch ($_REQUEST['action']) {
     case 'data_viewer':
         include(SERVER_ROOT . '/sections/tools/data/data_viewer.php');
         break;
-
 
     case 'browser_support':
         include(SERVER_ROOT . '/sections/tools/data/browser_support.php');

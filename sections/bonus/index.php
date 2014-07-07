@@ -1,18 +1,16 @@
 <?php
 include(SERVER_ROOT.'/sections/bonus/functions.php');
 
-if(!isset($_REQUEST['action'])) {
-	include(SERVER_ROOT.'/sections/bonus/bonus.php');
-}
-else
-{
-    switch ($_REQUEST['action']){
+if (!isset($_REQUEST['action'])) {
+    include(SERVER_ROOT.'/sections/bonus/bonus.php');
+} else {
+    switch ($_REQUEST['action']) {
         case 'slot_result':
             include(SERVER_ROOT.'/sections/bonus/ajax_slot_result.php');
             break;
         case 'ajax_slot_paytable':
             include(SERVER_ROOT.'/sections/bonus/slot_xxx_arrays.php');
-            $Bet=(int)$_REQUEST['bet'];
+            $Bet=(int) $_REQUEST['bet'];
             print_payout_table($Bet);
             break;
         case 'slot':

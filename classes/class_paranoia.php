@@ -28,7 +28,6 @@
 //   +
 // invitedcount: the number of users this user has directly invited
 
-
 define('PARANOIA_MSG','This users privacy (paranoia) settings mean you cannot view this page.');
 
 /**
@@ -41,49 +40,52 @@ define('PARANOIA_MSG','This users privacy (paranoia) settings mean you cannot vi
  * @param $UserID Optional. The user ID of the person being viewed
  * @return Boolean representing whether the current user can see through the paranoia setting
  */
-function check_paranoia($Property, $Paranoia, $UserClass, $UserID = false) {
-	global $LoggedUser, $Classes;
-	if(check_perms('users_override_paranoia', $UserClass)) {
-		return true;
-	}
-	if ($Property == false) {
-		return false;
-	}
-	if(!is_array($Paranoia)) {
-		$Paranoia = unserialize($Paranoia);
-	}
-	if(!is_array($Paranoia)) {
-		$Paranoia = array();
-	}
-	if(is_array($Property)) {
-		$all = true;
-		foreach ($Property as $P) { $all = $all && check_paranoia($P, $Paranoia, $UserClass, $UserID); }
-		return $all;
-	} else {
-		if(($UserID !== false) && ($LoggedUser['ID'] == $UserID)) {
-			return true;
-		}
+function check_paranoia($Property, $Paranoia, $UserClass, $UserID = false)
+{
+    global $LoggedUser, $Classes;
+    if (check_perms('users_override_paranoia', $UserClass)) {
+        return true;
+    }
+    if ($Property == false) {
+        return false;
+    }
+    if (!is_array($Paranoia)) {
+        $Paranoia = unserialize($Paranoia);
+    }
+    if (!is_array($Paranoia)) {
+        $Paranoia = array();
+    }
+    if (is_array($Property)) {
+        $all = true;
+        foreach ($Property as $P) { $all = $all && check_paranoia($P, $Paranoia, $UserClass, $UserID); }
 
-		$May = !in_array($Property, $Paranoia) && !in_array($Property . '+', $Paranoia);
-		switch ($Property) {
-			case 'downloaded':
-			case 'ratio':
-			case 'uploaded':
-			case 'lastseen':
-				$May = $May || check_perms('users_mod', $UserClass);
-				break;
-			case 'snatched': case 'snatched+':
-				$May = $May || check_perms('site_view_torrent_snatchlist', $UserClass);
-				break;
-			case 'uploads': case 'uploads+':
-			case 'leeching': case 'leeching+':
-			case 'seeding' : case 'seeding+':
-				$May = $May || check_perms('users_view_seedleech', $UserClass);
-				break;
-			case 'invitedcount':
-				$May = $May || check_perms('users_view_invites', $UserClass);
-				break;
-		}
-		return $May;
-	}
+        return $all;
+    } else {
+        if (($UserID !== false) && ($LoggedUser['ID'] == $UserID)) {
+            return true;
+        }
+
+        $May = !in_array($Property, $Paranoia) && !in_array($Property . '+', $Paranoia);
+        switch ($Property) {
+            case 'downloaded':
+            case 'ratio':
+            case 'uploaded':
+            case 'lastseen':
+                $May = $May || check_perms('users_mod', $UserClass);
+                break;
+            case 'snatched': case 'snatched+':
+                $May = $May || check_perms('site_view_torrent_snatchlist', $UserClass);
+                break;
+            case 'uploads': case 'uploads+':
+            case 'leeching': case 'leeching+':
+            case 'seeding' : case 'seeding+':
+                $May = $May || check_perms('users_view_seedleech', $UserClass);
+                break;
+            case 'invitedcount':
+                $May = $May || check_perms('users_view_invites', $UserClass);
+                break;
+        }
+
+        return $May;
+    }
 }

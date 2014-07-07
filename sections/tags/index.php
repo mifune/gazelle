@@ -1,7 +1,7 @@
 <?php
 enforce_login();
 
-switch ($_GET['action']){
+switch ($_GET['action']) {
 
     case 'autocomplete':
         // ajax call for autocomplete js class
@@ -11,7 +11,7 @@ switch ($_GET['action']){
     case 'synonyms':
 
         include(SERVER_ROOT.'/sections/tags/tag_synomyns.php');
-		break;
+        break;
 
     case 'tags':
     default:

@@ -37,14 +37,14 @@ show_header('Donate','bitcoin');
             <?php } else { ?>
                 <li>Our eternal love, as represented by the <img src="<?= STATIC_SERVER ?>common/symbols/donor.png" alt="Donor" /> you get next to your name.</li>
                 <li>A warm fuzzy feeling.</li>
-            <? }
+            <?php }
 
             $DB->query("SELECT Title, Description, Image, Cost FROM badges WHERE Type='Donor' ORDER BY Cost");
-            if($DB->record_count()>0) {
+            if ($DB->record_count()>0) {
                 ?>
                 <li>In order to recognise large contributers we have the following donor medals</li>
                 <?php
-                while( list($title, $desc, $image, $cost) = $DB->next_record()) {
+                while ( list($title, $desc, $image, $cost) = $DB->next_record()) {
                     ?>
                     <br/> &nbsp; &nbsp;<img style="vertical-align: middle;" src="<?= STATIC_SERVER ?>common/badges/<?=$image?>" alt="<?=$title?>" title="<?=$title?>" />  &nbsp; If you donate <span style="font-size: 1.3em;font-weight: bolder">&euro;<?=$cost?></span> you will get a <?=$title?>  <strong>(<?=number_format($cost/$eur_rate,3)?> bitcoins)</strong>
                     <br/>
@@ -64,7 +64,7 @@ show_header('Donate','bitcoin');
     <div class="box pad">
         <p><span style="font-size:1.1em;font-weight: bold;">What you will receive for your donation:</span></p>
         <ul>
-            <?
+            <?php
 
             foreach ($DonateLevels as $level=>$rate) {
                 ?>

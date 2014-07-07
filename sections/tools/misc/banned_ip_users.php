@@ -1,5 +1,5 @@
 <?php
-if(!check_perms('users_view_ips')) { error(403); }
+if (!check_perms('users_view_ips')) { error(403); }
 
 // The "order by x" links on columns headers
 
@@ -8,7 +8,8 @@ if(!check_perms('users_view_ips')) { error(403); }
  * @param $SortKey  'new_id', 'new_name', 'joindate', 'IP', 'b_id', 'b_name', 'bandate'
  * @param $DefaultWay 'desc' or 'asc'
  */
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -39,15 +40,15 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('new_id', 'ne
  * BanReason 0 - Unknown, 1 - Manual, 2 - Ratio, 3 - Inactive, 4 - Cheating.
  */
 $Reasons = array(0=>'Unknown',1=>'Manual',2=>'Ratio',3=>'Inactive',4=>'Cheating' );
-$BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int)$_GET['ban_reason'] : 4 ;
+$BanReason = (isset($_GET['ban_reason']) && is_number($_GET['ban_reason']) && $_GET['ban_reason'] < 5) ? (int) $_GET['ban_reason'] : 4 ;
 
-$Weeks =  (isset($_GET['weeks']) && is_number($_GET['weeks']) ) ? (int)$_GET['weeks'] : 1 ;
+$Weeks =  (isset($_GET['weeks']) && is_number($_GET['weeks']) ) ? (int) $_GET['weeks'] : 1 ;
 if ($Weeks > 104) $Weeks = 104;
 
 list($Page,$Limit) = page_limit(25);
 
 $CachedDupeResults = $Cache->get_value("dupeip_users_{$BanReason}_{$Weeks}_$OrderBy{$OrderWay}_$Page");
-if($CachedDupeResults===false) {
+if ($CachedDupeResults===false) {
 
     $DB->query("SELECT SQL_CALC_FOUND_ROWS
                        n.ID as new_id,
@@ -86,13 +87,13 @@ show_header('Dupe IPs','dupeip');
 
 ?>
 <div class="thin">
-	<h2>Returning Dupe IP's</h2>
-	<div class="linkbox">
-		<a href="tools.php?action=dupe_ips">[Dupe IP's]</a>
-		<strong><a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a></strong>
-	</div>
+    <h2>Returning Dupe IP's</h2>
+    <div class="linkbox">
+        <a href="tools.php?action=dupe_ips">[Dupe IP's]</a>
+        <strong><a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a></strong>
+    </div>
 
-	<div class="head">view settings</div>
+    <div class="head">view settings</div>
     <table width="100%">
         <tr>
            <td class="colhead center" colspan="2">
@@ -103,7 +104,7 @@ show_header('Dupe IPs','dupeip');
             <td class="center">
                 <label for="ban_reason" title="View Speed">Ban Reason </label>&nbsp;
                 <select id="ban_reason" name="ban_reason" title="" onchange="change_view(<?="'$OrderBy','$OrderWay'"?>)">
-<?php                   foreach($Reasons as $Key=>$Reason) {   ?>
+<?php                   foreach ($Reasons as $Key=>$Reason) {   ?>
                         <option value="<?=$Key?>" <?=($Key==$BanReason?' selected="selected"':'');?>>&nbsp;<?=$Reason;?> &nbsp;</option>
 <?php                   } ?>
                 </select>
@@ -117,19 +118,19 @@ show_header('Dupe IPs','dupeip');
     </table>
     <br/>
 
-	<div class="linkbox"> <?=$Pages; ?> </div>
+    <div class="linkbox"> <?=$Pages; ?> </div>
 
-	<div class="head">Current Users with a Dupe IP from a previously banned account</div>
-	<table width="100%">
-		<tr class="colhead">
-			<td class="center"><a href="<?=header_link('new_name') ?>">User</a></td>
+    <div class="head">Current Users with a Dupe IP from a previously banned account</div>
+    <table width="100%">
+        <tr class="colhead">
+            <td class="center"><a href="<?=header_link('new_name') ?>">User</a></td>
             <td class="center"><a href="<?=header_link('joindate') ?>">Join Date</a></td>
             <td class="center"><a href="<?=header_link('IP') ?>">Shared IP</a></td>
             <td class="center"><a href="<?=header_link('b_name') ?>">Banned User</a></td>
             <td class="center"><a href="<?=header_link('bandate') ?>">Banned Date</a></td>
-		</tr>
+        </tr>
 <?php
-        if($NumResults==0){
+        if ($NumResults==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="5">no duped users</td>
@@ -154,8 +155,8 @@ show_header('Dupe IPs','dupeip');
 <?php           }
         }
 ?>
-	</table>
-	<div class="linkbox"> <?=$Pages; ?> </div>
+    </table>
+    <div class="linkbox"> <?=$Pages; ?> </div>
 </div>
 <?php
 show_footer();

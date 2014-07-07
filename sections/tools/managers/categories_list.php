@@ -10,7 +10,8 @@ show_header('Manage Categories', 'jquery');
 ?>
 
 <script type="text/javascript">//<![CDATA[
-    function change_image(display_image, cat_image) {
+    public function change_image(display_image, cat_image)
+    {
         jQuery(display_image).html('<img src="/static/common/caticons/'+jQuery(cat_image).val()+'"/>');
     }
     //]]></script>

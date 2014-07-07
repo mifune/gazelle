@@ -2,7 +2,7 @@
 if (!check_perms('site_view_stats')) error(403);
 
 // helper tool for building old data from exisitng dataset (for switchover) NOTE: this is tailored to our specific data...
-if(isset($_POST['builddata']) && check_perms('site_debug')){
+if (isset($_POST['builddata']) && check_perms('site_debug')) {
 
     $date_start = date('Y-m-d H:i:s', strtotime( "$_POST[start_year]-$_POST[start_month]-$_POST[start_day]" )  );
     if($date_start===false) error("Error in Start date input");
@@ -31,7 +31,7 @@ if(isset($_POST['builddata']) && check_perms('site_debug')){
                                 '0','0' )");
         $date->add(new DateInterval('PT6H'));
         if ($date>$end) break;
-    } while(true);
+    } while (true);
 
     $Cache->delete_value('site_stats');
 }
@@ -104,7 +104,7 @@ if (count($SiteStats)>0) {
 
     $rows = array();
     //reset($SiteStats);
-    foreach ($SiteStats as $data)  {
+    foreach ($SiteStats as $data) {
         list($Label, $Users, $Torrents, $Seeders, $Leechers) = $data;
         $rows[] = " {c:[{v: '$Label'}, {v: $Users}, {v: $Torrents}, {v: $Seeders}, {v: $Leechers}]} ";
     }
@@ -118,11 +118,11 @@ show_header('Site Statistics', 'charts,jquery');
 ?>
 <div class="thin">
     <h2>Site stats</h2>
-	<div class="linkbox">
-		<a href="stats.php?action=users">[User graphs]</a>
-		<strong><a href="stats.php?action=site">[Site stats]</a></strong>
-		<a href="stats.php?action=torrents">[Torrent stats]</a>
-	</div>
+    <div class="linkbox">
+        <a href="stats.php?action=users">[User graphs]</a>
+        <strong><a href="stats.php?action=site">[Site stats]</a></strong>
+        <a href="stats.php?action=torrents">[Torrent stats]</a>
+    </div>
     <br/>
     <div class="head">Site history</div>
     <table class="">
@@ -157,7 +157,7 @@ show_header('Site Statistics', 'charts,jquery');
 
 <?php
     if (check_perms('site_stats_advanced')) {
-        if (isset($_POST['year1'])){
+        if (isset($_POST['year1'])) {
             $start = array ($_POST['year1'],$_POST['month1'],$_POST['day1']);
             $end = array ($_POST['year2'],$_POST['month2'],$_POST['day2']);
         } else {

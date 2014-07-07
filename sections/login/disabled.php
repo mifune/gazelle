@@ -1,6 +1,6 @@
 <?php
 show_header('Disabled');
-if(empty($_POST['submit']) || empty($_POST['username'])) {
+if (empty($_POST['submit']) || empty($_POST['username'])) {
     ?>
     <p class="warning">
     Your account has been disabled.<br />
@@ -20,11 +20,11 @@ if(empty($_POST['submit']) || empty($_POST['username'])) {
     </form>
     <?php
 } else {
-	$nick = $_POST['username'];
-	$nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
-	if(strlen($nick) == 0) {
-		$nick = "EmpGuest?";
-	}
+    $nick = $_POST['username'];
+    $nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
+    if (strlen($nick) == 0) {
+        $nick = "EmpGuest?";
+    }
       $nick = "disabled_$nick";
 
     ?>

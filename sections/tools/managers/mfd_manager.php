@@ -1,5 +1,5 @@
 <?php
-if(!check_perms('torrents_review')) { error(403); }
+if (!check_perms('torrents_review')) { error(403); }
 
 $ViewStatus = isset($_REQUEST['viewstatus'])?$_REQUEST['viewstatus']:'both';
 $ViewStatus = in_array($ViewStatus, array('warned','pending','both'))?$ViewStatus:'pending';
@@ -20,12 +20,12 @@ show_header('Manage torrents marked for deletion');
     <div class="thin">
         <h2>Torrents marked for deletion</h2>
 <?php
-	if($NumDeleted) {
+    if ($NumDeleted) {
           $ResultMessage ="Successfully Deleted $NumDeleted Torrent";
           if($NumDeleted>1) $ResultMessage .= 's';
-          if($ResultMessage){
+          if ($ResultMessage) {
 ?>
-			<div id="messagebar" class="messagebar"><?=$ResultMessage?></div><br />
+            <div id="messagebar" class="messagebar"><?=$ResultMessage?></div><br />
 <?php
           }
       }
@@ -40,7 +40,7 @@ show_header('Manage torrents marked for deletion');
                         <input type="hidden" name="overdue" value="<?=$OverdueOnly?>" />
                         <td class="center">
                             <label for="hours">Warning period: (hours) </label>
-<?php  if($CanManage){ ?>
+<?php  if ($CanManage) { ?>
                             <input name="hours" type="text" style="width:30px;" value="<?=$Hours?>" title="This is the hours given to fix the torrent when warned (has no effect on current list)" />
 <?php  } else { ?>
                             <input name="hours" type="text" style="width:30px;color:black;" disabled="disabled" value="<?=$Hours?>" title="This is the hours given to fix the torrent when warned (has no effect on current list)" />
@@ -48,7 +48,7 @@ show_header('Manage torrents marked for deletion');
                         </td>
                         <td  class="center">
                             <label for="autodelete" title="AutoDelete">Auto Delete</label>
-<?php  if($CanManage){ ?>
+<?php  if ($CanManage) { ?>
                             <select id="autodelete" name="autodelete" title="If On then marked torrents are automatically deleted when they time out (if not pending). If Off then overdue marked torrents can still be deleted manually in this page.">
                                 <option value="1"<?=$Delete?' selected="selected"':'';?>>On&nbsp;&nbsp;</option>
                                 <option value="0"<?=$Delete?'':' selected="selected"';?>>Off&nbsp;&nbsp;</option>
@@ -57,7 +57,7 @@ show_header('Manage torrents marked for deletion');
                             <input type="text" name="autodelete" style="width:30px;color:black;" disabled="disabled" value="<?=$Delete?'On':'Off';?>" title="If On then marked torrents are automatically deleted when they time out (if not pending). If Off then overdue marked torrents can still be deleted manually in this page." />
 <?php  }  ?>
                         </td>
-<?php  if($CanManage){ ?>   <td  class="center">  <!-- width="30%" -->
+<?php  if ($CanManage) { ?>   <td  class="center">  <!-- width="30%" -->
                             <input type="submit" value="Save Changes" />
                         </td> <?php  }  ?>
                 </form>
@@ -66,18 +66,18 @@ show_header('Manage torrents marked for deletion');
 
         <div class="linkbox" >
 
-<?php       if ($ViewStatus!='warned'){   ?>
+<?php       if ($ViewStatus!='warned') {   ?>
           [<a href="tools.php?action=marked_for_deletion&amp;viewstatus=warned&amp;overdue=<?=$OverdueOnly?>"> View warned only </a>] &nbsp;&nbsp;&nbsp;
 <?php       }
-        if ($ViewStatus!='pending'){   ?>
+        if ($ViewStatus!='pending') {   ?>
           [<a href="tools.php?action=marked_for_deletion&amp;viewstatus=pending&amp;overdue=<?=$OverdueOnly?>"> View pending only </a>] &nbsp;&nbsp;&nbsp;
 <?php       }
-        if ($ViewStatus!='both'){   ?>
+        if ($ViewStatus!='both') {   ?>
           [<a href="tools.php?action=marked_for_deletion&amp;viewstatus=both&amp;overdue=<?=$OverdueOnly?>"> View pending and warned </a>] &nbsp;&nbsp;&nbsp;
 <?php       }       ?>
 
 <?php       if ($NumOverdue) {
-            if ($OverdueOnly){  ?>
+            if ($OverdueOnly) {  ?>
           [<a href="tools.php?action=marked_for_deletion&amp;viewstatus=<?=$ViewStatus?>&amp;overdue=0"> View due and overdue </a>] &nbsp;&nbsp;&nbsp;
 <?php           } else {     ?>
           [<a href="tools.php?action=marked_for_deletion&amp;viewstatus=<?=$ViewStatus?>&amp;overdue=1"> View overdue only </a>] &nbsp;&nbsp;&nbsp;
@@ -96,7 +96,7 @@ show_header('Manage torrents marked for deletion');
             <div class="box pad">
                 <h3 style="float:right;margin:5px 10px 0 0;">Showing: <?=$ViewStatus=='both'?'pending and warned':$ViewStatus;?> <?=$OverdueOnly?'(overdue only)':'';?></h3>
 <?php       if ($NumOverdue) {
- 		if ($CanManage) {  // not sure who should have what permissions here??    ?>
+        if ($CanManage) {  // not sure who should have what permissions here??    ?>
                 <span style="position:absolute;">
                     <input type="submit" name="submit" title="Delete selected torrents" value="Delete selected" />
                 </span>
@@ -113,7 +113,7 @@ show_header('Manage torrents marked for deletion');
             <div class="head">Torrents Marked for Deletion</div>
             <table>
                 <tr class="colhead">
-<?php  if($NumOverdue && $CanManage){ ?><td width="8px"><input type="checkbox" onclick="toggleChecks('reviewform',this)" /></td><?php  } ?>
+<?php  if ($NumOverdue && $CanManage) { ?><td width="8px"><input type="checkbox" onclick="toggleChecks('reviewform',this)" /></td><?php  } ?>
                     <td>Torrent</td>
                     <td width="40px"><strong>Status</strong></td>
                     <td>time till nuke</td>
@@ -121,7 +121,7 @@ show_header('Manage torrents marked for deletion');
                     <td>Username</td>
                 </tr>
 <?php
-    if ($NumTorrents==0){ //
+    if ($NumTorrents==0) { //
 ?>
                 <tr>
                     <td colspan="6" class="center">no torrents are under review</td>
@@ -129,14 +129,14 @@ show_header('Manage torrents marked for deletion');
 <?php
     } else {
         $Row = 'a';
-        foreach($Torrents as $Torrent){
+        foreach ($Torrents as $Torrent) {
             $Row = $Row=='a'?'b':'a';
             list($TorrentID, $GroupID, $TorrentName, $Status, $ConvID, $KillTime, $Reason, $UserID, $Username) = $Torrent;
 
             $IsOverdue = strtotime($KillTime)<time();
 ?>
                 <tr class="<?=($IsOverdue?($Status=='Pending'?'orangebar':'redbar'):"row$Row")?>">
-<?php  if($NumOverdue && $CanManage){ ?><td class="center"><?=$IsOverdue?'<input type="checkbox" name="id[]" value="'.$GroupID.'" />':''?></td><?php  } ?>
+<?php  if ($NumOverdue && $CanManage) { ?><td class="center"><?=$IsOverdue?'<input type="checkbox" name="id[]" value="'.$GroupID.'" />':''?></td><?php  } ?>
                     <td><a href="torrents.php?id=<?=$GroupID?>"><?=$TorrentName?></a></td>
                     <td><?=$Status?></td>
                     <td><?=time_diff($KillTime)?></td>
@@ -187,7 +187,6 @@ $BaseSQL = "SELECT um.ID,
           GROUP BY r.UserID
           ORDER BY Num DESC";
 
-
 $DB->query(str_replace('[TIMECLAUSE]', 'NOW() - INTERVAL 24 HOUR', $BaseSQL));
 $Results = $DB->to_array();
 
@@ -200,8 +199,8 @@ $Results = $DB->to_array();
                     <td>Okay</td>
                     <td>Warned</td>
                 </tr>
-<?php  foreach($Results as $Result) {
-	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
+<?php  foreach ($Results as $Result) {
+    list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
                 <tr>
                     <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
@@ -226,8 +225,8 @@ $Results = $DB->to_array();
                     <td>Okay</td>
                     <td>Warned</td>
                 </tr>
-<?php  foreach($Results as $Result) {
-	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
+<?php  foreach ($Results as $Result) {
+    list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
                 <tr>
                     <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
@@ -245,26 +244,26 @@ $DB->query(str_replace('[TIMECLAUSE]', 'NOW() - INTERVAL 1 MONTH', $BaseSQL));
 $Results = $DB->to_array();
 
 ?>
-		<strong>MFD actions in the last month</strong>
-		<table class="noborder">
-			<tr class="colhead">
-				<td>Username</td>
-				<td>Total</td>
-				<td>Okay</td>
-				<td>Warned</td>
-			</tr>
-<?php  foreach($Results as $Result) {
-	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
+        <strong>MFD actions in the last month</strong>
+        <table class="noborder">
+            <tr class="colhead">
+                <td>Username</td>
+                <td>Total</td>
+                <td>Okay</td>
+                <td>Warned</td>
+            </tr>
+<?php  foreach ($Results as $Result) {
+    list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
-			<tr>
-				<td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
-				<td><?=$Num?></td>
-				<td><?=$NumOkay?></td>
-				<td><?=$NumWarned?></td>
-			</tr>
+            <tr>
+                <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
+                <td><?=$Num?></td>
+                <td><?=$NumOkay?></td>
+                <td><?=$NumWarned?></td>
+            </tr>
 <?php  } ?>
-		</table>
-		<br /><br />
+        </table>
+        <br /><br />
 <?php
 
 $DB->query(str_replace('[TIMECLAUSE]', "'0000-00-00 00:00:00'", $BaseSQL));
@@ -279,8 +278,8 @@ $Results = $DB->to_array();
                     <td>Okay</td>
                     <td>Warned</td>
                 </tr>
-<?php  foreach($Results as $Result) {
-	list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
+<?php  foreach ($Results as $Result) {
+    list($UserID, $Username, $Num, $NumOkay, $NumWarned) = $Result;
 ?>
                 <tr>
                     <td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>

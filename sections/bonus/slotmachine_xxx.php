@@ -28,14 +28,14 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             <?php
                 $Count=array();
                 $max=0;
-                for($i=0;$i<4;$i++){
+                for ($i=0;$i<4;$i++) {
                     $Count[$i]= count($Reel[$i]);
                     $max = max($max,$Count[$i]);
                 }
-                for($i=$max-1;$i>=0;$i--){ ?>
+                for ($i=$max-1;$i>=0;$i--) { ?>
                     <div class="reelsi">
-            <?php   for($j=0;$j<4;$j++){
-                        if ($i<$Count[$j]){ ?>
+            <?php   for ($j=0;$j<4;$j++) {
+                        if ($i<$Count[$j]) { ?>
                         <img src="<?=STATIC_SERVER?>common/casino/icon<?=$Reel[$j][$i]?>.png" />
             <?php       }
                     } ?>
@@ -98,7 +98,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
         <div class="box pad">
             <?php
             $UserResults = $Cache->get_value('sm_sum_history_'.$LoggedUser['ID']);
-            if($UserResults === false) {
+            if ($UserResults === false) {
                 $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins))
                           FROM sm_results WHERE UserID = $LoggedUser[ID]");
                 $UserResults = $DB->next_record();
@@ -129,7 +129,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
         <div class="box pad">
             <?php
             $TotalResults = $Cache->get_value('sm_sum_history');
-            if($TotalResults === false) {
+            if ($TotalResults === false) {
                 $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins))
                           FROM sm_results");
                 $TotalResults = $DB->next_record();
@@ -164,7 +164,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             <?php
 
             $TopResults = $Cache->get_value('sm_top_payouts');
-            if($TopResults === false) {
+            if ($TopResults === false) {
                 $DB->query("SELECT s.UserID, Username, Won, Bet, Spins, Result, s.Time
                               FROM sm_results as s
                               JOIN users_main as u ON s.UserID=u.ID
@@ -173,7 +173,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                              LIMIT 100");
                 $TopResults = $DB->to_array(false, MYSQLI_BOTH);
                 $Cache->cache_value('sm_top_payouts', $TopResults, 3600*24);
-                if(count($TopResults)<100){
+                if (count($TopResults)<100) {
                     $Cache->cache_value('sm_lowest_top_payout', 0, 3600*24);
                 } else {
                     list(, , $Won) = end($TopResults);
@@ -182,7 +182,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                 }
             }
             $i=1;
-            foreach($TopResults as $Result){
+            foreach ($TopResults as $Result) {
                 list($UserID, $Username, $Won, $Bet, $Spins, $Reels, $Time) = $Result;
         ?>
                 <tr>

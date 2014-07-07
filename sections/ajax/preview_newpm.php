@@ -8,7 +8,7 @@ if ( !empty($_REQUEST['message'])) $Body = $_REQUEST['message'];
 else $Body = $_REQUEST['body'];
 
 echo'
-			  <h2>'. display_str($Subject).'</h2>
+              <h2>'. display_str($Subject).'</h2>
                     <div class="box">
                         <div class="head">
                                '. format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true). '  Just now

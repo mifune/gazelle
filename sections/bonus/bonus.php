@@ -5,7 +5,7 @@ $Text = new TEXT;
 // check if their credits need updating (if they have been online whilst creds are accumalting)
 $DB->query("SELECT Credits FROM users_main WHERE ID='$LoggedUser[ID]'");
 list($TotalCredits) = $DB->next_record();
-if($TotalCredits != $LoggedUser['TotalCredits']){
+if ($TotalCredits != $LoggedUser['TotalCredits']) {
     $LoggedUser['TotalCredits'] = $TotalCredits; // for interface below
     $Cache->delete_value('user_stats_' . $LoggedUser['ID']);
 }
@@ -16,7 +16,7 @@ show_header('Bonus Shop','bonus,bbcode');
 $ShopItems = get_shop_items($LoggedUser['ID']);
 ?>
 <div class="thin">
-	<h2>Bonus shop</h2>
+    <h2>Bonus shop</h2>
             <div class="box pad shadow">
 <?php
                 $creditinfo = get_article('creditsinline');
@@ -26,25 +26,25 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
             <div class="box pad shadow" id="bonusdiv">
                 <h3 class="center">Credits: <?=number_format($LoggedUser['TotalCredits'],2)?></h3>
             </div>
- <?php      if(!empty($_REQUEST['result'])){  ?>
+ <?php      if (!empty($_REQUEST['result'])) {  ?>
                 <div class="box pad shadow">
                     <h3 class="center"><?=display_str($_REQUEST['result'])?></h3>
                 </div>
 <?php       }  ?>
 
-	<div class="head">Bonus Shop</div>
+    <div class="head">Bonus Shop</div>
 
-		<table class="bonusshop">
-			<tr class="smallhead">
-				<td width="120px">Title</td>
-				<td width="530px" colspan="2">Description</td>
-				<td width="90px" colspan="2">Price</td>
-			</tr>
+        <table class="bonusshop">
+            <tr class="smallhead">
+                <td width="120px">Title</td>
+                <td width="530px" colspan="2">Description</td>
+                <td width="90px" colspan="2">Price</td>
+            </tr>
 <?php
-	$Row = 'a';
+    $Row = 'a';
       $UserBadgeIDs = get_user_shop_badges_ids($LoggedUser['ID']);
-	foreach($ShopItems as $BonusItem) {
-		list($ItemID, $Title, $Description, $Action, $Value, $Cost, $Image, $Badge, $Rank, $UserRank) = $BonusItem;
+    foreach ($ShopItems as $BonusItem) {
+        list($ItemID, $Title, $Description, $Action, $Value, $Cost, $Image, $Badge, $Rank, $UserRank) = $BonusItem;
             $IsBadge = $Action=='badge';
             $IsBuyGB = $Action=='gb';
             $DescExtra='';
@@ -56,27 +56,27 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                 $CanBuy = false;
                 $BGClass= ' itemnotbuy';
             } else { //
-                $CanBuy = is_float((float)$LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
+                $CanBuy = is_float((float) $LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
                 $BGClass= ($CanBuy?' itembuy' :' itemnotbuy');
                 if ($IsBuyGB && $LoggedUser['BytesDownloaded'] < get_bytes($Value.'gb') ) {
                     $DescExtra = "<br/>(WARNING: will only remove ".get_size($LoggedUser['BytesDownloaded']) .")";
                 }
-                if($IsBadge ) {
+                if ($IsBadge) {
                     if ($LastBadge==$Badge) {
                         $CanBuy = false;
                         $BGClass = ' itemnotbuy';
-                    } elseif($Rank < $UserRank) {
+                    } elseif ($Rank < $UserRank) {
                         $CanBuy = false;
                         $BGClass = ' itemduplicate';
                     } else
                         $LastBadge=$Badge;
                 }
             }
-		$Row = ($Row == 'a') ? 'b' : 'a';
+        $Row = ($Row == 'a') ? 'b' : 'a';
 ?>
-			<tr class="row<?=$Row.$BGClass?>">
-				<td width="160px"><strong><?=display_str($Title) ?></strong></td>
-				<td style="border-right:none;" <?php if(!$Image) { echo 'colspan="2"'; } ?>><?=display_str($Description).$DescExtra?></td>
+            <tr class="row<?=$Row.$BGClass?>">
+                <td width="160px"><strong><?=display_str($Title) ?></strong></td>
+                <td style="border-right:none;" <?php if (!$Image) { echo 'colspan="2"'; } ?>><?=display_str($Description).$DescExtra?></td>
                     <?php if ($Image) {  ?>
                         <td style="border-left:none;width:160px;text-align:center;">
                             <div class="badge">
@@ -95,8 +95,8 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                             $OnSubmit = '';
                         }
                    ?>
-				<td width="60px" style="text-align: center;"><strong><?=number_format($Cost) ?>c</strong></td>
-				<td width="60px" style="text-align: center;">
+                <td width="60px" style="text-align: center;"><strong><?=number_format($Cost) ?>c</strong></td>
+                <td width="60px" style="text-align: center;">
                             <form method="post" action="" <?=$OnSubmit?>>
                                 <input type="hidden" name="action" value="buy" />
                                 <input type="hidden" id="othername<?=$ItemID?>" name="othername" value="" />
@@ -108,10 +108,10 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                                 <?php if($Action == 'title') echo '<input type="hidden" id="title'.$ItemID.'" name="title" value="" />'; ?>
                                 <?php if($Action == 'ufl') echo '<input type="hidden" id="torrentid'.$ItemID.'" name="torrentid" value="" />'; ?>
                             </form>
-				</td>
-			</tr>
+                </td>
+            </tr>
 <?php	} ?>
-		</table>
+        </table>
 </div>
 <?php
 show_footer();

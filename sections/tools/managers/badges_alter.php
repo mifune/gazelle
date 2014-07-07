@@ -1,10 +1,10 @@
 <?php
 
-if(!check_perms('site_manage_badges')){ error(403); }
+if (!check_perms('site_manage_badges')) { error(403); }
 
 authorize();
 
-if(isset($_POST['delselected'])) {
+if (isset($_POST['delselected'])) {
 
     if (isset($_POST['deleteids'])) {
 
@@ -45,7 +45,7 @@ if(isset($_POST['delselected'])) {
     $Val->SetFields('type', '1','inarray','Invalid badge type was set.',array('inarray'=>$BadgeTypes));
 
     $Err=$Val->ValidateForm($_POST); // Validate the form
-    if($Err){ error($Err); }
+    if ($Err) { error($Err); }
 
     $BadgeIDs = $_POST['id'];
     $NewRanks = array();
@@ -62,18 +62,18 @@ if(isset($_POST['delselected'])) {
         $Desc=db_string($_POST['desc'][$BadgeID]);
         $Image=db_string($_POST['image'][$BadgeID]);
         $Type=db_string($_POST['type'][$BadgeID]);
-        $DisplayRow=(int)$_POST['row'][$BadgeID];
-        $Rank=(int)$_POST['rank'][$BadgeID];
+        $DisplayRow=(int) $_POST['row'][$BadgeID];
+        $Rank=(int) $_POST['rank'][$BadgeID];
         if ($Rank<1) $Rank=1;
-        $Sort=(int)$_POST['sort'][$BadgeID];
-        $Cost=(int)$_POST['cost'][$BadgeID];
+        $Sort=(int) $_POST['sort'][$BadgeID];
+        $Cost=(int) $_POST['cost'][$BadgeID];
 
         // automagically constrain badge/rank
         if (isset($_POST['saveall'])) $DB->query("SELECT Rank FROM badges WHERE Badge='$Badge' AND ID !='$BadgeID'");
         else $DB->query("SELECT Rank FROM badges WHERE Badge='$Badge'");
 
         $Ranks = $DB->collect('Rank');
-        while( in_array($Rank, $Ranks ) || (isset($NewRanks[$Badge]) && $NewRanks[$Badge] >= $Rank ) ) {
+        while ( in_array($Rank, $Ranks ) || (isset($NewRanks[$Badge]) && $NewRanks[$Badge] >= $Rank ) ) {
             $Rank++;
         }
         $NewRanks[$Badge]=$Rank;
@@ -83,16 +83,16 @@ if(isset($_POST['delselected'])) {
         else $DB->query("SELECT Sort FROM badges");
 
         $Sorts = $DB->collect('Sort');
-        while( in_array($Sort, $Sorts ) || in_array($Sort, $NewSorts )){
+        while ( in_array($Sort, $Sorts ) || in_array($Sort, $NewSorts )) {
             $Sort++;
         }
         $NewSorts[] = $Sort;
 
-        if( isset($_POST['create']) ) {    // create
+        if ( isset($_POST['create']) ) {    // create
 
-		$SQL_values[] = "('$Badge','$Rank','$Type','$DisplayRow','$Sort','$Cost','$Title','$Desc','$Image')" ;
+        $SQL_values[] = "('$Badge','$Rank','$Type','$DisplayRow','$Sort','$Cost','$Title','$Desc','$Image')" ;
 
-        } elseif( isset($_POST['saveall']) ) { //Edit
+        } elseif ( isset($_POST['saveall']) ) { //Edit
 
             $DB->query("UPDATE badges SET
                               Badge='$Badge',
@@ -108,20 +108,19 @@ if(isset($_POST['delselected'])) {
         }
     }
 
-    if( isset($_POST['create']) && count($SQL_values)>0 ){   //Create
+    if ( isset($_POST['create']) && count($SQL_values)>0 ) {   //Create
             $SQL_values = implode(',', $SQL_values);
-		$DB->query("INSERT IGNORE INTO badges
-			(Badge, Rank, Type, Display, Sort, Cost, Title, Description, Image)
-			VALUES $SQL_values");
+        $DB->query("INSERT IGNORE INTO badges
+            (Badge, Rank, Type, Display, Sort, Cost, Title, Description, Image)
+            VALUES $SQL_values");
             $ReturnID = $DB->inserted_id(); // return user to first saved badge on return
     }
 }
 
-
 $Cache->delete_value('available_badges');
 
-if(isset($_REQUEST['numadd'])){ // set num add forms to be same as current
-    $numAdds = (int)$_REQUEST['numadd'];
+if (isset($_REQUEST['numadd'])) { // set num add forms to be same as current
+    $numAdds = (int) $_REQUEST['numadd'];
     if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
     $UrlExtra = "&numadd=$numAdds";
 }

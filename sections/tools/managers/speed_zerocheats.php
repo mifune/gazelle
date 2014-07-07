@@ -1,11 +1,12 @@
 <?php
 include(SERVER_ROOT . '/sections/tools/managers/speed_functions.php');
 
-function history_span($value) {
+function history_span($value)
+{
     return '<span style="color:'.($value=='false'?'red':'lightgrey').'">'.$value.'</span>';
 }
 
-if(!check_perms('users_manage_cheats')) { error(403); }
+if (!check_perms('users_manage_cheats')) { error(403); }
 
 $Action = 'speed_zerocheats';
 
@@ -23,15 +24,14 @@ if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Username', '
     $OrderBy = $_GET['order_by'];
 }
 
-$NumGrabbed = isset($_GET['grabbed']) ? (int)$_GET['grabbed'] : 2;
-$ViewDays = isset($_GET['viewdays']) ? (int)$_GET['viewdays'] : 1;
-
+$NumGrabbed = isset($_GET['grabbed']) ? (int) $_GET['grabbed'] : 2;
+$ViewDays = isset($_GET['viewdays']) ? (int) $_GET['viewdays'] : 1;
 
 $ViewInfo = "Min files: $NumGrabbed, joined > $ViewDays day ago" ;
 
 $WHERE = '';
 
-if (isset($_GET['viewbanned']) && $_GET['viewbanned']){
+if (isset($_GET['viewbanned']) && $_GET['viewbanned']) {
     $ViewInfo .= ' (all)';
 } else {
     $WHERE .= " AND um.Enabled='1' ";
@@ -44,13 +44,13 @@ show_header('Zero Stat Cheats','watchlist');
 <div class="thin">
   <h2>(possible) zero stat cheaters</h2>
 
-	<div class="linkbox">
-		<a href="tools.php?action=speed_watchlist">[Watch-list]</a>
-		<a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
-		<a href="tools.php?action=speed_records">[Speed Records]</a>
-		<a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
-		<a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tools.php?action=speed_watchlist">[Watch-list]</a>
+        <a href="tools.php?action=speed_excludelist">[Exclude-list]</a>
+        <a href="tools.php?action=speed_records">[Speed Records]</a>
+        <a href="tools.php?action=speed_cheats">[Speed Cheats]</a>
+        <a href="tools.php?action=speed_zerocheats">[Zero Cheats]</a>
+    </div>
 
     <div class="head">options</div>
     <table class="box pad">
@@ -104,7 +104,6 @@ list($Page,$Limit) = page_limit(50);
    JOIN users_info AS ui ON ui.UserID=um.ID
    LEFT JOIN users_downloads AS ud ON ud.UserID=um.ID
    GROUP BY x.uid LIMIT 50
-
 
    SELECT SQL_CALC_FOUND_ROWS
                    uid, Username, COUNT(x.fid), Count(DISTINCT ud.TorrentID) as Grabbed, MAX(x.upspeed), MAX(x.mtime)
@@ -215,7 +214,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 
 ?>
 
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 
     <div class="head"><?=$NumResults?> users with suspicious zero stats</div>
         <table>
@@ -233,7 +232,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
             </tr>
 <?php
             $row = 'a';
-            if($NumResults==0){
+            if ($NumResults==0) {
 ?>
                     <tr class="rowb">
                         <td class="center" colspan="10">no zero stat peers</td>
@@ -248,17 +247,17 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     $PeerIDs = explode('|', $PeerIDs);
                     $IPs = explode('|', $IPs);
 
-	$DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
+    $DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP
+                 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
                 UNION
                  (SELECT e.ID AS UserID, um.IP, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.IP=e.IP
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.ID!= $UserID AND um.ID = $UserID)
+                 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.ID!= $UserID AND um.ID = $UserID)
                 UNION
                  (SELECT um.ID AS UserID, um.IP, 'history', 'account' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.ID != $UserID)
+                 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.ID != $UserID)
                 UNION
                  (SELECT um.UserID AS UserID, um.IP, 'history', 'history' FROM users_history_ips AS um JOIN users_history_ips AS e ON um.IP=e.IP
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID)
+                 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID)
                 ORDER BY  UserID, IP
                 LIMIT 20");
                     $IPDupeCount = $DB->record_count();
@@ -268,7 +267,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
                     <tr class="row<?=$row?>">
                         <td>
 <?php
-                            if ($Enabled=='1'){  ?>
+                            if ($Enabled=='1') {  ?>
                                 <a href="tools.php?action=ban_zero_cheat&banuser=1&userid=<?=$UserID?>" title="ban this user for being a big fat zero stat cheat"><img src="static/common/symbols/ban2.png" alt="ban" /></a>
 <?php                           }
                            ?>
@@ -289,12 +288,12 @@ $Pages=get_pages($Page,$NumResults,50,9);
                         <td class="center"><?=$Grabbed?></td>
                         <td class="center"><?=history_span($HasSeedHistory)?></td>
                         <td class="center"><?php
-                            foreach($PeerIDs as $PeerID) {
+                            foreach ($PeerIDs as $PeerID) {
                         ?>  <span style="color:#555"><?=substr($PeerID,0,8)  ?></span> <br/>
                         <?php   } ?>
                         </td>
                         <td class="center"><?php
-                            foreach($IPs as $IP) {
+                            foreach ($IPs as $IP) {
                                 $ipcc = geoip($IP);
                                 echo display_ip($IP, $ipcc)."<br/>";
                             }
@@ -311,7 +310,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
             <table width="100%" class="border">
 <?php
             $i = 0;
-            foreach($IPDupes AS $IPDupe) {
+            foreach ($IPDupes AS $IPDupe) {
                 list($EUserID, $IP, $EType1, $EType2) = $IPDupe;
                 $i++;
                 $DupeInfo = user_info($EUserID);
@@ -331,7 +330,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
 <?php
                     if ( !array_key_exists($EUserID, $Dupes) ) {
 ?>
-						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>" title="link this user to <?=$Username?>">link</a>]
+                        [<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>" title="link this user to <?=$Username?>">link</a>]
 <?php
                     }
 ?>
@@ -353,7 +352,7 @@ $Pages=get_pages($Page,$NumResults,50,9);
             }
             ?>
         </table>
-	<div class="linkbox"><?=$Pages?></div>
+    <div class="linkbox"><?=$Pages?></div>
 </div>
 <?php
 show_footer();

@@ -7,7 +7,7 @@ show_header();
 <?php
     $DB->query("SELECT cc, country FROM countries");
 
-    while(list($cc,$country)=$DB->next_record()){
+    while (list($cc,$country)=$DB->next_record()) {
 ?>
         <tr>
             <td>

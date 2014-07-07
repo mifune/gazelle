@@ -11,12 +11,12 @@ $_GET['post'], which is the ID of the post.
 \*********************************************************************/
 
 // Quick SQL injection check
-if(!$_GET['post'] || !is_number($_GET['post'])){
-	error(0);
+if (!$_GET['post'] || !is_number($_GET['post'])) {
+    error(0);
 }
 
 // Variables for database input
-$PostID = (int)$_GET['post'];
+$PostID = (int) $_GET['post'];
 
 // Mainly
 $DB->query("SELECT Body FROM collages_comments WHERE ID='$PostID'");
@@ -24,7 +24,7 @@ list($Body) = $DB->next_record(MYSQLI_NUM);
 
 // This gets sent to the browser, which echoes it wherever
 
-if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
+if (isset($_REQUEST['body']) && $_REQUEST['body']==1) {
     echo trim($Body);
 } else {
     include(SERVER_ROOT.'/classes/class_text.php');

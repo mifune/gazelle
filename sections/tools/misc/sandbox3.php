@@ -2,7 +2,7 @@
 $time_start = microtime(true);
 
 $DoFix = isset($_POST['submit']) && $_POST['submit']=='Fix Titles';
-$WordLength = isset($_POST['wordlength'])? (int)$_POST['wordlength'] : 64;
+$WordLength = isset($_POST['wordlength'])? (int) $_POST['wordlength'] : 64;
 
 show_header("Fix Torrent Titles");
 
@@ -29,7 +29,7 @@ $numtorrents = $DB->record_count();
         while ( list($ID, $Title) = $DB->next_record()  ) {
             $Words = explode(' ', $Title);
             $found = false;
-            foreach($Words as &$word) {
+            foreach ($Words as &$word) {
                 $len = strlen($word);
                 if ($len <= $WordLength) continue;
 
@@ -51,12 +51,11 @@ $numtorrents = $DB->record_count();
             }
         }
 
-        if ($DoFix && $i>0){
+        if ($DoFix && $i>0) {
             $DB->query("INSERT INTO torrents_group (ID, Name) VALUES "
                     . implode(',', $updaterow)
                     . " ON DUPLICATE KEY UPDATE Name=Values(Name)");
         }
-
 
         echo "</code><br/>" . ($DoFix? 'FIXED':'Found' ) ." $i titles with overlong words in them<br/>";
 

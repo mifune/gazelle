@@ -4,10 +4,10 @@ show_header('Synonyms');
 <div class="thin">
     <h2>Synonyms</h2>
 
-	<div class="linkbox">
-		<a href="tags.php">[Tags & Search]</a>
-		<a style="font-weight: bold" href="tags.php?action=synonyms">[Synonyms]</a>
-	</div>
+    <div class="linkbox">
+        <a href="tags.php">[Tags & Search]</a>
+        <a style="font-weight: bold" href="tags.php?action=synonyms">[Synonyms]</a>
+    </div>
 
     <div class="tagtable">
 
@@ -23,7 +23,7 @@ show_header('Synonyms');
     $LastParentTagName ='';
     $Row = 'a';
 
-    foreach($Synomyns as $Synomyn) {
+    foreach ($Synomyns as $Synomyn) {
         list($SnID, $SnName, $ParentTagID, $ParentTagName, $Uses) = $Synomyn;
 
         if ($LastParentTagName != $ParentTagName) {
@@ -46,7 +46,7 @@ show_header('Synonyms');
                     <td ><?=$SnName?></td>
                 </tr>
 <?php   }
-    if($SnID){ // only finish if something was in list ?>
+    if ($SnID) { // only finish if something was in list ?>
             </table></div>
 <?php   }    ?>
     </div>

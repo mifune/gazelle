@@ -1,12 +1,13 @@
 <?php
-function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1) {
+function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1)
+{
     global $ArticleCats, $ArticleSubCats, $ClassLevels;
 
     $Row = 'a';
     $LastSubCat=-1;
     $OpenTable=false;
 
-    foreach($Articles as $Article) {
+    foreach ($Articles as $Article) {
         list($TopicID, $ATitle, $Description, $SubCat, $MinClass) = $Article;
 
         if($MinClass>$StaffClass) continue;
@@ -14,10 +15,10 @@ function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1) {
 
         $Row = ($Row == 'a') ? 'b' : 'a';
 
-        if($LastSubCat != $SubCat) {
+        if ($LastSubCat != $SubCat) {
             $Row = 'b';
             $LastSubCat = $SubCat;
-            if($OpenTable){  ?>
+            if ($OpenTable) {  ?>
         </table><br/>
 <?php           }  ?>
 
@@ -38,7 +39,7 @@ function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1) {
                     </td>
                     <td>
                             <?=display_str($Description)?>
-<?php               if($MinClass) { ?>
+<?php               if ($MinClass) { ?>
                         <span style="float:right">
                             <?="[{$ClassLevels[$MinClass][Name]}+]"?>
                         </span>
@@ -50,7 +51,8 @@ function print_articles($Articles, $StaffClass=0, $SkipSubArticle = -1) {
 <?php
 }
 
-function replace_special_tags($Body) {
+function replace_special_tags($Body)
+{
     global $DB, $Cache, $LoggedUser, $Text;
 
     // Deal with special article tags.
@@ -67,7 +69,7 @@ function replace_special_tags($Body) {
                 </tr>';
 
         $Row = 'a';
-        foreach($BlacklistedClients as $Client) {
+        foreach ($BlacklistedClients as $Client) {
             //list($ClientName,$Notes) = $Client;
             list($ClientName) = $Client;
             $Row = ($Row == 'a') ? 'b' : 'a';
@@ -83,7 +85,7 @@ function replace_special_tags($Body) {
     if (preg_match("/\[whitelist\]/i", $Body)) {
 
         $ImageWhitelist = $Cache->get_value('imagehost_whitelist');
-        if($ImageWhitelist === FALSE) {
+        if ($ImageWhitelist === FALSE) {
                 $DB->query("SELECT
                     Imagehost,
                     Link,
@@ -103,7 +105,7 @@ function replace_special_tags($Body) {
                 </tr>';
 
         $Row = 'a';
-        foreach($ImageWhitelist as $ImageHost) {
+        foreach ($ImageWhitelist as $ImageHost) {
 
             list($Host, $Link, $Comment, $Updated) = $ImageHost;
             $Row = ($Row == 'a') ? 'b' : 'a';
@@ -126,7 +128,7 @@ function replace_special_tags($Body) {
     if (preg_match("/\[dnulist\]/i", $Body)) {
 
         $DNUlist = $Cache->get_value('do_not_upload_list');
-        if($DNUlist === FALSE) {
+        if ($DNUlist === FALSE) {
                 $DB->query("SELECT  Name, Comment, Time FROM do_not_upload ORDER BY Time");
                 $DNUlist = $DB->to_array();
                 $Cache->cache_value('do_not_upload_list', $DNUlist);
@@ -138,7 +140,7 @@ function replace_special_tags($Body) {
                     </tr>';
 
         $Row = 'a';
-        foreach($DNUlist as $BadUpload) {
+        foreach ($DNUlist as $BadUpload) {
 
             list($Name, $Comment, $Updated) = $BadUpload;
             $Row = ($Row == 'a') ? 'b' : 'a';

@@ -37,12 +37,12 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
     <table width="100%" class="topic_list">
             <tr class="colhead">
                     <td colspan="2">Searched for: <?=$Searchtext?></td>
-                    <td>Found <?=$NumResults?> result<? if($NumResults!=1) echo"s";?></td>
+                    <td>Found <?=$NumResults?> result<?php if($NumResults!=1) echo"s";?></td>
             </tr>
 <?php
     $Row = 'a';
 
-    foreach($Articles as $Article) {
+    foreach ($Articles as $Article) {
         list($TopicID, $Title, $Description, $Category, $SubCat, $MinClass) = $Article;
 
         $Row = ($Row == 'a') ? 'b' : 'a';
@@ -57,7 +57,7 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
                     </td>
                     <td>
                             <?=display_str($Description)?>
-<?php               if($MinClass) { ?>
+<?php               if ($MinClass) { ?>
                         <span style="float:right">
                             <?="[{$ClassLevels[$MinClass][Name]}+]"?>
                         </span>
@@ -67,7 +67,6 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
 <?php  } ?>
     </table>
 </div>
-
 
 <?php
 show_footer();

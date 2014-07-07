@@ -55,8 +55,8 @@ show_header();
 <?php
 show_footer();
 
-function get_bonus_points($cap, $count, $a = 8.0, $b = 1, $c=10, $d=0){
-
+function get_bonus_points($cap, $count, $a = 8.0, $b = 1, $c=10, $d=0)
+{
     if ($cap>0 && $count>$cap)$count=$cap;
 
     $num = round( ( sqrt( ( $a *  $count ) + $b ) - 1.0  ) *$c )+$d;
@@ -64,7 +64,8 @@ function get_bonus_points($cap, $count, $a = 8.0, $b = 1, $c=10, $d=0){
     return $num;
 }
 
-function get_seed_values($cap, $a = 8.0, $b = 1, $c=10, $d=0) {
+function get_seed_values($cap, $a = 8.0, $b = 1, $c=10, $d=0)
+{
     $capm = $cap > 0 ? $cap : "no limit";
 
     $ret = "[size=1]round( ( sqrt( ( $a * count ) + $b ) - 1.0  ) *$c ) + $d\nmax torrents counted per hour = $capm [/size]\n\n";
@@ -73,7 +74,7 @@ function get_seed_values($cap, $a = 8.0, $b = 1, $c=10, $d=0) {
     $ret .= "| torrents | credits | max 1wk |\n";
     $ret .= "+----------+---------+---------+\n";
     $lastnum=-1;
-    for($count=1;$count<= 50;$count++){
+    for ($count=1;$count<= 50;$count++) {
             $num = get_bonus_points($cap, $count, $a, $b, $c, $d);
             if ($count==10 || $count==20 || $count==30 || $count==40 || $count==50 || $lastnum !== $num) {
                 $ret .= "| " . str_pad($count, 8)." | ". str_pad($num, 7)." | ". str_pad($num*168, 7)." |\n";
@@ -81,7 +82,7 @@ function get_seed_values($cap, $a = 8.0, $b = 1, $c=10, $d=0) {
             }
     }
 
-    for($i=0;$i<=20000;$i++){
+    for ($i=0;$i<=20000;$i++) {
 
         if ($i <= 15)
             $count = 50 + ( $i * 10);

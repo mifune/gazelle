@@ -1,13 +1,12 @@
 <?php
-if(empty($_REQUEST['groupid']) || !is_number($_REQUEST['groupid']) ){
+if (empty($_REQUEST['groupid']) || !is_number($_REQUEST['groupid']) ) {
      error(0);
 }
-$GroupID = (int)$_REQUEST['groupid'];
+$GroupID = (int) $_REQUEST['groupid'];
 
 $DB->query("SELECT Name, Comment from groups WHERE ID=$GroupID");
 if ($DB->record_count()==0) error(0);
 list($Name, $Description) = $DB->next_record();
-
 
 $DB->query("SELECT
                 UserID,
@@ -18,20 +17,18 @@ $DB->query("SELECT
 
 $Users = $DB->to_array(false,MYSQLI_BOTH);
 
-if(!$Users) { error("Cannot send a mass PM as there are no users in this group"); }
+if (!$Users) { error("Cannot send a mass PM as there are no users in this group"); }
 
 show_header('Send Mass PM', 'upload,bbcode,inbox');
-
-
 
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
 ?>
 <div class="thin">
-	<h2>Send PM To All Users in Group: <?=$Name?></h2>
+    <h2>Send PM To All Users in Group: <?=$Name?></h2>
 
-	<div class="head">Send list<span style="float:right;"><a href="#" onclick="$('#ulist').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span></div>
+    <div class="head">Send list<span style="float:right;"><a href="#" onclick="$('#ulist').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span></div>
       <div id="ulist" class="box pad hidden">
 <?php
            foreach ($Users as $User) {
@@ -62,10 +59,10 @@ $Text = new TEXT;
                         <textarea id="message" name="message" class="long" rows="10"><?=(!empty($Body) ? $Body : '')?></textarea>
                 </div>
             </div>
-		<div class="center">
-			 <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" />
-			 <input type="submit" value="Send Mass PM" />
-		</div>
+        <div class="center">
+             <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" />
+             <input type="submit" value="Send Mass PM" />
+        </div>
         </form>
 
 </div>

@@ -5,9 +5,9 @@ $Text = new TEXT;
 // Number of users per page
 define('USERS_PER_PAGE', '50');
 
-if (isset($_REQUEST['userid']) && $_REQUEST['userid'] >0) $SelectUserID = (int)$_REQUEST['userid'];
+if (isset($_REQUEST['userid']) && $_REQUEST['userid'] >0) $SelectUserID = (int) $_REQUEST['userid'];
 
-$GroupID = (int)$_REQUEST['groupid'];
+$GroupID = (int) $_REQUEST['groupid'];
 
 $DB->query("SELECT Name, Comment, Log
             FROM groups
@@ -21,26 +21,26 @@ list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
 // Main query
 $DB->query("SELECT
-	SQL_CALC_FOUND_ROWS
-	u.UserID,
-	u.Comment,
-	m.Username,
-	m.Uploaded,
-	m.Downloaded,
-	m.PermissionID,
-	m.GroupPermissionID,
-	m.Enabled,
-	m.Paranoia,
-	i.Donor,
-	i.Warned,
-	m.Title,
-	m.LastAccess,
-	i.Avatar
-	FROM users_groups AS u
-	JOIN users_main AS m ON u.UserID=m.ID
-	JOIN users_info AS i ON u.UserID=i.UserID
-	WHERE u.GroupID='$GroupID'
-	ORDER BY m.Username ASC LIMIT $Limit");
+    SQL_CALC_FOUND_ROWS
+    u.UserID,
+    u.Comment,
+    m.Username,
+    m.Uploaded,
+    m.Downloaded,
+    m.PermissionID,
+    m.GroupPermissionID,
+    m.Enabled,
+    m.Paranoia,
+    i.Donor,
+    i.Warned,
+    m.Title,
+    m.LastAccess,
+    i.Avatar
+    FROM users_groups AS u
+    JOIN users_main AS m ON u.UserID=m.ID
+    JOIN users_info AS i ON u.UserID=i.UserID
+    WHERE u.GroupID='$GroupID'
+    ORDER BY m.Username ASC LIMIT $Limit");
 $Users = $DB->to_array(false, MYSQLI_BOTH, array(7));
 
 // Number of results (for pagination)
@@ -160,7 +160,7 @@ list($Results) = $DB->next_record();
             $Pages=get_pages($Page,$Results,USERS_PER_PAGE,9);
             echo $Pages;
 
-            if($Results > 0) { ?>
+            if ($Results > 0) { ?>
                 <span style="float:right;">&nbsp;&nbsp;[<a href="#" onclick="Toggle_All(false);">hide all</a>]</span>&nbsp;
                 <span style="float:right;">&nbsp;&nbsp;[<a href="#" onclick="Toggle_All(true);">show all</a>]</span>&nbsp;
 <?php           }   ?>
@@ -168,10 +168,10 @@ list($Results) = $DB->next_record();
     <div class="head">members of <?=$Name?></div>
     <div class="box pad">
 <?php
-if($Results == 0) {
-	echo '<p>There are no users in this group</p>';
+if ($Results == 0) {
+    echo '<p>There are no users in this group</p>';
 } else {
-    foreach($Users as $User) {
+    foreach ($Users as $User) {
           list($UserID, $Comment, $Username, $Uploaded, $Downloaded, $Class, $GroupPermID, $Enabled, $Paranoia, $Donor, $Warned, $Title, $LastAccess, $Avatar) = $User;
     ?>
     <form action="groups.php" method="post">
@@ -183,20 +183,20 @@ if($Results == 0) {
                 <tr>
                       <td class="colhead" colspan="3">
                             <span style="float:left;"><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $Class, $Title, true, $GroupPermID, true)?>
-    <?php 	if(check_paranoia('ratio', $Paranoia, $Class, $UserID)) { ?>
+    <?php 	if (check_paranoia('ratio', $Paranoia, $Class, $UserID)) { ?>
                             &nbsp;Ratio: <strong><?=ratio($Uploaded, $Downloaded)?></strong>
     <?php 	} ?>
-    <?php 	if(check_paranoia('uploaded', $Paranoia, $Class, $UserID)) { ?>
+    <?php 	if (check_paranoia('uploaded', $Paranoia, $Class, $UserID)) { ?>
                             &nbsp;Up: <strong><?=get_size($Uploaded)?></strong>
     <?php 	} ?>
-    <?php 	if(check_paranoia('downloaded', $Paranoia, $Class, $UserID)) { ?>
+    <?php 	if (check_paranoia('downloaded', $Paranoia, $Class, $UserID)) { ?>
                             &nbsp;Down: <strong><?=get_size($Downloaded)?></strong>
     <?php 	} ?>
                             </span>
 
                             <span style="float:right;">&nbsp;&nbsp;<a href="#" class="togglelink" onclick="$('#friend<?=$UserID?>').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;"><?=($SelectUserID==$UserID?'(Hide)':'(View)')?></a></span>&nbsp;
 
-    <?php 	if(check_paranoia('lastseen', $Paranoia, $Class, $UserID)) { ?>
+    <?php 	if (check_paranoia('lastseen', $Paranoia, $Class, $UserID)) { ?>
                             <span style="float:right;"><?=time_diff($LastAccess)?></span>
     <?php 	} ?>
                       </td>
@@ -204,9 +204,9 @@ if($Results == 0) {
                 <tr id="friend<?=$UserID?>" class="<?=$SelectUserID==$UserID?'':'hidden '?>friendinfo">
                       <td width="50px" valign="top">
     <?php
-          if(empty($HeavyInfo['DisableAvatars'])) {
-                if(!empty($Avatar)) {
-                      if(check_perms('site_proxy_images')) {
+          if (empty($HeavyInfo['DisableAvatars'])) {
+                if (!empty($Avatar)) {
+                      if (check_perms('site_proxy_images')) {
                             $Avatar = 'http'.($SSL?'s':'').'://'.SITE_URL.'/image.php?c=1&i='.urlencode($Avatar);
                       }  ?>
                             <img src="<?=$Avatar?>" alt="<?=$Username?>'s avatar" width="50px" />
@@ -233,7 +233,7 @@ if($Results == 0) {
 ?>
     </div>
     <div class="linkbox">
-		<?=$Pages?>
+        <?=$Pages?>
     </div>
 
 </div>

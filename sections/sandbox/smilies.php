@@ -17,16 +17,16 @@ show_header('Smilies', 'bbcode');
 $files = scandir(STATIC_SERVER.'common/smileys');
 $smilies = $Text->Smilies;
 $Unadded = array();
-foreach($files as $Val) {
+foreach ($files as $Val) {
     if ( !in_array($Val, $smilies) ) $Unadded[] = $Val;
 }
 ?>
 <div class="thin"><div class="box pad"> <?php
-//foreach($smilies as $Val2) {
+//foreach ($smilies as $Val2) {
 //    echo "$Val2<br />";
 //}
 //    echo "<br /><br /><br /><br /><br /><br />";
-foreach($Unadded as $file) {
+foreach ($Unadded as $file) {
     echo "$file<br />";
 }  ?>
 </div></div>
@@ -35,7 +35,7 @@ foreach($Unadded as $file) {
 //---------------------------------------------
 ?>
 <div class="thin">
-	<h2>Smilies</h2>
+    <h2>Smilies</h2>
 
         <div class="linkbox" >
 

@@ -50,7 +50,7 @@ if (!$DupeResults || $NumDupes<1) {
 
         foreach ($DupeResults as $GroupID2 => $GData) {
 
-            if(isset($GData['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
+            if (isset($GData['excluded'])) { // this file was excluded from the dupe check, we will tell the user why
 ?>
                 <tr class="">
                     <td colspan="2">
@@ -77,12 +77,11 @@ if (!$DupeResults || $NumDupes<1) {
 
                 $TorrentTags = array();
                 $numtags=0;
-                foreach($TagList as $Tag) {
+                foreach ($TagList as $Tag) {
                     if ($numtags++>=$LoggedUser['MaxTags'])  break;
                     $TorrentTags[] = '<a href="torrents.php?' . $Action . '&amp;taglist=' . $Tag . '">' . $Tag . '</a>';
                 }
                 $TorrentTags = implode(' ', $TorrentTags);
-
 
                 $AddExtra = torrent_icons($Data, $TorrentID,$Review, $Bookmarks);
 
@@ -133,7 +132,7 @@ if (!$DupeResults || $NumDupes<1) {
     <?php
 }
 
-if(!$INLINE) {
+if (!$INLINE) {
     ?>
     </div>
     <?php

@@ -1,9 +1,9 @@
 <?php
 
-if(empty($_REQUEST['groupid']) || !is_number($_REQUEST['groupid']) ){
+if (empty($_REQUEST['groupid']) || !is_number($_REQUEST['groupid']) ) {
      error(0);
 }
-$GroupID = (int)$_REQUEST['groupid'];
+$GroupID = (int) $_REQUEST['groupid'];
 
 if (!check_perms('users_edit_badges')) {
     error(403);
@@ -22,7 +22,7 @@ $DB->query("SELECT
 
 $Users = $DB->to_array(false,MYSQLI_BOTH);
 
-if(!$Users) { error("Cannot make an award to this group as there are no users in this group"); }
+if (!$Users) { error("Cannot make an award to this group as there are no users in this group"); }
 
 show_header('Mass Award', 'upload,bbcode,inbox');
 
@@ -31,9 +31,9 @@ $Text = new TEXT;
 
 ?>
 <div class="thin">
-	<h2>Give Award To All Users in Group: <?=$Name?></h2>
+    <h2>Give Award To All Users in Group: <?=$Name?></h2>
 
-	<div class="colhead">Member list<span style="float:right;"><a href="#" onclick="$('#ulist').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span></div>
+    <div class="colhead">Member list<span style="float:right;"><a href="#" onclick="$('#ulist').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span></div>
       <div id="ulist" class="box pad hidden">
 <?php
            foreach ($Users as $User) {
@@ -68,7 +68,7 @@ $Text = new TEXT;
                                ORDER BY Sort");
                     $AvailableBadges = $DB->to_array();
 
-                    foreach($AvailableBadges as $Badge){ // = $DB->next_record()
+                    foreach ($AvailableBadges as $Badge) { // = $DB->next_record()
                         list($ID, $Type, $Name, $Tooltip, $Image, $Auto, $Available) = $Badge;
 ?>
                         <tr>

@@ -3,8 +3,8 @@ authorize();
 
 header('Content-Type: application/json; charset=utf-8');
 
-if(!empty($LoggedUser['DisableTagging'])) {
-	error(403,true);
+if (!empty($LoggedUser['DisableTagging'])) {
+    error(403,true);
 }
 
 include(SERVER_ROOT . '/sections/torrents/functions.php');
@@ -37,7 +37,7 @@ $AddedIDs = array();
 
 foreach ($Tags as $Tag) {
     $Tag = trim($Tag, '.'); // trim dots from the beginning and end
-    if ( count($CheckedTags)>0 && !check_perms('site_add_multiple_tags') ){
+    if ( count($CheckedTags)>0 && !check_perms('site_add_multiple_tags') ) {
         $Results[] = array(0, "You cannot enter multiple tags.");
         break;
     }
@@ -54,10 +54,10 @@ foreach ($Tags as $Tag) {
         $OrigTag = $Tag;
         $Tag = sanitize_tag($Tag);
 
-        if ( !is_valid_tag($Tag)){
+        if ( !is_valid_tag($Tag)) {
             $Results[] = array(0, "$OrigTag is not a valid tag.");
             continue;
-        } elseif ( $OrigTag!=$Tag){
+        } elseif ($OrigTag!=$Tag) {
             $Results[] = array(1, "$OrigTag --> $Tag");
         }
 
@@ -105,7 +105,7 @@ foreach ($Tags as $Tag) {
 }
 
 $count =count($AddedIDs);
-if ($count>0){
+if ($count>0) {
 
     $Values = "('".implode("', '$GroupID', '$VoteValue', '$UserID'), ('", $AddedIDs)."', '$GroupID', '$VoteValue', '$UserID')";
 
@@ -136,7 +136,6 @@ if ($count>0){
     update_hash($GroupID); // Delete torrent group cache
 
     echo json_encode(array($Results, get_taglist_html($GroupID, $_POST['tagsort'])));
-
 
 } else { //none actually added
 

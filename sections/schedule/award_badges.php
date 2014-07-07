@@ -4,7 +4,6 @@
  *
  */
 
-
 $DB->query("SELECT BadgeID, Badge, Rank, Title, Action, SendPM, Value, CategoryID, Description, Image
               FROM badges_auto AS ba
               JOIN badges AS b ON b.ID=ba.BadgeID
@@ -12,7 +11,7 @@ $DB->query("SELECT BadgeID, Badge, Rank, Title, Action, SendPM, Value, CategoryI
           ORDER BY b.Sort");
 $AutoActions = $DB->to_array();
 
-foreach($AutoActions as $AutoAction) {
+foreach ($AutoActions as $AutoAction) {
     list($BadgeID, $Badge, $Rank, $Name, $Action, $SendPM, $Value, $CategoryID, $Description, $Image) = $AutoAction;
 
     $SQL = false;
@@ -23,7 +22,7 @@ foreach($AutoActions as $AutoAction) {
                                        WHERE ub.BadgeID = $BadgeID
                                           OR (b.Badge='$Badge' AND b.Rank>=$Rank))";
 
-    switch($Action){ // count things done by user
+    switch ($Action) { // count things done by user
         case 'NumComments':
             $SQL = "SELECT u.ID FROM users_main AS u LEFT JOIN torrents_comments AS tc ON tc.AuthorID=u.ID
                      WHERE Enabled='1'
@@ -65,7 +64,7 @@ foreach($AutoActions as $AutoAction) {
             break;
 
         case 'NumUploaded':
-            if($CategoryID >0) { // category specific awards
+            if ($CategoryID >0) { // category specific awards
                 $SQL = "SELECT u.ID FROM users_main AS u
                           JOIN torrents AS t ON t.UserID=u.ID
                           JOIN torrents_group AS tg ON tg.ID=t.GroupID
@@ -125,7 +124,7 @@ foreach($AutoActions as $AutoAction) {
             break;
     }
 
-    if ($SQL){
+    if ($SQL) {
         $SQL .= " LIMIT 500";
         $DB->query($SQL);
 
@@ -144,7 +143,7 @@ foreach($AutoActions as $AutoAction) {
 
             $DB->query("UPDATE users_info SET AdminComment = CONCAT('".sqltime()." - Badge ". db_string($Name)." ". db_string($Description)." by Scheduler\n', AdminComment) WHERE UserID IN ($SQL_IN)");
 
-		$Values = "('".implode("', '".$BadgeID."', '".db_string($Description)."'), ('", $UserIDs)."', '".$BadgeID."', '".db_string($Description)."')";
+        $Values = "('".implode("', '".$BadgeID."', '".db_string($Description)."'), ('", $UserIDs)."', '".$BadgeID."', '".db_string($Description)."')";
             $DB->query("INSERT INTO users_badges (UserID, BadgeID, Description) VALUES $Values");
 
             // remove lower ranked badges of same badge set
@@ -154,12 +153,12 @@ foreach($AutoActions as $AutoAction) {
                          WHERE ub.UserID IN ($SQL_IN)
                            AND b.Badge='$Badge' AND b.Rank<$Rank");
 
-            if ($SendPM){
+            if ($SendPM) {
                 send_pm($UserIDs, 0, "Congratulations you have been awarded the $Name",
                             "[center][br][br][img]http://".NONSSL_SITE_URL.'/'.STATIC_SERVER."common/badges/{$Image}[/img][br][br][size=5][color=white][bg=#0261a3][br]{$Description}[br][br][/bg][/color][/size][/center]");
             }
 
-            foreach($UserIDs as $UserID) {
+            foreach ($UserIDs as $UserID) {
                 $Cache->delete_value('user_badges_'.$UserID);
                 $Cache->delete_value('user_badges_'.$UserID.'_limit');
             }

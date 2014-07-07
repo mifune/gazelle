@@ -13,7 +13,7 @@ enforce_login();
 require(SERVER_ROOT.'/classes/class_validate.php');
 $Validate = new VALIDATE;
 
-$GroupID = (int)$_POST['groupid'];
+$GroupID = (int) $_POST['groupid'];
 $SenderID = isset($_POST['showsender']) ? $LoggedUser['ID'] : 0;
 $Subject = db_string($_POST['subject']);
 $Message = db_string($_POST['message']);
@@ -26,10 +26,10 @@ $Validate->SetFields('subject','1','string','Invalid subject.',array('maxlength'
 $Validate->SetFields('message','1','string','Invalid message.',array('maxlength'=>10000, 'minlength'=>1));
 $Err = $Validate->ValidateForm($_POST); // Validate the form
 
-if($Err){
-	error($Err);
-	header('Location: '.$_SERVER['HTTP_REFERER']);
-	die();
+if ($Err) {
+    error($Err);
+    header('Location: '.$_SERVER['HTTP_REFERER']);
+    die();
 }
 
 //******************************************************************************//
@@ -39,11 +39,11 @@ $DB->query('SELECT UserID FROM users_groups WHERE GroupID='.$GroupID);
 
 if ($DB->record_count()>0) {
     $Users = $DB->collect('UserID');
-    if ($SenderID == 0){ // we only want to send a masspm if from system
+    if ($SenderID == 0) { // we only want to send a masspm if from system
         send_pm($Users,0,$Subject,$Message);
     } else {
         foreach ($Users as $UserID) {
-		send_pm($UserID,($SenderID==$UserID?0:$SenderID),$Subject,$Message);
+        send_pm($UserID,($SenderID==$UserID?0:$SenderID),$Subject,$Message);
         }
     }
 }

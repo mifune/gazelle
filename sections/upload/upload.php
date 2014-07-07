@@ -14,7 +14,7 @@ show_header('Upload', 'upload,bbcode,autocomplete,tag_autocomplete');
 
 if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']) && check_perms('use_templates') ) {
     /* -------  Get template ------- */
-    $TemplateID = (int)$_POST['template'];
+    $TemplateID = (int) $_POST['template'];
     $Properties = $Cache->get_value('template_' . $TemplateID);
     if ($Properties === FALSE) {
         $DB->query("SELECT
@@ -34,7 +34,7 @@ if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']
                           LEFT JOIN users_main AS u ON u.ID=t.UserID
                               WHERE t.ID='$TemplateID'");
         list($Properties) = $DB->to_array(false, MYSQLI_BOTH);
-        if($Properties){
+        if ($Properties) {
             $Properties['TemplateFooter'] = "[bg=#0074b7][bg=#0074b7,90%][color=white][align=right][b][i][font=Courier New]$Properties[Name] template by $Properties[Authorname][/font][/i][/b][/align][/color][/bg][/bg]";
             $Properties['TemplateID'] = $TemplateID;
             $Cache->cache_value('template_' .$TemplateID, $Properties, 96400 * 7);
@@ -52,15 +52,15 @@ if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']
 
 } elseif (empty($Properties) && !empty($_GET['groupid']) && is_number($_GET['groupid'])) {
     $DB->query("SELECT
-		tg.ID as GroupID,
-		tg.NewCategoryID AS Category,
-		tg.Name AS Title,
-		tg.Image AS Image,
-		tg.Body AS GroupDescription,
+        tg.ID as GroupID,
+        tg.NewCategoryID AS Category,
+        tg.Name AS Title,
+        tg.Image AS Image,
+        tg.Body AS GroupDescription,
             t.UserID
-		FROM torrents_group AS tg
-		LEFT JOIN torrents AS t ON t.GroupID = tg.ID
-		WHERE tg.ID='$_GET[groupid]'");
+        FROM torrents_group AS tg
+        LEFT JOIN torrents AS t ON t.GroupID = tg.ID
+        WHERE tg.ID='$_GET[groupid]'");
     if ($DB->record_count()) {
         list($Properties) = $DB->to_array(false, MYSQLI_BOTH);
         // only the uploader can use this to prefill
@@ -84,12 +84,12 @@ if (empty($Properties) && !empty($_POST['fill']) && is_number($_POST['template']
 } elseif (empty($Properties) && !empty($_GET['requestid']) && is_number($_GET['requestid'])) {
     include(SERVER_ROOT . '/sections/requests/functions.php');
     $DB->query("SELECT
-		r.ID AS RequestID,
-		r.CategoryID,
-		r.Title AS Title,
-		r.Image
-		FROM requests AS r
-		WHERE r.ID=" . $_GET['requestid']);
+        r.ID AS RequestID,
+        r.CategoryID,
+        r.Title AS Title,
+        r.Image
+        FROM requests AS r
+        WHERE r.ID=" . $_GET['requestid']);
 
     list($Properties) = $DB->to_array(false, MYSQLI_BOTH);
     $Properties['TagList'] = implode(" ", get_request_tags($_GET['requestid']));
@@ -118,7 +118,7 @@ if ($DNU === FALSE) {
 list($Name, $Comment, $Updated) = end($DNU);
 reset($DNU);
 $DB->query("SELECT IF(MAX(t.Time) < '$Updated' OR MAX(t.Time) IS NULL,1,0) FROM torrents AS t
-			WHERE UserID = " . $LoggedUser['ID']);
+            WHERE UserID = " . $LoggedUser['ID']);
 list($NewDNU) = $DB->next_record();
 // test $HideDNU first as it may have been passed from upload_handle
 if (!$HideDNU)
@@ -126,7 +126,8 @@ if (!$HideDNU)
 ?>
 
 <script type="text/javascript">//<![CDATA[
-    function change_tagtext() {
+    public function change_tagtext()
+    {
         var tags = new Array();
 <?php
 foreach ($NewCategories as $cat) {
@@ -262,7 +263,8 @@ foreach ($Whitelist as $ImageHost) {
             </form>
         </div>
         <script type="text/javascript">//<![CDATA[
-        function SynchTemplates(){
+        function SynchTemplates()
+        {
             SelectTemplate(<?=$CanDelAny?>);
         }
             addDOMLoadEvent(SynchTemplates);

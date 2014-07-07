@@ -1,12 +1,11 @@
 <?php
 if (!check_perms('users_view_ips')) error(403,true);
 
-if(empty($_REQUEST['ip']) || !preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $_REQUEST['ip']) ){
+if (empty($_REQUEST['ip']) || !preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $_REQUEST['ip']) ) {
     error("IP error: ".display_str($_REQUEST['ip']),true);
 }
 
 $IP = $_REQUEST['ip'];
-
 
 $DB->query("SELECT
                 h.UserID,

@@ -24,7 +24,8 @@ include(SERVER_ROOT . '/sections/bookmarks/functions.php');
 include(SERVER_ROOT . '/sections/torrents/functions.php');
 
 // The "order by x" links on columns headers
-function header_link($SortKey, $DefaultWay = "desc") {
+function header_link($SortKey, $DefaultWay = "desc")
+{
     global $OrderBy, $OrderWay;
     if ($SortKey == $OrderBy) {
         if ($OrderWay == "desc") {
@@ -40,9 +41,9 @@ function header_link($SortKey, $DefaultWay = "desc") {
 }
 
 if (isset($LoggedUser['TorrentsPerPage'])) {
-	$TorrentsPerPage = $LoggedUser['TorrentsPerPage'];
+    $TorrentsPerPage = $LoggedUser['TorrentsPerPage'];
 } else {
-	$TorrentsPerPage = TORRENTS_PER_PAGE;
+    $TorrentsPerPage = TORRENTS_PER_PAGE;
 }
 
 $UserID = $LoggedUser['ID'];
@@ -268,20 +269,20 @@ if (!isset($_GET['sizerange'])) $_GET['sizerange'] = 0.01;
 if (!isset($_GET['sizetype'])) $_GET['sizetype'] = 'gb';
 
 if (!empty($_GET['sizeall'])) {
-    if($_GET['sizetype']=='tb') {
+    if ($_GET['sizetype']=='tb') {
         $mul = 1024 * 1024 * 1024;
-    } elseif($_GET['sizetype']=='gb') {
+    } elseif ($_GET['sizetype']=='gb') {
         $mul = 1024 * 1024;
-    } elseif($_GET['sizetype']=='mb'){
+    } elseif ($_GET['sizetype']=='mb') {
         $mul = 1024;
     } else {
         $mul = 1;
     }
-    $totalsize = (float)$_GET['sizeall'] * $mul;
-    $rangemod = (float)$_GET['sizerange'];
-    $range = (float)($mul * $rangemod);
-    $min_sizekb = (int)ceil($totalsize - $range);
-    $max_sizekb = (int)ceil($totalsize + $range);
+    $totalsize = (float) $_GET['sizeall'] * $mul;
+    $rangemod = (float) $_GET['sizerange'];
+    $range = (float) ($mul * $rangemod);
+    $min_sizekb = (int) ceil($totalsize - $range);
+    $max_sizekb = (int) ceil($totalsize + $range);
     $SS->set_filter_range('size', $min_sizekb, $max_sizekb);
 }
 
@@ -368,7 +369,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
         <a style="float:left;margin-top:4px" href="feeds.php?feed=torrents_all&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>" title="<?=SITE_NAME?> : All Torrents" ><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
     Browse Torrents</h2>
 <?php
-    if(check_perms('torrents_review')){
+    if (check_perms('torrents_review')) {
         update_staff_checking("browsing torrents", true);
 ?>
         <div id="staff_status" class="status_box">
@@ -458,7 +459,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                             <label style="margin-left:20px;" for="limit_matches" title="Limit results to the first 100 matches"><strong>Limit results (max 100):</strong></label>
                             <input type="checkbox" value="1" name="limit_matches" <?php  selected('limit_matches', 1, 'checked') ?> />
                     <?php  } ?>
-                <span style="float:right"><a href="#" onclick="$('.on_cat_change').toggle();$('.non_cat_change').toggle(); if(this.innerHTML=='(View Categories)'){this.innerHTML='(Hide Categories)';} else {this.innerHTML='(View Categories)';}; return false;"><?= (!empty($LoggedUser['HideCats'])) ? '(View Categories)' : '(Hide Categories)' ?></a></span>
+                <span style="float:right"><a href="#" onclick="$('.on_cat_change').toggle();$('.non_cat_change').toggle(); if (this.innerHTML=='(View Categories)') {this.innerHTML='(Hide Categories)';} else {this.innerHTML='(View Categories)';}; return false;"><?= (!empty($LoggedUser['HideCats'])) ? '(View Categories)' : '(Hide Categories)' ?></a></span>
 
                     <input class="non_cat_change <?php  if (empty($LoggedUser['HideCats'])) { ?>hidden<?php  } ?>" style="float:right;position:relative;right:2px;top:45px;"
                            type="submit" value="Filter Torrents" />
@@ -488,11 +489,11 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
                         <td colspan="3">
                             <input type="text" spellcheck="false" size="25" name="sizeall" class="smallish" title="Specify a size, IMPORTANT: because size is rounded from bytes there is a small margin each way - so not all matches will have the exact same number of bytes" value="<?php  form('sizeall') ?>" />
                             <select name="sizetype">
-									<option value="kb" <?php if($_GET['sizetype']=='kb')echo'selected="selected"'?> > KB </option>
-									<option value="mb" <?php if($_GET['sizetype']=='mb')echo'selected="selected"'?>> MB </option>
-									<option value="gb" <?php if($_GET['sizetype']=='gb')echo'selected="selected"'?>> GB </option>
-									<option value="tb" <?php if($_GET['sizetype']=='tb')echo'selected="selected"'?>> TB </option>
-							</select>
+                                    <option value="kb" <?php if($_GET['sizetype']=='kb')echo'selected="selected"'?> > KB </option>
+                                    <option value="mb" <?php if($_GET['sizetype']=='mb')echo'selected="selected"'?>> MB </option>
+                                    <option value="gb" <?php if($_GET['sizetype']=='gb')echo'selected="selected"'?>> GB </option>
+                                    <option value="tb" <?php if($_GET['sizetype']=='tb')echo'selected="selected"'?>> TB </option>
+                            </select>
                 <?php  //if ( check_perms('site_debug')) { ?>
                             &nbsp; range &plusmn;
                             <input type="text" spellcheck="false" size="10" name="sizerange" class="smallest" title="Advanced users! Specify a range modifier, default is &plusmn;0.01" value="<?php  form('sizerange') ?>" />
@@ -547,7 +548,7 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
         </div>
             </table>
             <div>
-                <span style="float:left;margin-left:80%;"><a href="#" onclick="$('#taglist').toggle(); if(this.innerHTML=='(View Tags)'){this.innerHTML='(Hide Tags)';} else {this.innerHTML='(View Tags)';}; return false;"><?= (empty($LoggedUser['ShowTags'])) ? '(View Tags)' : '(Hide Tags)' ?></a></span>
+                <span style="float:left;margin-left:80%;"><a href="#" onclick="$('#taglist').toggle(); if (this.innerHTML=='(View Tags)') {this.innerHTML='(Hide Tags)';} else {this.innerHTML='(View Tags)';}; return false;"><?= (empty($LoggedUser['ShowTags'])) ? '(View Tags)' : '(Hide Tags)' ?></a></span>
                 <br/>
             </div>
             <table width="100%" class="taglist <?php  if (empty($LoggedUser['ShowTags'])) { ?>hidden<?php  } ?>" id="taglist">
@@ -594,21 +595,21 @@ $Pages = get_pages($Page, $TorrentCount, $TorrentsPerPage);
 
 if ($TorrentCount == 0) {
     $DB->query("SELECT
-	tags.Name,
-	((COUNT(tags.Name)-2)*(SUM(tt.PositiveVotes)-SUM(tt.NegativeVotes)))/(tags.Uses*0.8) AS Score
-	FROM xbt_snatched AS s
-	INNER JOIN torrents AS t ON t.ID=s.fid
-	INNER JOIN torrents_group AS g ON t.GroupID=g.ID
-	INNER JOIN torrents_tags AS tt ON tt.GroupID=g.ID
-	INNER JOIN tags ON tags.ID=tt.TagID
-	WHERE s.uid='$LoggedUser[ID]'
-	AND tt.TagID<>'13679'
-	AND tt.TagID<>'4820'
-	AND tt.TagID<>'2838'
-	AND tags.Uses > '10'
-	GROUP BY tt.TagID
-	ORDER BY Score DESC
-	LIMIT 8");
+    tags.Name,
+    ((COUNT(tags.Name)-2)*(SUM(tt.PositiveVotes)-SUM(tt.NegativeVotes)))/(tags.Uses*0.8) AS Score
+    FROM xbt_snatched AS s
+    INNER JOIN torrents AS t ON t.ID=s.fid
+    INNER JOIN torrents_group AS g ON t.GroupID=g.ID
+    INNER JOIN torrents_tags AS tt ON tt.GroupID=g.ID
+    INNER JOIN tags ON tags.ID=tt.TagID
+    WHERE s.uid='$LoggedUser[ID]'
+    AND tt.TagID<>'13679'
+    AND tt.TagID<>'4820'
+    AND tt.TagID<>'2838'
+    AND tags.Uses > '10'
+    GROUP BY tt.TagID
+    ORDER BY Score DESC
+    LIMIT 8");
     ?>
     <div class="box pad" align="center">
         <h2>Your search did not match anything.</h2>
@@ -651,7 +652,7 @@ $Bookmarks = all_bookmarks('torrent');
         $Review = get_last_review($GroupID);
 
         $day = date('j', strtotime($Data['Time'])  - $LoggedUser['TimeOffset']);
-        if ($AllTorrents && $LoggedUser['SplitByDays'] && $lastday !== $day ) {
+        if ($AllTorrents && $LoggedUser['SplitByDays'] && $lastday !== $day) {
 ?>
     <tr class="colhead">
         <td colspan="10" class="center">
@@ -666,7 +667,7 @@ $Bookmarks = all_bookmarks('torrent');
 
         $TorrentTags = array();
         $numtags=0;
-		foreach($TagList as $Tag) {
+        foreach ($TagList as $Tag) {
             if ($numtags++>=$LoggedUser['MaxTags'])  break;
             $TorrentTags[] = '<a href="torrents.php?' . $Action . '&amp;taglist=' . $Tag . '">' . $Tag . '</a>';
         }
@@ -693,7 +694,7 @@ $Bookmarks = all_bookmarks('torrent');
                     $GroupName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
                 }
 
-                if ($LoggedUser['HideFloat']){?>
+                if ($LoggedUser['HideFloat']) {?>
                     <?=$AddExtra?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a>
 <?php               } else {
                     $Overlay = get_overlay_html($GroupName, $TorrentUsername, $Image, $Data['Seeders'], $Data['Leechers'], $Data['Size'], $Data['Snatched']);

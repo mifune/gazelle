@@ -1,23 +1,22 @@
 <?php
-if(!check_perms('admin_donor_addresses')) { error(403); }
+if (!check_perms('admin_donor_addresses')) { error(403); }
 
 include(SERVER_ROOT.'/sections/donate/functions.php');
 define('DONATIONS_PER_PAGE', 50);
-
 
 show_header('Bitcoin addresses');
 ?>
 <div class="thin">
     <h2>Bitcoin address pool</h2>
 
-	<div class="linkbox">
-		<a href="tools.php?action=btc_address_input">[Unused address pool]</a>
+    <div class="linkbox">
+        <a href="tools.php?action=btc_address_input">[Unused address pool]</a>
         <?php if (check_perms('admin_donor_log')) { ?>
-		<a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
-		<a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
-		<a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
+        <a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
+        <a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
+        <a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
         <?php  } ?>
-	</div>
+    </div>
 
     <div class="head">Add more donation addresses</div>
     <div class="box pad">
@@ -72,7 +71,7 @@ show_header('Bitcoin addresses');
                         <td></td>
                     </tr>
     <?php
-        foreach($Addresses as $Address) {
+        foreach ($Addresses as $Address) {
             list($ID, $public, $UserID, $Username, $PermissionID, $Enabled, $Donor, $Warned) = $Address;
 
                 $row = $row=='b'?'a':'b';
@@ -95,7 +94,6 @@ show_header('Bitcoin addresses');
             </div>
         </form>
     </div>
-
 
     <div class="linkbox">
         <?=$Pages?>

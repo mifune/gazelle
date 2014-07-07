@@ -37,7 +37,7 @@ if (isset($_POST['delsynomyns'])) {
 
 if (isset($_POST['tagtosynomyn'])) {
 
-    $ParentTagID = (int)$_POST['parenttagid'];
+    $ParentTagID = (int) $_POST['parenttagid'];
     if ($ParentTagID) {
         $DB->query("SELECT Name FROM tags WHERE ID=$ParentTagID");
         list($ParentTagName) = $DB->next_record();
@@ -50,11 +50,11 @@ if (isset($_POST['tagtosynomyn'])) {
             if (!is_number($TagID)) error(0);
         }
     } else {
-        $TagsID = array( (int)$_POST['movetagid'] );
+        $TagsID = array( (int) $_POST['movetagid'] );
     }
 
-    foreach( $TagsID as $TagID) {
-        $TagID = (int)$TagID;
+    foreach ($TagsID as $TagID) {
+        $TagID = (int) $TagID;
         if ($TagID) {
             $DB->query("SELECT Name, Count(ts.ID)
                           FROM tags AS t
@@ -107,7 +107,7 @@ if (isset($_POST['tagtosynomyn'])) {
                             $MsgGroups = "torrents ";
                             foreach ($GroupInfos as $Group) {
                                 list($GroupID, $PVotes, $NVotes, $Count) = $Group;
-                                if ($Count==0){ // only insert parenttag into groups where not already present
+                                if ($Count==0) { // only insert parenttag into groups where not already present
                                     $SQL .= "$Div ('$ParentTagID', '$GroupID', '$PVotes', '$NVotes', '{$LoggedUser['ID']}')";
                                     $Div = ',';
                                     $NumChangedFilelists++;
@@ -117,7 +117,7 @@ if (isset($_POST['tagtosynomyn'])) {
                             }
 
                             // update torrents_tags with entries for parentTagID
-                            if($SQL !=''){
+                            if ($SQL !='') {
                                 $SQL = "INSERT IGNORE INTO torrents_tags
                                                   (TagID, GroupID, PositiveVotes, NegativeVotes, UserID) VALUES $SQL";
                                 $DB->query($SQL);

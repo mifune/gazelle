@@ -17,15 +17,15 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
 ?>
 
 <div class="thin">
-	<h2>Medals and Awards</h2>
+    <h2>Medals and Awards</h2>
 <?php
-	$Row = 'a';
+    $Row = 'a';
       $LastType='';
-	foreach($Awards as $Award) {
-		list($Name, $Type, $Desc, $Cost, $Image, $Sorter) = $Award;
+    foreach ($Awards as $Award) {
+        list($Name, $Type, $Desc, $Cost, $Image, $Sorter) = $Award;
 
-            if ($LastType != $Sorter) {     // && $Type != 'Unique'){
-                if ($LastType!=''){  ?>
+            if ($LastType != $Sorter) {     // && $Type != 'Unique') {
+                if ($LastType!='') {  ?>
       </div>
 <?php
                 }
@@ -33,7 +33,7 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
       <div class="" style="width:40%;float:right;margin:0 4% 20px 4%;display:inline-block;">
             <div class="head pad">
                 <?php
-                switch($Sorter){
+                switch ($Sorter) {
                     case 2:
                         echo "Medals available for purchase in the bonus shop";
                         break;
@@ -51,9 +51,9 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
                 $LastType=$Sorter;
             }
 
-		$Row = ($Row == 'a') ? 'b' : 'a';
+        $Row = ($Row == 'a') ? 'b' : 'a';
 ?>
-		<div class="row<?=$Row?> pad">
+        <div class="row<?=$Row?> pad">
                 <h3 class="pad" style="float:left;"><?=display_str($Name)?></h3>
 <?php           if ($Type=='Shop') echo '<strong style="float:right;margin-top:2px;">Cost: '.number_format($Cost).'</strong>'; ?>
                 <div class="badge" style="width:100%;height:40px;clear:both;">
@@ -62,9 +62,9 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
                 <div class="pad" style="width:100%;">
                     <p><?=$Desc?></p>
                 </div>
-		</div>
+        </div>
 <?php	}  ?>
-	</div>
+    </div>
     <div class="clear"></div>
 </div>
 

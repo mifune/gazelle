@@ -1,5 +1,5 @@
 <?php
-if(!check_perms('site_manage_awards')) { error(403); }
+if (!check_perms('site_manage_awards')) { error(403); }
 
 show_header('Automatic Awards schedule','badges');
 
@@ -11,7 +11,8 @@ $DB->query("SELECT ID, Name
               FROM categories ORDER BY Name");
 $CatsArray = $DB->to_array();
 
-function print_badges_select($ElementID, $CurrentBadgeID=-1){
+function print_badges_select($ElementID, $CurrentBadgeID=-1)
+{
     global $BadgesArray;
 ?>
     <select name="badgeid[<?=$ElementID?>]" id="badgeid<?=$ElementID?>" onchange="Select_Badge('<?=$ElementID?>')">
@@ -22,7 +23,8 @@ function print_badges_select($ElementID, $CurrentBadgeID=-1){
     </select>
 <?php
 }
-function print_categories($ElementID, $SelectedCat=-1){
+function print_categories($ElementID, $SelectedCat=-1)
+{
     global $CatsArray;
 ?>
     <select name="catid[<?=$ElementID?>]" id="catid<?=$ElementID?>" onchange="Set_Edit('<?=$ElementID?>')" title="Category ID: If specified for NumUploaded then only torrents in this cateogry are counted (has no effect on other actions)">
@@ -59,10 +61,10 @@ function print_categories($ElementID, $SelectedCat=-1){
                 <td colspan="6">Description (from badges)</td>
             </tr>
 <?php
-            $numAdds = isset($_REQUEST['numadd'])?(int)$_REQUEST['numadd']:5;
+            $numAdds = isset($_REQUEST['numadd'])?(int) $_REQUEST['numadd']:5;
             if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
 
-            for($i = 0; $i < $numAdds; $i++) {
+            for ($i = 0; $i < $numAdds; $i++) {
                 $ID = "new$i";
 ?>
                 <tr class="rowb">
@@ -170,7 +172,7 @@ function print_categories($ElementID, $SelectedCat=-1){
                       JOIN badges AS b ON b.ID=ba.BadgeID ORDER BY b.Sort");
 
             $Row = 'b';
-            while(list($ID, $BadgeID, $Name, $Action, $SendPM, $Value, $CategoryID, $Description, $Image, $Active) = $DB->next_record()){
+            while (list($ID, $BadgeID, $Name, $Action, $SendPM, $Value, $CategoryID, $Description, $Image, $Active) = $DB->next_record()) {
                   $Row = ($Row === 'a' ? 'b' : 'a');
 ?>
 

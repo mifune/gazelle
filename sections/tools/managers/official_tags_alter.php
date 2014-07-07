@@ -27,17 +27,17 @@ if (isset($_POST['doit'])) {
                       GROUP BY t.ID
                           ");
             list($SynName, $NumSynomyns) = $DB->next_record();
-            if ($NumSynomyns==0){
-                $ChangeIDs[] = (int)$OldTagID;
+            if ($NumSynomyns==0) {
+                $ChangeIDs[] = (int) $OldTagID;
                 $ChangeNames[] = $SynName;
             } else
                 $NotChangeNames[] = $SynName;
         }
-        if(count($NotChangeNames)>0){
+        if (count($NotChangeNames)>0) {
             $Message .= "Cannot remove tags from official list that have synonyms: ". implode(', ', $NotChangeNames).". ";
             $Result = 0;
         }
-        if(count($ChangeIDs)>0){
+        if (count($ChangeIDs)>0) {
             $ChangeIDs = implode(', ', $ChangeIDs);
             $DB->query("UPDATE tags SET TagType = 'other' WHERE ID IN ($ChangeIDs)");
             $Message .= "Removed tags from official list: ". implode(', ', $ChangeNames);
@@ -77,7 +77,7 @@ if (isset($_POST['deletetagperm'])) {
     if (!check_perms('site_convert_tags')) error(403);
 
     $Result = 0;
-    $TagID = (int)$_POST['permdeletetagid'];
+    $TagID = (int) $_POST['permdeletetagid'];
 
     $DB->query("SELECT Name, Count(ts.ID)
                           FROM tags AS t
@@ -128,7 +128,7 @@ if (isset($_POST['deletetagperm'])) {
     }
 }
 
-if(isset($_POST['recountall'])) {
+if (isset($_POST['recountall'])) {
 
     if (!check_perms('site_convert_tags'))  error(403);
 

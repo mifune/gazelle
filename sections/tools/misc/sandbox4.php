@@ -14,17 +14,17 @@ $fname=1;
 
 $Peers = array();
 
-foreach($input as $key=>$line){
+foreach ($input as $key=>$line) {
 
-    if (strpos($line, "INSERT INTO")!==FALSE){
+    if (strpos($line, "INSERT INTO")!==FALSE) {
 
     } else {
         $parts = explode("', '", $line);
         if (count($parts)>1) {
             $parts[0] = substr($parts[0], 2, 8);
-            if (substr($parts[0], 0, 4)!='exbc'){
+            if (substr($parts[0], 0, 4)!='exbc') {
                 $str = preg_replace('/[^a-z0-9]/', '', $parts[0]);
-                if ( !array_key_exists($str, $Peers)){
+                if ( !array_key_exists($str, $Peers)) {
                     $i++;
                     $parts[1] = substr($parts[1], 0, strlen($parts[1])-4 );
                     $Peers[$str] = array(0, db_string($parts[0]) , $parts[1] );
@@ -36,7 +36,7 @@ foreach($input as $key=>$line){
     }
 }
 
-foreach($Peers as $key=>$val){
+foreach ($Peers as $key=>$val) {
     $Values[] = "('$val[0]', '$val[1]', '$val[2]'),\n";
 }
 
@@ -47,9 +47,10 @@ foreach($Peers as $key=>$val){
 
 echo $i;
 
-function saverest($filename, $output){
+function saverest($filename, $output)
+{
     $handle = fopen($filename, 'w');
-    if ( $handle === FALSE) {
+    if ($handle === FALSE) {
          echo "Cannot open file ($filename)<br/>";
          exit;
     }
@@ -72,9 +73,11 @@ function saverest($filename, $output){
         echo "Success, wrote input to file ($filename)<br/>";
 
         fclose($handle);
+
         return true;
     } else {
         echo "The file $filename is not writable<br/>";
+
         return false;
     }
 }

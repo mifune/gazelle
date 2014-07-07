@@ -3,21 +3,21 @@ enforce_login();
 
 if (empty($_REQUEST['action'])) { $_REQUEST['action'] = ''; }
 
-switch($_REQUEST['action']){
-	case 'report':
-		include('report.php');
-		break;
-	case 'takereport':
-		include('takereport.php');
-		break;
-	case 'Resolve':
-		include('takeresolve.php');
-		break;
+switch ($_REQUEST['action']) {
+    case 'report':
+        include 'report.php';
+        break;
+    case 'takereport':
+        include 'takereport.php';
+        break;
+    case 'Resolve':
+        include 'takeresolve.php';
+        break;
       case 'Add comment':
             authorize();
 
             if(empty($_POST['reportid']) && !is_number($_POST['reportid'])) error(0);
-            $ReportID = (int)$_POST['reportid'];
+            $ReportID = (int) $_POST['reportid'];
 
             if (isset($_POST['comment'])) $Comment = trim($_POST['comment']);
             if(!$Comment || $Comment == '') error("Cannot add a blank comment!");
@@ -37,7 +37,7 @@ switch($_REQUEST['action']){
             if(empty($_POST['subject']) || $_POST['subject']=='') error("No Subject!");
             if(empty($_POST['toid']) || !is_number($_POST['toid'])) error(0);
 
-            $ReportID = (int)$_POST['reportid'];
+            $ReportID = (int) $_POST['reportid'];
 
             $Message = db_string($_POST['message']);
             $Subject = db_string($_POST['subject']);
@@ -60,11 +60,11 @@ switch($_REQUEST['action']){
             $Cache->delete_value('staff_pm_new_'.$ToID);
             header("Location: reports.php#report$ReportID");
 
-		break;
-	case 'stats':
-		include(SERVER_ROOT.'/sections/reports/stats.php');
-		break;
-	default:
-		include(SERVER_ROOT.'/sections/reports/reports.php');
-		break;
+        break;
+    case 'stats':
+        include(SERVER_ROOT.'/sections/reports/stats.php');
+        break;
+    default:
+        include(SERVER_ROOT.'/sections/reports/reports.php');
+        break;
 }

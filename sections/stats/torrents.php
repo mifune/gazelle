@@ -8,10 +8,10 @@ $DB->query("SELECT tg.NewCategoryID, COUNT(t.ID) AS Torrents
           GROUP BY tg.NewCategoryID ORDER BY Torrents DESC");
 $Groups = $DB->to_array();
 $Pie = new PIE_CHART(750,400,array('Other'=>0.2,'Percentage'=>1));
-foreach($Groups as $Group) {
-	list($NewCategoryID, $Torrents) = $Group;
-	//$CategoryName = $NewCategories[$NewCategoryID]['name'];
-	$Pie->add($NewCategories[$NewCategoryID]['name'],$Torrents);
+foreach ($Groups as $Group) {
+    list($NewCategoryID, $Torrents) = $Group;
+    //$CategoryName = $NewCategories[$NewCategoryID]['name'];
+    $Pie->add($NewCategories[$NewCategoryID]['name'],$Torrents);
 }
 $Pie->transparent();
 $Pie->color('FF33CC');
@@ -74,7 +74,7 @@ if (count($TorrentStats)>0) {
 
     $rows = array();
     //reset($SiteStats);
-    foreach ($TorrentStats as $data)  {
+    foreach ($TorrentStats as $data) {
         list($Label, $Torrents) = $data;
         $rows[] = " {c:[{v: '$Label'}, {v: $Torrents}]} ";
     }
@@ -84,17 +84,16 @@ if (count($TorrentStats)>0) {
 
 //=================================================================
 
-
 show_header('Torrent statistics','charts,jquery');
 ?>
 
 <div class="thin">
     <h2>Torrent stats</h2>
-	<div class="linkbox">
-		<a href="stats.php?action=users">[User graphs]</a>
-		<a href="stats.php?action=site">[Site stats]</a>
-		<strong><a href="stats.php?action=torrents">[Torrent stats]</a></strong>
-	</div>
+    <div class="linkbox">
+        <a href="stats.php?action=users">[User graphs]</a>
+        <a href="stats.php?action=site">[Site stats]</a>
+        <strong><a href="stats.php?action=torrents">[Torrent stats]</a></strong>
+    </div>
     <br/>
 
     <div class="head">Uploads daily</div>
@@ -140,7 +139,7 @@ show_header('Torrent statistics','charts,jquery');
 
 <?php
     if (check_perms('site_stats_advanced')) {
-        if (isset($_POST['year1'])){
+        if (isset($_POST['year1'])) {
             $start = array ($_POST['year1'],$_POST['month1'],$_POST['day1']);
             $end = array ($_POST['year2'],$_POST['month2'],$_POST['day2']);
         } else {
