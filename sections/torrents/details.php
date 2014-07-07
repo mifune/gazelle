@@ -11,7 +11,6 @@ include(SERVER_ROOT.'/sections/tools/managers/mfd_functions.php');
 include(SERVER_ROOT.'/sections/requests/functions.php');
 include(SERVER_ROOT.'/sections/bookmarks/functions.php'); // has_bookmarked()
 include(SERVER_ROOT.'/classes/class_text.php');
-include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
 
 if(!$GroupID) $GroupID=ceil($_GET['id']);

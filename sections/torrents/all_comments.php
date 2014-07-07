@@ -6,7 +6,6 @@ if (!check_perms('users_mod')) error(403);
 //---------- Things to sort out before it can start printing/generating content
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
-include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
  
 if (isset($LoggedUser['PostsPerPage'])) {

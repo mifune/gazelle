@@ -12,7 +12,7 @@ Things to expect in $_GET:
 //---------- Things to sort out before it can start printing/generating content
 
 include(SERVER_ROOT.'/classes/class_text.php');
-include(SERVER_ROOT.'/classes/class_comment.php');
+
 $Text = new TEXT;
 
 // Check for lame SQL injection attempts

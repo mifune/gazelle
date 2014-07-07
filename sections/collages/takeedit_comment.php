@@ -2,7 +2,7 @@
 authorize();
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
-include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
+
 $Text = new TEXT;
 
 // Quick SQL injection check

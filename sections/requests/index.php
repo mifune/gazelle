@@ -119,7 +119,6 @@ if(!isset($_REQUEST['action'])) {
 			authorize();
 
 			include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
-			include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 
 			$Text = new TEXT;
 			$Text->validate_bbcode($_POST['body'],  get_permissions_advtags($LoggedUser['ID']));

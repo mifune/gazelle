@@ -6,7 +6,6 @@
 
 include(SERVER_ROOT.'/sections/bookmarks/functions.php'); // has_bookmarked()
 include(SERVER_ROOT.'/classes/class_text.php');
-include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
 
 if(empty($_GET['id']) || !is_number($_GET['id'])) { 
