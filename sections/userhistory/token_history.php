@@ -1,4 +1,4 @@
-<?
+<?php
 /************************************************************************
 ||------------------|| User token history page ||-----------------------||
 This page lists the torrents a user has spent his tokens on. It
@@ -30,17 +30,12 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $OrderWay = 'desc';
 }
 
-
-                                    // 'upspeed', 
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Torrent', 'Size', 'Time', 'Freeleech' ,'Doubleseed' ))) {
     $_GET['order_by'] = 'Time';
-    $OrderBy = 'Time'; 
+    $OrderBy = 'Time';
 } else {
     $OrderBy = $_GET['order_by'];
 }
-
-
-
 
 if (isset($_GET['userid'])) {
 	$UserID = $_GET['userid'];
@@ -61,7 +56,7 @@ if (isset($_GET['expire'])) {
 	if (!check_perms('users_mod')) { error(403); }
 	$UserID = $_GET['userid'];
 	$TorrentID = $_GET['torrentid'];
-	
+
 	if (!is_number($UserID) || !is_number($TorrentID)) { error(403); }
 	$DB->query("SELECT info_hash FROM torrents where ID = $TorrentID");
 	if (list($InfoHash) = $DB->next_record(MYSQLI_NUM, FALSE)) {
@@ -88,7 +83,7 @@ $DB->query("SELECT SQL_CALC_FOUND_ROWS
 			JOIN torrents AS t ON t.ID = us.TorrentID
 			JOIN torrents_group AS tg ON tg.ID = t.GroupID
 		   WHERE us.UserID = $UserID
-		ORDER BY $OrderBy $OrderWay 
+		ORDER BY $OrderBy $OrderWay
            LIMIT $Limit");
 $Tokens = $DB->to_array();
 
@@ -108,7 +103,7 @@ $Pages=get_pages($Page, $NumResults, 50);
             <td class="center"><a href="<?=header_link('Freeleech') ?>">Freeleech</a></td>
             <td class="center"><a href="<?=header_link('Doubleseed') ?>">Doubleseed</a></td>
         </tr>
-<?
+<?php
     foreach ($Tokens as $Token) {
         $GroupIDs[] = $Token['GroupID'];
     }
@@ -116,15 +111,12 @@ $Pages=get_pages($Page, $NumResults, 50);
     $i = true;
     foreach ($Tokens as $Token) {
         $i = !$i;
-        list($TorrentID, $GroupID, $Size, $Time, $FreeLeech, $DoubleSeed, $Name) = $Token; 
+        list($TorrentID, $GroupID, $Size, $Time, $FreeLeech, $DoubleSeed, $Name) = $Token;
         $Name = "<a href=\"torrents.php?torrentid=$TorrentID\">$Name</a>";
             if ($FreeLeech == '0000-00-00 00:00:00') {
                 $fl = 'No';
             } else {
-                $fl = time_diff($FreeLeech,2,true,false,1) ;
-                //if ($FreeLeech <= sqltime() ) $fl = '<span style="color:red">'.$fl. '</span>' ;
-                
-                $fl = $FreeLeech > sqltime() ? 
+                $fl = $FreeLeech > sqltime() ?
                     time_diff($FreeLeech) : '<span style="color:red" title="' . time_diff($FreeLeech,2,false,false,1) . '">Expired</span>';
             }
 
@@ -132,8 +124,6 @@ $Pages=get_pages($Page, $NumResults, 50);
                 $ds = 'No';
             } else {
                 $ds = time_diff($DoubleSeed,2,true,false,1);
-                //if ($DoubleSeed <= sqltime() ) $ds = '<span style="color:red">'.$ds. '</span>' ;
-                
                 $ds = $DoubleSeed > sqltime() ?
                     time_diff($DoubleSeed) : '<span style="color:red" title="' . time_diff($DoubleSeed,2,false,false,1) . '">Expired</span>';
             }
@@ -145,11 +135,10 @@ $Pages=get_pages($Page, $NumResults, 50);
             <td class="center"><?=$fl?></td>
             <td class="center"><?=$ds?></td>
         </tr>
-<?  }       ?>
+<?php   }       ?>
     </table>
     <div class="linkbox"><?=$Pages?></div>
 </div>
 
-<?
+<?php
 show_footer();
-?>

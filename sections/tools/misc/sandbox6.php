@@ -1,9 +1,6 @@
-<? 
+<?php
 enforce_login();
 show_header('Staff Awarded Medals');
-  
-//include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
-//$Text = new TEXT;
 
 $DB->query("SELECT b.Title, b.Type, b.Description, b.Cost, b.Image , b.Badge, b.Rank
               FROM badges AS b
@@ -11,25 +8,23 @@ $DB->query("SELECT b.Title, b.Type, b.Description, b.Cost, b.Image , b.Badge, b.
               WHERE ba.ID IS NULL AND Type!='Shop'
            ORDER BY b.Sort"); // b.Type,
 
-
 $Awards = $DB->to_array(false, MYSQLI_BOTH);
-
 
 ?>
 
 <div class="thin">
 	<h2>Medals and Awards</h2>
     <div class="box pad">
-        
+
         <pre>
-<?
+<?php
         $LastBadge='';
 
         foreach($Awards as $Award) {
             list($Name, $Type, $Desc, $Cost, $Image, $Badge, $Rank) = $Award;
 
 
-            if ($LastBadge != $Badge) { 
+            if ($LastBadge != $Badge) {
 
                 $Str .= "[size=3]$Name ($Badge)[/size]\n";
 
@@ -40,18 +35,14 @@ $Awards = $DB->to_array(false, MYSQLI_BOTH);
             $Str .= "$Desc \n";
             $Str .= "[img]http://".SITE_URL."/".STATIC_SERVER."common/badges/{$Image}[/img]\n";
             $Str .= "[quote]criteria: [/quote]\n\n";
- 
-        }
-        
-        echo $Str;  // $Text->full_format($Str, true, true);
-?>
 
+        }
+
+        echo $Str;
+?>
         </pre>
     </div>
 </div>
 
-<?
-
+<?php
 show_footer();
-
-?>

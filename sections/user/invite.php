@@ -1,9 +1,7 @@
-<?
-
-
+<?php
 if(isset($_GET['userid']) && check_perms('users_view_invites')){
 	if(!is_number($_GET['userid'])){ error(403); }
-	
+
 	$UserID=$_GET['userid'];
 	$Sneaky = true;
 } else {
@@ -12,13 +10,12 @@ if(isset($_GET['userid']) && check_perms('users_view_invites')){
 		list($UserCount) = $DB->next_record();
 		$Cache->cache_value('stats_user_count', $UserCount, 0);
 	}
-	
+
 	$UserID = $LoggedUser['ID'];
 	$Sneaky = false;
 }
 
 list($UserID, $Username, $PermissionID) = array_values(user_info($UserID));
-
 
 $DB->query("SELECT InviteKey, Email, Expires FROM invites WHERE InviterID='$UserID' ORDER BY Expires");
 $Pending = 	$DB->to_array();
@@ -96,13 +93,13 @@ show_header('Invites');
 <div class="thin">
 	<h2><?=format_username($UserID,$Username)?> &gt; Invites</h2>
 	<div class="linkbox">
-		[<a href="user.php?action=invitetree<? if($Sneaky){ echo '&amp;userid='.$UserID; }?>">Invite tree</a>]
+		[<a href="user.php?action=invitetree<?php  if($Sneaky){ echo '&amp;userid='.$UserID; }?>">Invite tree</a>]
 	</div>
-<? if ($UserCount >= USER_LIMIT && !check_perms('site_can_invite_always')) { ?>
+<?php  if ($UserCount >= USER_LIMIT && !check_perms('site_can_invite_always')) { ?>
 	<div class="box pad notice">
 		<p>Because the user limit has been reached you are unable to send invites at this time.</p>
 	</div>
-<? }
+<?php  }
 
 /*
 	Users cannot send invites if they:
@@ -116,11 +113,11 @@ show_header('Invites');
 $DB->query("SELECT can_leech FROM users_main WHERE ID = ".$UserID);
 list($CanLeech) = $DB->next_record();
 
-if(!$Sneaky 
+if(!$Sneaky
 	&& !$LoggedUser['RatioWatch']
 	&& $CanLeech
 	&& empty($LoggedUser['DisableInvites'])
-	&& ($LoggedUser['Invites']>0 || check_perms('site_send_unlimited_invites')) 
+	&& ($LoggedUser['Invites']>0 || check_perms('site_send_unlimited_invites'))
 	&& ($UserCount <= USER_LIMIT || USER_LIMIT == 0 || check_perms('site_can_invite_always'))
 	){ ?>
 	<div class="box pad">
@@ -142,17 +139,17 @@ if(!$Sneaky
 			</table>
 		</form>
 	</div>
-<?
+<?php
 } elseif (!empty($LoggedUser['DisableInvites'])) {?>
 	<div class="box pad" style="text-align: center">
 		<strong class="important_text">Your invites have been disabled.  Please read <a href="articles.php?topic=invites">this article</a> for more information.</strong>
 	</div>
-<?
+<?php
 } elseif ($LoggedUser['RatioWatch'] || !$CanLeech) { ?>
 	<div class="box pad" style="text-align:center">
 		<strong class="important_text">You may not send invites while on Ratio Watch or while your leeching privileges are disabled.  Please read <a href="articles.php?topic=invites">this article</a> for more information.</strong>
 	</div>
-<?
+<?php
 }
 
 if (!empty($Pending)) {
@@ -165,7 +162,7 @@ if (!empty($Pending)) {
 				<td>Expires in</td>
 				<td>Delete invite</td>
 			</tr>
-<?
+<?php
 	$Row = 'a';
 	foreach ($Pending as $Invite) {
 		list($InviteKey, $Email, $Expires) = $Invite;
@@ -176,13 +173,13 @@ if (!empty($Pending)) {
 				<td><?=time_diff($Expires)?></td>
 				<td><a href="user.php?action=deleteinvite&amp;invite=<?=$InviteKey?>&amp;auth=<?=$LoggedUser['AuthKey']?>" onclick="return confirm('Are you sure you want to delete this invite?');">Delete invite</a></td>
 			</tr>
-<?	} ?> 
+<?php 	} ?>
 		</table>
 	</div>
-<?
+<?php
 }
 
-?> 
+?>
 	<div class="head">Invitee list</div>
 		<table width="100%">
 			<tr class="colhead">
@@ -194,12 +191,12 @@ if (!empty($Pending)) {
 				<td><a href="user.php?action=invite&amp;order=downloaded&amp;sort=<?=(($CurrentOrder == 'downloaded') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Downloaded</td>
 				<td><a href="user.php?action=invite&amp;order=ratio&amp;sort=<?=(($CurrentOrder == 'ratio') ? $NewSort : 'desc')?>&amp;<?=$CurrentURL ?>">Ratio</a></td>
 			</tr>
-<?
+<?php
 	$Row = 'a';
 	foreach ($Invited as $User) {
 		list($ID, $Username, $Donor, $Warned, $Enabled, $Class, $Email, $Uploaded, $Downloaded, $JoinDate, $LastAccess) = $User;
 		$Row = ($Row == 'a') ? 'b' : 'a';
-?> 
+?>
 			<tr class="row<?=$Row?>">
 				<td><?=format_username($ID, $Username, $Donor, $Warned, $Enabled, $Class)?></td>
 				<td><?=display_str($Email)?></td>
@@ -209,9 +206,9 @@ if (!empty($Pending)) {
 				<td><?=get_size($Downloaded)?></td>
 				<td><?=ratio($Uploaded, $Downloaded)?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 
 </div>
-<?
+<?php
 show_footer();

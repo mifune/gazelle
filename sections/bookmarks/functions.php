@@ -1,5 +1,4 @@
-<?
-
+<?php
 function can_bookmark($Type) {
 	return in_array($Type, array('torrent', 'collage', 'request'));
 }
@@ -16,7 +15,7 @@ function bookmark_schema($Type) {
 			break;
 		case 'request':
 			return array('bookmarks_requests', 'RequestID');
-			break;			
+			break;
 		default:
 			die('HAX');
 	}
@@ -38,4 +37,3 @@ function all_bookmarks($Type, $UserID = false) {
 	}
 	return $Bookmarks;
 }
-?>

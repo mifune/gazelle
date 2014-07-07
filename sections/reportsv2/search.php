@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * I'm not writing documentation for this page untill I write this page >.>
  */
@@ -14,6 +14,5 @@ include('header.php');
 <br />
 On hold until FZeroX fixes the main torrents search, then I will steal all his work and claim it as my own.
 </div>
-<?
+<?php
 show_footer();
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 /*-- API Start Class -----------------------------------*/
 /*------------------------------------------------------*/
 /* Simplified version of script_start, used for the	    */
@@ -111,6 +111,5 @@ function display_array($Array, $Escape = array()) {
 header('Expires: '.date('D, d M Y H:i:s', time()+(2*60*60)).' GMT');
 header('Last-Modified: '.date('D, d M Y H:i:s').' GMT');
 header('Content-type: text/xml');
-echo '<?xml version="1.0"?><payload>';
+echo '<?php xml version="1.0"?><payload>';
 require(SERVER_ROOT.'/sections/api/index.php');
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 // error out on invalid requests (before caching)
 if(isset($_GET['details'])) {
 	if(in_array($_GET['details'],array('ul','dl','numul','uls','dls','rat'))) {
@@ -21,8 +21,7 @@ show_header('Top 10 Users');
 		<a href="top10.php?type=taggers">[Taggers]</a>
 	</div>
 
-<?
-
+<?php
 // defaults to 10 (duh)
 $Limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 $Limit = in_array($Limit, array(10,100,250,500)) ? $Limit : 10;
@@ -41,14 +40,11 @@ $BaseQuery = "SELECT
 	LEFT JOIN torrents AS t ON t.UserID=u.ID
 	WHERE u.Enabled='1'
 	AND (Paranoia IS NULL OR (Paranoia NOT LIKE '%\"uploaded\"%' AND Paranoia NOT LIKE '%\"downloaded\"%')) ";
-	//AND Uploaded>'". 1024*1024*1024 ."' 
-	//AND Downloaded>'". 1024*1024*1024 ."' 
-	//GROUP BY u.ID";
 
 	if($Details=='all' || $Details=='ul') {
 		if (!$TopUserUploads = $Cache->get_value('topuser_ul_'.$Limit)) {
             $Query = $BaseQuery ."
-                AND Uploaded>'". 1024*1024*1024 ."' 
+                AND Uploaded>'". 1024*1024*1024 ."'
                 GROUP BY u.ID";
 			$DB->query("$Query ORDER BY u.Uploaded DESC LIMIT $Limit;");
 			$TopUserUploads = $DB->to_array();
@@ -60,8 +56,8 @@ $BaseQuery = "SELECT
 	if($Details=='all' || $Details=='dl') {
 		if (!$TopUserDownloads = $Cache->get_value('topuser_dl_'.$Limit)) {
             $Query = $BaseQuery ."
-                AND Uploaded>'524288000' 
-                AND Downloaded>'". 1024*1024*1024 ."' 
+                AND Uploaded>'524288000'
+                AND Downloaded>'". 1024*1024*1024 ."'
                 GROUP BY u.ID";
 			$DB->query("$Query ORDER BY u.Downloaded DESC LIMIT $Limit;");
 			$TopUserDownloads = $DB->to_array();
@@ -69,16 +65,11 @@ $BaseQuery = "SELECT
 		}
 		generate_user_table('Downloaders', 'dl', $TopUserDownloads, $Limit);
 	}
-	
-         /*   $Query = $BaseQuery ."
-                AND Uploaded>'". 1024*1024*1024 ."' 
-                AND Downloaded>'". 1024*1024*1024 ."' 
-                GROUP BY u.ID"; */
-    
+
     $Query = $BaseQuery ."
-                AND Uploaded>'524288000' 
+                AND Uploaded>'524288000'
                 GROUP BY u.ID";
-            
+
 	if($Details=='all' || $Details=='numul') {
 		if (!$TopUserNumUploads = $Cache->get_value('topuser_numul_'.$Limit)) {
 			$DB->query("$Query ORDER BY NumUploads DESC LIMIT $Limit;");
@@ -105,14 +96,13 @@ $BaseQuery = "SELECT
 		}
 		generate_user_table('Fastest Downloaders', 'dls', $TopUserDownloadSpeed, $Limit);
 	}
-    
-    
+
 	if($Details=='all' || $Details=='rat') {
 		if (!$TopUserRatio = $Cache->get_value('topuser_ratio_'.$Limit)) {
             $Query = $BaseQuery ."
-                AND Uploaded>'". 1024*1024*1024 ."' 
-                AND Downloaded>'". 1024*1024*1024 ."' 
-                GROUP BY u.ID"; 
+                AND Uploaded>'". 1024*1024*1024 ."'
+                AND Downloaded>'". 1024*1024*1024 ."'
+                GROUP BY u.ID";
 			$DB->query("$Query ORDER BY Uploaded/Downloaded DESC LIMIT $Limit;");
 			$TopUserRatio = $DB->to_array();
 			$Cache->cache_value('topuser_ratio_'.$Limit,$TopUserRatio,3600*12);
@@ -148,7 +138,7 @@ function generate_user_table($Caption, $Tag, $Details, $Limit) {
 		<td style='text-align:right'>Ratio</td>
 		<td style='text-align:right'>Joined</td>
 	</tr>
-<?
+<?php
 	// in the unlikely event that query finds 0 rows...
 	if(empty($Details)) {
 		echo '
@@ -176,10 +166,9 @@ function generate_user_table($Caption, $Tag, $Details, $Limit) {
 		<td style="text-align:right"><?=ratio($Detail['Uploaded'], $Detail['Downloaded'])?></td>
 		<td style="text-align:right"><?=time_diff($Detail['JoinDate'])?></td>
 	</tr>
-<?
+<?php
 	}
 ?>
 </table><br />
-<?
+<?php
 }
-?>

@@ -1,15 +1,14 @@
-<?
+<?php
 if(!check_perms('users_view_ips') || !check_perms('users_view_email')) { error(403); }
 show_header('Registration log');
 ?>
 <div class="thin">
 	<h2>Registration Log</h2>
-<?
+<?php
 define('USERS_PER_PAGE', 50);
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
-
-$RS = $DB->query("SELECT 
+$RS = $DB->query("SELECT
 	SQL_CALC_FOUND_ROWS
 	m.ID,
 	m.IP,
@@ -34,12 +33,12 @@ $RS = $DB->query("SELECT
 	ii.Donor,
 	ii.Warned,
 	ii.JoinDate,
-	(SELECT COUNT(h2.UserID) FROM users_history_ips AS h2 WHERE h2.IP=im.IP) AS InviterUses 
-	FROM users_main AS m 
+	(SELECT COUNT(h2.UserID) FROM users_history_ips AS h2 WHERE h2.IP=im.IP) AS InviterUses
+	FROM users_main AS m
 	LEFT JOIN users_info AS i ON i.UserID=m.ID
 	LEFT JOIN users_main AS im ON i.Inviter = im.ID
 	LEFT JOIN users_info AS ii ON i.Inviter = ii.UserID
-	WHERE i.JoinDate > '".time_minus(3600*24*3)."' 
+	WHERE i.JoinDate > '".time_minus(3600*24*3)."'
 	ORDER BY i.Joindate DESC LIMIT $Limit");
 $DB->query("SELECT FOUND_ROWS()");
 list($Results) = $DB->next_record();
@@ -48,7 +47,7 @@ $DB->set_query_id($RS);
 if($DB->record_count()) {
 ?>
 	<div class="linkbox">
-<?
+<?php
 	$Pages=get_pages($Page,$Results,USERS_PER_PAGE,11) ;
 	echo $Pages;
 ?>
@@ -62,7 +61,7 @@ if($DB->record_count()) {
 			<td>Host</td>
 			<td>Registered</td>
 		</tr>
-<?
+<?php
 	while(list($UserID, $IP, $Email, $Username, $PermissionID, $Uploaded, $Downloaded, $Enabled, $Donor, $Warned, $Joined, $Uses, $InviterID, $InviterIP, $InviterEmail, $InviterUsername, $InviterPermissionID, $InviterUploaded, $InviterDownloaded, $InviterEnabled, $InviterDonor, $InviterWarned, $InviterJoined, $InviterUses)=$DB->next_record()) {
 	$Row = ($IP == $InviterIP) ? 'a' : 'b';
 ?>
@@ -87,16 +86,14 @@ if($DB->record_count()) {
 			</td>
 			<td><?=time_diff($Joined)?><br /><?=time_diff($InviterJoined)?></td>
 		</tr>
-<?	} ?>
+<?php	} ?>
 	</table>
 	<div class="linkbox">
-<? echo $Pages; ?>
+<?=$Pages; ?>
 	</div>
-<? } else { ?>
+<?php } else { ?>
 	<h2 align="center">There have been no new registrations in the past 72 hours.</h2>
-<? }
-?>
+<?php } ?>
 </div>
-<?
+<?php
 show_footer();
-?>

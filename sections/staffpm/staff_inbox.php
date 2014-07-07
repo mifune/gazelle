@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT.'/sections/staffpm/functions.php');
 
 show_header('Staff Inbox');
@@ -70,26 +70,26 @@ $Row = 'a';
 ?>
 <div class="thin">
 	<div class="linkbox">
-<? 	if ($IsStaff) { ?>
-		[ &nbsp;<a href="staffpm.php?view=my">My unanswered<?=$NumMy>0?" ($NumMy)":''?></a>&nbsp; ] &nbsp; 
-<? 	} ?>
-		[ &nbsp;<a href="staffpm.php?view=unanswered">All unanswered<?=$NumUnanswered>0?" ($NumUnanswered)":''?></a>&nbsp; ] &nbsp; 
-		[ &nbsp;<a href="staffpm.php?view=open">Open<?=$NumOpen>0?" ($NumOpen)":''?></a>&nbsp; ] &nbsp; 
-		[ &nbsp;<a href="staffpm.php?view=resolved">Resolved</a>&nbsp; ] &nbsp; 
+<?php  	if ($IsStaff) { ?>
+		[ &nbsp;<a href="staffpm.php?view=my">My unanswered<?=$NumMy>0?" ($NumMy)":''?></a>&nbsp; ] &nbsp;
+<?php  	} ?>
+		[ &nbsp;<a href="staffpm.php?view=unanswered">All unanswered<?=$NumUnanswered>0?" ($NumUnanswered)":''?></a>&nbsp; ] &nbsp;
+		[ &nbsp;<a href="staffpm.php?view=open">Open<?=$NumOpen>0?" ($NumOpen)":''?></a>&nbsp; ] &nbsp;
+		[ &nbsp;<a href="staffpm.php?view=resolved">Resolved</a>&nbsp; ] &nbsp;
 		[ &nbsp;<a href="staffpm.php?action=responses">Common Answers</a>&nbsp; ]
 		<br />
 		<br />
 		<?=$Pages?>
 	</div>
-	<div class="head"><?=$ViewString?> Staff PMs</div>    
+	<div class="head"><?=$ViewString?> Staff PMs</div>
 	<div class="box pad" id="inbox">
-<?
+<?php
 
 if ($DB->record_count() == 0) {
 	// No messages
 ?>
 		<h2>No messages</h2>
-<?
+<?php
 
 } else {
 	// Messages, draw table
@@ -99,27 +99,27 @@ if ($DB->record_count() == 0) {
 		<form method="post" action="staffpm.php" id="messageform" onsubmit="return anyChecks('messageform')">
 			<input type="hidden" name="action" value="multiresolve" />
 			<input type="hidden" name="view" value="<?=strtolower($View)?>" />
-<?
+<?php
 	}
 
 	// Table head
 ?>
 			<table>
 				<tr class="colhead">
-<? 				if ($ViewString != 'Resolved' && $IsStaff) { ?>
+<?php  				if ($ViewString != 'Resolved' && $IsStaff) { ?>
 					<td width="10"><input type="checkbox" onclick="toggleChecks('messageform',this)" /></td>
-<? 				} ?>
+<?php  				} ?>
 					<td>Subject</td>
 					<td width="20%">User</td>
 					<td width="18%">Date</td>
 					<td width="18%">Assigned to</td>
-<?				if ($ViewString == 'Resolved') { ?>
+<?php 				if ($ViewString == 'Resolved') { ?>
 					<td width="18%">Resolved by</td>
-<?				} else { ?>
+<?php 				} else { ?>
                               <td width="8%">Status</td>
-<?				}  ?>
+<?php 				}  ?>
 				</tr>
-<?
+<?php
 
 	// List messages
 	while(list($ID, $Subject, $UserID, $Status, $Level, $AssignedToUser, $Date, $Unread, $ResolverID) = $DB->next_record()) {
@@ -152,20 +152,20 @@ if ($DB->record_count() == 0) {
 		// Table row
 ?>
 				<tr class="<?=$RowClass?>">
-<? 				if ($ViewString != 'Resolved' && $IsStaff) { ?>
+<?php  				if ($ViewString != 'Resolved' && $IsStaff) { ?>
 					<td class="center"><input type="checkbox" name="id[]" value="<?=$ID?>" /></td>
-<? 				} ?>
+<?php  				} ?>
 					<td><a href="staffpm.php?action=viewconv&amp;id=<?=$ID?>"><?=display_str($Subject)?></a></td>
 					<td><?=$UserStr?></td>
 					<td><?=time_diff($Date, 2, true)?></td>
 					<td><?=$Assigned?></td>
-<?				if ($ViewString == 'Resolved') { ?>
+<?php 				if ($ViewString == 'Resolved') { ?>
 					<td><?=$ResolverStr?></td>
-<?				} else { ?>
+<?php 				} else { ?>
                               <td><?=$Status?></td>
-<?				} ?>
+<?php 				} ?>
 				</tr>
-<?
+<?php
 
 		$DB->set_query_id($StaffPMs);
 	}
@@ -173,11 +173,11 @@ if ($DB->record_count() == 0) {
 	// Close table and multiresolve form
 ?>
 			</table>
-<? 		if ($ViewString != 'Resolved' && $IsStaff) { ?>
+<?php  		if ($ViewString != 'Resolved' && $IsStaff) { ?>
 			<input type="submit" value="Resolve selected" />
-<?		} ?>
+<?php 		} ?>
 		</form>
-<?
+<?php
 
 }
 
@@ -187,8 +187,7 @@ if ($DB->record_count() == 0) {
 		<?=$Pages?>
 	</div>
 </div>
-<?
+<?php
 
 show_footer();
 
-?>

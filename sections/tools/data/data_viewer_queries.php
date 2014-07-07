@@ -1,5 +1,4 @@
-<?
-
+<?php
 $data_viewer_queries = array(
 	'torrents_monthly' => array(
 		'title' => 'Torrents: Monthly stats',
@@ -137,8 +136,7 @@ LEFT OUTER JOIN
 			month
 	) AS banned
 ON
-	joined.year = banned.year 
+	joined.year = banned.year
 	AND joined.month = banned.month"
 	),
 );
-

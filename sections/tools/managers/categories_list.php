@@ -1,4 +1,4 @@
-<?
+<?php
 if (!check_perms('admin_manage_categories')) {
     error(403);
 }
@@ -19,7 +19,6 @@ show_header('Manage Categories', 'jquery');
     <h2>Categories</h2>
     <p><strong>Observe!</strong> You must upload new images to the <?= SERVER_ROOT ?>/static/common/caticons/ folder before you can use it here.</p><br />
 
-
     <table>
         <tr class="head">
             <td colspan="4">Add a new category</td>
@@ -39,21 +38,21 @@ show_header('Manage Categories', 'jquery');
                     <img src="/static/common/caticons/<?= $images[2] ?>   " />
                 </span>
                 <span style="float:right"> <select id="cat_image0" name="image" onchange="change_image('#display_image0', '#cat_image0');">
-                        <? foreach ($images as $key => $value) { ?>
+                        <?php  foreach ($images as $key => $value) { ?>
                             <option value="<?= display_str($value) ?>"><?= $value ?></option>
-                        <? } ?>
-                    </select> </span>  
+                        <?php  } ?>
+                    </select> </span>
             </td>
             <td>
                 <input class="medium" type="text" name="name" />
             </td>
             <td>
                 <input class="long"  type="text" name="tag" />
-            </td>                
+            </td>
             <td>
                 <input type="submit" value="Create" />
             </td>
-        </form>      
+        </form>
         </tr>
     </table>
     <br />
@@ -64,7 +63,7 @@ show_header('Manage Categories', 'jquery');
             <td width="39%">Tag</td>
             <td width="13%">Submit</td>
         </tr>
-        <?
+        <?php
         $DB->query("SELECT
         id,
         name,
@@ -73,7 +72,7 @@ show_header('Manage Categories', 'jquery');
         FROM categories");
 
         while (list($id, $name, $image, $tag) = $DB->next_record()) {
-            ?>        
+            ?>
             <tr>
             <form action="tools.php" method="post">
                 <td>
@@ -83,11 +82,11 @@ show_header('Manage Categories', 'jquery');
                     <span id="display_image<?= $id ?>">
                         <img src="/static/common/caticons/<?= $image ?>" />
                     </span>
-                    <span style="float:right"> 
+                    <span style="float:right">
                         <select id="cat_image<?= $id ?>" name="image" onchange="change_image('#display_image<?= $id ?>', '#cat_image<?= $id ?>');">
-                            <? foreach ($images as $key => $value) { ?>
+                            <?php  foreach ($images as $key => $value) { ?>
                                 <option value="<?= display_str($value) ?>"<?= ($image == $value) ? 'selected="selected"' : ''; ?>><?= $value ?></option>
-    <? } ?>
+    <?php  } ?>
                         </select>
                     </span>
                 </td>
@@ -96,15 +95,16 @@ show_header('Manage Categories', 'jquery');
                 </td>
                 <td>
                     <input type="text" class="long"  name="tag" value="<?= display_str($tag) ?>" />
-                </td>                
+                </td>
                 <td>
                     <input type="submit" name="submit" value="Edit" />
                     <input type="submit" name="submit" value="Delete" />
                 </td>
             </form>
             </tr>
-<? } ?>        
+<?php  } ?>
     </table>
 </div>
 
-<? show_footer(); ?>
+<?php
+show_footer();

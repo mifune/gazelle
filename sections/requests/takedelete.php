@@ -1,4 +1,4 @@
-<?
+<?php
 //******************************************************************************//
 //--------------- Delete request -----------------------------------------------//
 
@@ -16,18 +16,11 @@ $DB->query("SELECT UserID,
 			WHERE ID = ".$RequestID);
 list($UserID, $Title, $GroupID) = $DB->next_record();
 
-/* now that requests expire maybe we shouldnt let users delete them
-if($LoggedUser['ID'] != $UserID && !check_perms('site_moderate_requests')) { 
-	error(403);
-} */
-
-if(!check_perms('site_moderate_requests')) { 
+if(!check_perms('site_moderate_requests')) {
 	error(403);
 }
 
 $FullName = $Title;
-
-
 
 // Delete request, votes and tags
 $DB->query("DELETE FROM requests WHERE ID='$RequestID'");
@@ -48,4 +41,3 @@ if ($GroupID) {
 update_sphinx_requests($RequestID);
 
 header('Location: requests.php');
-?>

@@ -1,6 +1,6 @@
-<state><?
+<state><?php
 switch ($User['State']) {
-	case 0: 
+	case 0:
 		echo 'pending';
 		break;
 	case 1:

@@ -1,20 +1,20 @@
-<?
+<?php
 
 /*
- * The $Types array is the backbone of the reports system and is stored here so it can 
+ * The $Types array is the backbone of the reports system and is stored here so it can
  * be included on the pages that need it, but not clog up the pages that don't.
  * Important thing to note about the array:
- * 1. When coding for a non music site, you need to ensure that the top level of the 
+ * 1. When coding for a non music site, you need to ensure that the top level of the
  * array lines up with the $Categories array in your config.php.
- * 2. The first sub array contains resolves that are present on every report type 
+ * 2. The first sub array contains resolves that are present on every report type
  * regardless of category.
- * 3. The only part that shouldn't be self explanatory is that for the tracks field in 
+ * 3. The only part that shouldn't be self explanatory is that for the tracks field in
  * the report_fields arrays, 0 means not shown, 1 means required, 2 means required but
  * you can't tick the 'All' box.
  * 4. The current report_fields that are set up are tracks, sitelink, link and image. If
- * you wanted to add a new one, you'd need to add a field to the reportsv2 table, elements 
- * to the relevant report_fields arrays here, add the HTML in ajax_report and add security 
- * in takereport. 
+ * you wanted to add a new one, you'd need to add a field to the reportsv2 table, elements
+ * to the relevant report_fields arrays here, add the HTML in ajax_report and add security
+ * in takereport.
  */
 
 $Types = array(
@@ -92,24 +92,7 @@ $Types = array(
             'pm' => '',
             'bounty' => 0
         )
-    ),/*  // should we remove this one? i guess in rare cases it could be applicable but so rare its probably not worth having an option for it
-    'missing_crack' => array(
-        'priority' => '7',
-        'title' => 'No Crack/Keygen/Patch',
-        'report_messages' => array(
-            'Please include as much information as possible to verify the report',
-        ),
-        'report_fields' => array(
-            'link' => '0'
-        ),
-        'resolve_options' => array(
-            'upload' => '0',
-            'warn' => '1',
-            'delete' => '1',
-            'pm' => 'All applications must come with a crack, keygen, or other method of ensuring that downloaders can install them easily. App torrents with keygens, cracks, or patches that do not work and torrents missing clear installation instructions are deleted if reported. No exceptions.',
-            'bounty' => 0
-        )
-    ),*/
+    ),
     'screens' => array(
         'priority' => '8',
         'title' => 'No Images',

@@ -1,10 +1,4 @@
-<?
-
-/* replace
-$UserID = $LoggedUser['ID'];
-authorize();
-replace */
-
+<?php
 if (isset($_POST['delete'])) {
 	$Action = "delete";
 } elseif (isset($_POST['unread'])) {
@@ -17,8 +11,6 @@ if (isset($_POST['delete'])) {
 
 if(!isset($_POST['messages']) || !is_array($_POST['messages'])){
 	error("No messages are selected to $Action.");
-	//header('Location: inbox.php');
-	//die();
 }
 
 $Messages = $_POST['messages'];
@@ -52,4 +44,3 @@ if (isset($_POST['delete'])) {
 $Cache->delete_value('inbox_new_'.$UserID);
 
 header('Location: inbox.php');
-?>

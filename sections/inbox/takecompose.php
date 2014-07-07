@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 function blockedPM($ToID, $FromID, &$Error){
@@ -10,7 +10,7 @@ function blockedPM($ToID, $FromID, &$Error){
     } else {
 		$ToID = (int)$ToID;
             if(!isset($StaffIDs[$FromID])){ // staff are never blocked
-                // check if this user is blocked from sending 
+                // check if this user is blocked from sending
                 $DB->query("SELECT Type FROM friends WHERE UserID='$ToID' AND FriendID='$FromID'");
                 list($FType)=$DB->next_record();
                 if($FType == 'blocked') $Err = "This user cannot recieve PM's from you.";
@@ -18,7 +18,7 @@ function blockedPM($ToID, $FromID, &$Error){
                     $DB->query("SELECT BlockPMs FROM users_info WHERE UserID='$ToID'");
                     list($BlockPMs)=$DB->next_record();
                     if($BlockPMs == 2) $Err = "This user cannot recieve PM's from you.";
-                    elseif($BlockPMs == 1 && $FType != 'friends') 
+                    elseif($BlockPMs == 1 && $FType != 'friends')
                         $Err = "This user cannot recieve PM's from you.";
                 }
             }
@@ -26,7 +26,6 @@ function blockedPM($ToID, $FromID, &$Error){
     $Error = $Err;
     return $Err !== false;
 }
-
 
 if(empty($_POST['toid']) || !is_number($_POST['toid'])) { error(404); }
 
@@ -37,7 +36,6 @@ if(!empty($LoggedUser['DisablePM']) && !isset($StaffIDs[$_POST['toid']])) {
 $ToID = $_POST['toid'];
 if (blockedPM($ToID, $LoggedUser[ID], $Err)) error($Err);
 
-
 if (isset($_POST['convid']) && is_number($_POST['convid'])) {
 	$ConvID = $_POST['convid'];
 	$DB->query("SELECT UserID FROM pm_conversations_users WHERE UserID='$LoggedUser[ID]' AND ConvID='$ConvID'");
@@ -45,22 +43,8 @@ if (isset($_POST['convid']) && is_number($_POST['convid'])) {
 		error(403);
 	}
 	$Subject='';
-    /*
-	$ToID = explode(',', $_POST['toid']);
-	foreach($ToID as $TID) {
-        if (blockedPM($TID, $LoggedUser[ID], $Err)) {
-            break;
-        }
-	} */
 } else {  // new convo
     $ConvID='';
-    /*
-	$ToID = explode(',', $_POST['toid']);
-	foreach($ToID as $TID) {
-        if (blockedPM($TID, $LoggedUser[ID], $Err)) {
-            break;
-        }
-	} */
     $Subject = trim($_POST['subject']);
     if (!$Err && empty($Subject)) {
         $Err = "You can't send a message without a subject.";
@@ -80,17 +64,6 @@ if (isset($_POST['forwardbody'])){
     $_POST['body'] = "$_POST[forwardbody][br]$_POST[body]";
 }
 
-/*
-if(!empty($Err)) {
-	error($Err);
-	//header('Location: inbox.php?action=compose&to='.$_POST['toid']);
-	$ToID = (int)$_POST['toid'];
-	$Return = true;
-	include(SERVER_ROOT.'/sections/inbox/compose.php');
-	die(); 
-}*/
-
 $ConvID = send_pm($ToID,$LoggedUser['ID'],db_string($Subject),db_string($_POST['body']),$ConvID);
 
 header('Location: inbox.php');
-?>

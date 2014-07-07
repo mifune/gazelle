@@ -1,7 +1,5 @@
-<?
-
+<?php
 include_once(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
-
 
 function link_users($UserID, $TargetID) {
 	global $DB, $LoggedUser;
@@ -110,7 +108,7 @@ function dupe_comments($GroupID, $Comments) {
 	authorize();
 	if (!check_perms('users_mod')) error(403);
 	if (!is_number($GroupID)) error(0);
-	
+
 	$DB->query("SELECT Comments, SHA1(Comments) AS CommentHash FROM dupe_groups WHERE ID = '$GroupID'");
 	list($OldComment, $OldCommentHash) = $DB->next_record();
 	if ($OldCommentHash != sha1($Comments)) {
@@ -139,9 +137,7 @@ function user_dupes_table($UserID, $Username) {
 	if (!is_number($UserID)) {
 		error(403);
 	}
-    
-    
-    
+
 	$DB->query("SELECT d.ID, d.Comments, SHA1(d.Comments) AS CommentHash
 				FROM dupe_groups AS d
 				JOIN users_dupes AS u ON u.GroupID = d.ID
@@ -158,33 +154,16 @@ function user_dupes_table($UserID, $Username) {
 		$DupeCount = 0;
 		$Dupes = array();
 	}
-    
-    
-    /*
-	$DB->query(" (SELECT e.UserID AS UserID, um.IP, 'account', 'history' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID!= $UserID AND um.ID = $UserID)
-                UNION
-                 (SELECT e.ID AS UserID, um.IP, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.ID!= $UserID AND um.ID = $UserID)
-                UNION
-                 (SELECT um.ID AS UserID, um.IP, 'history', 'account' FROM users_main AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.ID != $UserID)
-                UNION
-                 (SELECT um.UserID AS UserID, um.IP, 'history', 'history' FROM users_history_ips AS um JOIN users_history_ips AS e ON um.IP=e.IP 
-				 WHERE um.IP != '127.0.0.1' AND um.IP !='' AND e.UserID = $UserID AND um.UserID != $UserID ) 
-                ORDER BY  UserID, IP  
-                LIMIT 50"); 
-     */
-     
-	$DB->query("SELECT uh.UserID AS UserID, uh.IP 
-                  FROM users_history_ips AS uh 
-                  JOIN users_history_ips AS me ON uh.IP=me.IP 
-				 WHERE uh.IP != '127.0.0.1' AND uh.IP !='' AND me.UserID = $UserID AND uh.UserID != $UserID 
+
+	$DB->query("SELECT uh.UserID AS UserID, uh.IP
+                  FROM users_history_ips AS uh
+                  JOIN users_history_ips AS me ON uh.IP=me.IP
+				 WHERE uh.IP != '127.0.0.1' AND uh.IP !='' AND me.UserID = $UserID AND uh.UserID != $UserID
               GROUP BY UserID, IP
-              ORDER BY UserID, IP  
-                 LIMIT 50"); 
-    
-    
+              ORDER BY UserID, IP
+                 LIMIT 50");
+
+
     $IPDupeCount = $DB->record_count();
     $IPDupes = $DB->to_array();
     if ($IPDupeCount>0) {
@@ -192,12 +171,12 @@ function user_dupes_table($UserID, $Username) {
         <div class="head">
             <span style="float:left;"><?=$IPDupeCount?> record<?=(($IPDupeCount == 1)?'':'s')?> with the same IP address</span>
             <span style="float:right;"><a href="#" id="iplinkedbutton" onclick="return Toggle_view('iplinked');">(Hide)</a></span>&nbsp;
-        </div> 
+        </div>
         <div class="box">
             <table width="100%" id="iplinkeddiv" class="shadow">
-<?
+<?php
             foreach($IPDupes AS $IPDupe) {
-                list($EUserID, $IP) = $IPDupe;  //, $EType1, $EType2) = $IPDupe;
+                list($EUserID, $IP) = $IPDupe;
                 $DupeInfo = user_info($EUserID);
 
             $Row = ($Row == 'a') ? 'b' : 'a';
@@ -209,53 +188,32 @@ function user_dupes_table($UserID, $Username) {
                 <td align="left">
                     <?=display_ip($IP, $DupeInfo['ipcc'])?>
                 </td>
-                <!-- <td align="left">
-                    <?="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
-                </td> -->
                 <td>
-<?
+<?php
                     if ( !array_key_exists($EUserID, $Dupes) ) {
 ?>
 						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>">link</a>]
-<?
+<?php
                     }
 ?>
-                </td> 
+                </td>
             </tr>
-<?
+<?php
             }
 ?>
             </table>
         </div>
-<? 
+<?php
     }
-    
-     
-    
-    /*
-	$DB->query("(SELECT e.UserID, um.Email, 'account', 'history' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID!= $UserID AND um.ID = $UserID)
-                UNION
-                (SELECT e.ID, um.Email, 'account', 'account' FROM users_main AS um JOIN users_main AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.ID!= $UserID AND um.ID = $UserID)
-                UNION
-                (SELECT um.ID, um.Email, 'history', 'account' FROM users_main AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID = $UserID AND um.ID != $UserID)
-                UNION
-                (SELECT um.UserID, um.Email, 'history', 'history' FROM users_history_emails AS um JOIN users_history_emails AS e ON um.Email=e.Email 
-				 WHERE um.Email != '' AND e.UserID = $UserID AND um.UserID != $UserID)
+
+	$DB->query("SELECT um.UserID, um.Email
+                  FROM users_history_emails AS um
+                  JOIN users_history_emails AS me ON um.Email=me.Email
+				 WHERE um.Email != '' AND me.UserID = $UserID AND um.UserID != $UserID
+              ORDER BY UserID, Email
                 LIMIT 50");
-    */
-    
-    
-	$DB->query("SELECT um.UserID, um.Email 
-                  FROM users_history_emails AS um 
-                  JOIN users_history_emails AS me ON um.Email=me.Email 
-				 WHERE um.Email != '' AND me.UserID = $UserID AND um.UserID != $UserID 
-              ORDER BY UserID, Email  
-                LIMIT 50"); 
-    
-    
+
+
     $EDupeCount = $DB->record_count();
     $EDupes = $DB->to_array();
     if ($EDupeCount>0) {
@@ -263,10 +221,10 @@ function user_dupes_table($UserID, $Username) {
         <div class="head">
             <span style="float:left;"><?=$EDupeCount?> record<?=(($EDupeCount == 1)?'':'s')?> with the same email address</span>
             <span style="float:right;"><a href="#" id="elinkedbutton" onclick="return Toggle_view('elinked');">(Hide)</a></span>&nbsp;
-        </div> 
+        </div>
         <div class="box">
             <table width="100%" id="elinkeddiv" class="shadow">
-<?
+<?php
             $i = 0;
             foreach($EDupes AS $EDupe) {
                 list($EUserID, $EEmail, $EType1, $EType2) = $EDupe;
@@ -282,41 +240,20 @@ function user_dupes_table($UserID, $Username) {
                 <td align="left">
                     <?=$EEmail?>
                 </td>
-                <!-- <td align="left">
-                    <?="$Username's $EType1 <-> $DupeInfo[Username]'s $EType2"?>
-                </td> -->
                 <td>
-<?
+<?php
                     if ( !array_key_exists($EUserID, $Dupes) ) {   ?>
 						[<a href="user.php?action=dupes&dupeaction=link&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&targetid=<?=$EUserID?>">link</a>]
-<?                  }       ?>
-                </td> 
+<?php                   }       ?>
+                </td>
             </tr>
-<?
+<?php
             }
 ?>
             </table>
         </div>
-<? 
+<?php
     }
-    
-    /*
-	$DB->query("SELECT d.ID, d.Comments, SHA1(d.Comments) AS CommentHash
-				FROM dupe_groups AS d
-				JOIN users_dupes AS u ON u.GroupID = d.ID
-				WHERE u.UserID = $UserID");
-	if (list($GroupID, $Comments, $CommentHash) = $DB->next_record()) {
-		$DB->query("SELECT m.ID
-					FROM users_main AS m
-					JOIN users_dupes AS d ON m.ID = d.UserID
-					WHERE d.GroupID = $GroupID
-					ORDER BY m.ID ASC");
-		$DupeCount = $DB->record_count();
-		$Dupes = $DB->to_array();
-	} else {
-		$DupeCount = 0;
-		$Dupes = array();
-	} */
 ?>
         <div class="head">
             <span style="float:left;"><?=$DupeCount?max($DupeCount - 1, 0).' ':''?>Linked Account<?=(($DupeCount == 2)?'':'s')?></span>
@@ -331,7 +268,7 @@ function user_dupes_table($UserID, $Username) {
 			<input type="hidden" id="form_comment_hash" name="form_comment_hash" value="<?=$CommentHash?>" />
                  <table width="100%"  id="linkeddiv" class="linkedaccounts shadow">
 					<?=($DupeCount?'<tr >':'')?>
-<?
+<?php
 	$i = 0;
 	foreach ($Dupes as $Dupe) {
 		$i++;
@@ -341,7 +278,7 @@ function user_dupes_table($UserID, $Username) {
 ?>
 					<td class="row<?=$Row?>" align="left"><?=format_username($DupeID, $DupeInfo['Username'], $DupeInfo['Donor'], $DupeInfo['Warned'], $DupeInfo['Enabled'], $DupeInfo['PermissionID'])?>
 						[<a href="user.php?action=dupes&dupeaction=remove&auth=<?=$LoggedUser['AuthKey']?>&userid=<?=$UserID?>&removeid=<?=$DupeID?>" onClick="return confirm('Are you sure you wish to remove <?=$DupeInfo['Username']?> from this group?');">x</a>]</td>
-<?
+<?php
 		if ($i == 4) {
 			$i = 0;
 			echo '</tr><tr>';
@@ -366,7 +303,7 @@ function user_dupes_table($UserID, $Username) {
 							<span style="float:right;"><a href="#" onClick="$('#dupecomments').toggle(); $('#editdupecomments').toggle(); resize('dupecommentsbox');return false;">(Edit comments)</a>
 						</td>
 					</tr>
-<?	}	?>
+<?php 	}	?>
 					<tr>
 						<td colspan="5" align="left">
                                         <label for="target">Link this user with: </label>
@@ -376,13 +313,6 @@ function user_dupes_table($UserID, $Username) {
 					</tr>
 				</table>
 		</form>
-				<!--<div class="pad hidden linkedaccounts">
-					<label for="target">Link this user with: </label><input type="text" name="target" id="target"><input type="submit" value="Link" id="submitlink" />
-				</div>-->
 			</div>
-<?
+<?php
 }
-
-
-
-?>

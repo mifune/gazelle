@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $InviteKey = db_string($_GET['invite']);
@@ -19,5 +19,3 @@ if(!check_perms('site_send_unlimited_invites')){
 	}
 }
 header('Location: user.php?action=invite');
-
-?>

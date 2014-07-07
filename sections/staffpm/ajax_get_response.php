@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 // Get user level
@@ -28,9 +28,8 @@ if ($ID = (int)$_GET['id']) {
 		$Text = new TEXT;
 		echo $Text->full_format($Message, true);
 	}
-	
+
 } else {
 	// No id
 	echo '-1';
 }
-?>

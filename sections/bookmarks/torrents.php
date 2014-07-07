@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(0);
 //~~~~~~~~~~~ Main bookmarks page ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-                        		
+
 function compare($X, $Y){
 	return($Y['count'] - $X['count']);
 }
@@ -27,8 +27,8 @@ if($Data) {
 	list($K, list($TorrentList, $CollageDataList)) = each($Data);
 } else {
 	// Build the data for the collage and the torrent list
-	$DB->query("SELECT 
-		bt.GroupID, 
+	$DB->query("SELECT
+		bt.GroupID,
 		tg.Image,
 		tg.NewCategoryID,
 		bt.Time
@@ -36,7 +36,7 @@ if($Data) {
 		JOIN torrents_group AS tg ON tg.ID=bt.GroupID
 		WHERE bt.UserID='$UserID'
 		ORDER BY bt.Time");
-	
+
 	$GroupIDs = $DB->collect('GroupID');
 	$CollageDataList=$DB->to_array('GroupID', MYSQLI_ASSOC);
 	if(count($GroupIDs)>0) {
@@ -67,10 +67,10 @@ $Tags = array();
 foreach ($TorrentList as $GroupID=>$Group) {
 	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $Image, $NewCategoryID, $AddedTime) = array_values($CollageDataList[$GroupID]);
-	
+
 	// Handle stats and stuff
 	$NumGroups++;
-	
+
 	$TagList = explode(' ',str_replace('_','.',$TagList));
 
 	$TorrentTags = array();
@@ -90,28 +90,28 @@ foreach ($TorrentList as $GroupID=>$Group) {
 
 
 	$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-	
+
 	// Start an output buffer, so we can store this output in $TorrentTable
-	ob_start(); 
+	ob_start();
 
         list($TorrentID, $Torrent) = each($Torrents);
 
         $Review = get_last_review($GroupID);
-        
+
         $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
 
         if(!empty($Torrent['FreeTorrent'])) {
-                $DisplayName .=' <strong>/ Freeleech!</strong>'; 
-        } elseif(!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['FreeLeech'] > sqltime()) { 
+                $DisplayName .=' <strong>/ Freeleech!</strong>';
+        } elseif(!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['FreeLeech'] > sqltime()) {
                 $DisplayName .= ' <strong>/ Personal Freeleech!</strong>';
-        } elseif(!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['DoubleSeed'] > sqltime()) { 
+        } elseif(!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['DoubleSeed'] > sqltime()) {
                 $DisplayName .= ' <strong>/ Personal Doubleseed!</strong>';
         }
     if ($Torrent['ReportCount'] > 0) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
     }
-        
+
         $AddExtra = torrent_icons($Torrent, $TorrentID, $Review, true );
         $row = ($row == 'a'? 'b' : 'a');
         $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
@@ -123,13 +123,13 @@ foreach ($TorrentList as $GroupID=>$Group) {
         </td>
         <td>
                     <?=$AddExtra?>
-                <strong><?=$DisplayName?></strong> 
-                <? if ($LoggedUser['HideTagsInLists'] !== 1) {             
+                <strong><?=$DisplayName?></strong>
+                <?php if ($LoggedUser['HideTagsInLists'] !== 1) {
                         echo $TorrentTags;
                    } ?>
-<? if(!$Sneaky){ ?>
+<?php if(!$Sneaky){ ?>
                 <span style="float:left;"><a href="#group_<?=$GroupID?>" onclick="Unbookmark('torrent', <?=$GroupID?>, '');return false;">Remove Bookmark</a></span>
-<? } ?>
+<?php } ?>
                 <span style="float:right;"><?=time_diff($AddedTime);?></span>
 
         </td>
@@ -138,31 +138,31 @@ foreach ($TorrentList as $GroupID=>$Group) {
         <td<?=($Torrent['Seeders']==0)?' class="r00"':''?>><?=number_format($Torrent['Seeders'])?></td>
         <td><?=number_format($Torrent['Leechers'])?></td>
     </tr>
-<?
+<?php
 	$TorrentTable.=ob_get_clean();
-	
+
 	// Album art
-	
+
 	ob_start();
-	
+
 	$DisplayName = $GroupName;
 ?>
 		<li class="image_group_<?=$GroupID?>">
 			<a href="#group_<?=$GroupID?>" class="bookmark_<?=$GroupID?>">
-<?	if($Image) { 
+<?php	if($Image) {
 		if(check_perms('site_proxy_images')) {
 			$Image = 'http'.($SSL?'s':'').'://'.SITE_URL.'/image.php?i='.urlencode($Image);
 		}
 ?>
 				<img src="<?=$Image?>" alt="<?=$DisplayName?>" title="<?=$DisplayName?>" width="117" />
-<?	} else { ?>
+<?php	} else { ?>
 				<div style="width:107px;padding:5px"><?=$DisplayName?></div>
-<?	} ?>
+<?php	} ?>
 			</a>
 		</li>
-<?
+<?php
 	$Collage[]=ob_get_clean();
-	
+
 }
 
 $CollageCovers = isset($LoggedUser['CollageCovers'])?$LoggedUser['CollageCovers']:25;
@@ -184,19 +184,19 @@ show_header($Title, 'browse,collage');
 		<a href="bookmarks.php?type=torrents">[Torrents]</a>
 		<a href="bookmarks.php?type=collages">[Collages]</a>
 		<a href="bookmarks.php?type=requests">[Requests]</a>
-<? if (count($TorrentList) > 0) { ?>
+<?php if (count($TorrentList) > 0) { ?>
 		<br /><br />
 		<a href="bookmarks.php?action=remove_snatched&amp;auth=<?=$LoggedUser['AuthKey']?>" onclick="return confirm('Are you sure you want to remove the bookmarks for all items you\'ve snatched?');">[Remove Snatched]</a>
-<? } ?>
+<?php } ?>
 	</div>
-<? if (count($TorrentList) == 0) { ?>
-	<div class="head"><? if (!$Sneaky) { ?><a href="feeds.php?feed=torrents_bookmarks_t_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;name=<?=urlencode(SITE_NAME.': Bookmarked Torrents')?>"><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>&nbsp;<? } ?><?=$Title?></div>
-    
+<?php if (count($TorrentList) == 0) { ?>
+	<div class="head"><?php if (!$Sneaky) { ?><a href="feeds.php?feed=torrents_bookmarks_t_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;name=<?=urlencode(SITE_NAME.': Bookmarked Torrents')?>"><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>&nbsp;<?php } ?><?=$Title?></div>
+
 	<div class="box pad" align="center">
 		<h2>You have not bookmarked any torrents.</h2>
 	</div>
 </div><!--content-->
-<?
+<?php
 	show_footer();
 	die();
 } ?>
@@ -211,7 +211,7 @@ show_header($Title, 'browse,collage');
 		<div class="box">
 			<div class="pad">
 				<ol style="padding-left:5px;">
-<?
+<?php
 uasort($Tags, 'compare');
 $i = 0;
 foreach ($Tags as $TagName => $Tag) {
@@ -219,7 +219,7 @@ foreach ($Tags as $TagName => $Tag) {
 	if($i>5) { break; }
 ?>
 					<li><a href="torrents.php?taglist=<?=$TagName?>"><?=$TagName?></a> (<?=$Tag['count']?>)</li>
-<?
+<?php
 }
 ?>
 				</ol>
@@ -227,25 +227,25 @@ foreach ($Tags as $TagName => $Tag) {
 		</div>
 	</div>
 	<div class="main_column">
-<?
+<?php
 if($CollageCovers != 0) { ?>
 		<div class="head" id="coverhead"><strong>Cover Art</strong></div>
 		<div id="coverart" class="box">
 			<ul class="collage_images" id="collage_page0">
-<?
+<?php
 	$Page1 = array_slice($Collage, 0, $CollageCovers);
 	foreach($Page1 as $Group) {
 		echo $Group;
 }?>
 			</ul>
 		</div>
-<?		if ($NumGroups > $CollageCovers) { ?>
+<?php	if ($NumGroups > $CollageCovers) { ?>
 		<div class="linkbox pager" style="clear: left;" id="pageslinksdiv">
 			<span id="firstpage" class="invisible"><a href="#" class="pageslink" onClick="collageShow.page(0, this); return false;">&lt;&lt; First</a> | </span>
 			<span id="prevpage" class="invisible"><a href="#" id="prevpage"  class="pageslink" onClick="collageShow.prevPage(); return false;">&lt; Prev</a> | </span>
-<?			for ($i=0; $i < $NumGroups/$CollageCovers; $i++) { ?>
+<?php		for ($i=0; $i < $NumGroups/$CollageCovers; $i++) { ?>
 			<span id="pagelink<?=$i?>" class="<?=(($i>4)?'hidden':'')?><?=(($i==0)?' selected':'')?>"><a href="#" class="pageslink" onClick="collageShow.page(<?=$i?>, this); return false;"><?=$CollageCovers*$i+1?>-<?=min($NumGroups,$CollageCovers*($i+1))?></a><?=($i != ceil($NumGroups/$CollageCovers)-1)?' | ':''?></span>
-<?			} ?>
+<?php		} ?>
 			<span id="nextbar" class="<?=($NumGroups/$CollageCovers > 5)?'hidden':''?>"> | </span>
 			<span id="nextpage"><a href="#" class="pageslink" onClick="collageShow.nextPage(); return false;">Next &gt;</a></span>
 			<span id="lastpage" class="<?=ceil($NumGroups/$CollageCovers)==2?'invisible':''?>"> | <a href="#" id="lastpage" class="pageslink" onClick="collageShow.page(<?=ceil($NumGroups/$CollageCovers)-1?>, this); return false;">Last &gt;&gt;</a></span>
@@ -253,7 +253,7 @@ if($CollageCovers != 0) { ?>
 		<script type="text/javascript">
 			collageShow.init(<?=json_encode($CollagePages)?>);
 		</script>
-<?		} 
+<?php	}
 } ?>
 		<br />
 		<table class="torrent_table" id="torrent_table">
@@ -269,7 +269,6 @@ if($CollageCovers != 0) { ?>
 		</table>
 	</div>
 </div>
-<?
+<?php
 show_footer();
 $Cache->cache_value('bookmarks_torrent_'.$UserID.'_full', serialize(array(array($TorrentList, $CollageDataList))), 3600);
-?>

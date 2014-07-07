@@ -1,4 +1,4 @@
-<?
+<?php
 //******************************************************************************//
 //--------------- Fill a request -----------------------------------------------//
 
@@ -23,11 +23,11 @@ if(!empty($_GET['torrentid']) && is_number($_GET['torrentid'])) {
 			$GroupID = $Matches[3];
 		}
 	}
-	
+
 	if(!empty($Err)) {
 		error($Err);
 	}
-	
+
 	if(!$GroupID || !is_number($GroupID)) {
 		error(404);
 	}
@@ -36,14 +36,14 @@ if(!empty($_GET['torrentid']) && is_number($_GET['torrentid'])) {
 $Where = $TorID ? "t.ID = $TorrentID" : "tg.ID = $GroupID";
 
 //Torrent exists, check it's applicable
-$DB->query("SELECT 
+$DB->query("SELECT
                     t.ID,
                     t.UserID,
                     t.Time,
-                    tg.NewCategoryID				
+                    tg.NewCategoryID
             FROM torrents AS t
                     LEFT JOIN torrents_group AS tg ON t.GroupID=tg.ID
-            WHERE $Where 
+            WHERE $Where
             LIMIT 1");
 
 
@@ -69,8 +69,6 @@ if(time_ago($UploadTime) < 3600 && $UploaderID != $FillerID && !check_perms('sit
 	$Err = "There is a one hour grace period for new uploads, to allow the torrent's uploader to fill the request";
 }
 
-
-
 $DB->query("SELECT Title, UserID, TorrentID, CategoryID
               FROM requests WHERE ID = ".$RequestID);
 list($Title, $RequesterID, $OldTorrentID, $RequestCategoryID) = $DB->next_record();
@@ -79,10 +77,6 @@ list($Title, $RequesterID, $OldTorrentID, $RequestCategoryID) = $DB->next_record
 if(!empty($OldTorrentID)) {
 	$Err = "This request has already been filled";
 }
-/*  // mifune: removing category match
-if($RequestCategoryID != 0 && $TorrentCategoryID != $RequestCategoryID) {
-	$Err = "This torrent is of a different category than the request";
-} */
 
 // Fill request
 if(!empty($Err)) {
@@ -94,7 +88,7 @@ $DB->query("UPDATE requests SET
 				FillerID = ".$FillerID.",
 				TorrentID = ".$TorrentID.",
 				TimeFilled = '".sqltime()."'
-			WHERE ID = ".$RequestID);	
+			WHERE ID = ".$RequestID);
 
 $FullName = $Title;
 
@@ -110,12 +104,10 @@ write_log("Request ".$RequestID." (".$FullName.") was filled by user ".$FillerID
 
 // Give bounty
 $DB->query("UPDATE users_main
-			SET Uploaded = (Uploaded + ".$RequestVotes['TotalBounty'].") 
+			SET Uploaded = (Uploaded + ".$RequestVotes['TotalBounty'].")
 			WHERE ID = ".$FillerID);
 
 write_user_log($FillerID, "Added +". get_size($RequestVotes['TotalBounty']). " for filling [url=/requests.php?action=view&id={$RequestID}]Request $RequestID ({$Title})[/url] ");
-    
-
 
 $Cache->delete_value('user_stats_'.$FillerID);
 $Cache->delete_value('request_'.$RequestID);
@@ -128,4 +120,3 @@ $SS->UpdateAttributes('requests', array('torrentid','fillerid'), array($RequestI
 update_sphinx_requests($RequestID);
 
 header('Location: requests.php?action=view&id='.$RequestID);
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 include(SERVER_ROOT . '/sections/torrents/functions.php');
@@ -11,7 +11,7 @@ $P = db_array($_POST);
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 $Text->validate_bbcode($_POST['description'],  get_permissions_advtags($LoggedUser['ID']));
-            
+
 if ($P['category'] > 0 || check_perms('site_collages_renamepersonal')) {
 	$Val->SetFields('name', '1','string','The name must be between 3 and 100 characters',array('maxlength'=>100, 'minlength'=>3));
 } else {
@@ -59,7 +59,6 @@ if(!$Err) {
 }
 
 if($Err) {
-	//error($Err);
 	$Err         = urlencode($Err);
 	$Name        = urlencode($_POST['name']);
 	$Category    = urlencode($_POST['category']);
@@ -68,7 +67,7 @@ if($Err) {
 	header("Location: collages.php?action=new&err=$Err&name=$Name&cat=$Category&tags=$Tags&descr=$Description");
 	die();
 }
- 
+
 $TagList = explode(' ',$_POST['tags']);
 $NewTags = array();
 foreach($TagList as $ID=>$Tag) {
@@ -80,11 +79,11 @@ foreach($TagList as $ID=>$Tag) {
 }
 $TagList = implode(' ',$NewTags);
 
-if(!is_number($P['permission'])) error(404); 
+if(!is_number($P['permission'])) error(404);
 if ($P['permission'] !=0 && !array_key_exists($P['permission'], $ClassLevels)) error(0);
 
-$DB->query("INSERT INTO collages 
-	(Name, Description, UserID, TagList, CategoryID, Permissions) 
+$DB->query("INSERT INTO collages
+	(Name, Description, UserID, TagList, CategoryID, Permissions)
 	VALUES
 	('$P[name]', '$P[description]', $LoggedUser[ID], '$TagList', '$P[category]','$P[permission]')");
 
@@ -92,5 +91,3 @@ $CollageID = $DB->inserted_id();
 $Cache->delete_value('collage_'.$CollageID);
 write_log("Collage $CollageID ($P[name]) was created by $LoggedUser[Username]");
 header('Location: collages.php?id='.$CollageID);
-
-?>

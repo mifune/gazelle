@@ -1,67 +1,66 @@
-<?
-
+<?php
 class TEXT {
 
-    // tag=>max number of attributes 'link'=>1, 
+    // tag=>max number of attributes 'link'=>1,
     private $ValidTags = array(
-        'ratiolist'=>0, 
-        'codeblock' => 1, 
-        'you' => 0, 
-        'h5v' => 1, 
+        'ratiolist'=>0,
+        'codeblock' => 1,
+        'you' => 0,
+        'h5v' => 1,
         'yt' => 1,
         'vimeo' => 1,
-        'video' => 1, 
-        'flash' => 1, 
-        'banner' => 0, 
-        'thumb' => 0, 
-        '#' => 1, 
-        'anchor' => 1, 
-        'mcom' => 0, 
-        'table' => 1, 
-        'th' => 1, 
-        'tr' => 1, 
-        'td' => 1, 
-        'bg' => 1, 
-        'cast' => 0, 
-        'details' => 0, 
-        'info' => 0, 
-        'plot' => 0, 
-        'screens' => 0, 
-        'br' => 0, 
-        'hr' => 0, 
-        'font' => 1, 
-        'center' => 0, 
-        'spoiler' => 1, 
-        'b' => 0, 
-        'u' => 0, 
-        'i' => 0, 
-        's' => 0, 
-        '*' => 0, 
-        'user' => 0, 
-        'n' => 0, 
-        'inlineurl' => 0, 
-        'inlinesize' => 1, 
-        'align' => 1, 
-        'color' => 1, 
-        'colour' => 1, 
-        'size' => 1, 
-        'url' => 1, 
-        'img' => 1, 
-        'quote' => 1, 
-        'pre' => 1, 
-        'code' => 1, 
-        'tex' => 0, 
-        'hide' => 1, 
-        'plain' => 0, 
-        'important' => 0, 
+        'video' => 1,
+        'flash' => 1,
+        'banner' => 0,
+        'thumb' => 0,
+        '#' => 1,
+        'anchor' => 1,
+        'mcom' => 0,
+        'table' => 1,
+        'th' => 1,
+        'tr' => 1,
+        'td' => 1,
+        'bg' => 1,
+        'cast' => 0,
+        'details' => 0,
+        'info' => 0,
+        'plot' => 0,
+        'screens' => 0,
+        'br' => 0,
+        'hr' => 0,
+        'font' => 1,
+        'center' => 0,
+        'spoiler' => 1,
+        'b' => 0,
+        'u' => 0,
+        'i' => 0,
+        's' => 0,
+        '*' => 0,
+        'user' => 0,
+        'n' => 0,
+        'inlineurl' => 0,
+        'inlinesize' => 1,
+        'align' => 1,
+        'color' => 1,
+        'colour' => 1,
+        'size' => 1,
+        'url' => 1,
+        'img' => 1,
+        'quote' => 1,
+        'pre' => 1,
+        'code' => 1,
+        'tex' => 0,
+        'hide' => 1,
+        'plain' => 0,
+        'important' => 0,
         'torrent' => 0,
-        'rank' => 1, 
-        'tip' => 1, 
-        'imgnm' => 1, 
-        'imgalt' => 1, 
+        'rank' => 1,
+        'tip' => 1,
+        'imgnm' => 1,
+        'imgalt' => 1,
         'article' =>1
     );
-    
+
     private $Smileys = array(
         ':smile1:' => 'smile1.gif',
         ':smile2:' => 'smile2.gif',
@@ -155,10 +154,10 @@ class TEXT {
         ':weirdo:' => 'weirdo.gif',
         ':yawn:' => 'yawn.gif',
         ':snap:' => 'snap.gif',
-        
+
         ':cupcake:' => 'cupcake.gif',
         ':emplove:' => 'loveemp.gif',
-        
+
         ':strongbench:' => 'strongbench.gif',
         ':weakbench:' => 'weakbench.gif',
         ':dumbells:' => 'dumbells.gif',
@@ -191,7 +190,7 @@ class TEXT {
 
         ':tick:' => 'tick.gif',
         ':cross:' => 'cross.gif',
-        
+
         ':happydancing:' => 'happydancing.gif',
         ':argh:' => 'frustrated.gif',
         ':tumble:' => 'tumbleweed.gif',
@@ -203,7 +202,7 @@ class TEXT {
         ':judge:' => 'judge.gif',
         ':chair:' => 'chair.gif',
         ':pythfoot:' => 'pythfoot.gif',
-        
+
         ':flowers:' => 'flowers.gif',
         ':wub:' => 'wub.gif',
         ':lovers:' => 'lovers.gif',
@@ -248,16 +247,15 @@ class TEXT {
         ':bananadance:' => 'bananadance.gif',
         ':smurf:' => 'smurf.gif',
         ':yikes:' => 'yikes.gif',
-        
+
         ':box:' => 'box.gif',
         ':boxing:' => 'boxing.gif',
         ':shoot:' => 'shoot.gif',
         ':shoot2:' => 'shoot2.gif',
-        
-        
+
         ':jail:' => 'jail.gif',
         ':jailmad:' => 'jail_mad.gif',
-        
+
         //----------------------------
         //----------------------------
         ':sing:' => 'singing.gif',
@@ -331,13 +329,10 @@ class TEXT {
         ':ridicule:' => 'ridicule.gif',
         //----------------------------
 
-
-
         ':vader-smiley:' => 'vader-smiley.gif',
         ':lsvader:' => 'lsvader.gif',
         ':emperor:' => 'emperor.gif',
         //----------------------------
-
 
         ':punish:' => 'punish.gif',
         ':puppykisses:' => 'puppykisses.gif',
@@ -438,7 +433,6 @@ class TEXT {
         ':zzz:' => 'zzz.gif',
         //----------------------------
 
-
         ':santa:' => 'santa.gif',
         ':indian:' => 'indian.gif',
         ':pimp:' => 'pimp.gif',
@@ -457,7 +451,7 @@ class TEXT {
         ':bike:' => 'bike.gif',
         ':badass:' => 'badass.gif',
         ':blind:' => 'blind.gif',
-        
+
         ':picard:' => 'picard.gif',
         ':why:' => 'why.gif',
         ':blah:' => 'blah.gif',
@@ -488,8 +482,6 @@ class TEXT {
         ':evilgenius:' => 'evil-genius-smiley.gif',
         ':lesson:' => 'explanation-smiley.gif',
         //=======================================================================
-
-
 
         ':lmao:' => 'lmao.gif',
         ':rules:' => 'rules.gif',
@@ -554,7 +546,7 @@ class TEXT {
         'Trebuchet MS' => "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;",
         'Verdana' => "Verdana, Geneva, sans-serif;"
     );
-    //  icon tag => img  //[cast][details][info][plot][screens] 
+    //  icon tag => img  //[cast][details][info][plot][screens]
     private $Icons = array(
         'cast' => "cast11.png",
         'details' => "details11.png",
@@ -599,13 +591,8 @@ class TEXT {
 
         $Str = str_replace('  ', '&nbsp;&nbsp;', $Str);
         //Inline links
-        //$Str = preg_replace('/\[video\=/i', '[vid=', $Str);
-        //$Str = preg_replace('/\[thumb\]/i', '[thu]', $Str);
-        //$Str = preg_replace('/\[banner\]/i', '[ban]', $Str);
         $Str = preg_replace('/\[bg\=/i', '[bgg=', $Str);
-        //$Str = preg_replace('/\[bg\]/i', '[bgg]', $Str);
         $Str = preg_replace('/\[td\=/i', '[tdd=', $Str);
-        //$Str = preg_replace('/\[td\]/i', '[tdd]', $Str);
         $Str = preg_replace('/\[tr\=/i', '[trr=', $Str);
         $Str = preg_replace('/\[th\=/i', '[thh=', $Str);
 
@@ -620,10 +607,6 @@ class TEXT {
         $Str = preg_replace('/\=\=\=([^=].*)\=\=\=/i', '[inlinesize=5]$1[/inlinesize]', $Str);
         $Str = preg_replace('/\=\=([^=].*)\=\=/i', '[inlinesize=7]$1[/inlinesize]', $Str);
 
-        //$Str = preg_replace('/\[vid\=/i', '[video=', $Str);
-        //$Str = preg_replace('/\[thu\]/i', '[thumb]', $Str);
-        //$Str = preg_replace('/\[ban\]/i', '[banner]', $Str);
-        //$Str = preg_replace('/\[bgg\]/i', '[bg]', $Str);
         $Str = preg_replace('/\[bgg\=/i', '[bg=', $Str);
         $Str = preg_replace('/\[tdd\=/i', '[td=', $Str);
         $Str = preg_replace('/\[trr\=/i', '[tr=', $Str);
@@ -634,18 +617,6 @@ class TEXT {
         $HTML = $this->to_html($Str);
 
         $HTML = nl2br($HTML);
-        
-        /*
-        if($this->ShowErrors) {
-            $offset=0;
-            //$nextbr = stripos($HTML, "<br />", $offset);
-            while(($nextbr=stripos($HTML, "<br />", $offset))!==false) {
-                $offset = $nextbr+6;
-                $text = '<span class="errornum">'.$nextbr.'</span>';
-                $HTML = substr_replace($HTML, $text, $offset, 0);
-                $offset += strlen($text);
-            }
-        } */
         return $HTML;
     }
 
@@ -655,7 +626,7 @@ class TEXT {
      * @param string $Str The text to be validated
      * @param boolean $AdvancedTags Whether AdvancedTags are allowed (this is only for the preview if errorout=true)
      * @param boolean $ErrorOut If $ErrorOut=true then on errors the error page will be displayed with a preview of the errors (If false the function just returns the validate result)
-     * @return boolean True if there are no bad tags and false otherwise 
+     * @return boolean True if there are no bad tags and false otherwise
      */
     function validate_bbcode($Str, $AdvancedTags = false, $ErrorOut = true) {
         $preview = $this->full_format($Str, $AdvancedTags, true);
@@ -714,7 +685,7 @@ class TEXT {
 
         $remove[] = '/\[article.*?\]/i';
         $remove[] = '/\[\/article\]/i';
-        
+
         $remove[] = '/\[audio\].*?\[\/audio\]/i';
 
         $remove[] = '/\[b\]/i';
@@ -815,7 +786,7 @@ class TEXT {
         $remove[] = '/\[\/td\]/i';
 
         $remove[] = '/\[tex\].*?\[\/tex\]/i';
-        
+
         $remove[] = '/\[tip.*?\]/i';
         $remove[] = '/\[\/tip\]/i';
 
@@ -834,7 +805,7 @@ class TEXT {
         $remove[] = '/\[video.*?\].*?\[\/video.*?\]/i';
 
         $remove[] = '/\[you\]/i';
-        
+
         $remove[] = '/\[yt.*?\]/i';
         $remove[] = '/\[vimeo.*?\]/i';
 
@@ -1017,9 +988,9 @@ class TEXT {
                 $Block = $URL; // Get the URL
                 // strcspn returns the number of characters after the offset $i, not after the beginning of the string
                 // Therefore, we use += instead of the = everywhere else
-                $i += $CloseTag; // 5d) Move the pointer past the end of the [/close] tag. 
+                $i += $CloseTag; // 5d) Move the pointer past the end of the [/close] tag.
             } elseif ($WikiLink == true || $TagName == 'ratiolist' || $TagName == 'n' || $TagName == 'br' || $TagName == 'hr' || $TagName == 'cast' || $TagName == 'details' || $TagName == 'info' || $TagName == 'plot' || $TagName == 'screens' || $TagName == 'you') {
-                // Don't need to do anything - empty tag with no closing 
+                // Don't need to do anything - empty tag with no closing
             } elseif ($TagName === '*') {   //  || $TagName === '#' - no longer list tag
                 // We're in a list. Find where it ends
                 $NewLine = $i;
@@ -1032,7 +1003,7 @@ class TEXT {
                     $CloseTag = $Len;
                 }
                 $Block = substr($Str, $i, $CloseTag - $i); // Get the list
-                $i = $CloseTag; // 5d) Move the pointer past the end of the [/close] tag. 
+                $i = $CloseTag; // 5d) Move the pointer past the end of the [/close] tag.
             } else {
                 //5b) If it's a normal tag, it may have versions of itself nested inside
                 $CloseTag = $i - 1;
@@ -1048,14 +1019,14 @@ class TEXT {
 
                 $closetaglength = strlen($TagName) + 3;
 
-                // Every time we find an internal open tag of the same type, search for the next close tag 
+                // Every time we find an internal open tag of the same type, search for the next close tag
                 // (as the first close tag won't do - it's been opened again)
                 do {
                     $CloseTag = stripos($Str, '[/' . $TagName . ']', $CloseTag + 1);
                     if ($CloseTag === false) {
                         if ($TagName == '#' || $TagName == 'anchor') {
-                            // automatically close open anchor tags (otherwise it wraps the entire text 
-                            // in an <a> tag which then get stripped from the end as they are way out of place and you have 
+                            // automatically close open anchor tags (otherwise it wraps the entire text
+                            // in an <a> tag which then get stripped from the end as they are way out of place and you have
                             // open <a> tags in the code - but links without any href so its a subtle break
                             $CloseTag = $i;
                             $closetaglength = 0;
@@ -1064,15 +1035,12 @@ class TEXT {
                             $istart = max(  $TagPos- 20, 0 );
                             $iend = min( $i + 20, $Len );
                             $errnum = count($this->Errors); // &nbsp; <a class="error" href="#err'.$errnum.'">goto error</a>
-                    
+
                             $postlink = '<a class="postlink error" href="#err'.$errnum.'" title="scroll to error"><span class="postlink"></span></a>';
-                                    
-                            //$this->Errors[] = "<span class=\"quote_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
-                            //        .'<code class="error">'.$Tag[0][0].'</code>'. substr($Str, $i, $iend - $i) .'... </blockquote>';
-                     
+
                             $this->Errors[] = "<span class=\"error_label\">unclosed [$TagName] tag: $postlink</span><blockquote class=\"bbcode error\">..." . substr($Str, $istart, $TagPos - $istart)
                                     .'<code class="error">'.$Tag[0][0].'</code>'. substr($Str, $i, $iend - $i) .'... </blockquote>';
-                     
+
                             if ($this->ShowErrors) {
                                 $Block = "[$TagName]";
                                 $TagName = 'error';
@@ -1104,9 +1072,9 @@ class TEXT {
                 if (!$Block)
                     $Block = substr($Str, $i, $CloseTag - $i); // 5c) Get the contents between [open] and [/close] and call it the block.
 
-                $i = $CloseTag + $closetaglength; // 5d) Move the pointer past the end of the [/close] tag. 
+                $i = $CloseTag + $closetaglength; // 5d) Move the pointer past the end of the [/close] tag.
             }
-            
+
             // 6) Depending on what type of tag we're dealing with, create an array with the attribute and block.
             switch ($TagName) {
                 case 'h5v': // html5 video tag
@@ -1157,14 +1125,14 @@ class TEXT {
                 case 'quote':
                     $Array[$ArrayPos] = array('Type' => 'quote', 'Attr' => $Attrib, 'Val' => $this->parse($Block));
                     break;
-                
+
                 case 'imgnm':
                     $Array[$ArrayPos] = array('Type' => 'imgnm',  'Attr' => $Attrib, 'Val' => $Block);
                     break;
                 case 'imgalt':
                     $Array[$ArrayPos] = array('Type' => 'imgalt', 'Attr' => $Attrib, 'Val' => $Block);
                     break;
-                
+
                 case 'img':
                 case 'image':
                     if (empty($Block)) {
@@ -1191,7 +1159,7 @@ class TEXT {
                 case 'user':
                     $Array[$ArrayPos] = array('Type' => 'user', 'Val' => $Block);
                     break;
-                
+
                 case 'torrent':
                     $Array[$ArrayPos] = array('Type' => 'torrent', 'Val' => $Block);
                     break;
@@ -1252,16 +1220,11 @@ class TEXT {
         return $Array;
     }
 
-    
-    
+
+
     function get_allowed_colors() {
-        static $ColorAttribs; 
-        if (!$ColorAttribs) { // only define it once per page  
-            /* $ColorAttribs = array('orange', 'aqua', 'aquamarine', 'magenta', 'darkmagenta', 'slategrey', 'pink', 'hotpink', 
-                'black', 'wheat', 'midnightblue', 'forestgreen', 'blue', 'lightblue', 'fuchsia', 'lightgreen', 'green', 
-                'grey', 'lightgrey', 'lime', 'maroon', 'navy', 'olive', 'khaki', 'darkkhaki', 'gold', 'goldenrod', 'darkgoldenrod', 
-                'purple', 'violet', 'red', 'crimson', 'firebrick', 'gainsboro', 'silver', 'teal', 'linen', 'aliceblue', 'lavender', 
-                'white', 'whitesmoke', 'lightyellow', 'yellow'); */
+        static $ColorAttribs;
+        if (!$ColorAttribs) { // only define it once per page
             // now with more colors!
             $ColorAttribs = array( 'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet',
                 'brown','burlywood','cadetblue','chartreuse','chocolate','coral','cornflowerblue','cornsilk','crimson','cyan','darkblue','darkcyan','darkgoldenrod',
@@ -1280,10 +1243,10 @@ class TEXT {
     }
 
     function is_color_attrib(&$Attrib) {
-        global $ClassNames;  
-         
+        global $ClassNames;
+
         $Att = strtolower($Attrib);
-        
+
         // convert class names to class colors
         if (isset($ClassNames[$Att]['Color'])) {
             $Attrib = '#' . $ClassNames[$Att]['Color'];
@@ -1291,7 +1254,7 @@ class TEXT {
         }
         // if in format #rgb hex then return as is
         if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $Att)) return true;
-        
+
         // check and capture #rgba format
         if (preg_match('/^#(?|([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})|([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1})([0-9a-f]{1}))$/', $Att, $matches) ) {
             // capture #rgba hex and convert into rgba(r,g,b,a) format (from base 16 to base 10 0->255)
@@ -1303,16 +1266,16 @@ class TEXT {
             // alpha channel is in 0->1.0 range not 0->255 (!)
             $matches[4] = number_format( base_convert($matches[4], 16, 10) /255 , 2);
             // attribute is in rgb(r,g,b,a) format for alpha channel
-            $Attrib = "rgba($matches[1],$matches[2],$matches[3],$matches[4])"; 
+            $Attrib = "rgba($matches[1],$matches[2],$matches[3],$matches[4])";
             return true;
         }
-         
+
         // if not in #rgb or #rgba format then check for allowed colors
         return in_array($Att, $this->get_allowed_colors());
     }
-    
 
-    
+
+
     function extract_attributes($Attrib, $MaxNumber=-1) {
 
         $Elements=array();
@@ -1320,14 +1283,14 @@ class TEXT {
             $attributes = explode(",", $Attrib);
             if ($attributes) {
                 foreach ($attributes as &$att) {
-                    
+
                     if ($this->is_color_attrib($att)) {
                         $Elements['color'][] = $att;
-                        
+
                     } elseif (preg_match('/^([0-9]*)$/', $att, $matches)) {
                         if ($MaxNumber>-1 && $att>$MaxNumber) $att = $MaxNumber;
                         $Elements['number'][] = $att;
-              
+
                     } elseif ( $this->valid_url($att) ) {
                         $Elements['url'][] = $att;
                     }
@@ -1337,8 +1300,8 @@ class TEXT {
         }
         return $Elements;
     }
-    
-    
+
+
     function get_css_attributes($Attrib, $AllowMargin=true, $AllowColor=true, $AllowWidth=true, $AllowNoBorder=true, $AllowImage=true) {
         $InlineStyle = '';
         if (isset($Attrib) && $Attrib) {
@@ -1391,15 +1354,15 @@ class TEXT {
                     } elseif ($AllowImage && $this->valid_url($att) ) {
                         $InlineStyle .= "background-image: url(".$att.");";
                         //$InlineStyle .= "background: url('$att') no-repeat center center;";
-                        
+
                     } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})px$/', $att, $matches)) {
                         if ((int) $matches[1] > 920) $matches[1] = '920';
                         $InlineStyle .= 'width:' . $matches[1] . 'px;';
-                        
+
                     } elseif ($AllowWidth && preg_match('/^([0-9]{1,3})%?$/', $att, $matches)) {
                         if ((int) $matches[1] > 100) $matches[1] = '100';
                         $InlineStyle .= 'width:' . $matches[1] . '%;';
-                        
+
                     } elseif ($AllowMargin && in_array($att, array('left', 'center', 'right'))) {
                         switch ($att) {
                             case 'left':
@@ -1413,12 +1376,12 @@ class TEXT {
                                 $InlineStyle .= 'margin: 0px auto;';
                                 break;
                         }
-                    } elseif ($AllowNoBorder && in_array($att, array('nball', 'nb', 'noborder'))) { //  'nball', 
+                    } elseif ($AllowNoBorder && in_array($att, array('nball', 'nb', 'noborder'))) { //  'nball',
                         $InlineStyle .= 'border:none;';
-                        
-                    } elseif ($AllowMargin && in_array($att, array('nopad'))) { 
+
+                    } elseif ($AllowMargin && in_array($att, array('nopad'))) {
                         $InlineStyle .= 'padding:0px;';
-                        
+
                     } //elseif (!in_array($att, array('nopad', 'nball')) ) {
                        // return FALSE;
                     //}
@@ -1428,7 +1391,7 @@ class TEXT {
         }
         return $InlineStyle;
     }
-    
+
     function get_css_classes($Attrib, $MatchClasses) {
         if ($Attrib == '') return '';
         $classes='';
@@ -1487,13 +1450,9 @@ class TEXT {
                 continue;
             }
             switch ($Block['Type']) {
-                case 'article': // link to article 
-                 
-    //if (preg_match('/^#[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+$|^\/[a-zA-Z0-9\-\_.,%\@~&=:;()+*\^$!#|]+\.php[a-zA-Z0-9\?\-\_.,%\@~&=:;()+*\^$!#|]*$/', $Block['Attr'])) {
-                   
+                case 'article': // link to article
                     if (!empty($Block['Attr']) && preg_match('/^[a-z0-9\-\_.()\@&]+$/', strtolower($Block['Attr'])))
                         $Str.='<a class="bbcode article" href="articles.php?topic=' .strtolower($Block['Attr']). '">' . $this->to_html($Block['Val']) . '</a>';
-                        //$Str.='<span class="bbcode tooltip" title="' .display_str($Block['Attr']) . '">' . $this->to_html($Block['Val']) . '</span>';
                     else
                         $Str.='[article='. $Block['Attr'] . ']' . $this->to_html($Block['Val']) . '[/article]';
                     break;
@@ -1528,10 +1487,7 @@ class TEXT {
                                 }
                             }
                         }
-                        //$Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong> wrote: ' . $postlink . '</span>';
                         $Str.= '<span class="quote_label"><strong>' . display_str($qname) . '</strong>: ' . $postlink . '</span>';
-                    } else {
-                         // $Str.= '<span class="quote_label"><strong>quote</strong>:</span>';
                     }
                     $Str.='<blockquote class="bbcode">' . $this->to_html($Block['Val']) . '</blockquote>';
                     $this->NoImg--;
@@ -1550,7 +1506,7 @@ class TEXT {
                     // Supports youtube and vimeo for now.
                     if (preg_match('/^https?:\/\/www\.youtube\.com\/.*v=(.*)$/i', $Block['Attr'], $matches)) {
                         $vidurl = "http://www.youtube.com/v/{$matches[1]}";
-                        $Str.='<object height="385" width="640"><param name="movie" value="' . $vidurl . '"><param name="allowFullScreen" value="true"><param name="allowscriptaccess" value="always"><embed src="' . $vidurl . '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" height="385" width="640"></object>';                        
+                        $Str.='<object height="385" width="640"><param name="movie" value="' . $vidurl . '"><param name="allowFullScreen" value="true"><param name="allowscriptaccess" value="always"><embed src="' . $vidurl . '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" height="385" width="640"></object>';
                     } elseif (preg_match('/^https?:\/\/vimeo.com\/([0-9]+)$/i', $Block['Attr'], $matches))  {
                         $Str .= '<object type="application/x-shockwave-flash" width="640" height="385" data="http://www.vimeo.com/moogaloop.swf?clip_id='.$matches[1].'"><param name="quality" value="best" /><param name="allowfullscreen" value="true" /><param name="scale" value="showAll" /><param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=' . $matches[1] . '" /></object>';
                     } else {
@@ -1560,7 +1516,7 @@ class TEXT {
                 case 'h5v':
                     // html5 video tag
                     $Attributes= $this->extract_attributes($Block['Attr'], 920);
-                    
+
                     if ( ($Block['Attr'] != '' && count($Attributes)==0) || $Block['Val'] == '' ) {
                         $Str.='[h5v' . ($Block['Attr'] != ''?'='. $Block['Attr']:'')  . ']' . $this->to_html($Block['Val']) . '[/h5v]';
                     } else  {
@@ -1572,7 +1528,7 @@ class TEXT {
                             $parameters .= ' poster="'.$Attributes['url'][0].'" ';
                         }
                         $Sources = explode(',', $Block['Val']);
-                        $Str .= '<video '.$parameters.' controls>';     // src="'.str_replace('[inlineurl]', '', $Block['Val']).'">';
+                        $Str .= '<video '.$parameters.' controls>';
                         foreach( $Sources as $Source) {
                             $lastdot = strripos($Source, '.');
                             $mime = substr($Source, $lastdot+1);
@@ -1583,7 +1539,7 @@ class TEXT {
                     }
                     break;
                 case 'flash':
-                    // note: as a non attribute the link has been auto-formatted as [inlinelink]link.url  
+                    // note: as a non attribute the link has been auto-formatted as [inlinelink]link.url
                     if (($Block['Attr'] != '' && !preg_match('/^([0-9]{2,4})\,([0-9]{2,4})$/', $Block['Attr'], $matches))
                             || strpos($Block['Val'], '[inlineurl]') === FALSE) {
                         $Str.='[flash=' . ($Block['Attr'] != ''?'='. $Block['Attr']:'') . ']' . $this->to_html($Block['Val']) . '[/flash]';
@@ -1682,7 +1638,7 @@ class TEXT {
                         $Str.='<'. $Block['Type'] .' class="bbcode'.$tableclass.'"' . $InlineStyle . '>' . $this->to_html($Block['Val']) . '</' . $Block['Type'] . '>';
                     }
                     break;
-                    
+
                 case 'bg':
                     $InlineStyle = $this->get_css_attributes($Block['Attr'], true, true, true, false);
                     if (!$InlineStyle || $InlineStyle == '') {
@@ -1836,8 +1792,8 @@ class TEXT {
                     if ($Block['Attr'] != '' && ($Block['Type'] == 'imgnm' || $Block['Type'] == 'imgalt') ) $alttext = $Block['Attr'];
                     else $alttext = $Block['Val'];
                     $Str.='<img class="scale_image'.$cssclass.'" onclick="lightbox.init(this,500);" alt="'.$alttext.'" src="'.$Block['Val'].'" />';
-                    
                     break;
+
                 case 'thumb':
                     if ($this->NoImg > 0 && $this->valid_url($Block['Val'])) {
                         $Str.='<a rel="noreferrer" target="_blank" href="' . $Block['Val'] . '">' . $Block['Val'] . '</a> (image)';
@@ -1888,7 +1844,7 @@ class TEXT {
                     if (!$this->Advanced)
                         $Str.= '[ratiolist]';
                     else {
-                    
+
                     $table = '<table>
                       <tr class="colhead">
                             <td>Amount downloaded</td>
@@ -2085,7 +2041,6 @@ class TEXT {
 
                             <a class="bb_button" onclick="url('<?= $textarea; ?>')" title="URL: [url]http://url[/url] or [url=http://url]URL text[/url]" alt="Url">Url</a>
                             <a class="bb_button" onclick="anchor('<?= $textarea; ?>')" title="Anchored heading: [anchor=name]Heading text[/anchor] or [#=name]Heading text[/#]" alt="Anchor">Anchor</a>
-                            <!-- <a class="bb_button" onclick="link('<?= $textarea; ?>')" title="Local link: [link=/localpage.php]Link text[/link] or [link=#anchorname]Link text[/link]" alt="Link">Link</a> -->
 
                             <a class="bb_button" onclick="image_prompt('<?= $textarea; ?>')" title="Image: [img]http://image_url[/img]" alt="Image">Img</a>
                             <a class="bb_button" onclick="tag('code', '<?= $textarea; ?>')" title="Code display: [code]code[/code]" alt="Code">Code</a>
@@ -2097,12 +2052,12 @@ class TEXT {
 
                             <a class="bb_button" onclick="insert('[*]', '<?= $textarea; ?>')" title="List item: [*]text" alt="List">List</a>
 
-        <? if ($AllowAdvancedTags) { ?>
+        <?php       if ($AllowAdvancedTags) { ?>
 
                                 <a class="bb_button" onclick="colorpicker('<?= $textarea; ?>','bg');" title="Background: [bg=color,width% or widthpx,align]text[/bg]" alt="Background">Bg</a>
 
                                 <a class="bb_button" onclick="table('<?= $textarea; ?>')" title="Table: [table=color,width% or widthpx,align][tr][td]text[/td][td]text[/td][/tr][/table]" alt="Table">Table</a>
-        <? } ?>
+        <?php       } ?>
 
                         </div>
 
@@ -2110,11 +2065,11 @@ class TEXT {
                             <a class="bb_help" href="<?= "http://" . SITE_URL . "/articles.php?topic=bbcode" ?>" target="_blank">Help</a>
                         </div>
                         <div class="bb_buttons_right">
-                            <img class="bb_icon" src="<?= get_symbol_url('align_center.png') ?>" onclick="wrap('align','','center', '<?= $textarea; ?>')" title="Center Align text: [align=center]text[/align]" alt="Center" /> 
-                            <img class="bb_icon" src="<?= get_symbol_url('align_left.png') ?>" onclick="wrap('align','','left', '<?= $textarea; ?>')" title="Left Align text: [align=left]text[/align]" alt="Left" /> 
+                            <img class="bb_icon" src="<?= get_symbol_url('align_center.png') ?>" onclick="wrap('align','','center', '<?= $textarea; ?>')" title="Center Align text: [align=center]text[/align]" alt="Center" />
+                            <img class="bb_icon" src="<?= get_symbol_url('align_left.png') ?>" onclick="wrap('align','','left', '<?= $textarea; ?>')" title="Left Align text: [align=left]text[/align]" alt="Left" />
                             <img class="bb_icon" src="<?= get_symbol_url('align_justify.png') ?>" onclick="wrap('align','','justify', '<?= $textarea; ?>')" title="Justify text: [align=justify]text[/align]" alt="Justify" />
-                            <img class="bb_icon" src="<?= get_symbol_url('align_right.png') ?>" onclick="wrap('align','','right', '<?= $textarea; ?>')" title="Right Align text: [align=right]text[/align]" alt="Right" /> 
-                            <img class="bb_icon" src="<?= get_symbol_url('text_uppercase.png') ?>" onclick="text('up', '<?= $textarea; ?>')" title="To Uppercase" alt="Up" /> 
+                            <img class="bb_icon" src="<?= get_symbol_url('align_right.png') ?>" onclick="wrap('align','','right', '<?= $textarea; ?>')" title="Right Align text: [align=right]text[/align]" alt="Right" />
+                            <img class="bb_icon" src="<?= get_symbol_url('text_uppercase.png') ?>" onclick="text('up', '<?= $textarea; ?>')" title="To Uppercase" alt="Up" />
                             <img class="bb_icon" src="<?= get_symbol_url('text_lowercase.png') ?>" onclick="text('low', '<?= $textarea; ?>')" title="To Lowercase" alt="Low" />
                         </div>
 
@@ -2122,7 +2077,7 @@ class TEXT {
                         <div class="bb_buttons_left">
                             <select class="bb_button" name="fontfont" id="fontfont<?= $textarea; ?>" onchange="font('font',this.value,'<?= $textarea; ?>');" title="Font: [font=fontfamily]text[/font]">
                                 <option value="-1">Font Type</option>
-        <?
+        <?php
         foreach ($this->Fonts as $Key => $Val) {
             echo '
                                 <option value="' . $Key . '"  style="font-family: ' . $Val . '">' . $Key . '</option>';
@@ -2153,30 +2108,30 @@ class TEXT {
                             <a class="bb_button" onclick="insert('[screens]', '<?= $textarea; ?>')" title="Screens icon: [screens]" alt="screens">screens</a>
 
 
-        <? if (check_perms('site_moderate_forums')) { ?>
+        <?php if (check_perms('site_moderate_forums')) { ?>
                                 <a class="bb_button" style="border: 2px solid #600;" onclick="tag('mcom', '<?= $textarea; ?>')" title="Staff Comment: [mcom]text[/mcom]" alt="Mod comment">Mod</a>
-        <? } ?> 
+        <?php } ?>
                         </div>
 
 
                     </td>
-                </tr> 
+                </tr>
                 <tr>
                     <td>
                         <div id="pickerholder<?= $textarea; ?>" class="picker_holder"></div>
                         <div id="smiley_overflow<?= $textarea; ?>" class="bb_smiley_holder">
-        <? if ($start_num_smilies > 0) {
+        <?php if ($start_num_smilies > 0) {
             $this->draw_smilies_from(0, $start_num_smilies, $textarea);
-        } ?> 
+        } ?>
                         </div>
                         <div class="overflow_button">
                             <a href="#" id="open_overflow<?= $textarea; ?>" onclick="if(this.isopen){Close_Smilies('<?= $textarea; ?>');}else{Open_Smilies(<?= "$start_num_smilies,$load_increment_first,'$textarea'" ?>);};return false;">Show smilies</a>
                             <a href="#" id="open_overflow_more<?= $textarea; ?>" onclick="Open_Smilies(<?= "$start_num_smilies,$load_increment,'$textarea'" ?>);return false;"></a>
                             <span id="smiley_count<?= $textarea; ?>" class="number" style="float:right;"></span>
                             <span id="smiley_max<?= $textarea; ?>" class="number" style="float:left;"></span>
-                        </div>  
+                        </div>
                     </td></tr></tbody></table>
-        <?
+        <?php
     }
 
     // output smiley data in xml (we dont just draw the html because we want maxsmilies in js)
@@ -2225,7 +2180,6 @@ class TEXT {
         echo '<div class="box center" style="font-size:1.2em;">';
         foreach ($this->Smileys as $Key => $Val) {
             echo '<div class="bb_smiley pad center" style="display:inline-block;margin:8px 8px;">';
-            //echo '      <a class="bb_smiley" title="' .$Key. '" href="javascript:em(\' '.$Key.' \',\''.$textarea.'\');">'.$Val.'</a>';
             echo "      $Val <br /><br />$Key";
             echo '</div>';
 
@@ -2252,6 +2206,3 @@ class TEXT {
   echo $Text->full_format($Str);
   echo "\n"
  */
-
-?>
-

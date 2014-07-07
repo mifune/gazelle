@@ -1,5 +1,4 @@
-<?
-
+<?php
 if(!$UserCount = $Cache->get_value('stats_user_count')){
 	$DB->query("SELECT COUNT(ID) FROM users_main WHERE Enabled='1'");
 	list($UserCount) = $DB->next_record();
@@ -19,7 +18,7 @@ if($LoggedUser['RatioWatch'] ||
 	$LoggedUser['DisableInvites'] == '1'||
 	$LoggedUser['Invites']==0 && !check_perms('site_send_unlimited_invites') ||
 	($UserCount >= USER_LIMIT && USER_LIMIT != 0 && !check_perms('site_can_invite_always'))) {
-		
+
 		error(403);
 }
 
@@ -53,7 +52,7 @@ foreach($Emails as $CurEmail){
 		die();
 	}
 	$InviteKey = db_string(make_secret());
-		
+
 $Message = <<<EOT
 The user $Username has invited you to join $SiteName, and has specified this address ($CurEmail) as your email address. If you do not know this person, please ignore this email, and do not reply.
 
@@ -63,12 +62,12 @@ To confirm your invite, click on the following link:
 
 http://$SiteURL/register.php?invite=$InviteKey
 
-After you register, you will be able to use your account. Please take note that if you do not use this invite in the next 3 days, it will expire. We urge you to read the RULES and the wiki immediately after you join. 
+After you register, you will be able to use your account. Please take note that if you do not use this invite in the next 3 days, it will expire. We urge you to read the RULES and the wiki immediately after you join.
 
 Thank you,
 $SiteName Staff
 EOT;
-	
+
 	$DB->query("INSERT INTO invites
 		(InviterID, InviteKey, Email, Expires) VALUES
 		('$LoggedUser[ID]', '$InviteKey', '".db_string($CurEmail)."', '$InviteExpires')");
@@ -79,11 +78,8 @@ EOT;
 		$Cache->update_row(false, array('Invites'=>'-1'));
 		$Cache->commit_transaction(0);
 	}
-	
-	send_email($CurEmail, 'You have been invited to '.SITE_NAME, $Message,'noreply');
 
-	
+	send_email($CurEmail, 'You have been invited to '.SITE_NAME, $Message,'noreply');
 }
 
 header('Location: user.php?action=invite');
-?>

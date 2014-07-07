@@ -1,4 +1,4 @@
-<?
+<?php
 // Already done in /sections/ajax/index.php
 //enforce_login();
 
@@ -59,7 +59,7 @@ else {
 		unset($ForumID, $Forum);
 		$Cache->cache_value('forums_list', $Forums, 0); //Inf cache.
 	}
-	
+
 	if(empty($_GET['type']) || $_GET['type'] == 'main') {
 		include(SERVER_ROOT.'/sections/ajax/forum/main.php');
 	} else {
@@ -98,10 +98,8 @@ function get_forum_info($ForumID) {
 		}
 		// Makes an array, with $Forum['Name'], etc.
 		$Forum = $DB->next_record(MYSQLI_ASSOC);
-		
+
 		$Cache->cache_value('ForumInfo_'.$ForumID, $Forum, 86400); // Cache for a day
 	}
 	return $Forum;
 }
-
-?>

@@ -1,10 +1,10 @@
-<?
+<?php
 authorize();
 
 if(empty($_POST['id']) || !is_number($_POST['id']) || empty($_POST['type']) ) {
 	error(0);
 }
-    
+
 if ($_POST['type'] != "request_update" && empty($_POST['reason'])) {
 	error("You must enter a reason for your report");
 }
@@ -15,7 +15,7 @@ if(!array_key_exists($_POST['type'], $Types)) {
 	error(403);
 }
 $Short = $_POST['type'];
-$Type = $Types[$Short]; 
+$Type = $Types[$Short];
 $ID = $_POST['id'];
 if($Short == "request_update") {
 	$Reason .= "[b]Additional Comments[/b]: ".$_POST['comment'];
@@ -90,4 +90,3 @@ foreach($Channels as $Channel) {
 $Cache->delete_value('num_other_reports');
 
 header('Location: '.$Link);
-?>

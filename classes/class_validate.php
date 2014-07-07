@@ -1,4 +1,4 @@
-<?
+<?php
 /*-- TODO ---------------------------//
 Writeup how to use the VALIDATE class, add in support for form id checks
 Complete the number and date validation
@@ -180,7 +180,6 @@ class VALIDATE {
                                     }
 
                             } elseif($Field['Type']=="desc") {
-                                    
                                     // desc Type gets 3 checks for the price of one 
                                     // 1)desc length 2)imglink as valid url 3)imglinks against whitelist
                                     // this kind of breaks the pattern of this class but screw it... 
@@ -212,7 +211,6 @@ class VALIDATE {
                                         $Field['ErrorMessage'] .= " (counted:$TextLength all:$RealLength)";
                                         return $Field['ErrorMessage'];
                                     }
-
 
                                     //  Check image urls inside the desc text against the whitelist.
                                     //  the whitelist is set inside the $Field['Regex'] var (in options arrary in ->SetFields)
@@ -261,11 +259,7 @@ class VALIDATE {
                     }
 		} // foreach
 	} // function
- 
-      
-      
-      
-      
+
 	function GenerateJS($FormID) {
 		$ReturnJS="<script type=\"text/javascript\" language=\"javascript\">\r\n";
 		$ReturnJS.="//<![CDATA[\r\n";
@@ -372,7 +366,6 @@ function get_remote_file_size($url, $user = "", $pw = "") {
     $return = false;
     $retheaders = explode("\n", $retheaders);
     foreach($retheaders as $header) {
-			
         // follow redirect
         $s = 'Location: ';
         if(substr(strtolower ($header), 0, strlen($s)) == strtolower($s)) {
@@ -389,89 +382,3 @@ function get_remote_file_size($url, $user = "", $pw = "") {
     }
     return -1;
 }
-
-
-
-   /*
- 
-function get_remote_file_size($url, $readable = true){
-   $parsed = parse_url($url);
-   $host = $parsed["host"];
-   $fp = @fsockopen($host, 80, $errno, $errstr);
-   if(!$fp) return false;
-   else {
-       @fputs($fp, "HEAD $url HTTP/1.0\r\n");
-       @fputs($fp, "HOST: $host\r\n");
-       @fputs($fp, "Connection: close\r\n\r\n");
-       $headers = "";
-       while(!@feof($fp))$headers .= @fgets ($fp, 128);
-   }
-   @fclose ($fp);
-   $return = false;
-   $arr_headers = explode("\n", $headers);
-   foreach($arr_headers as $header) {
-			// follow redirect
-			$s = 'Location: ';
-			if(substr(strtolower ($header), 0, strlen($s)) == strtolower($s)) {
-				$url = trim(substr($header, strlen($s)));
-				return get_remote_file_size($url, $readable);
-			}
-			
-			// parse for content length
-       $s = "Content-Length: ";
-       if(substr(strtolower ($header), 0, strlen($s)) == strtolower($s)) {
-           $return = trim(substr($header, strlen($s)));
-           break;
-       }
-   }
-   if($return && $readable) {
-			$size = round($return / 1024, 2);
-			$sz = "KB"; // Size In KB
-			if ($size > 1024) {
-				$size = round($size / 1024, 2);
-				$sz = "MB"; // Size in MB
-			}
-			return "$size $sz";
-   }
-   return $headers;
-}
-
-/*
-function get_remote_image_size($url){
-
-    $url = preg_replace('/http:\/\//','',$url);
-    if( preg_match('/(.*?)(\/.*)/', $url, $match) ){
-    
-        $domain = $match[1];
-        $portno = 80;
-        $method = "HEAD";
-        $url    = $match[2];
-        # print "$domain\n$url\n";
-        
-        $http_response = "";
-        $http_request .= $method." ".$url ." HTTP/1.0\r\n";
-        $http_request .= "\r\n";
-
-        $fp = fsockopen($domain, $portno, $errno, $errstr);
-        if($fp){
-            fputs($fp, $http_request);
-            while (!feof($fp)) $http_response .= fgets($fp, 128);
-            fclose($fp);
-        }
-        // "Redirecting to http://hcd-1.imgbox.com/aafB53RJ.gif?st=fSQYwu7CBo6OMh7ZTCzJsA&e=1347570774";
-        
-        //$header = "Content-Length";
-        //$ret_str = "";
-        if( preg_match("/Content\-Length: (\d+)/i",$http_response, $match ) ){
-            return $match[1] . " ---> ". $http_request.$http_response;
-        }
-        if( preg_match("/Location:\s(.*)\s/i",$http_response, $match ) ){
-            //return  get_remote_image_size($match[1]);    // $match[1];   //
-        }
-        return $http_request.$http_response;
-    }
-    return -1;
-}
-*/
-
-?>

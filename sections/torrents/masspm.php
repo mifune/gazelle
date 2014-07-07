@@ -1,27 +1,13 @@
-<?
+<?php
 if(!check_perms('site_moderate_requests')) {
 	error(403);
 }
-//if(!isset($_GET['id']) || !is_number($_GET['id']) || !isset($_GET['torrentid']) || !is_number($_GET['torrentid'])) { error(0); }
-if( !isset($_GET['torrentid']) || !is_number($_GET['torrentid']) ) { 
+
+if( !isset($_GET['torrentid']) || !is_number($_GET['torrentid']) ) {
     error(0);
 }
 
-//$GroupID = $_GET['id'];
 $TorrentID = $_GET['torrentid'];
-/*
-$DB->query("SELECT
-		t.FreeTorrent,
-		t.Dupable,
-		t.DupeReason,
-		t.Description AS TorrentDescription,
-		tg.Name AS Title,
-		t.GroupID,
-		t.UserID,
-		t.FreeTorrent
-		FROM torrents AS t
-		JOIN torrents_group AS tg ON tg.ID=t.GroupID
-		WHERE t.ID='$TorrentID'"); */
 
 $DB->query("SELECT
 		tg.Name AS Title,
@@ -43,10 +29,10 @@ $Text = new TEXT;
 ?>
 <div class="thin">
 	<h2>Send PM To All Snatchers Of "<?=$Properties['Title']?>"</h2>
-      
+
     <div id="preview" class="hidden"></div>
     <form action="torrents.php" method="post" id="messageform">
-        <div id="quickpost">  
+        <div id="quickpost">
             <br/>
             <div class="box pad">
                 <input type="hidden" name="action" value="takemasspm" />
@@ -56,17 +42,16 @@ $Text = new TEXT;
                 <h3>Subject</h3>
                 <input type="text" name="subject" class="long" value="<?=(!empty($Subject) ? $Subject : "Message to all snatchers of '$Properties[Title]'")?>"/>
                 <br />
-                <h3>Message</h3>  
-                <? $Text->display_bbcode_assistant("message", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+                <h3>Message</h3>
+                <?php  $Text->display_bbcode_assistant("message", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
                 <textarea id="message" name="message" class="long" rows="10"><?=(!empty($Body) ? $Body : "Torrent: [url=/torrents.php?id=$Properties[GroupID]]$Properties[Title][/url]")?></textarea>
             </div>
         </div>
 		<div class="center">
-			 <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" /> 
+			 <input type="button" id="previewbtn" value="Preview" onclick="Inbox_Preview();" />
 			 <input type="submit" value="Send Mass PM" />
 		</div>
     </form>
 </div>
-<?
+<?php
 show_footer();
-?>

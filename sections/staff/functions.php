@@ -1,5 +1,4 @@
-<?
-
+<?php
 function get_fls() {
     global $Cache, $DB;
     if (($FLS = $Cache->get_value('fls')) === false) {
@@ -24,7 +23,7 @@ function get_fls() {
 
 /* -----------------------------------------------
  * 26th April: changed functions to return Mod Pervs in 'forum staff' (and not in 'staff')
- * this assumes we will not have a layer of FLS (user/helpers) then a layer of 'forum mods' who 
+ * this assumes we will not have a layer of FLS (user/helpers) then a layer of 'forum mods' who
  * are not staff then a layer of 'Mods' who are staff then senior staff... can easily change
  * back if we go that way though
  */
@@ -91,9 +90,9 @@ function get_user_languages($UserID) {
 
     $Userlangs = $Cache->get_value('user_langs_' . $UserID);
     if ($Userlangs === false) {
-        $DB->query("SELECT ul.LangID, l.code, l.flag_cc AS cc, l.language  
-                              FROM users_languages AS ul 
-                              JOIN languages AS l ON l.ID=ul.LangID  
+        $DB->query("SELECT ul.LangID, l.code, l.flag_cc AS cc, l.language
+                              FROM users_languages AS ul
+                              JOIN languages AS l ON l.ID=ul.LangID
                              WHERE UserID=$UserID");
         $Userlangs = $DB->to_array('LangID', MYSQL_ASSOC);
         $Cache->cache_value('user_langs_' . $UserID, $Userlangs);

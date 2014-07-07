@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT.'/sections/bonus/functions.php');
 
 if(!isset($_REQUEST['action'])) {
@@ -31,5 +31,4 @@ else
             include(SERVER_ROOT.'/sections/bonus/bonus.php');
             break;
     }
-} 
-?>
+}

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 New post page
 
@@ -31,7 +31,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 				<a href="#" onclick="return false;"><?=!empty($HeavyInfo['AutoSubscribe']) ? '[Unsubscribe]' : '[Subscribe]'?></a>
 			</div>
 		</div>
-<? if (check_perms('forums_polls_create')) { ?>
+<?php if (check_perms('forums_polls_create')) { ?>
 		<div class="box thin clear hidden" id="pollpreview">
 			<div class="head colhead_dark"><strong>Poll</strong> <a href="#" onclick="$('#threadpoll').toggle();return false;">(View)</a></div>
 			<div class="pad" id="threadpoll">
@@ -41,12 +41,12 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 				<input type="button" style="float: left;" value="Vote" />
 			</div>
 		</div>
-<? } ?>
+<?php } ?>
 		<table class="forum_post box vertical_margin" style="text-align:left;">
 			<tr class="colhead_dark">
 				<td colspan="2">
 					<span style="float:left;"><a href='#newthreadpreview'>#XXXXXX</a>
-						<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true)?> <? //if (!empty($LoggedUser['Title'])) { echo '('.$LoggedUser['Title'].')'; }?>
+						<?=format_username($LoggedUser['ID'], $LoggedUser['Username'], $LoggedUser['Donor'], $LoggedUser['Warned'], $LoggedUser['Enabled'], $LoggedUser['PermissionID'], $LoggedUser['Title'], true)?> <?php //if (!empty($LoggedUser['Title'])) { echo '('.$LoggedUser['Title'].')'; }?>
 					Just now
 					</span>
 					<span id="barpreview" style="float:right;">
@@ -58,12 +58,12 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 			</tr>
 			<tr>
 				<td class="avatar" valign="top">
-			<? if (!empty($LoggedUser['Avatar'])) { 
+			<?php if (!empty($LoggedUser['Avatar'])) {
                               $PermissionsInfo = get_permissions($LoggedUser['PermissionID']) ; ?>
 					<img src="<?=$LoggedUser['Avatar']?>" class="avatar" style="<?=get_avatar_css($PermissionsInfo['MaxAvatarWidth'], $PermissionsInfo['MaxAvatarHeight'])?>" alt="<?=$LoggedUser['Username']?>'s avatar" />
-			<? } else { ?>
+			<?php } else { ?>
 					<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
-			<? } ?>
+			<?php } ?>
 				</td>
 				<td class="body" valign="top">
 					<div id="contentpreview" style="text-align:left;"></div>
@@ -85,7 +85,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 				</tr>
 				<tr>
 					<td class="label">Body</td>
-					<td> <? $Text->display_bbcode_assistant("posttext", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+					<td> <?php $Text->display_bbcode_assistant("posttext", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
                                    <textarea id="posttext" class="long" onkeyup="resize('posttext');" name="body" cols="90" rows="8"></textarea>
                               </td>
 				</tr>
@@ -96,7 +96,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 						<label for="subscribebox">Subscribe to topic</label>
 					</td>
 				</tr>
-<? if (check_perms('forums_polls_create')) { ?>
+<?php if (check_perms('forums_polls_create')) { ?>
 				<script type="text/javascript">
 				var AnswerCount = 1;
 
@@ -107,7 +107,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 						AnswerField.id = "answer_"+AnswerCount;
 						AnswerField.name = "answers[]";
 						AnswerField.style.width = "90%";
-		
+
 						var x = $('#answer_block').raw();
 						x.appendChild(document.createElement("br"));
 						x.appendChild(AnswerField);
@@ -123,8 +123,8 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 				</script>
 				<tr>
 					<td colspan="2" class="center">
-						<strong>Poll Settings</strong> 
-						<a href="#" onclick="$('#poll_question, #poll_answers').toggle();return false;">(View)</a> 
+						<strong>Poll Settings</strong>
+						<a href="#" onclick="$('#poll_question, #poll_answers').toggle();return false;">(View)</a>
 					</td>
 				</tr>
 				<tr id="poll_question" class="hidden">
@@ -139,7 +139,7 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 						[<a href="#" onclick="RemoveAnswerField();return false;">-</a>]
 					</td>
 				</tr>
-<? } ?>
+<?php } ?>
 			</table>
 			<div id="subscribediv" class="hidden">
 				<input id="subscribeboxpreview" type="checkbox" name="subscribe"<?=!empty($HeavyInfo['AutoSubscribe'])?' checked="checked"':''?> />
@@ -151,4 +151,5 @@ show_header('Forums > '.$Forum['Name'].' > New Topic','comments,bbcode,jquery');
 		</form>
 	</div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

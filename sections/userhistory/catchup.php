@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 if(($UserSubscriptions = $Cache->get_value('subscriptions_user_'.$LoggedUser['ID'])) === false) {
 	$DB->query('SELECT TopicID FROM users_subscriptions WHERE UserID = '.db_string($LoggedUser['ID']));
@@ -15,4 +15,3 @@ if(!empty($UserSubscriptions)) {
 }
 $Cache->delete_value('subscriptions_user_new_'.$LoggedUser['ID']);
 header('Location: userhistory.php?action=subscriptions');
-?>

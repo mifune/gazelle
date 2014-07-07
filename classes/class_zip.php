@@ -1,12 +1,12 @@
-<?
+<?php
 /*************************************************************************|
 |--------------- Zip class -----------------------------------------------|
 |*************************************************************************|
 
 This class provides a convenient way for us to generate and serve zip
-archives to our end users, both from physical files, cached 
+archives to our end users, both from physical files, cached
 or already parsed data (torrent files). It's all done on the fly, due to
-the high probability that a filesystem stored archive will never be 
+the high probability that a filesystem stored archive will never be
 downloaded twice.
 
 Utilizes gzcompress, based upon RFC 1950
@@ -39,7 +39,7 @@ $Zip->add_file(file_get_contents("data/file.txt"), "File.txt");
 $Zip->add_file($TorrentData, "Bookmarks/Album [2008].torrent");
 
 	Adds the parsed torrent to the archive in the Bookmarks folder (created simply by placing it in the path).
-	
+
 -----
 
 * Then, close the archive to the user:
@@ -76,32 +76,19 @@ http://www.fileformat.info/tool/hexdump.htm - Useful for analyzing ZIP files
 if (!extension_loaded('zlib')) {
 	error('Zlib Extension not loaded.');
 }
-/*
-//Handles timestamps
-function dostime($TimeStamp = 0) {
-	if(!is_number($TimeStamp)) { // Assume that $TimeStamp is SQL timestamp
-		if($TimeStamp == '0000-00-00 00:00:00') { return 'Never'; }
-		$TimeStamp = strtotime($TimeStamp);
-	}
-	$Date = ($TimeStamp == 0) ? getdate() : getdate($TimeStamp);
-	$Hex = dechex((($Date['year'] - 1980) << 25) | ($Date['mon'] << 21) | ($Date['mday'] << 16) | ($Date['hours'] << 11) | ($Date['minutes'] << 5) | ($Date['seconds'] >> 1));
-	eval("\$Return = \"\x$Hex[6]$Hex[7]\x$Hex[4]$Hex[5]\x$Hex[2]$Hex[3]\x$Hex[0]$Hex[1]\";");
-	return $Return;
-}
-*/
 
-class ZIP { 
+class ZIP {
 	public $ArchiveSize = 0; //Total size
 	public $ArchiveFiles = 0; // Total files
 	private $Structure = ''; // Structure saved to memory
 	private $FileOffset = 0; // Offset to write data
 	private $Data = ''; //An idea
-	
+
 	public function __construct ($ArchiveName='Archive') {
 		header("Content-type: application/octet-stream"); //Stream download
 		header("Content-disposition: attachment; filename=\"".urlencode($ArchiveName).".zip\""); //Name the archive
 	}
-	
+
 	public static function unlimit () {
 		ob_end_clean();
 		set_time_limit(3600); //Limit 1 hour
@@ -121,7 +108,7 @@ class ZIP {
 		$ZipData = gzcompress($FileData); // Ditto.
 		$ZipData = substr ($ZipData, 2,(strlen($ZipData) - 6)); // Checksum resolution
 		$ZipLength = strlen($ZipData); //Ditto.
-		$this->Data .= pack("V",$CRC32); // CRC-32 
+		$this->Data .= pack("V",$CRC32); // CRC-32
 		$this->Data .= pack("V",$ZipLength); // Compressed filesize
 		$this->Data .= pack("V",$DataLength); // Uncompressed filesize
 		$this->Data .= pack("v",strlen($ArchivePath)); // Pathname length
@@ -133,13 +120,6 @@ class ZIP {
 		$this->Data .= $ZipData; // File data
 		/* END file data */
 
-        /* Data descriptor
-        Not needed (only needed when 3rd bitflag is set), causes problems with OS X archive utility
-		$this->Data .= pack("V",$CRC32); // CRC-32
-        $this->Data .= pack("V",$ZipLength); // Compressed filesize 
-        $this->Data .= pack("V",$DataLength); // Uncompressed filesize 
-		END data descriptor */
-	
 		$FileDataLength = strlen($this->Data);
 		$this->ArchiveSize = $this->ArchiveSize + $FileDataLength; // All we really need is the size
 		$CurrentOffset = $this->ArchiveSize; // Update offsets
@@ -148,14 +128,14 @@ class ZIP {
 		/* Central Directory Structure */
 		$CDS = "\x50\x4b\x01\x02"; // CDS signature
 		$CDS .="\x00\x00"; // Constructor version
-		$CDS .="\x14\x00"; // Version requirements 
+		$CDS .="\x14\x00"; // Version requirements
 		$CDS .="\x00\x00"; // Bit flag
 		$CDS .="\x08\x00"; // Compression
-		$CDS .="\x00\x00\x00\x00"; // Last modified 
-		$CDS .= pack("V",$CRC32); // CRC-32 
-		$CDS .= pack("V",$ZipLength); // Compressed filesize 
-		$CDS .= pack("V",$DataLength); // Uncompressed filesize 
-		$CDS .= pack("v",strlen($ArchivePath)); // Pathname length 
+		$CDS .="\x00\x00\x00\x00"; // Last modified
+		$CDS .= pack("V",$CRC32); // CRC-32
+		$CDS .= pack("V",$ZipLength); // Compressed filesize
+		$CDS .= pack("V",$DataLength); // Uncompressed filesize
+		$CDS .= pack("v",strlen($ArchivePath)); // Pathname length
 		$CDS .="\x00\x00"; // Extra field length (0'd so we can ignore this)
 		$CDS .="\x00\x00"; // File comment length  (no comment, 0'd)
 		$CDS .="\x00\x00"; // Disk number start (0 seems valid)
@@ -171,14 +151,14 @@ class ZIP {
 	}
 
 	public function close_stream() {
-		echo $this->Structure; // Structure Root 
+		echo $this->Structure; // Structure Root
 		echo "\x50\x4b\x05\x06"; // End of central directory signature
 		echo "\x00\x00"; // This disk
-		echo "\x00\x00"; // CDS start 
+		echo "\x00\x00"; // CDS start
 		echo pack("v", $this->ArchiveFiles); // Handle the numebr of entries
 		echo pack("v", $this->ArchiveFiles); // Ditto
-		echo pack("V", strlen($this->Structure)); //Size 
-		echo pack("V", $this->ArchiveSize); // Offset 
+		echo pack("V", strlen($this->Structure)); //Size
+		echo pack("V", $this->ArchiveSize); // Offset
 		echo "\x00\x00"; // No comment, close it off
 	}
 }

@@ -1,5 +1,4 @@
-<?
-
+<?php
 if (!extension_loaded('date')) {
     error('Date Extension not loaded.');
 }
@@ -35,7 +34,6 @@ function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFo
     } else {
         $TimeFormat = $LoggedUser['TimeStyle'];
     }
-
 
     if ($TimeFormat == 1 && !$Span) { // shortcut if only need plain date time format returned 
         $TimeNow = date('M d Y, H:i', $TimeStamp - (int) $LoggedUser['TimeOffset']);
@@ -164,16 +162,13 @@ function time_diff($TimeStamp, $Levels=2, $Span=true, $Lowercase=false, $ForceFo
     }
 }
 
-/**    Returns the offset from the origin timezone to the remote timezone, in seconds.
+/**   Returns the offset from the origin timezone to the remote timezone, in seconds.
  *    @param string $remote_tz the remote timezone ie. 'Europe/London'
  *    @param string $origin_tz origin timezone. If null the servers current timezone is used as the origin.
  *    @return int;
  */
 function get_timezone_offset($remote_tz, $origin_tz = null) {
     if ($origin_tz === null) {
-        /* if(!is_string($origin_tz = date_default_timezone_get())) {
-          return false; // A UTC timestamp was returned -- bail out!
-          } */
         $origin_tz = "UTC";
     }
     $origin_dtz = new DateTimeZone($origin_tz);
@@ -330,5 +325,3 @@ function hoursdays($TotalHours) {
     $Hours = modulos($TotalHours, 24.0);
     return "$Days $Hours hrs";
 }
-
-?>

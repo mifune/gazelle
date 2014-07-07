@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 include(SERVER_ROOT.'/classes/class_text.php');
@@ -62,14 +61,14 @@ foreach ($News as $NewsItem) {
 	if (strtotime($NewsTime) > time()) {
 		continue;
 	}
-	
+
 	$JsonAnnouncements[] = array(
 		'newsId' => (int) $NewsID,
 		'title' => $Title,
 		'body' => $Text->full_format($Body,true),
 		'newsTime' => $NewsTime
 	);
-	
+
 	if (++$Count > 4) {
 		break;
 	}
@@ -85,5 +84,3 @@ print
 			)
 		)
 	);
-
-?>

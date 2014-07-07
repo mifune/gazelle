@@ -1,5 +1,4 @@
 <?php
-
 authorize(true);
 
 require(SERVER_ROOT.'/sections/torrents/functions.php');

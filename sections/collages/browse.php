@@ -1,4 +1,4 @@
-<?
+<?php
 define('COLLAGES_PER_PAGE', 25);
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
@@ -26,7 +26,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
 
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('Name', 'NumTorrents', 'StartDate', 'LastDate', 'Username'  ))) {
     $_GET['order_by'] = 'LastDate';
-    $OrderBy = 'LastDate';   
+    $OrderBy = 'LastDate';
 } else {
     $OrderBy = $_GET['order_by'];
 }
@@ -37,15 +37,6 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'asc') {
     $_GET['order_way'] = 'desc';
     $OrderWay = 'desc';
 }
-
-
-
-/*
-$OrderVals = array('Time', 'Name', 'Torrents');
-$WayVals = array('Ascending', 'Descending');
-$OrderTable = array('Time'=>'ID', 'Name'=>'c.Name', 'Torrents'=>'NumTorrents');
-$WayTable = array('Ascending'=>'ASC', 'Descending'=>'DESC');
-*/
 
 // Are we searching in bodies, or just names?
 if(!empty($_GET['type'])) {
@@ -81,20 +72,6 @@ if(!empty($_GET['cats'])) {
 	$Categories = array(1,2,3,4,5,6);
 }
 
-/*
-// Ordering
-if(!empty($_GET['order']) && !empty($OrderTable[$_GET['order']])) {
-	$Order = $OrderTable[$_GET['order']];
-} else {
-	$Order = 'ID';
-}
-
-if(!empty($_GET['way']) && !empty($WayTable[$_GET['way']])) {
-	$Way = $WayTable[$_GET['way']];
-} else {
-	$Way = 'DESC';
-}  */
-
 $BookmarkView = !empty($_GET['bookmarks']);
 
 if ($BookmarkView) {
@@ -103,24 +80,9 @@ if ($BookmarkView) {
 	$BookmarkJoin = '';
 }
 
-/*
-$BaseSQL = $SQL = "SELECT SQL_CALC_FOUND_ROWS 
-	c.ID, 
-	c.Name, 
-	c.NumTorrents,
-	c.TagList,
-	c.CategoryID,
-	c.UserID,
-	um.Username 
-	FROM collages AS c 
-	$BookmarkJoin
-	LEFT JOIN users_main AS um ON um.ID=c.UserID 
-	WHERE Deleted = '0'";  */
-
-
-$BaseSQL = $SQL = "SELECT SQL_CALC_FOUND_ROWS 
-	c.ID, 
-	c.Name, 
+$BaseSQL = $SQL = "SELECT SQL_CALC_FOUND_ROWS
+	c.ID,
+	c.Name,
 	Count(ct.GroupID) AS NumTorrents,
 	c.TagList,
 	c.CategoryID,
@@ -128,18 +90,15 @@ $BaseSQL = $SQL = "SELECT SQL_CALC_FOUND_ROWS
 	um.Username ,
     Min(ct.AddedOn) AS StartDate,
     Max(ct.AddedOn) AS LastDate
-	FROM collages AS c 
+	FROM collages AS c
     LEFT JOIN collages_torrents AS ct ON ct.CollageID=c.ID
 	$BookmarkJoin
-	LEFT JOIN users_main AS um ON um.ID=c.UserID 
+	LEFT JOIN users_main AS um ON um.ID=c.UserID
 	WHERE Deleted = '0'";
-
 
 if ($BookmarkView) {
 	$SQL .= " AND bc.UserID = '" . $LoggedUser['ID'] . "'";
 }
-
-
 
 if(!empty($Search)) {
 	$SQL .= " AND $Type LIKE '%";
@@ -189,7 +148,7 @@ if ($_GET['action'] == 'mine') {
 }
 
 $SQL.=" GROUP BY c.ID
-        ORDER BY $OrderBy $OrderWay 
+        ORDER BY $OrderBy $OrderWay
         LIMIT $Limit ";
 $DB->query($SQL);
 $Collages = $DB->to_array();
@@ -200,8 +159,7 @@ show_header(($BookmarkView)?'Your bookmarked collages':'Browse collages');
 ?>
 <div class="thin">
     <h2>Collages</h2>
-<? if (!$BookmarkView) { ?>
-	
+<?php if (!$BookmarkView) { ?>
 		<div class="head">Search</div>
 		<form action="" method="get">
 			<input type="hidden" name="action" value="search" />
@@ -221,115 +179,99 @@ show_header(($BookmarkView)?'Your bookmarked collages':'Browse collages');
 				<tr>
 					<td class="label"><strong>Categories:</strong></td>
 					<td colspan="1">
-<? foreach($CollageCats as $ID=>$Cat) { ?>
-						<input type="checkbox" value="1" name="cats[<?=$ID?>]" id="cats_<?=$ID?>" <?if(in_array($ID, $Categories)) { echo ' checked="checked"'; }?>>
+<?php foreach($CollageCats as $ID=>$Cat) { ?>
+						<input type="checkbox" value="1" name="cats[<?=$ID?>]" id="cats_<?=$ID?>" <?php if(in_array($ID, $Categories)) { echo ' checked="checked"'; }?>>
 						<label for="cats_<?=$ID?>"><?=$Cat?></label>
-<? } ?>
+<?php } ?>
 					</td>
 				</tr>
 				<tr>
 					<td class="label"><strong>Search in:</strong></td>
 					<td>
-						<input type="radio" name="type" value="c.name" <? if($Type == 'c.name') { echo 'checked="checked" '; }?>/> Names
-						<input type="radio" name="type" value="description" <? if($Type == 'description') { echo 'checked="checked" '; }?>/> Descriptions
+						<input type="radio" name="type" value="c.name" <?php if($Type == 'c.name') { echo 'checked="checked" '; }?>/> Names
+						<input type="radio" name="type" value="description" <?php if($Type == 'description') { echo 'checked="checked" '; }?>/> Descriptions
 					</td>
-                    <!--
-					<td class="label"><strong>Order by:</strong></td>
-					<td>
-						<select name="order">
-						<?
-							foreach($OrderVals as $Cur){ ?>
-							<option value="<?=$Cur?>"<? if(isset($_GET['order']) && $_GET['order'] == $Cur || (!isset($_GET['order']) && $Cur == 'Time')) { echo ' selected="selected"'; } ?>><?=$Cur?></option>
-						<?	}?>
-						</select>
-						<select name="way">
-						<?	foreach($WayVals as $Cur){ ?>
-							<option value="<?=$Cur?>"<? if(isset($_GET['way']) && $_GET['way'] == $Cur || (!isset($_GET['way']) && $Cur == 'Descending')) { echo ' selected="selected"'; } ?>><?=$Cur?></option>
-						<?	}?>
-						</select>
-					</td>  -->
 				</tr>
 				<tr>
 					<td colspan="2" class="center">
 						<input type="submit" value="Search" />
 					</td>
 				</tr>
-			</table>	
+			</table>
 		</form>
-	
-<? }  ?>
+
+<?php }  ?>
 	<div class="linkbox">
-<? if (!$BookmarkView) {
+<?php if (!$BookmarkView) {
 if (check_perms('site_collages_create')) { ?>
 		<a href="collages.php?action=new">[New collage]</a>
-<?		} else { ?>
+<?php		} else { ?>
             <em> <a href="articles.php?topic=collagehelp">You must be a Good Perv with a ratio of at least 1.05 to be able to create a collage.</a></em><br/>
-<?          }
+<?php          }
 if (check_perms('site_collages_personal')) {
-	
  	$DB->query("SELECT ID FROM collages WHERE UserID='$LoggedUser[ID]' AND CategoryID='0' AND Deleted='0'");
 	$CollageCount = $DB->record_count();
-	
+
 	if ($CollageCount == 1) {
 		list($CollageID) = $DB->next_record();
 ?>
 		<a href="collages.php?id=<?=$CollageID?>">[My personal collage]</a>
-<?	} elseif ($CollageCount > 1) { ?>
+<?php	} elseif ($CollageCount > 1) { ?>
 		<a href="collages.php?action=mine">[My personal collages]</a>
-<?	}
-} 
+<?php	}
+}
 if (check_perms('site_collages_subscribe')) { ?>
 		<a href="userhistory.php?action=subscribed_collages">[My Subscribed Collages]</a>
-<? }
+<?php }
 if (check_perms('site_collages_recover')) { ?>
 		<a href="collages.php?action=recover">[Recover collage]</a>
-<?
+<?php
 }
 if (check_perms('site_collages_create') || check_perms('site_collages_personal') || check_perms('site_collages_subscribe') || check_perms('site_collages_recover')) {
 ?>
 		<br />
-<?
+<?php
 }
 ?>
 		<a href="collages.php?userid=<?=$LoggedUser['ID']?>">[Collages you started]</a>
 		<a href="collages.php?userid=<?=$LoggedUser['ID']?>&amp;contrib=1">[Collages you've contributed to]</a>
-<? } else { ?>
+<?php } else { ?>
 		<a href="bookmarks.php?type=torrents">[Torrents]</a>
 		<a href="bookmarks.php?type=collages">[Collages]</a>
 		<a href="bookmarks.php?type=requests">[Requests]</a>
-<? } ?>
-<?
+<?php }
+
 $Pages=get_pages($Page,$NumResults,COLLAGES_PER_PAGE,9);
 echo "<br />$Pages";
 ?>
 	</div>
-<? if ($BookmarkView) { ?>
+<?php if ($BookmarkView) { ?>
 	<div class="head">Your bookmarked collages</div>
-<? } else { ?>
+<?php } else { ?>
 	<div class="head">Browse collages<?=(!empty($UserLink) ? (isset($CollageIDs) ? ' with contributions by '.$UserLink : ' started by '.$UserLink) : '')?></div>
-<? } ?>    
-<? if (count($Collages) == 0) { ?>
+<?php } ?>
+<?php if (count($Collages) == 0) { ?>
 <div class="box pad" align="center">
-<?	if ($BookmarkView) { ?>
+<?php	if ($BookmarkView) { ?>
 	<h2>You have not bookmarked any collages.</h2>
-<?	} else { ?>
+<?php	} else { ?>
 	<h2>Your search did not match anything.</h2>
 	<p>Make sure all names are spelled correctly, or try making your search less specific.</p>
-<?	} ?>
+<?php	} ?>
 </div><!--box-->
 </div><!--content-->
-<? show_footer(); die();
+<?php show_footer(); die();
 } ?>
 <table width="100%">
 	<tr class="colhead">
 		<td class="center"></td>
         <td><a href="<?=header_link('Name') ?>">Collage</a></td>
 		<td class="center"><a href="<?=header_link('NumTorrents') ?>">Torrents</a></td>
-		<td><a href="<?=header_link('StartDate') ?>">Started</a></td> 
+		<td><a href="<?=header_link('StartDate') ?>">Started</a></td>
 		<td class="nobr"><a href="<?=header_link('LastDate') ?>">Last Added</a></td>
-        <td class="center"><a href="<?=header_link('Username') ?>">Author</a></td> 
+        <td class="center"><a href="<?=header_link('Username') ?>">Author</a></td>
 	</tr>
-<?
+<?php
 $Row = 'a'; // For the pretty colours
 foreach ($Collages as $Collage) {
 	list($ID, $Name, $NumTorrents, $TagList, $CategoryID, $UserID, $Username, $StartDate, $LastDate) = $Collage;
@@ -340,7 +282,7 @@ foreach ($Collages as $Collage) {
 		$Tags[]='<a href="collages.php?action=search&amp;tags='.$Tag.'">'.$Tag.'</a>';
 	}
 	$Tags = implode(', ', $Tags);
-	
+
 	//Print results
 ?>
 	<tr class="row<?=$Row?> <?=($BookmarkView)?'bookmark_'.$ID:''?>">
@@ -349,26 +291,25 @@ foreach ($Collages as $Collage) {
 		</td>
 		<td>
 			<a href="collages.php?id=<?=$ID?>"><?=$Name?></a>
-<?	if ($BookmarkView) { ?>
+<?php	if ($BookmarkView) { ?>
 			<span style="float:right">
 				<a href="#" onclick="Unbookmark('collage', <?=$ID?>,'');return false;">[Remove bookmark]</a>
 			</span>
-<?	} ?>
-                        <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
+<?php	} ?>
+                        <?php if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 			<div class="tags">
 				<?=$Tags?>
 			</div>
-                        <? } ?>
+                        <?php } ?>
 		</td>
 		<td class="center"><?=(int)$NumTorrents?></td>
         <td class=""><?=time_diff($StartDate)?></td>
         <td class=""><?=time_diff($LastDate)?></td>
 		<td class="center"><?=format_username($UserID, $Username)?></td>
 	</tr>
-<? } ?>
+<?php } ?>
 </table>
 	<div class="linkbox"><?=$Pages?></div>
 </div>
-<?
+<?php
 show_footer();
-?>

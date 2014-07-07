@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 if(!check_perms('admin_manage_forums')) { error(403); }
@@ -53,6 +53,5 @@ if($_POST['submit'] == 'Delete'){ //Delete
 
 $Cache->delete('forums_list'); // Clear cache
 
-// Go back 
+// Go back
 header('Location: tools.php?action=forum');
-?>

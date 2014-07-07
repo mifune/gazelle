@@ -1,4 +1,4 @@
-<?
+<?php
 /**********|| Page to show individual forums || ********************************\
 
 Things to expect in $_GET:
@@ -66,16 +66,15 @@ if (!check_perms('site_moderate_forums')) {
 if($LoggedUser['CustomForums'][$ForumID] != 1 && $Forums[$ForumID]['MinClassRead'] > $LoggedUser['Class']) { error(403); }
 
 // Start printing
-//show_header('Forums > '. $Forums[$ForumID]['Name']);
 show_header(empty($LoggedUser['ShortTitles'])?"Forums > {$Forums[$ForumID][Name]}":$Forums[$ForumID][Name]);
-//$p = (empty($LoggedUser['ShortTitles'])?"Forums > {$Forums[$ForumID][Name]}":$Forums[$ForumID][Name]);
+
 ?>
 <div class="thin">
-<? print_latest_forum_topics(); ?>
+<?php print_latest_forum_topics(); ?>
 	<div class="linkbox">
-<? if(check_forumperm($ForumID, 'Write') && check_forumperm($ForumID, 'Create')){ ?>
+<?php if(check_forumperm($ForumID, 'Write') && check_forumperm($ForumID, 'Create')){ ?>
 		[<a href="forums.php?action=new&amp;forumid=<?=$ForumID?>">New Thread</a>]&nbsp;
-<? } ?>
+<?php } ?>
 		[<a href="#" onclick="$('#searchforum').toggle(); this.innerHTML = (this.innerHTML == 'Search this Forum'?'Hide Search':'Search this Forum'); return false;">Search this Forum</a>]&nbsp;
 		[<a href="forums.php?action=unread">Unread Posts</a>]
 		<div id="searchforum" class="hidden">
@@ -83,7 +82,7 @@ show_header(empty($LoggedUser['ShortTitles'])?"Forums > {$Forums[$ForumID][Name]
                             <br />
 				<div class="head">Search this forum</div>
 				<form action="forums.php" method="get">
-					<table cellpadding="6" cellspacing="1" border="0" class="border">	
+					<table cellpadding="6" cellspacing="1" border="0" class="border">
 						<input type="hidden" name="action" value="search" />
 						<input type="hidden" name="forums[]" value="<?=$ForumID?>" />
 						<tr>
@@ -92,9 +91,9 @@ show_header(empty($LoggedUser['ShortTitles'])?"Forums > {$Forums[$ForumID][Name]
 						<tr>
 							<td><strong>Search in:</strong></td>
 							<td>
-								<input type="radio" name="type" id="type_title" value="title" checked="checked" /> 
+								<input type="radio" name="type" id="type_title" value="title" checked="checked" />
 								<label for="type_title">Titles</label>
-								<input type="radio" name="type" id="type_body" value="body" /> 
+								<input type="radio" name="type" id="type_body" value="body" />
 								<label for="type_body">Post bodies</label>
 							</td>
 						<tr>
@@ -107,37 +106,31 @@ show_header(empty($LoggedUser['ShortTitles'])?"Forums > {$Forums[$ForumID][Name]
 			</div>
 		</div>
 	</div>
-<? if(check_perms('site_moderate_forums')) { ?>
+<?php if(check_perms('site_moderate_forums')) { ?>
 	<div class="linkbox">
 		<a href="forums.php?action=edit_rules&amp;forumid=<?=$ForumID?>">Change specific rules</a>
 	</div>
-<? } ?>
-<? if(!empty($Forums[$ForumID]['SpecificRules'])) { ?>
+<?php } ?>
+<?php if(!empty($Forums[$ForumID]['SpecificRules'])) { ?>
 	<div class="head">
 		Forum Specific Rules
 	</div>
-	<div class="box pad center"> 
-<? foreach($Forums[$ForumID]['SpecificRules'] as $ThreadIDs) {
+	<div class="box pad center">
+<?php foreach($Forums[$ForumID]['SpecificRules'] as $ThreadIDs) {
 	$Thread = get_thread_info($ThreadIDs);
 ?>
             &nbsp;&nbsp;[<a href="forums.php?action=viewthread&amp;threadid=<?=$ThreadIDs?>"><?=$Thread['Title']?></a>]&nbsp;&nbsp;
-<? } ?>
+<?php } ?>
 	</div>
-<? } ?>
+<?php } ?>
 	<div class="linkbox pager">
-<?
+<?php
 $Pages=get_pages($Page,$Forums[$ForumID]['NumTopics'],TOPICS_PER_PAGE,9);
 echo $Pages;
 ?>
 	</div>
         <div class="head"><a href="forums.php">Forums</a> &gt; <?=$Forums[$ForumID]['Name']?></div>
 	<table class="forum_list" width="100%">
-		<!--<tr class="colhead">
-			<td style="width:2%;"></td>
-			<td>Latest</td>
-			<td style="width:7%;">Replies</td>
-			<td style="width:14%;">Author</td>
-		</tr>-->
 		<tr class="colhead">
 			<td style="width:2%;"></td>
 			<td>Topic</td>
@@ -145,7 +138,7 @@ echo $Pages;
 			<td style="width:5%;">Views</td>
 			<td>Latest</td>
 		</tr>
-<?
+<?php
 // Check that we have content to process
 if (count($Forum) == 0) {
 ?>
@@ -154,7 +147,7 @@ if (count($Forum) == 0) {
 				No threads to display in this forum!
 			</td>
 		</tr>
-<?
+<?php
 } else {
 	// forums_last_read_topics is a record of the last post a user read in a topic, and what page that was on
 	$DB->query('SELECT
@@ -201,8 +194,8 @@ if (count($Forum) == 0) {
 			$PagesText.=')';
 		}
 
-            $NumViews = get_thread_views($TopicID);
- 
+        $NumViews = get_thread_views($TopicID);
+
 		// handle read/unread posts - the reason we can't cache the whole page
 		if((!$Locked || $Sticky) && ((empty($LastRead[$TopicID]) || $LastRead[$TopicID]['PostID']<$LastID) && strtotime($LastTime)>$LoggedUser['CatchupTime'])) {
 			$Read = 'unread';
@@ -216,7 +209,7 @@ if (count($Forum) == 0) {
 		<td class="<?=$Read?>" title="<?=ucwords(str_replace('_',' ',$Read))?>"></td>
 		<td>
 			<span style="float:left;" class="last_topic">
-<?
+<?php
 		$TopicLength=75-(2*count($PageLinks));
 		unset($PageLinks);
 ?>
@@ -225,11 +218,11 @@ if (count($Forum) == 0) {
 				</strong>
 				<?=$PagesText?>
 			</span>
-<?		if(!empty($LastRead[$TopicID])) { ?>
+<?php		if(!empty($LastRead[$TopicID])) { ?>
 			<span style="float: left;" class="last_read" title="Jump to last read">
 				<a href="forums.php?action=viewthread&amp;threadid=<?=$TopicID?>&amp;page=<?=$LastRead[$TopicID]['Page']?>#post<?=$LastRead[$TopicID]['PostID']?>"></a>
 			</span>
-<?		} ?>
+<?php		} ?>
 			<span style="float: right;" class="first_poster">
 				started by <?=format_username($AuthorID, $AuthorName)?>
 			</span>
@@ -239,21 +232,19 @@ if (count($Forum) == 0) {
 		<td>
                 <span style="float: left;" class="last_poster">
                     by <?=format_username($LastAuthorID, $LastAuthorName)?> <?=time_diff($LastTime,1)?>
-                </span> 
+                </span>
 			<span style="float: left;" class="last_post" title="Jump to last post">
 				<a href="forums.php?action=viewthread&amp;threadid=<?=$TopicID?>&amp;postid=<?=$LastID?>#post<?=$LastID?>"></a>
 			</span>
             </td>
 	</tr>
-<?	}
+<?php	}
 } ?>
 </table>
-<!--<div class="breadcrumbs">
-	<a href="forums.php">Forums</a> &gt; <?=$Forums[$ForumID]['Name']?>
-</div>-->
 	<div class="linkbox pager">
 		<?=$Pages?>
 	</div>
 	<div class="linkbox">[<a href="forums.php?action=catchup&amp;forumid=<?=$ForumID?>&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up</a>]</div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 print
@@ -11,5 +10,3 @@ print
 			)
 		)
 	);
-
-?>

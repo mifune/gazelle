@@ -1,4 +1,4 @@
-<?
+<?php
 $CollageID = $_GET['collageid'];
 if(!is_number($CollageID)) { error(0); }
 
@@ -48,20 +48,17 @@ show_header('Manage collage '.$Name);
 			<td>User</td>
 			<td>Submit</td>
 		</tr>
-<?
-
-
+<?php
 $Number = 0;
 foreach ($TorrentList as $GroupID=>$Group) {
 	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $UserID, $Username, $Sort) = array_values($CollageDataList[$GroupID]);
-	
-	
+
+
 	$Number++;
 
 	$DisplayName = $Number.' - ';
 	$DisplayName .= '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-	
 ?>
 		<tr>
 			<form action="collages.php" method="post">
@@ -84,9 +81,10 @@ foreach ($TorrentList as $GroupID=>$Group) {
 				</td>
 			</form>
 		</tr>
-<?
+<?php
 }
 ?>
 	</table>
 </div>
-<? show_footer() ?>
+<?php
+show_footer();

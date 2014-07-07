@@ -1,4 +1,4 @@
-<?
+<?php
 // error out on invalid requests (before caching)
 if(isset($_GET['details'])) {
 	if(in_array($_GET['details'],array('ut','ur','v'))) {
@@ -21,7 +21,7 @@ show_header('Top 10 Tags');
 		<a href="top10.php?type=taggers">[Taggers]</a>
 	</div>
 
-<?
+<?php
 
 // defaults to 10 (duh)
 $Limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
@@ -111,13 +111,13 @@ function generate_tag_table($Caption, $Tag, $Details, $Limit, $ShowVotes=true, $
 		<td class="tags_rank">Rank</td>
 		<td class="tags_tag">Tag</td>
 		<td class="tags_uses">Uses</td>
-<?	if($ShowVotes) {	?>
+<?php 	if($ShowVotes) {	?>
 		<td class="tags_votes">Votes</td>
             <td class="tags_votes_detail"></td>
             <td class="tags_votes_detail2"></td>
-<?	}	?>
+<?php 	}	?>
 	</tr>
-<?
+<?php
 	// in the unlikely event that query finds 0 rows...
 	if(empty($Details)) {
 		echo '
@@ -140,14 +140,13 @@ function generate_tag_table($Caption, $Tag, $Details, $Limit, $ShowVotes=true, $
 		<td class="tags_rank"><?=$Rank?></td>
 		<td class="tags_tag"><a href="<?=$URLString?><?=$Detail['Name']?>"><?=$Detail['Name']?></a></td>
 		<td class="tags_uses"><?=$Detail['Uses']?></td>
-<?		if($ShowVotes) { ?>
+<?php 		if($ShowVotes) { ?>
 		<td class="tags_votes"><span class="total_votes"><?=($Detail['PosVotes']-$Detail['NegVotes'])?></span></td>
             <td class="tags_votes_detail"><span class="pos_votes">+<?=$Detail['PosVotes']?></span></td>
             <td class="tags_votes_detail2"><span class="neg_votes">-<?=$Detail['NegVotes']?></span></td>
-<?		} ?>
+<?php 		} ?>
 	</tr>
-<?
+<?php
 	}
 	echo '</table><br />';
 }
-?>

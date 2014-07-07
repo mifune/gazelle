@@ -1,5 +1,4 @@
-<?
-
+<?php
 enforce_login();
 
 if(!empty($LoggedUser['DisableForums'])) {
@@ -10,10 +9,9 @@ include(SERVER_ROOT.'/sections/forums/functions.php');
 
 // Replace the old hard-coded forum categories
 unset($ForumCats);
-$ForumCats = get_forum_cats(); 
+$ForumCats = get_forum_cats();
 //This variable contains all our lovely forum data
 $Forums = get_forums_info();
- 
 
 if(!empty($_POST['action'])){
 	switch ($_POST['action']) {
@@ -40,7 +38,7 @@ if(!empty($_POST['action'])){
 	}
 } elseif(!empty($_GET['action'])) {
 	switch ($_GET['action']) {
-		case 'unread': 
+		case 'unread':
 			require(SERVER_ROOT.'/sections/forums/unread_posts.php');
 			break;
 		case 'viewforum':
@@ -49,7 +47,7 @@ if(!empty($_POST['action'])){
 			break;
 		case 'viewthread':
 		case 'viewtopic':
-			// Page that displays threads	
+			// Page that displays threads
 			require(SERVER_ROOT.'/sections/forums/thread.php');
 			break;
 		case 'ajax_get_edit':
@@ -123,7 +121,7 @@ function get_forum_info($ForumID) {
 		}
 		// Makes an array, with $Forum['Name'], etc.
 		$Forum = $DB->next_record(MYSQLI_ASSOC);
-		
+
 		$Cache->cache_value('ForumInfo_'.$ForumID, $Forum, 86400); // Cache for a day
 	}
 	return $Forum;

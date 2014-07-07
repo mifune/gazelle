@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_torrents_notify')){ error(403); }
 show_header('Manage notifications');
 ?>
@@ -7,10 +7,10 @@ show_header('Manage notifications');
         <a style="float:left;margin-top:4px" title="RSS Feed - All your torrent notification filters" href="feeds.php?feed=torrents_notify_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>"><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
 		 Notification filters
     </h2>
-    <div  class="linkbox"> 
+    <div  class="linkbox">
             [<a href="torrents.php?action=notify" title="View your current pending notifications">notifications</a>]
     </div>
-<?
+<?php
 $DB->query("SELECT ID, Label, Tags, NotTags, Categories FROM users_notify_filters WHERE UserID='$LoggedUser[ID]' UNION ALL SELECT NULL, NULL, NULL, 1, NULL");
 $i = 0;
 $NumFilters = $DB->record_count()-1;
@@ -25,18 +25,18 @@ foreach($Notifications as $N) { //$N stands for Notifications
 
 	if($i>$NumFilters){ ?>
             <div class="head">Create a new notification filter</div>
-<?	} elseif($NumFilters>0) { ?>
+<?php 	} elseif($NumFilters>0) { ?>
             <div class="head">
 				<a title="RSS Feed - <?=$N['Label']?>" href="feeds.php?feed=torrents_notify_<?=$N['ID']?>_<?=$LoggedUser['torrent_pass']?>&amp;user=<?=$LoggedUser['ID']?>&amp;auth=<?=$LoggedUser['RSS_Auth']?>&amp;passkey=<?=$LoggedUser['torrent_pass']?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;name=<?=urlencode($N['Label'])?>"><img src="<?=STATIC_SERVER?>/common/symbols/rss.png" alt="RSS feed" /></a>
 				<?=display_str($N['Label'])?>
 				<a href="user.php?action=notify_delete&amp;id=<?=$N['ID']?>&amp;auth=<?=$LoggedUser['AuthKey']?>">(Delete)</a>
 		</div>
-<?	} ?>
+<?php 	} ?>
 	<form action="user.php" method="post">
 		<input type="hidden" name="action" value="notify_handle" />
 		<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 		<table>
-<?	if($i>$NumFilters){ ?>
+<?php 	if($i>$NumFilters){ ?>
 			<tr>
 				<td class="label"><strong>Label</strong></td>
 				<td>
@@ -49,9 +49,9 @@ foreach($Notifications as $N) { //$N stands for Notifications
 					<strong>All fields below here are optional</strong>
 				</td>
 			</tr>
-<?	} else { ?>
+<?php 	} else { ?>
 			<input type="hidden" name="id" value="<?=$N['ID']?>" />
-<?	} ?>
+<?php 	} ?>
 
 			<tr>
 				<td class="label"><strong>At least one of these tags</strong></td>
@@ -71,11 +71,11 @@ foreach($Notifications as $N) { //$N stands for Notifications
 				<td colspan="2">
             <table class="cat_list noborder" style="text-align:left;padding:0px">
                 <tr>
-                    <td colspan="7"> 
+                    <td colspan="7">
                         <strong>select categories to match</strong>
                     </td>
                 </tr>
-                <?
+                <?php
                 $row = 'a';
                 $x = 0;
                 reset($NewCategories);
@@ -84,18 +84,18 @@ foreach($Notifications as $N) { //$N stands for Notifications
                         if ($x > 0) {
                             ?>
                             </tr>
-                        <? } ?>
+                        <?php  } ?>
                         <tr class="row<?=$row?>">
-                            <?
+                            <?php
                             $row = $row == 'a' ? 'b' : 'a';
                         }
                         $x++;
                         ?>
                         <td>
-					<input type="checkbox" name="categories[]" id="<?=$Category['name']?>_<?=$N['ID']?>" value="<?=$Category['name']?>"<? if(in_array($Category['name'], $N['Categories'])) { echo ' checked="checked"';} ?> />
+					<input type="checkbox" name="categories[]" id="<?=$Category['name']?>_<?=$N['ID']?>" value="<?=$Category['name']?>"<?php  if(in_array($Category['name'], $N['Categories'])) { echo ' checked="checked"';} ?> />
 					<label for="<?=$Category['name']?>_<?=$N['ID']?>"><?=$Category['name']?></label>
                         </td>
-<?              } ?>                           
+<?php               } ?>
                     <td colspan="<?= 7 - ($x % 7) ?>"></td>
                 </tr>
             </table>
@@ -109,8 +109,7 @@ foreach($Notifications as $N) { //$N stands for Notifications
 		</table>
 	</form>
 	<br /><br />
-<? } ?>
+<?php  } ?>
 </div>
-<?
+<?php
 show_footer();
-?>

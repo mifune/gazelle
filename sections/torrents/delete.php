@@ -1,4 +1,4 @@
-<?
+<?php
 $TorrentID = $_GET['torrentid'];
 if (!$TorrentID || !is_number($TorrentID)) error(404);
 
@@ -13,7 +13,7 @@ if ($LoggedUser['ID']!=$UserID && !check_perms('torrents_delete')) {
 	error(403);
 }
 if($LoggedUser['DisableUpload'] || !check_perms('site_upload')) error('You can no longer delete this torrent as your upload rights have been disabled');
- 
+
 
 if(isset($_SESSION['logged_user']['multi_delete']) && $_SESSION['logged_user']['multi_delete']>=3 && !check_perms('torrents_delete_fast')) {
 	error('You have recently deleted 3 torrents, please contact a staff member if you need to delete more.');
@@ -58,11 +58,11 @@ show_header('Delete torrent', 'reportsv2');
         </div>
     </div>
 </div>
-<?
+<?php
 if(check_perms('admin_reports')) {
 ?>
 <div id="all_reports" style="width: 80%; margin-left: auto; margin-right: auto">
-<?
+<?php
 	require(SERVER_ROOT.'/sections/reportsv2/array.php');
 	require(SERVER_ROOT.'/classes/class_text.php');
 	$Text = NEW TEXT;
@@ -84,9 +84,9 @@ if(check_perms('admin_reports')) {
 	}
 	list($GroupName, $GroupID, $Time,
 		$Size, $UploaderID, $UploaderName) = $DB->next_record();
-	
+
 	$Type = 'dupe'; //hardcoded default
-	
+
 	if (array_key_exists($Type, $Types)) {
 		$ReportType = $Types[$Type];
 	} else {
@@ -95,15 +95,15 @@ if(check_perms('admin_reports')) {
 		$ReportType = $Types['master']['other'];
 	}
         $RawName = $GroupName." (". get_size($Size).")" ; // number_format($Size/(1024*1024), 2)." MB)";
-        $LinkName = "<a href='torrents.php?id=$GroupID'>$GroupName</a> (". get_size($Size).")" ; 
-        $BBName = "[url=torrents.php?id=$GroupID]$GroupName"."[/url] (".get_size($Size).")" ; 
-?>	
+        $LinkName = "<a href='torrents.php?id=$GroupID'>$GroupName</a> (". get_size($Size).")" ;
+        $BBName = "[url=torrents.php?id=$GroupID]$GroupName"."[/url] (".get_size($Size).")" ;
+?>
 	<div id="report<?=$ReportID?>">
         <div class="head">Use Report resolve system to delete (much better logging/auto actions)</div>
 		<form id="report_form<?=$ReportID?>" action="reports.php" method="post">
-			<? 
+			<?php
 				/*
-				* Some of these are for takeresolve, some for the javascript.			
+				* Some of these are for takeresolve, some for the javascript.
 				*/
 			?>
 			<div>
@@ -123,29 +123,29 @@ if(check_perms('admin_reports')) {
 				<tr>
 					<td class="label">Torrent:</td>
 					<td colspan="3">
-	<?	if(!$GroupID) { ?>
+	<?php 	if(!$GroupID) { ?>
 						<a href="log.php?search=Torrent+<?=$TorrentID?>"><?=$TorrentID?></a> (Deleted)
-	<?  } else {?>
+	<?php   } else {?>
 						<?=$LinkName?>
 						<a href="torrents.php?action=download&amp;id=<?=$TorrentID?>&amp;authkey=<?=$LoggedUser['AuthKey']?>&amp;torrent_pass=<?=$LoggedUser['torrent_pass']?>" title="Download">[DL]</a>
 						uploaded by <a href="user.php?id=<?=$UploaderID?>"><?=$UploaderName?></a> <?=time_diff($Time)?>
 						<br />
-	<?		$DB->query("SELECT r.ID 
-						FROM reportsv2 AS r 
-						LEFT JOIN torrents AS t ON t.ID=r.TorrentID 
+	<?php 		$DB->query("SELECT r.ID
+						FROM reportsv2 AS r
+						LEFT JOIN torrents AS t ON t.ID=r.TorrentID
 						WHERE r.Status != 'Resolved'
 						AND t.GroupID=$GroupID");
 			$GroupOthers = ($DB->record_count());
-			
+
 			if($GroupOthers > 0) { ?>
 						<div style="text-align: right;">
 							<a href="reportsv2.php?view=group&amp;id=<?=$GroupID?>">There <?=(($GroupOthers > 1) ? "are $GroupOthers reports" : "is 1 other report")?> for torrent(s) in this group</a>
 						</div>
-	<? 		}
-	
-			$DB->query("SELECT t.UserID 
-						FROM reportsv2 AS r 
-						JOIN torrents AS t ON t.ID=r.TorrentID 
+	<?php  		}
+
+			$DB->query("SELECT t.UserID
+						FROM reportsv2 AS r
+						JOIN torrents AS t ON t.ID=r.TorrentID
 						WHERE r.Status != 'Resolved'
 						AND t.UserID=$UploaderID");
 			$UploaderOthers = ($DB->record_count());
@@ -154,8 +154,8 @@ if(check_perms('admin_reports')) {
 						<div style="text-align: right;">
 							<a href="reportsv2.php?view=uploader&amp;id=<?=$UploaderID?>">There <?=(($UploaderOthers > 1) ? "are $UploaderOthers reports" : "is 1 other report")?> for torrent(s) uploaded by this user</a>
 						</div>
-	<? 		}
-		
+	<?php  		}
+
 			$DB->query("SELECT DISTINCT req.ID,
 						req.FillerID,
 						um.Username,
@@ -170,20 +170,19 @@ if(check_perms('admin_reports')) {
 							<div style="text-align: right;">
 								<a href="user.php?id=<?=$FillerID?>"><?=$FillerName?></a> used this torrent to fill <a href="requests.php?action=viewrequest&amp;id=<?=$RequestID?>">this request</a> <?=time_diff($FilledTime)?>
 							</div>
-		<?		}
+		<?php 		}
 			}
 		}
 		?>
 					</td>
 				</tr>
-				<? // END REPORTED STUFF :|: BEGIN MOD STUFF ?>
+				<?php  // END REPORTED STUFF :|: BEGIN MOD STUFF ?>
 				<tr class="spacespans">
 					<td class="label">Resolve
-						<!--<a href="javascript:Load('<?=$ReportID?>')" title="Set back to <?=$ReportType['title']?>">Resolve</a>-->
 					</td>
 					<td colspan="3">
 						<select name="resolve_type" id="resolve_type<?=$ReportID?>" onchange="ChangeResolve(<?=$ReportID?>)">
-<?
+<?php
 $TypeList = $Types;
 $Priorities = array();
 foreach ($TypeList as $Key => $Value) {
@@ -194,10 +193,10 @@ array_multisort($Priorities, SORT_ASC, $TypeList);
 foreach($TypeList as $IType => $Data) {
 ?>
 					<option value="<?=$IType?>"<?=(($Type == $IType)?' selected="selected"':'')?>><?=$Data['title']?></option>
-<? } ?>
+<?php  } ?>
 						</select>
 						<span id="options<?=$ReportID?>">
-							<span title="Delete Torrent?">	
+							<span title="Delete Torrent?">
 								<strong>Delete</strong>
 								<input type="checkbox" name="delete" id="delete<?=$ReportID?>"<?=($ReportType['resolve_options']['delete']?' checked="checked"':'')?>>
 							</span>
@@ -206,9 +205,9 @@ foreach($TypeList as $IType => $Data) {
 								<select name="warning" id="warning<?=$ReportID?>">
 									<option value="0">none</option>
 									<option value="1"<?=(($ReportType['resolve_options']['warn'] == 1)?' selected="selected"':'')?>>1 week</option>
-<?                                      for($i = 2; $i < 9; $i++) {  ?>
+<?php                                       for($i = 2; $i < 9; $i++) {  ?>
 									<option value="<?=$i?>"<?=(($ReportType['resolve_options']['warn'] == $i)?' selected="selected"':'')?>><?=$i?> weeks</option>
-<?                                      }       ?>
+<?php                                       }       ?>
 								</select>
 							</span>
 							<span title="Remove upload privileges?">
@@ -221,7 +220,7 @@ foreach($TypeList as $IType => $Data) {
 						</td>
 				</tr>
 				<tr>
-					<td class="label">PM Uploader</td> 
+					<td class="label">PM Uploader</td>
 					<td colspan="3">A PM is automatically generated for the uploader (and if a bounty is paid to the reporter). Any text here is appended to the uploaders auto PM unless using 'Send Now' to immediately send a message.<br />
                               <blockquote><strong>uploader pm text:</strong><br/><span id="pm_message<?=$ReportID?>"><?=$ReportType['resolve_options']['pm']?></span></blockquote>
                             <span title="Appended to the regular message unless using send now.">
@@ -231,11 +230,11 @@ foreach($TypeList as $IType => $Data) {
 					</td>
 				</tr>
 				<tr>
-					<td class="label"><strong>Extra</strong> Log Message:</td> 
+					<td class="label"><strong>Extra</strong> Log Message:</td>
 					<td>
 						<input type="text" name="log_message" id="log_message<?=$ReportID?>" size="40" />
 					</td>
-					<td class="label"><strong>Extra</strong> Staff Notes:</td> 
+					<td class="label"><strong>Extra</strong> Staff Notes:</td>
 					<td>
 						<input type="text" name="admin_message" id="admin_message<?=$ReportID?>" size="40" />
 					</td>
@@ -250,7 +249,6 @@ foreach($TypeList as $IType => $Data) {
 		<br />
 	</div>
 </div>
-<?
+<?php
 }
 show_footer();
-?>

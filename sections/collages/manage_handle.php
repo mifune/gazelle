@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $CollageID = $_POST['collageid'];
@@ -7,7 +7,6 @@ if(!is_number($CollageID)) { error(404); }
 $DB->query("SELECT UserID, Name, Permissions FROM collages WHERE ID='$CollageID'");
 list($UserID, $Name, $CPermissions) = $DB->next_record();
 
-//if($CategoryID == 0 && $UserID!=$LoggedUser['ID'] && !check_perms('site_collages_delete')) { error(403); }
 if (!check_perms('site_collages_manage')){
     $CPermissions=(int)$CPermissions;
     if ($UserID == $LoggedUser['ID']) {
@@ -22,7 +21,6 @@ if (!check_perms('site_collages_manage')){
 
 $GroupID = $_POST['groupid'];
 if(!is_number($GroupID)) { error(404); }
-
 
 if($_POST['submit'] == 'Remove') {
 	$DB->query("DELETE FROM collages_torrents WHERE CollageID='$CollageID' AND GroupID='$GroupID'");
@@ -39,4 +37,3 @@ if($_POST['submit'] == 'Remove') {
 }
 $Cache->delete_value('collage_'.$CollageID);
 header('Location: collages.php?action=manage&collageid='.$CollageID);
-?>

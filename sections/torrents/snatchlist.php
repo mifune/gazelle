@@ -1,4 +1,4 @@
-<?
+<?php
 if (!isset($_GET['torrentid']) || !is_number($_GET['torrentid']) ) {
     error(404);
 }
@@ -28,22 +28,22 @@ $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
 ?>
 
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_snatches', $_GET['torrentid'], $NumResults, $Page) ?></div>
-    <? } ?>
+    <?php  } ?>
 <table>
-    <?
+    <?php
     if ($NumResults == 0) {
-        ?> 
+        ?>
         <tr class="smallhead">
             <td colspan="4">There have been no snatches of this torrent</td>
-        </tr> 
-        <?
+        </tr>
+        <?php
     } else {
         ?>
         <tr class="smallhead">
             <td colspan="4">Snatches</td>
-        </tr>    
+        </tr>
         <tr class="rowa" style="font-weight: bold;">
             <td>User</td>
             <td>Time</td>
@@ -52,7 +52,7 @@ list($NumResults) = $DB->next_record();
             <td>Time</td>
         </tr>
         <tr>
-            <?
+            <?php
             $i = 0;
 
             foreach ($Results as $ID => $Data) {
@@ -63,23 +63,23 @@ list($NumResults) = $DB->next_record();
                 $User = format_username($SnatcherID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID']);
 
                 if ($i % 2 == 0 && $i > 0) {
-                    ?> 
+                    ?>
                 </tr>
-                <tr>	
-                    <?
+                <tr>
+                    <?php
                 }
-                ?> 
+                ?>
                 <td><?= $User ?></td>
                 <td><?= time_diff($Timestamp) ?></td>
-                <?
+                <?php
                 $i++;
             }
             ?>
         </tr>
-        <?
+        <?php
     }
     ?>
 </table>
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_snatches', $_GET['torrentid'], $NumResults, $Page) ?></div>
-<? } ?>
+<?php  }

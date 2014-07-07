@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('admin_manage_ipbans')) { error(403); }
 
 if (isset($_POST['submit'])) {
@@ -15,17 +15,17 @@ if (isset($_POST['submit'])) {
 		$Val->SetFields('notes', '1','string','You must inculde a note regarding the reason for the ban.');
 		$Err=$Val->ValidateForm($_POST); // Validate the form
 		if($Err){ error($Err); }
-	
+
 		$Notes = db_string($_POST['notes']);
 		$Start = ip2unsigned($_POST['start']); //Sanitized by Validation regex
 		$End = ip2unsigned($_POST['end']); //See above
         $EndHours = db_string($_POST['endtime']);
-         
+
         $time = '0000-00-00 00:00:00';
         if ($EndHours > 1) {
             $time = time_plus( 3600*$EndHours );
         }
-        
+
 		if($_POST['submit'] == 'Edit'){ //Edit
 			if(empty($_POST['id']) || !is_number($_POST['id'])) {
 				error(404);
@@ -35,7 +35,7 @@ if (isset($_POST['submit'])) {
             if ($EndHours != 1 && $time != $EndTime) {
                 $SQL_ENDTIME = "EndTime='$time',";
             } else  $SQL_ENDTIME = '';
-            
+
 			$DB->query("UPDATE ip_bans SET
 				FromIP=$Start,
 				ToIP='$End',
@@ -51,9 +51,9 @@ if (isset($_POST['submit'])) {
             if ($Username) {
                 $UserID = get_userid($Username);
                 if (!$UserID) error("Could not find User '$Username'");
-            } else 
+            } else
                 $UserID=0;
-            
+
 			$DB->query("INSERT INTO ip_bans
 				(FromIP, ToIP, UserID, StaffID, EndTime, Reason) VALUES
 				('$Start','$End', '$UserID', '$LoggedUser[ID]', '$time', '$Notes')");
@@ -63,14 +63,11 @@ if (isset($_POST['submit'])) {
 			$Cache->cache_value('ip_bans', $Bans, 0);
 		}
 	}
-    
     header('Location: tools.php?action=ip_ban');
     die();
 }
 
 define('BANS_PER_PAGE', '50');
-
-
 
 // The "order by x" links on columns headers
 function header_link($SortKey, $DefaultWay = "desc") {
@@ -91,7 +88,7 @@ function header_link($SortKey, $DefaultWay = "desc") {
 
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('FromIP', 'Username', 'Staffname', 'EndTime', 'Notes'  ))) {
     $_GET['order_by'] = 'FromIP';
-    $OrderBy = 'FromIP';   
+    $OrderBy = 'FromIP';
 } else {
     $OrderBy = $_GET['order_by'];
 }
@@ -103,14 +100,11 @@ if (!empty($_GET['order_way']) && $_GET['order_way'] == 'desc') {
     $OrderWay = 'asc';
 }
 
-
-
 list($Page,$Limit) = page_limit(BANS_PER_PAGE);
 
-
-$sql = "SELECT SQL_CALC_FOUND_ROWS 
+$sql = "SELECT SQL_CALC_FOUND_ROWS
                 i.ID, i.FromIP, i.ToIP, i.UserID, i.StaffID, i.EndTime, i.Reason as Notes, um.Username as Username, um2.Username as Staffname
-          FROM ip_bans AS i 
+          FROM ip_bans AS i
      LEFT JOIN users_main as um ON i.UserID=um.ID
      LEFT JOIN users_main as um2 ON i.StaffID=um2.ID";
 
@@ -147,15 +141,10 @@ if($userid){
     $UserInfo = user_info($userid);
     $username = $UserInfo['Username'];
 }
-$startip = display_str($_GET['uip']);  
-$endip = display_str($_GET['uip']);  
+$startip = display_str($_GET['uip']);
+$endip = display_str($_GET['uip']);
 $notes = display_str($_GET['unotes']);
 $endtime = display_str($_GET['uend']);
-
-
-//$endHours = db_string($_POST['endtime']);
-         
-        
 ?>
 
 <div class="thin">
@@ -177,14 +166,14 @@ $endtime = display_str($_GET['uend']);
                         <input type="submit" value="Search" />
                     </td>
                 </tr>
-            </table>	
+            </table>
         </form>
     </div>
     <br />
 
     <h2>Manage</h2>
     <div class="linkbox"><?=$PageLinks?></div>
-    
+
     <div class="head">Create new IP ban</div>
     <table width="100%">
         <tr class="colhead">
@@ -211,13 +200,13 @@ $endtime = display_str($_GET['uend']);
                 </td>
                 <td class="center">
                     <select name="endtime">
-                        <option value="24" <?if($endtime==24)echo'selected="selected" '?>>24 hours</option>
-                        <option value="48" <?if($endtime==48)echo'selected="selected" '?>>48 hours</option>
-                        <option value="168" <?if($endtime==168)echo'selected="selected" '?>>1 week</option>
-                        <option value="336" <?if($endtime==336)echo'selected="selected" '?>>2 weeks</option>
-                        <option value="672" <?if($endtime==672)echo'selected="selected" '?>>4 weeks</option>
-                        <option value="2016" <?if($endtime==2016)echo'selected="selected" '?>>12 weeks</option>
-                        <option value="0" <?if(!$endtime)echo'selected="selected" '?>>Never</option>
+                        <option value="24" <?php if($endtime==24)echo'selected="selected" '?>>24 hours</option>
+                        <option value="48" <?php if($endtime==48)echo'selected="selected" '?>>48 hours</option>
+                        <option value="168" <?php if($endtime==168)echo'selected="selected" '?>>1 week</option>
+                        <option value="336" <?php if($endtime==336)echo'selected="selected" '?>>2 weeks</option>
+                        <option value="672" <?php if($endtime==672)echo'selected="selected" '?>>4 weeks</option>
+                        <option value="2016" <?php if($endtime==2016)echo'selected="selected" '?>>12 weeks</option>
+                        <option value="0" <?php if(!$endtime)echo'selected="selected" '?>>Never</option>
                     </select>
                 </td>
                 <td>
@@ -230,7 +219,7 @@ $endtime = display_str($_GET['uend']);
             </form>
         </tr>
     </table>
-    
+
     <br/>
     <div class="head"><?=  str_plural('IP ban', $Results) ?> </div>
     <table width="100%">
@@ -242,11 +231,10 @@ $endtime = display_str($_GET['uend']);
             <td style="width:40%"><a href="<?=header_link('Notes') ?>">Notes</a></td>
             <td>Submit</td>
         </tr>
-<?
+<?php
     $Row = 'a';
     foreach($Bans as $Ban){
         list($ID, $Start, $End, $UserID, $StaffID, $EndTime, $Reason) = $Ban;
-    //while(list($ID, $Start, $End, $UserID, $StaffID, $EndTime, $Reason) = $DB->next_record()){
         $Row = ($Row === 'a' ? 'b' : 'a');
         $Start=long2ip($Start);
         $End=long2ip($End);
@@ -264,17 +252,17 @@ $endtime = display_str($_GET['uend']);
                 </td>
                 <td class="nobr center">
  <?=  $UserID ? format_username($UserID, $UserInfo['Username'], $UserInfo['Donor'], $UserInfo['Warned'], $UserInfo['Enabled'], $UserInfo['PermissionID'], false, false, $UserInfo['GroupPermissionID'], true, true) : '-';?>
-                 
+
                 </td>
                 <td class="nobr center">
   <?= $StaffID ? format_username($StaffID, $StaffInfo['Username'], $StaffInfo['Donor'], $StaffInfo['Warned'], $StaffInfo['Enabled'], $StaffInfo['PermissionID'], false, false, $StaffInfo['GroupPermissionID'], true, true): '-';?>
-               
+
                 </td>
                 <td class="center">
                     <select name="endtime">
- <? if ($EndTime !='0000-00-00 00:00:00') { ?>
+ <?php  if ($EndTime !='0000-00-00 00:00:00') { ?>
                         <option value="1" selected="selected"><?=time_diff($EndTime, 2, false,false,0)?></option>
- <? } ?>
+ <?php  } ?>
                         <option value="24">24 hours</option>
                         <option value="48">48 hours</option>
                         <option value="168">1 week</option>
@@ -294,10 +282,11 @@ $endtime = display_str($_GET['uend']);
 
             </form>
         </tr>
-<?
+<?php
     }
 ?>
     </table>
     <div class="linkbox"><?=$PageLinks?></div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

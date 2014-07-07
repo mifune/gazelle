@@ -1,10 +1,10 @@
-<?
+<?php
 /*
 AJAX Switch Center
 
-This page acts as an AJAX "switch" - it's called by scripts, and it includes the required pages. 
+This page acts as an AJAX "switch" - it's called by scripts, and it includes the required pages.
 
-The required page is determined by $_GET['action']. 
+The required page is determined by $_GET['action'].
 
 */
 
@@ -20,7 +20,7 @@ switch ($_GET['action']){
 	case 'check_donation':
 		require(SERVER_ROOT.'/sections/ajax/check_donation.php');
 		break;
-    
+
 	case 'check_synonym_list':
 		require(SERVER_ROOT.'/sections/ajax/check_synonym_list.php');
 		break;
@@ -30,11 +30,11 @@ switch ($_GET['action']){
 	case 'get_taglist':
 		require(SERVER_ROOT.'/sections/ajax/get_taglist.php');
 		break;
-    
+
 	case 'get_ip_dupes':
 		require(SERVER_ROOT.'/sections/ajax/get_ip_dupes.php');
 		break;
-    
+
     case 'get_badge_info':
 		require(SERVER_ROOT.'/sections/ajax/get_badge_info.php');
 		break;
@@ -78,7 +78,7 @@ switch ($_GET['action']){
     case 'get_smilies':
 		require('get_smilies.php');
 		break;
-            
+
 	case 'connchecker':
 		include('do_conncheck.php');
 		break;
@@ -88,7 +88,7 @@ switch ($_GET['action']){
 	case 'delete_conn_record':
 		include('delete_connrecord.php');
 		break;
-	
+
 	case 'watchlist_add':
 	case 'watchlist_remove':
 	case 'excludelist_add':
@@ -96,10 +96,10 @@ switch ($_GET['action']){
 	case 'remove_records':
 		include('do_watchlist.php');
 		break;
-    
+
 	// things not yet used on the site
 	case 'torrentgroup':
-		// Lanz: disabled, get_group_info() is broken for this code.
+		// disabled, get_group_info() is broken for this code.
                 //require('torrentgroup.php');
 		break;
 	case 'user':
@@ -145,5 +145,3 @@ switch ($_GET['action']){
 		// If they're screwing around with the query string
 		print json_encode(array('status' => 'failure'));
 }
-
-?>

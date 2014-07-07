@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 /*
@@ -119,4 +118,3 @@ print
 			)
 		)
 	);
-?>

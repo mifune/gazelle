@@ -1,4 +1,4 @@
-<?
+<?php
 
 authorize();
 
@@ -111,4 +111,3 @@ function generate_user_json($Caption, $Tag, $Details, $Limit) {
 		'results' => $results
 		);
 }
-?>

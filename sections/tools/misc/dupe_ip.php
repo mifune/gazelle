@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('users_view_ips')) { error(403); }
 
 define('USERS_PER_PAGE', 50);
@@ -24,19 +24,17 @@ if (empty($_GET['order_way']) || $_GET['order_way'] == 'asc') {
     $_GET['order_way'] = 'desc';
     $OrderWay = 'desc';
 }
- 
+
 if (empty($_GET['order_by']) || !in_array($_GET['order_by'], array('NumUsers', 'IP', 'StartTime', 'EndTime' ))) {
     $_GET['order_by'] = 'NumUsers';
-    $OrderBy = 'NumUsers'; 
+    $OrderBy = 'NumUsers';
 } else {
     $OrderBy = $_GET['order_by'];
 }
 
-
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
-
-$RS = $DB->query("SELECT 
+$RS = $DB->query("SELECT
                     SQL_CALC_FOUND_ROWS
                     Count(DISTINCT h.UserID) as NumUsers,
                     h.IP as IP,
@@ -49,15 +47,11 @@ $RS = $DB->query("SELECT
                   ORDER BY $OrderBy $OrderWay
                   LIMIT $Limit ");
 
-                   // GROUP_CONCAT(UserID SEPARATOR '|') AS UserIDs, 
-                //  WHERE IP != '127.0.0.1'
-
 $DupeIPtotals = $DB->to_array();
 $DB->query("SELECT FOUND_ROWS()");
 list($NumResults) = $DB->next_record();
- 
-$Pages=get_pages($Page,$NumResults,USERS_PER_PAGE,9);
 
+$Pages=get_pages($Page,$NumResults,USERS_PER_PAGE,9);
 
 show_header('Dupe IPs','dupeip');
 
@@ -68,9 +62,9 @@ show_header('Dupe IPs','dupeip');
 		<strong><a href="tools.php?action=dupe_ips">[Dupe IP's]</a></strong>
 		<a href="tools.php?action=banned_ip_users">[Returning Dupe IP's]</a>
 	</div>
- 
+
 	<div class="linkbox"> <?=$Pages; ?> </div>
-    
+
 	<div class="head">Duped IP's</div>
 	<table width="100%">
 		<tr class="colhead">
@@ -80,13 +74,13 @@ show_header('Dupe IPs','dupeip');
 			<td class="center"><a href="<?=header_link('StartTime') ?>">Last Start Time</a></td>
             <td class="center"><a href="<?=header_link('EndTime') ?>">Last End Time</a></td>
 		</tr>
-<?
+<?php
         if($NumResults==0){
-?> 
+?>
                     <tr class="rowb">
                         <td class="center" colspan="5">no duped ips</td>
                     </tr>
-<?      } else {
+<?php       } else {
             $i=0;
             foreach ($DupeIPtotals as $Record) {
                 list($NumUsers, $IP, $StartTime, $EndTime) = $Record;
@@ -105,12 +99,11 @@ show_header('Dupe IPs','dupeip');
                     <td class="center"><?=time_diff($EndTime)?></td>
                 </tr>
                 <tr id="users_<?=$i?>" class="hidden"></tr>
-<?          } 
-        } 
+<?php           }
+        }
 ?>
 	</table>
 	<div class="linkbox"> <?=$Pages; ?> </div>
 </div>
-<?
+<?php
 show_footer();
-?>

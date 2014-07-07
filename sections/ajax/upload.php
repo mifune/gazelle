@@ -1,6 +1,5 @@
-<?
+<?php
 // echo out the slice of the form needed for the selected upload type ($_GET['section']).
-
 
 // this is probably broken now... but is currently unused, and has been supplanted by the new category/tag system
 
@@ -15,9 +14,4 @@ if(!$GenreTags){
 	$Cache->cache_value('genre_tags', $GenreTags, 3600*24);
 }
 
-
 $TorrentForm->simple_form($GenreTags);
-
-
-
-?>

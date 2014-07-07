@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 if (isset($LoggedUser['PostsPerPage'])) {
@@ -57,7 +56,7 @@ foreach ($Forums as $Forum) {
 		);
 		$JsonForums = array();
 	}
-	
+
 	if((!$Locked || $Sticky) && $LastPostID != 0 && ((empty($LastRead[$LastTopicID]) || $LastRead[$LastTopicID]['PostID'] < $LastPostID) && strtotime($LastTime)>$LoggedUser['CatchupTime'])) {
 		$Read = 'unread';
 	} else {

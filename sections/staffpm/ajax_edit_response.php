@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 // Get user level
 
@@ -28,14 +28,14 @@ $Message = isset($_POST['message'])? $_POST['message']:false;
 $Name = isset($_POST['name'])? trim($_POST['name']):false;
 
 if ($Message && $Name && (trim($Message) != "") && ($Name != "")) {
-    
+
       include(SERVER_ROOT.'/classes/class_text.php');
       $Text = new TEXT;
       if (!$Text->validate_bbcode($Message,  get_permissions_advtags($LoggedUser['ID']), !$IsAjax)){
         echo "There are errors in your bbcode (unclosed tags)";
         die();
       }
-      
+
       $Message = db_string($Message);
       $Name = db_string($Name);
 	$ID = (int)$_POST['id'];
@@ -43,14 +43,13 @@ if ($Message && $Name && (trim($Message) != "") && ($Name != "")) {
 		if ($ID == 0) {
 			// Create new response
 			$DB->query("INSERT INTO staff_pm_responses (Message, Name) VALUES ('$Message', '$Name')");
-                  // if submit is set then this is not an ajax response - reload page and pass vars for message & return convid
-                  if (!$IsAjax){
-                      $InsertedID = $DB->inserted_id();
-                      $ConvID = (int)$_POST['convid'];
-                      header("Location: staffpm.php?action=responses&added=$InsertedID".($ConvID>0?"&convid=$ConvID":'')."#old_responses");
-                  } else
-                      echo 1;
-                  
+      // if submit is set then this is not an ajax response - reload page and pass vars for message & return convid
+      if (!$IsAjax){
+          $InsertedID = $DB->inserted_id();
+          $ConvID = (int)$_POST['convid'];
+          header("Location: staffpm.php?action=responses&added=$InsertedID".($ConvID>0?"&convid=$ConvID":'')."#old_responses");
+      } else
+          echo 1;
 		} else {
 			$DB->query("SELECT * FROM staff_pm_responses WHERE ID=$ID");
 			if ($DB->record_count() != 0) {
@@ -61,12 +60,12 @@ if ($Message && $Name && (trim($Message) != "") && ($Name != "")) {
 				// Create new response
 				$DB->query("INSERT INTO staff_pm_responses (Message, Name) VALUES ('$Message', '$Name')");
 				// if submit is set then this is not an ajax response - reload page and pass vars for message & return convid
-                        if (!$IsAjax){
-                              $InsertedID = $DB->inserted_id();
-                              $ConvID = (int)$_POST['convid'];
-                              header("Location: staffpm.php?action=responses&added=$InsertedID".($ConvID>0?"&convid=$ConvID":'')."#old_responses");
-                        } else
-                              echo 1;
+        if (!$IsAjax){
+              $InsertedID = $DB->inserted_id();
+              $ConvID = (int)$_POST['convid'];
+              header("Location: staffpm.php?action=responses&added=$InsertedID".($ConvID>0?"&convid=$ConvID":'')."#old_responses");
+        } else
+              echo 1;
 			}
 		}
 	} else {
@@ -77,7 +76,7 @@ if ($Message && $Name && (trim($Message) != "") && ($Name != "")) {
             } else
                   echo -2;
 	}
-	
+
 } else {
 	// No message/name
 	if (!$IsAjax){
@@ -86,4 +85,3 @@ if ($Message && $Name && (trim($Message) != "") && ($Name != "")) {
       } else
             echo -1;
 }
-?>

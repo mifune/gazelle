@@ -1,4 +1,4 @@
-<?
+<?php
 /*-- Image Start Class ---------------------------------*/
 /*------------------------------------------------------*/
 /* Simplified version of script_start, used for the	 */
@@ -53,7 +53,6 @@ function invisible($Image) {
 		$TotalAlpha += $Color['alpha'];
 	}
 	return (($TotalAlpha/$Count) == 127) ? true : false;
-	
 }
 
 function is_number($Str) {
@@ -163,14 +162,10 @@ function send_pm($ToID,$FromID,$Subject,$Body,$ConvID='') {
 			('$FromID', '$ConvID', '".sqltime()."', '".$Body."')");
 
 	// Clear the caches of the inbox and sentbox
-	//$DB->query("SELECT UnRead from pm_conversations_users WHERE ConvID='$ConvID' AND UserID='$ToID'");
 	$DB->query("SELECT COUNT(ConvID) FROM pm_conversations_users WHERE UnRead = '1' and UserID='$ToID' AND InInbox = '1'");
 	list($UnRead) = $DB->next_record(MYSQLI_BOTH, FALSE);
 	$Cache->cache_value('inbox_new_'.$ToID, $UnRead);
 
-	//if ($UnRead == 0) {
-	//	$Cache->increment('inbox_new_'.$ToID);
-	//}
 	return $ConvID;
 }
 
@@ -229,4 +224,3 @@ function is_utf8($Str) {
 }
 
 require(SERVER_ROOT.'/sections/image/index.php');
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 if (!check_perms('site_collages_recover')) {
 	error(403);
 }
@@ -35,5 +35,5 @@ show_header("Collage recovery!");
 		</div>
 	</div>
 </div>
-<? show_footer();
-
+<?php
+show_footer();

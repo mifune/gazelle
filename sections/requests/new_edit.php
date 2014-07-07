@@ -1,9 +1,9 @@
-<?
+<?php
 
 /*
  * Yeah, that's right, edit and new are the same place again.
  * It makes the page uglier to read but ultimately better as the alternative means
- * maintaining 2 copies of almost identical files. 
+ * maintaining 2 copies of almost identical files.
  */
 
 include(SERVER_ROOT.'/classes/class_text.php');
@@ -20,44 +20,43 @@ if(!$NewRequest) {
 	}
 }
 
-
 if($NewRequest && ($LoggedUser['BytesUploaded'] < 250*1024*1024 || !check_perms('site_submit_requests'))) {
 	error('You do not have enough uploaded to make a request.');
 }
 
 if(!$NewRequest) {
 	if(empty($ReturnEdit)) {
-		
+
 		$Request = get_requests(array($RequestID));
 		$Request = $Request['matches'][$RequestID];
 		if(empty($Request)) {
 			error(404);
 		}
-		
-		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+
+		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description,
 		     $FillerID, $FillerName, $TorrentID, $TimeFilled, $GroupID) = $Request;
 		$VoteArray = get_votes_array($RequestID);
 		$VoteCount = count($VoteArray['Voters']);
-				
+
 		$IsFilled = !empty($TorrentID);
 		$CategoryName = $NewCategories[$CategoryID]['name'];
 		$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0)));
 		$CanEdit = ((!$IsFilled && $LoggedUser['ID'] == $RequestorID && $VoteCount < 2) || $ProjectCanEdit || check_perms('site_moderate_requests'));
-		
+
 		if(!$CanEdit) {
 			error(403);
 		}
-				
+
 		$Tags = implode(" ", $Request['Tags']);
 	}
 }
 
 if($NewRequest && !empty($_GET['groupid']) && is_number($_GET['groupid'])) {
-	$DB->query("SELECT 
-                            tg.Name, 					
+	$DB->query("SELECT
+                            tg.Name,
                             tg.Image,
                             GROUP_CONCAT(t.Name SEPARATOR ', '),
-                    FROM torrents_group AS tg 
+                    FROM torrents_group AS tg
                             JOIN torrents_tags AS tt ON tt.GroupID=tg.ID
                             JOIN tags AS t ON t.ID=tt.TagID
                     WHERE tg.ID = ".$_GET['groupid']);
@@ -71,7 +70,7 @@ show_header(($NewRequest ? "Create a request" : "Edit a request"), 'requests,bbc
 <script type="text/javascript">//<![CDATA[
     function change_tagtext() {
         var tags = new Array();
-<?
+<?php
 foreach ($NewCategories as $cat) {
     echo 'tags[' . $cat['id'] . ']="' . $cat['tag'] . '"' . ";\n";
 }
@@ -82,7 +81,7 @@ foreach ($NewCategories as $cat) {
             $('#tagtext').html("<strong>The tag "+tags[$('#category').raw().value]+" will be added automatically.</strong>");
         }
     }
-<?
+<?php
 if (!empty($Properties))
     echo "addDOMLoadEvent(SynchInterface);";
 ?>
@@ -90,29 +89,29 @@ if (!empty($Properties))
 
 <div class="thin">
 	<h2><?=($NewRequest ? "Create a request" : "Edit a request")?></h2>
-	
+
 	<div class="linkbox">
-            <a href="requests.php">[Search requests]</a> 
+            <a href="requests.php">[Search requests]</a>
             <a href="requests.php?type=created">[My requests]</a>
-<?	 if(check_perms('site_vote')){?> 
+<?php 	 if(check_perms('site_vote')){?>
             <a href="requests.php?type=voted">[Requests I've voted on]</a>
-<?		}  ?>
- 
+<?php 		}  ?>
+
 	</div>
       <div class="head"><?=($NewRequest ? "Create New Request" : "Edit Request")?></div>
 	<div class="box pad">
 		<form action="" method="post" id="request_form" onsubmit="Calculate();">
-<? if(!$NewRequest) { ?>
-				<input type="hidden" name="requestid" value="<?=$RequestID?>" /> 
-<? } ?>
+<?php  if(!$NewRequest) { ?>
+				<input type="hidden" name="requestid" value="<?=$RequestID?>" />
+<?php  } ?>
 				<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 				<input type="hidden" name="action" value="<?=$NewRequest ? 'takenew' : 'takeedit'?>" />
-			
+
 			<table>
 				<tr>
 					<td colspan="2" class="center">Please make sure your request follows <a href="articles.php?topic=requests">the request rules!</a></td>
 				</tr>
-<?	if($NewRequest || $CanEdit) { ?>
+<?php 	if($NewRequest || $CanEdit) { ?>
                 <tr class="pad">
                     <td colspan="2" class="center">
                         <strong class="important_text">NOTE: Requests automatically expire after 90 days. At this time if the bounty has not been filled all outstanding bounties are returned to those who placed them</strong>
@@ -125,19 +124,12 @@ if (!empty($Properties))
 					<td>
 						<select id="category" name="category" onchange="change_tagtext();">
                                         <option value="0">---</option>
-                                    <? foreach($NewCategories as $category) { ?>
-                                        <option value="<?=$category['id']?>"<? 
+                                    <?php  foreach($NewCategories as $category) { ?>
+                                        <option value="<?=$category['id']?>"<?php
                                             if (isset($CategoryID) && $CategoryID==$category['id']) {
                                                 echo ' selected="selected"';
                                             }   ?>><?=$category['name']?></option>
-                                    <? } ?>
-<? /*
-        foreach($NewCategories as $Cat){ $Cat = display_array($Cat); ?>
-							<option value='<?=$Cat['id']?>' <?=(!empty($CategoryName) && ($CategoryName ==  $Cat['name']) ? 'selected="selected"' : '')?>><?=$Cat['name']?></option>
-<?		} */
-
-
-?>
+                                    <?php  } ?>
 						</select>
 					</td>
 				</tr>
@@ -147,8 +139,6 @@ if (!empty($Properties))
 						<input type="text" name="title" class="long" value="<?=(!empty($Title) ? display_str($Title) : '')?>" />
 					</td>
 				</tr>
-<?	//} ?>
-<?	//if($NewRequest || $CanEdit) { ?>
 				<tr id="image_tr">
                             <td class="label">Cover Image</td>
                             <td>    <strong>Enter the full url for your image.</strong><br/>
@@ -156,12 +146,12 @@ if (!empty($Properties))
                                  <input type="text" id="image" class="long" name="image" value="<?=(!empty($Image) ? $Image : '')?>" />
                             </td>
 				</tr>
-<?	} ?>
+<?php 	} ?>
 				<tr>
 					<td class="label">Tags</td>
 					<td>
                     <div id="tagtext"></div>
-<?
+<?php
 	$GenreTags = $Cache->get_value('genre_tags');
 	if(!$GenreTags) {
 		$DB->query('SELECT Name FROM tags WHERE TagType=\'genre\' ORDER BY Name');
@@ -171,17 +161,16 @@ if (!empty($Properties))
 ?>
 						<select id="genre_tags" name="genre_tags" onchange="add_tag();return false;" >
 							<option>---</option>
-<?	foreach(display_array($GenreTags) as $Genre){ ?>
+<?php 	foreach(display_array($GenreTags) as $Genre){ ?>
 							<option value="<?=$Genre ?>"><?=$Genre ?></option>
-<?	} ?>
+<?php 	} ?>
 						</select>
                     <textarea id="tags" name="tags" class="medium" style="height:1.4em;" ><?=(!empty($Tags) ? display_str($Tags) : '')?></textarea>
-                     
-	 <!--	<input type="text" id="tags" name="tags" class="medium"  value="<?=(!empty($Tags) ? display_str($Tags) : '')?>" /> -->
+
 						<br />
-					<? 
+					<?php
                                       $taginfo = get_article('tagrulesinline');
-                                      if($taginfo) echo $Text->full_format($taginfo, true); 
+                                      if($taginfo) echo $Text->full_format($taginfo, true);
                               ?>
 					</td>
 				</tr>
@@ -189,14 +178,14 @@ if (!empty($Properties))
 					<td class="label">Description</td>
 					<td>  <div id="preview" class="box pad hidden"></div>
                                     <div  id="editor">
-                                         <? $Text->display_bbcode_assistant("quickcomment", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
-                                        <textarea  id="quickcomment" name="description" class="long" rows="7"><?=(!empty($Description) ? $Description : '')?></textarea> 
+                                         <?php  $Text->display_bbcode_assistant("quickcomment", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); ?>
+                                        <textarea  id="quickcomment" name="description" class="long" rows="7"><?=(!empty($Description) ? $Description : '')?></textarea>
                                     </div>
                                     <input type="button" id="previewbtn" value="Preview" style="margin-right: 40px;" onclick="Preview_Request();" />
                               </td>
 				</tr>
 
-<?	if($NewRequest) { ?>
+<?php 	if($NewRequest) { ?>
 				<tr id="voting">
 					<td class="label" id="bounty">Bounty</td>
 					<td>
@@ -226,17 +215,16 @@ if (!empty($Properties))
 						<input type="submit" id="button_vote" value="Create request" />
 					</td>
 				</tr>
-<?	} else { ?>		
+<?php 	} else { ?>
 				<tr>
 					<td colspan="2" class="center">
 						<input type="submit" id="button_vote" value="Edit request" />
 					</td>
 				</tr>
-<?	} ?>
+<?php 	} ?>
 			</table>
 		</form>
 	</div>
 </div>
-<?
-show_footer(); 
-?>
+<?php
+show_footer();

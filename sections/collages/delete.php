@@ -1,28 +1,18 @@
-<?
+<?php
 
 $CollageID = $_GET['collageid'];
-if(!is_number($CollageID) || !$CollageID) { 
-	error(404); 
+if(!is_number($CollageID) || !$CollageID) {
+	error(404);
 }
 
 $DB->query("SELECT Name, UserID, CategoryID FROM collages WHERE ID='$CollageID'");
 list($Name, $CreatorID, $CategoryID) = $DB->next_record();
 
-/*
-if(!check_perms('site_collages_delete') || $UserID != $LoggedUser['ID']) {
-	error(403);
-}  
- * 
-<? if (check_perms('site_collages_delete') || 
-        ($CreatorID == $LoggedUser['ID'] && 
-                        ( $CollageCategoryID ==0 || $NumUsers == 0 || ($NumUsers ==1 && isset($Users[$CreatorID]) ))) ) { ?>
- */
-
 // if user has permission to delete collages then no further checks needed
 if(!check_perms('site_collages_delete') ) {
     // if not the user then cannot delete
     if ($CreatorID != $LoggedUser['ID']) error(403);
-    
+
     if ($CategoryID !=0) {  // if personal cat then user can delete
         $DB->query("SELECT DISTINCT UserID FROM collages_torrents WHERE CollageID='$CollageID'");
         $NumUsers = $DB->record_count();
@@ -34,7 +24,6 @@ if(!check_perms('site_collages_delete') ) {
         }
     }
 }
-
 
 show_header('Delete collage');
 ?>
@@ -55,6 +44,5 @@ show_header('Delete collage');
 		</div>
 	</div>
 </div>
-<?
+<?php
 show_footer();
-?>

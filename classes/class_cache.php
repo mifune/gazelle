@@ -1,4 +1,4 @@
-<?
+<?php
 /*************************************************************************|
 |--------------- Caching class -------------------------------------------|
 |*************************************************************************|
@@ -39,13 +39,11 @@ class CACHE extends Memcache {
 		'percentiles_*',
 		'top10tor_*'
 	);
-	
+
 	public $CanClear = false;
 
 	function __construct() {
 		$this->pconnect(MEMCACHED_HOST, MEMCACHED_PORT);
-		
-		//$this->connect('localhost', 11211);
 	}
 
 	//---------- Caching functions ----------//
@@ -302,24 +300,4 @@ class CACHE extends Memcache {
 		}
 
 	}
-
-	// Built-in increment/decrement functions are said not to be thread safe
-/* Supposedly fixed in v1.4.6
-	public function increment($Key, $Value=1) {
-		if(($OldValue = $this->get($Key)) === false || !is_number($Value)) {
-			return false;
-		}
-		$this->replace_value($Key, $OldValue+$Value);
-	}
-
-	public function decrement($Key, $Value=1) {
-		if(($OldValue = $this->get($Key)) === false || !is_number($Value) || !is_number($OldValue)) {
-			return false;
-		}
-		if($Value > $OldValue) {
-			$OldValue = $Value = 0;
-		}
-		$this->replace_value($Key, $OldValue-$Value);
-	}
-*/
 }

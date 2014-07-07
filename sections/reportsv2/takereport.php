@@ -1,13 +1,13 @@
-<?
+<?php
 /*
  * This page handles the backend from when a user submits a report.
  * It checks for (in order):
- * 1. The usual POST injections, then checks that things. 
- * 2. Things that are required by the report type are filled 
+ * 1. The usual POST injections, then checks that things.
+ * 2. Things that are required by the report type are filled
  * 	('1' in the report_fields array).
  * 3. Things that are filled are filled with correct things.
  * 4. That the torrent you're reporting still exists.
- * 
+ *
  * Then it just inserts the report to the DB and increments the counter.
  */
 
@@ -45,7 +45,6 @@ foreach($ReportType['report_fields'] as $Field => $Value) {
 
 if(!empty($_POST['sitelink'])) {
 	if(preg_match_all('/((https?:\/\/)?([a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.)?'.NONSSL_SITE_URL.'\/torrents.php\?(id=[0-9]+\&)?id=([0-9]+))/is', $_POST['sitelink'], $Matches)) {
-		
         $ExtraIDs = $Matches[6];
         //$ExtraIDs = implode(' ', $Matches[6]);
 		if(in_array($TorrentID, $Matches[6])) {
@@ -106,7 +105,7 @@ if($Type=='dupe') {
     foreach($ExtraIDs as $DupeID) {
         if(!is_number($DupeID)) error("Cannot parse your links for duped torrents!"); // should be weeded out by regex above but keep here in case of changes etc
         $DB->query("SELECT Time FROM torrents WHERE ID=".$DupeID);
-        if($DB->record_count() < 1) error("The duped torrent with ID=$DupeID doesn't exist!"); 
+        if($DB->record_count() < 1) error("The duped torrent with ID=$DupeID doesn't exist!");
         list($TimeStamp) = $DB->next_record();
         if (time_ago($TimeStamp) > 24*3600*EXCLUDE_DUPES_AFTER_DAYS) {
             $PeerInfo = get_peers($DupeID);
@@ -121,8 +120,6 @@ if($ExtraIDs) $ExtraIDs = implode(' ', $ExtraIDs);
 
 if(!empty($Err)) {
 	error($Err);
-	//include(SERVER_ROOT.'/sections/reportsv2/report.php');
-	//die();
 }
 
 $DB->query("SELECT ID FROM reportsv2 WHERE TorrentID=".$TorrentID." AND ReporterID=".db_string($LoggedUser['ID'])." AND ReportedTime > '".time_minus(3)."'");
@@ -148,4 +145,3 @@ list($GroupID) = $DB->next_record();
 $Cache->delete_value('torrent_group_'.$GroupID);
 
 header('Location: torrents.php?torrentid='.$TorrentID);
-?>

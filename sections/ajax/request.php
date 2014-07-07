@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 // Minimum and default amount of upload to remove from the user when they vote.
@@ -16,7 +15,7 @@ include(SERVER_ROOT.'/sections/bookmarks/functions.php'); // has_bookmarked()
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
-if(empty($_GET['id']) || !is_number($_GET['id'])) { 
+if(empty($_GET['id']) || !is_number($_GET['id'])) {
 	print
 		json_encode(
 			array(
@@ -30,7 +29,7 @@ $RequestID = $_GET['id'];
 
 //First things first, lets get the data for the request.
 
-$Request = get_requests(array($RequestID));	
+$Request = get_requests(array($RequestID));
 $Request = $Request['matches'][$RequestID];
 if(empty($Request)) {
 	print
@@ -42,7 +41,7 @@ if(empty($Request)) {
 	die();
 }
 
-list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description,
 	$FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
 
 //Convenience variables
@@ -69,7 +68,7 @@ $JsonMusicInfo = array();
 
 $JsonTopContributors = array();
 $VoteMax = ($VoteCount < 5 ? $VoteCount : 5);
-for($i = 0; $i < $VoteMax; $i++) { 
+for($i = 0; $i < $VoteMax; $i++) {
 	$User = array_shift($RequestVotes['Voters']);
 	$JsonTopContributors[] = array(
 		'userId' => (int) $User['UserID'],
@@ -192,4 +191,3 @@ function pullmediainfo($Array) {
 	}
 	return $NewArray;
 }
-?>

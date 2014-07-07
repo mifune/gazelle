@@ -1,12 +1,12 @@
-<?
+<?php
 //TODO: make this use the cache version of the thread, save the db query
 /*********************************************************************\
 //--------------Get Post--------------------------------------------//
 
-This gets the raw BBCode of a post. It's used for editing and 
-quoting posts. 
+This gets the raw BBCode of a post. It's used for editing and
+quoting posts.
 
-It gets called if $_GET['action'] == 'get_post'. It requires 
+It gets called if $_GET['action'] == 'get_post'. It requires
 $_GET['post'], which is the ID of the post.
 
 \*********************************************************************/
@@ -23,13 +23,11 @@ $PostID = $_GET['post'];
 $DB->query("SELECT
 		m.Body
 		FROM pm_messages as m
-		JOIN pm_conversations_users AS u ON m.ConvID=u.ConvID 
+		JOIN pm_conversations_users AS u ON m.ConvID=u.ConvID
 		WHERE m.ID='$PostID'
 		AND u.UserID=".$LoggedUser['ID']);
 list($Body) = $DB->next_record(MYSQLI_NUM);
 
-// This gets sent to the browser, which echoes it wherever 
+// This gets sent to the browser, which echoes it wherever
 
 echo trim($Body);
-
-?>

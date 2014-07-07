@@ -1,33 +1,31 @@
-<?
- 
+<?php
 enforce_login();
- 
+
 if (!check_perms( 'site_play_slots')) error ("You do not have permission to play the xxx slot machine!");
 
 include(SERVER_ROOT.'/sections/bonus/slot_xxx_arrays.php');
-            
+
 show_header('Slot Machine','slotmachine_xxx');
 
 $BetAmount = 10;
 
 ?>
-<script type="text/javascript"><?      // get the reels array from sm_arrays into js
+<script type="text/javascript"><?php      // get the reels array from sm_arrays into js
 echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
 </script>
 <div class="thin">
     <h2>Slot Machine XXX</h2>
-    
+
     <div style="float:right;width:260px;">
-        
+
         <div class="head center"> payouts </div>
-        <div class="box pad"> 
+        <div class="box pad">
             <div class="box pad center"><strong class="important_text">note:</strong> all winning lines must start with the left hand reel</div>
-            <span id="payout_table" class="reelsi"><? print_payout_table($BetAmount) ?></span>
-        </div> 
-<?  //if ( isset($_REQUEST['showreels'])){    ?>
+            <span id="payout_table" class="reelsi"><?php print_payout_table($BetAmount) ?></span>
+        </div>
         <div class="head center"> reels </div>
-        <div class="box pad center"> 
-            <?
+        <div class="box pad center">
+            <?php
                 $Count=array();
                 $max=0;
                 for($i=0;$i<4;$i++){
@@ -36,20 +34,19 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                 }
                 for($i=$max-1;$i>=0;$i--){ ?>
                     <div class="reelsi">
-            <?      for($j=0;$j<4;$j++){
-                        if ($i<$Count[$j]){ ?>  
+            <?php   for($j=0;$j<4;$j++){
+                        if ($i<$Count[$j]){ ?>
                         <img src="<?=STATIC_SERVER?>common/casino/icon<?=$Reel[$j][$i]?>.png" />
-            <?          }  
+            <?php       }
                     } ?>
                     </div>
-            <?  } ?>
+            <?php  } ?>
         </div>
-<?  //}   ?>
     </div>
-    
+
     <div class=" " style="position:relative;width:664px;margin:20px 330px 50px auto;">
-        
-        <div class="head center"> slot machine </div> 
+
+        <div class="head center"> slot machine </div>
         <div class="box pad">
             <table id="fmtop" class=" fm" >
                 <tr>
@@ -96,13 +93,13 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             <div id="betb" class="chip" style="top:344px;"><span id="betbnum">10</span></div>
             <div id="betc" class="chip hidden" style="top:499px;"><span id="betcnum">10</span></div>
         </div>
-    
-        <div class="head center"> your slot machine history </div> 
+
+        <div class="head center"> your slot machine history </div>
         <div class="box pad">
-            <?
+            <?php
             $UserResults = $Cache->get_value('sm_sum_history_'.$LoggedUser['ID']);
             if($UserResults === false) {
-                $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins)) 
+                $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins))
                           FROM sm_results WHERE UserID = $LoggedUser[ID]");
                 $UserResults = $DB->next_record();
                 $Cache->cache_value('sm_sum_history_'.$LoggedUser['ID'], $UserResults, 86400);
@@ -128,12 +125,12 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             </table>
         </div>
 
-        <div class="head center"> winners </div> 
+        <div class="head center"> winners </div>
         <div class="box pad">
-            <?
+            <?php
             $TotalResults = $Cache->get_value('sm_sum_history');
             if($TotalResults === false) {
-                $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins)) 
+                $DB->query("SELECT Count(ID), SUM(Spins), SUM(Won),SUM(Bet*Spins),(SUM(Won)/SUM(Bet*Spins))
                           FROM sm_results");
                 $TotalResults = $DB->next_record();
                 $Cache->cache_value('sm_sum_history', $TotalResults, 86400);
@@ -157,14 +154,14 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
             </table>
             <table class="box pad fmresults">
                 <tr>
-                    <td class="fmheader"></td> 
+                    <td class="fmheader"></td>
                     <td class="fmheader">Username</td>
                     <td class="fmheader">Bet</td>
                     <td class="fmheader">Won</td>
                     <td class="fmheader">Result</td>
                     <td class="fmheader">Time</td>
                 </tr>
-            <?
+            <?php
 
             $TopResults = $Cache->get_value('sm_top_payouts');
             if($TopResults === false) {
@@ -183,7 +180,7 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                     reset($TopResults);
                     $Cache->cache_value('sm_lowest_top_payout', $Won, 3600*24);
                 }
-            } 
+            }
             $i=1;
             foreach($TopResults as $Result){
                 list($UserID, $Username, $Won, $Bet, $Spins, $Reels, $Time) = $Result;
@@ -196,13 +193,12 @@ echo "var reelPix = ". json_encode($Reel) . ";\n"; ?>
                     <td class="noborder center"><?=$Reels?></td>
                     <td class="noborder center"><?=time_diff($Time)?></td>
                 </tr>
-        <?  }   ?>
+        <?php  }   ?>
             </table>
         </div>
     </div>
     <span id="sound" style="visibility:hidden;height:0px;"></span>
 </div>
 
-<?
+<?php
 show_footer();
-?>

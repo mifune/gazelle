@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT . '/sections/bookmarks/functions.php');
 
 $Where = array();
@@ -6,7 +6,7 @@ $Where = array();
 if(!empty($_GET['advanced']) && check_perms('site_advanced_top10')) {
 	$Details = 'all';
 	$Limit = 10;
-	
+
 	if($_GET['tags']) {
                 $Tags = cleanup_tags($_GET['tags']);
 		$Tags = explode(' ', str_replace(".","_",trim($Tags)));
@@ -16,7 +16,7 @@ if(!empty($_GET['advanced']) && check_perms('site_advanced_top10')) {
 				$Where[]="g.TagList REGEXP '[[:<:]]".$Tag."[[:>:]]'";
 			}
 		}
-	}	
+	}
 } else {
 	// error out on invalid requests (before caching)
 	if(isset($_GET['details'])) {
@@ -28,7 +28,7 @@ if(!empty($_GET['advanced']) && check_perms('site_advanced_top10')) {
 	} else {
 		$Details = 'all';
 	}
-	
+
 	// defaults to 10 (duh)
 	$Limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
 	$Limit = in_array($Limit, array(10, 100, 250,500)) ? $Limit : 10;
@@ -44,7 +44,7 @@ show_header('Top '.$Limit.' Torrents','overlib');
 		<a href="top10.php?type=tags">[Tags]</a>
 		<a href="top10.php?type=taggers">[Taggers]</a>
 	</div>
-<?
+<?php
 
 if(check_perms('site_advanced_top10')) {
 ?>
@@ -55,7 +55,7 @@ if(check_perms('site_advanced_top10')) {
 				<tr>
 					<td class="label">Tags:</td>
 					<td>
-						<input type="text" name="tags" class="long" value="<? if(!empty($_GET['tags'])) { echo display_str($_GET['tags']);} ?>" />
+						<input type="text" name="tags" class="long" value="<?php  if(!empty($_GET['tags'])) { echo display_str($_GET['tags']);} ?>" />
 					</td>
 				</tr>
 				<tr>
@@ -63,10 +63,10 @@ if(check_perms('site_advanced_top10')) {
 						<input type="submit" value="Filter torrents" />
 					</td>
 				</tr>
-			</table>	
+			</table>
 		</form>
-	
-<?
+
+<?php
 }
 
 // default setting to have them shown
@@ -101,12 +101,12 @@ $FreeleechToggleQuery .= 'freeleech=' . $FreeleechToggleName;
 	<div style="text-align: right;">
 		<a href="top10.php?<?=$FreeleechToggleQuery?>">[<?=ucfirst($FreeleechToggleName)?> Freeleech in Top 10]</a>
 	</div>
-<?
+<?php
 
 $Where = implode(' AND ', $Where);
 
 $WhereSum = (empty($Where)) ? '' : md5($Where);
-      
+
 $BaseQuery = "SELECT
 	t.ID,
 	g.ID,
@@ -119,16 +119,16 @@ $BaseQuery = "SELECT
 	((t.Size * t.Snatched) + (t.Size * 0.5 * t.Leechers)) AS Data,
       t.Size,
       t.UserID,
-      u.Username, 
-      t.FreeTorrent, 
+      u.Username,
+      t.FreeTorrent,
       t.double_seed ,
       t.Anonymous,
       g.Image
 	FROM torrents AS t
 	LEFT JOIN torrents_group AS g ON g.ID = t.GroupID
     LEFT JOIN users_main AS u ON u.ID = t.UserID ";
-      
- 
+
+
 if($Details=='all' || $Details=='day') {
 	if (!$TopTorrentsActiveLastDay = $Cache->get_value('top10tor_day_'.$Limit.$WhereSum)) {
 		$DayAgo = time_minus(86400);
@@ -228,7 +228,7 @@ if(($Details=='all' || $Details=='seeded') && !$Filtered) {
 
 ?>
 </div>
-<?
+<?php
 show_footer();
 
 // generate a table based on data from most recent query to $DB
@@ -236,13 +236,13 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 	global $LoggedUser, $NewCategories, $Debug;
 ?>
 		<div class="head">Top <?=$Limit.' '.$Caption?>
-<?	if(empty($_GET['advanced'])){ ?> 
+<?php 	if(empty($_GET['advanced'])){ ?>
 		<small>
 			- [<a href="top10.php?type=torrents&amp;limit=100&amp;details=<?=$Tag?>">Top 100</a>]
 			- [<a href="top10.php?type=torrents&amp;limit=250&amp;details=<?=$Tag?>">Top 250</a>]
 			- [<a href="top10.php?type=torrents&amp;limit=500&amp;details=<?=$Tag?>">Top 500</a>]
 		</small>
-<?	} ?> 
+<?php 	} ?>
 		</div>
 	<table class="torrent_table">
 	<tr class="colhead">
@@ -257,7 +257,7 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 		<td class="top10 stat">Peers</td>
 		<td class="top10 statname">Uploader</td>
 	</tr>
-<?
+<?php
 	// in the unlikely event that query finds 0 rows...
 	if(empty($Details)) {
 ?>
@@ -267,7 +267,7 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 			</td>
 		</tr>
 		</table><br />
-<?
+<?php
 		return;
 	}
 	$Rank = 0;
@@ -284,11 +284,9 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 		$row = ($Rank % 2 ? 'b' : 'a');
 
         $Review = get_last_review($GroupID);
-		// generate torrent's title
-		//$DisplayName = "<a href='torrents.php?id=$GroupID&amp;torrentid=$TorrentID'  title='View Torrent'>$GroupName</a>"; 
-        
+
 		$TagList=array();
-		
+
 		$PrimaryTag = '';
 		if($TorrentTags!='') {
 			$TorrentTags=explode(' ',$TorrentTags);
@@ -300,35 +298,35 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 			$TagList = implode(' ', $TagList);
 			$TorrentTags='<br /><div class="tags">'.$TagList.'</div>';
 		}
- 
+
 		$Icons = torrent_icons($Detail, $TorrentID, $Review, in_array($GroupID, $Bookmarks));
-        
+
         $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
 		// print row
 ?>
 	<tr class="torrent <?=($IsMarkedForDeletion?'redbar':"row$row")?>">
 		<td style="padding:8px;text-align:center;"><strong><?=$Rank?></strong></td>
 		<td class="center cats_col">
-                    <? $CatImg = 'static/common/caticons/'.$NewCategories[$NewCategoryID]['image']; ?>
+                    <?php  $CatImg = 'static/common/caticons/'.$NewCategories[$NewCategoryID]['image']; ?>
                     <div title="<?=$NewCategories[$NewCategoryID]['tag']?>"><img src="<?=$CatImg?>" /></div>
                 </td>
 		<td>
- <?
+ <?php
                 if ($LoggedUser['HideFloat']){?>
-                    <?=$Icons?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a> 
-<?              } else { 
+                    <?=$Icons?> <a href="torrents.php?id=<?=$GroupID?>"><?=$GroupName?></a>
+<?php               } else {
                     $Overlay = get_overlay_html($GroupName, anon_username($UploaderName, $IsAnon), $Image, $Seeders, $Leechers, $Size, $Snatched);
                     ?>
                     <script>
                         var overlay<?=$GroupID?> = <?=json_encode($Overlay)?>
                     </script>
                     <?=$Icons?>
-                    <a href="torrents.php?id=<?=$GroupID?>" onmouseover="return overlib(overlay<?=$GroupID?>, FULLHTML);" onmouseout="return nd();"><?=$GroupName?></a> 
-<?              }  ?>
-                    
-    <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
+                    <a href="torrents.php?id=<?=$GroupID?>" onmouseover="return overlib(overlay<?=$GroupID?>, FULLHTML);" onmouseout="return nd();"><?=$GroupName?></a>
+<?php               }  ?>
+
+    <?php  if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
 			<?=$TorrentTags?>
-    <? } ?>
+    <?php  } ?>
 		</td>
 		<td class="top10 nobr"><?=get_size($Data)?></td>
 		<td class="top10"><?=get_size($Size)?></td>
@@ -338,10 +336,9 @@ function generate_torrent_table($Caption, $Tag, $Details, $Limit) {
 		<td class="top10"><?=number_format($Seeders+$Leechers)?></td>
         <td class="top10"><?=torrent_username($UploaderID, $UploaderName, $IsAnon)?></td>
 	</tr>
-<?
+<?php
 	}
 ?>
 	</table><br />
-<?
+<?php
 }
-?>

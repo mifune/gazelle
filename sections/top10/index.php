@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 if(!check_perms('site_top10')){
@@ -7,11 +7,10 @@ if(!check_perms('site_top10')){
 <div class="content_basiccontainer">
 	You do not have access to view this feature
 </div>
-<?
+<?php
 	show_footer();
 	die();
 }
-
 
 if(empty($_GET['type']) || $_GET['type'] == 'torrents') {
 	include(SERVER_ROOT.'/sections/top10/torrents.php');
@@ -34,4 +33,3 @@ if(empty($_GET['type']) || $_GET['type'] == 'torrents') {
 			break;
 	}
 }
-?>

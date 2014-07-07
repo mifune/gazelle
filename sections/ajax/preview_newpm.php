@@ -1,5 +1,4 @@
-<?
-
+<?php
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 $Text = new TEXT;
 
@@ -16,5 +15,3 @@ echo'
                         </div>
                         <div class="body">'.$Text->full_format($Body, get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions']), true).'</div>
                     </div>';
-   
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
@@ -8,8 +8,6 @@ if(!$ConvID || !is_number($ConvID)) {
 	die();
 }
 
-
-
 $UserID = $LoggedUser['ID'];
 $DB->query("SELECT InInbox, InSentbox FROM pm_conversations_users WHERE UserID='$UserID' AND ConvID='$ConvID'");
 if($DB->record_count() == 0) {
@@ -17,9 +15,6 @@ if($DB->record_count() == 0) {
 	die();
 }
 list($InInbox, $InSentbox) = $DB->next_record();
-
-
-
 
 if (!$InInbox && !$InSentbox) {
 	print json_encode(array('status' => 'failure'));
@@ -52,8 +47,6 @@ while(list($PMUserID, $Username, $PermissionID, $GroupPermissionID, $Enabled, $D
 }
 $Users[0]['UserStr'] = 'System'; // in case it's a message from the system
 $Users[0]['Username'] = 'System';
-
-
 
 if($UnRead=='1') {
 
@@ -89,4 +82,3 @@ print
 			)
 		)
 	);
-?>

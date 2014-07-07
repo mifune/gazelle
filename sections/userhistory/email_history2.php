@@ -1,4 +1,4 @@
-<?
+<?php
 /************************************************************************
 ||------------|| User email history page ||---------------------------||
 
@@ -26,7 +26,7 @@ show_header("Email history for $Username");
 
 // Get current email (and matches)
 $DB->query("
-	SELECT 
+	SELECT
 		m.Email,
 		'".sqltime()."' AS Time,
 		m.IP,
@@ -47,8 +47,8 @@ $CurrentEmail = array_shift($DB->to_array());
 
 // Get historic emails (and matches)
 $DB->query("
-	SELECT 
-		h2.Email, 
+	SELECT
+		h2.Email,
 		h2.Time,
 		h2.IP,
 		h2.ChangedbyID,
@@ -101,8 +101,6 @@ if (count($History) == 1) {
 	$Invite['EndTime'] = $Joined;
 	$Invite['AccountAge'] = date(time() + time() - strtotime($Joined)); // Same as EndTime but without ' ago'
 	$Invite['IP'] = $History[0]['IP'];
-	//$Invite['ChangedbyID'] = $History[0]['ChangedbyID'];
-	//$Invite['CUsername'] = $History[0]['CUsername'];
 	if ($Current['StartTime'] == '0000-00-00 00:00:00') { $Current['StartTime'] = $Joined; }
 } else {
 	foreach ($History as $Key => $Val) {
@@ -161,8 +159,6 @@ if ($Old) {
 		$Old[$LastOld+1]['EndTime'] = $Old[$LastOld]['StartTime'];
 		$Old[$LastOld+1]['ElapsedTime'] = date(time()+strtotime($Old[$LastOld+1]['EndTime'] )-strtotime($Old[$LastOld+1]['StartTime']));
 		$Old[$LastOld+1]['IP'] = $Invite['IP'];
-		//$Old[$LastOld+1]['ChangedbyID'] = $Invite['ChangedbyID'];
-		//$Old[$LastOld+1]['CUsername'] = $Invite['CUsername'];
 	}
 }
 
@@ -193,10 +189,10 @@ if ($Old) {
 			</td>
 			<td><?=format_username($Current['ChangedbyID'],$Current['CUsername'])?></td>
 		</tr>
-<?
+<?php
 if ($CurrentMatches) {
 	// Match on the current email
-	foreach($CurrentMatches as $Match) {		
+	foreach($CurrentMatches as $Match) {
 ?>
 		<tr class="rowb">
 			<td><?=$Match['Username']?></td>
@@ -208,8 +204,8 @@ if ($CurrentMatches) {
 				<?=get_host($Match['IP'])?>
 			</td>
 			<td><?=format_username($Match['ChangedbyID'],$Match['CUsername'])?></td>
-		</tr>			
-<? 
+		</tr>
+<?php
 	}
 }
 // Old emails
@@ -223,10 +219,10 @@ if ($Old) {
 			<td>Set from IP</td>
 			<td>Set by</td>
 		</tr>
-<?
+<?php
 	$j=0;
 	// Old email
-	foreach ($Old as $Record) { 
+	foreach ($Old as $Record) {
 		++$j;
 
 		// Matches on old email
@@ -247,8 +243,8 @@ if ($Old) {
 				<?=get_host($Match['IP'])?>
 			</td>
 			<td><?=format_username($Match['ChangedbyID'],$Match['CUsername'])?></td>
-		</tr>	
-<?			
+		</tr>
+<?php
 			}
 		}
 
@@ -267,10 +263,10 @@ if ($Old) {
 				<?=get_host($Record['IP'])?>
 			</td>
 			<td><?=format_username($Record['ChangedbyID'],$Record['CUsername'])?></td>
-		</tr>			
-<?		
+		</tr>
+<?php
 		if ($MatchCount > 0) {
-			if (isset($Matches)) { 
+			if (isset($Matches)) {
 				echo $Matches;
 				unset($Matches);
 				unset($MatchCount);
@@ -288,7 +284,7 @@ if ($Old) {
 			<td>Signup IP</td>
 			<td>Set by</td>
 		</tr>
-<?
+<?php
 // Matches on invite email
 if ($OldMatches) {
 	$i=0;
@@ -308,8 +304,8 @@ if ($OldMatches) {
 				<?=get_host($Match['IP'])?>
 			</td>
 			<td><?=format_username($Match['ChangedbyID'],$Match['CUsername'])?></td>
-		</tr>	
-<?
+		</tr>
+<?php
 		}
 	}
 	$MatchCount = $i;
@@ -328,13 +324,14 @@ if ($OldMatches) {
 			</td>
 			<td><?=format_username($Invite['ChangedbyID'],$Invite['CUsername'])?></td>
 		</tr>
-<?
+<?php
 
 if ($Matches) {
 	echo $Matches;
 }
 
-?>		
+?>
 	</table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

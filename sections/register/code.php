@@ -1,4 +1,4 @@
-<?
+<?php
 show_header('Register');
 ?>
 <div style="width:500px;">
@@ -15,6 +15,5 @@ show_header('Register');
 	</table>
 	</form>
 </div>
-<?
+<?php
 show_footer();
-?>

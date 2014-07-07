@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
@@ -26,7 +26,7 @@ if(isset($_GET['id'])) {
 	}
 	$Perms = get_permissions($UserInfo['PermissionID']);
 	$UserClass = $Perms['Class'];
-	if ( !check_force_anon($UserID) || 
+	if ( !check_force_anon($UserID) ||
             !check_paranoia('torrentcomments', $UserInfo['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
 } else {
 	$UserID = $LoggedUser['ID'];
@@ -66,37 +66,37 @@ $Comments = $DB->query("SELECT
 	m.GroupPermissionID,
 	m.Enabled,
             m.CustomPermissions,
-	
+
 	i.Avatar,
 	i.Donor,
 	i.Warned,
-	
+
 	t.ID AS TorrentID,
 	t.GroupID,
-	
+
 	tg.Name,
-	
+
 	tc.ID AS PostID,
 	tc.Body,
 	tc.AddedTime,
 	tc.EditedTime,
-	
+
 	em.ID as EditorID,
 	em.Username as EditorUsername
-	
+
 	FROM torrents as t
 	JOIN torrents_comments as tc ON tc.GroupID = t.GroupID
 	JOIN users_main as m ON tc.AuthorID = m.ID
 	JOIN users_info as i ON i.UserID = m.ID
 	JOIN torrents_group as tg ON t.GroupID = tg.ID
 	LEFT JOIN users_main as em ON em.ID = tc.EditedUserID
-	
+
 	$Conditions
-	
+
 	GROUP BY tc.ID
-	
+
 	ORDER BY tc.AddedTime DESC
-	
+
 	LIMIT $Limit;
 ");
 
@@ -109,10 +109,10 @@ $DB->set_query_id($Comments);
 
 $GroupIDs = $DB->collect('GroupID');
 
-$DB->set_query_id($Comments); 
+$DB->set_query_id($Comments);
 
 ?><div class="thin">
-    <h2><?=$Header?></h2>    
+    <h2><?=$Header?></h2>
 	<div class="linkbox">
 	<?=$OtherLink?>&nbsp;&nbsp;&nbsp;
 			<a href="userhistory.php?action=posts&amp;userid=<?=$LoggedUser['ID']?>">Go to post history</a>&nbsp;&nbsp;&nbsp;
@@ -120,17 +120,16 @@ $DB->set_query_id($Comments);
 	<br /><br />
 	<?=$Pages?>
 	</div>
-<?
+<?php
 
      $Posts = $DB->to_array(false,MYSQLI_ASSOC,array('CustomPermissions'));
 
 foreach($Posts as $Post){
 	list($UserID, $Username, $Class, $GroupPermID, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = array_values($Post);
-          
-//while(list($UserID, $Username, $Class, $Enabled, $CustomPermissions, $Avatar, $Donor, $Warned, $TorrentID, $GroupID, $Title, $PostID, $Body, $AddedTime, $EditedTime, $EditorID, $EditorUsername) = $DB->next_record(MYSQLI_BOTH,  array('CustomPermissions'))) {
+
 	$AuthorPermissions = get_permissions($Class);
-      list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
-?>   
+    list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
+?>
 	<table class='forum_post box vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>' id="post<?=$PostID?>">
 		<tr class='smallhead'>
 			<td  colspan="2">
@@ -141,44 +140,41 @@ foreach($Posts as $Post){
 			</td>
 		</tr>
 		<tr>
-<?
+<?php
 if(empty($HeavyInfo['DisableAvatars'])) {
 ?>
 			<td class='avatar' valign="top">
-<?
+<?php
                     if($Avatar){    ?>
                         <img src="<?=$Avatar?>" class="avatar" style="<?=get_avatar_css($MaxAvatarWidth, $MaxAvatarHeight)?>" alt="<?=$Username ?>'s avatar" />
-<?                  } else {        ?>
+<?php               } else {        ?>
                         <img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
-<?                  }               ?>
+<?php               }               ?>
 			</td>
-<? } ?>
+<?php } ?>
 			<td class='body' valign="top">
-				<?=$Text->full_format($Body, get_permissions_advtags($UserID, unserialize($CustomPermissions), $AuthorPermissions)) ?> 
-<? 
-				if($EditorID){ 
+				<?=$Text->full_format($Body, get_permissions_advtags($UserID, unserialize($CustomPermissions), $AuthorPermissions)) ?>
+<?php
+				if($EditorID){
 ?>
 				<br /><br />
 				Last edited by
 				<?=format_username($EditorID, $EditorUsername) ?> <?=time_diff($EditedTime)?>
-<?
+<?php
 				}
 ?>
 			</td>
 		</tr>
 	</table>
-<?
+<?php
 }
 
 ?>
 	<div class="linkbox">
-<?
+<?php
 echo $Pages;
 ?>
 	</div>
 </div>
-<?
-
+<?php
 show_footer();
-
-?>

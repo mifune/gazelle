@@ -1,4 +1,4 @@
-<?
+<?php
 // Already done in /sections/ajax/index.php
 //enforce_login();
 
@@ -6,7 +6,6 @@ if(!check_perms('site_top10')){
 	print json_encode(array('status' => 'failure'));
 	die();
 }
-
 
 if(empty($_GET['type']) || $_GET['type'] == 'torrents') {
 	include(SERVER_ROOT.'/sections/ajax/top10/torrents.php');
@@ -26,4 +25,3 @@ if(empty($_GET['type']) || $_GET['type'] == 'torrents') {
 			break;
 	}
 }
-?>

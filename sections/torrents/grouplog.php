@@ -1,4 +1,4 @@
-<?
+<?php
 $GroupID = $_GET['groupid'];
 if (!is_number($GroupID)) { error(404); }
 
@@ -30,12 +30,12 @@ if (!empty($Groups['matches'][$GroupID])) {
 			<td>User</td>
 			<td>Info</td>
 		</tr>
-<?
-    if (!$LoggedUser['DisplayStaff']=='1' && !$LoggedUser['SupportFor']!='') 
+<?php
+    if (!$LoggedUser['DisplayStaff']=='1' && !$LoggedUser['SupportFor']!='')
         $XTRAWHERE = "AND Hidden='0'";
-    
-	$Log = $DB->query("SELECT TorrentID, t.Name, g.UserID, Username, Info, g.Time 
-                         FROM group_log AS g 
+
+	$Log = $DB->query("SELECT TorrentID, t.Name, g.UserID, Username, Info, g.Time
+                         FROM group_log AS g
                     LEFT JOIN users_main AS u ON u.ID=g.UserID
                     LEFT JOIN torrents_group AS t ON t.ID=g.GroupID
                         WHERE GroupID = ".$GroupID."  $XTRAWHERE
@@ -48,11 +48,7 @@ if (!empty($Groups['matches'][$GroupID])) {
 			<td><?=$Time?></td>
 			<td><?=$Name?></td>
 
-<? /*
-			$DB->query("SELECT Username FROM users_main WHERE ID = ".$UserID);
-			list($Username) = $DB->next_record();
-			$DB->set_query_id($Log);  */
-
+<?php
             if ( $AuthorID == $UserID ) {
                 $TorrentUsername = torrent_username($UserID, $Username, $IsAnon);
             } else {
@@ -62,11 +58,10 @@ if (!empty($Groups['matches'][$GroupID])) {
 			<td><?=$TorrentUsername?></td>
 			<td><?=$Text->full_format($Info)?></td>
 		</tr>
-<?
+<?php
 	}
 ?>
 	</table>
 </div>
-<?
+<?php
 show_footer();
-?>

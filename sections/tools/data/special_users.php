@@ -1,10 +1,10 @@
-<?
+<?php
 if(!check_perms('admin_manage_permissions')) { error(403); }
 show_header('Special Users List');
 ?>
 <div class="thin">
-<?
-$DB->query("SELECT 
+<?php
+$DB->query("SELECT
 	m.ID,
 	m.Username,
 	m.PermissionID,
@@ -22,17 +22,18 @@ if($DB->record_count()) {
 			<td>User</td>
 			<td>Access</td>
 		</tr>
-<?
+<?php
 	while(list($UserID, $Username, $PermissionID, $Enabled, $Donor, $Warned)=$DB->next_record()) {
 ?>
 		<tr>
 			<td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?></td>
 			<td><a href="user.php?action=permissions&amp;userid=<?=$UserID?>">Manage</a></td>
 		</tr>
-<?	} ?>
+<?php } ?>
 	</table>
-<? } else { ?>
+<?php } else { ?>
 	<h2 align="center">There are no special users.</h2>
-<? } ?>
+<?php  } ?>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

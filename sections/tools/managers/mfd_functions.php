@@ -1,5 +1,4 @@
-<?
- 
+<?php
 /*
  * Possibly this should not be hardcoded... and should be changeable in the toolbox somewhere
  * while it is hardcoded it can go here
@@ -13,7 +12,6 @@ function get_warning_time(){
     list($Time) = $DB->next_record();
     return time() + ((int)$Time * 3600);
 }
-
 
 // message is in two parts so we can grab the bits around the reason for display etc.
 function get_warning_message($FirstPart = true, $LastPart = false, $GroupID=0, $TorrentName='', $Reason = null, $KillTime = '', $Rejected = false, $ExtraMsg = ''){
@@ -36,22 +34,22 @@ function get_warning_message($FirstPart = true, $LastPart = false, $GroupID=0, $
     return $Message;
 }
 
-// a reply to an existing conversation 
+// a reply to an existing conversation
 function send_message_reply($ConvID, $ToID, $FromID, $Message, $SetStatus = false, $FromStaff = true, $NewSubject = null){   //, $Unanswered = false){
     global $LoggedUser, $DB, $Cache;
-    
+
     $DB->query("INSERT INTO staff_pm_messages (UserID, SentDate, Message, ConvID)
                        VALUES ($FromID, '".sqltime()."', '".db_string($Message)."', $ConvID)");
-    
+
     if ($SetStatus !== FALSE){
-        // Update conversation (if from user 
-        if ($SetStatus == 'Resolved') $SQL_insert = "Status='Resolved', ResolverID=$FromID"; 
-        elseif ($SetStatus == 'Open') $SQL_insert = "Status='Open'"; 
-        else $SQL_insert = "Status='Unanswered'"; 
+        // Update conversation (if from user
+        if ($SetStatus == 'Resolved') $SQL_insert = "Status='Resolved', ResolverID=$FromID";
+        elseif ($SetStatus == 'Open') $SQL_insert = "Status='Open'";
+        else $SQL_insert = "Status='Unanswered'";
         if ($NewSubject) $SQL_insert .= ", Subject='".db_string($NewSubject)."' ";
         $DB->query("UPDATE staff_pm_conversations SET Date='".sqltime()."', Unread=true, $SQL_insert WHERE ID=$ConvID");
     }
-    
+
     if($FromStaff){
         if ($FromID>0){
             $Cache->delete_value('num_staff_pms_'.$FromID);
@@ -61,12 +59,12 @@ function send_message_reply($ConvID, $ToID, $FromID, $Message, $SetStatus = fals
     }
     elseif($ToID>0)  // Clear cache for user
         $Cache->delete_value('staff_pm_new_'.$ToID);
-    
+
 }
 
 // the message the user sends to staff to tell them its fixed
 function get_user_okay_message($GroupID, $TorrentName, $KillTime, $Reason){
-    
+
     $Message = "[br]I have fixed my upload [url=/torrents.php?id=$GroupID]{$TorrentName}[/url].";
     $Message .= "[br][br]note for staff: deal with this by going to the torrent detail page and using the review tools to mark as 'Accept Fix' or 'Reject Fix'.";
     $Message .= "[br][br][b]Reason it needed fixing:[/b]&nbsp;$Reason";
@@ -80,23 +78,21 @@ function get_fixed_message($GroupID, $TorrentName){
     return $Message;
 }
 
-
 // message is in two parts so we can grab the bits around the reason for display etc.
 function get_deleted_message($GroupID, $TorrentName, $Reason){
-    
+
     $Message = "[b][br]Your upload [/b][url=/torrents.php?id=$GroupID]{$TorrentName}[/url] [b]has been auto-deleted.";
     $Message .= "[br][br]Reason: &nbsp;[color=red]{$Reason}[/color][/b]";
     $Message .= '[br][br]Before you upload something again please make sure you read the [url=/articles.php?topic=upload]Upload Rules[/url]';
     $Message .= '[br]You will find useful guides in the [url=/articles.php?topic=tutorials]Tutorials section[/url]';
     $Message .= '[br]If you need further help please post in the [url=/forums.php?action=viewforum&amp;forumid=6]Help & Support Forum[/url]';
-    
+
     return $Message;
 }
- 
 
 function get_num_overdue_torrents($WhereStatus = 'warned'){
     global $DB;
-    
+
     switch ($WhereStatus) {
         case 'pending':
             $WHERE= "tr.Status = 'Pending' ";
@@ -109,16 +105,16 @@ function get_num_overdue_torrents($WhereStatus = 'warned'){
             $WHERE= "tr.Status = 'Warned' ";
             break;
     }
-        
+
     $DB->query("SELECT Count(*)
 			  FROM torrents AS t
                     JOIN torrents_reviews AS tr ON tr.GroupID=t.GroupID
                    WHERE $WHERE
-                     AND tr.Time=(SELECT MAX(torrents_reviews.Time) 
-                                         FROM torrents_reviews 
+                     AND tr.Time=(SELECT MAX(torrents_reviews.Time)
+                                         FROM torrents_reviews
                                          WHERE torrents_reviews.GroupID=t.GroupID)
                      AND tr.KillTime < '".sqltime()."'");
- 
+
     list($Num) = $DB->next_record();
     return $Num;
 }
@@ -126,7 +122,7 @@ function get_num_overdue_torrents($WhereStatus = 'warned'){
  // passing an array of ints as last param makes the where clause ignores the first 2 params
 function get_torrents_under_review($ViewStatus = 'warned', $ReturnOverdueOnly = true, $InGroupIDs = false){
       global $DB;
-      
+
       if ($InGroupIDs !== false && is_array($InGroupIDs)){
           $WHERE = 't.GroupID IN (';
           $Sep = '';
@@ -149,9 +145,9 @@ function get_torrents_under_review($ViewStatus = 'warned', $ReturnOverdueOnly = 
                   $WHERE= "tr.Status = 'Warned' ";
                   break;
           }
-          if ($ReturnOverdueOnly) $WHERE .=  "AND tr.KillTime < '".sqltime()."' "; 
+          if ($ReturnOverdueOnly) $WHERE .=  "AND tr.KillTime < '".sqltime()."' ";
       }
-      
+
       $DB->query("SELECT t.ID,
                          t.GroupID,
                          tg.Name,
@@ -166,49 +162,42 @@ function get_torrents_under_review($ViewStatus = 'warned', $ReturnOverdueOnly = 
                     JOIN torrents_reviews AS tr ON tr.GroupID=t.GroupID
                LEFT JOIN review_reasons AS rr ON rr.ID=tr.ReasonID
                LEFT JOIN users_main AS um ON um.ID=t.UserID
-                   WHERE $WHERE 
-                     AND tr.Time=(SELECT MAX(torrents_reviews.Time) 
-                                         FROM torrents_reviews 
+                   WHERE $WHERE
+                     AND tr.Time=(SELECT MAX(torrents_reviews.Time)
+                                         FROM torrents_reviews
                                          WHERE torrents_reviews.GroupID=t.GroupID)
                 ORDER BY KillTime");
-      
+
 	$Torrents = $DB->to_array();
       return $Torrents;
 }
-      
-      
-
 
 function delete_torrents_list($Torrents){
       global $DB;
-      
+
 	$LogEntries = array();
 	$i=0;
 	foreach ($Torrents as $TorrentID) {
 		list($ID, $GroupID, $Name, $Status, $ConvID, $KillTime, $Reason, $UserID, $Username) = $TorrentID;
-            
+
             //echo "deleting $i : $ID, $GroupID, $Name, $Status, $ConvID, $KillTime, $Reason, $UserID, $Username";
 		delete_torrent($ID, $GroupID, $UserID);
 		$LogEntries[] = "Torrent ".$ID." (".$Name.") was auto-deleted for $Reason";
-		
+
 		$Msg = get_deleted_message($GroupID, $Name, $Reason);
-            
-            if($ConvID){ //
-                    send_message_reply($ConvID, $UserID, 0, $Msg, 'Resolved');
-            } else { 
-                    send_pm($UserID, 0, db_string("Your upload has been auto deleted."), $Msg);
-            }
-                                
+
+    if($ConvID){ //
+            send_message_reply($ConvID, $UserID, 0, $Msg, 'Resolved');
+    } else {
+            send_pm($UserID, 0, db_string("Your upload has been auto deleted."), $Msg);
+    }
 		++$i;
 	}
-		//echo "\nDeleted $i torrents for \n";
+
 	$sqltime=sqltime();
 	if(count($LogEntries) > 0) {
 		$Values = "('".implode("', '".$sqltime."'), ('",$LogEntries)."', '".$sqltime."')";
 		$DB->query('INSERT INTO log (Message, Time) VALUES '.$Values);
 	}
-      
-      return $i;
+  return $i;
 }
-
-?>

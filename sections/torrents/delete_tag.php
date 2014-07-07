@@ -1,5 +1,4 @@
-<?
-
+<?php
 header('Content-Type: application/json; charset=utf-8');
 
 if(!empty($LoggedUser['DisableTagging'])) {
@@ -13,19 +12,19 @@ $TagID = db_string($_POST['tagid']);
 $GroupID = db_string($_POST['groupid']);
 
 if(!is_number($TagID) || !is_number($GroupID)) {
-	error(0, true); 
+	error(0, true);
 }
- 
+
 $DB->query("SELECT Name, TagType FROM tags WHERE ID='$TagID'");
 list($TagName, $TagType) = $DB->next_record();
 if (!$TagName) error(0, true);
-        
+
 if(!check_perms('site_delete_tag')) {
     //only need to check this if not already permitted
-    $DB->query("SELECT t.UserID, tt.UserID 
-                  FROM torrents AS t 
-             LEFT JOIN torrents_tags AS tt 
-                    ON t.GroupID=tt.GroupID 
+    $DB->query("SELECT t.UserID, tt.UserID
+                  FROM torrents AS t
+             LEFT JOIN torrents_tags AS tt
+                    ON t.GroupID=tt.GroupID
                    AND tt.TagID='$TagID'
                  WHERE t.GroupID='$GroupID'");
     list($AuthorID,$OwnerID) = $DB->next_record();
@@ -35,8 +34,6 @@ if(!check_perms('site_delete_tag')) {
 
 $DB->query("INSERT INTO group_log (GroupID, UserID, Time, Info)
 				VALUES ('$GroupID',".$LoggedUser['ID'].",'".sqltime()."','".db_string('Tag "'.$TagName.'" removed from group')."')");
- 
-
 $DB->query("DELETE FROM torrents_tags_votes WHERE GroupID='$GroupID' AND TagID='$TagID'");
 $DB->query("DELETE FROM torrents_tags WHERE GroupID='$GroupID' AND TagID='$TagID'");
 
@@ -55,6 +52,3 @@ if ($TagType == 'genre' || $Count > 0) {
 
 $Result = array(1, "Deleted tag $TagName");
 echo json_encode(array(array($Result), get_taglist_html($GroupID, $_POST['tagsort'])));
-
-//header('Location: '.$_SERVER['HTTP_REFERER']);
-?>

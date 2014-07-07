@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('admin_imagehosts')) { error(403); }
 
 authorize();
@@ -27,9 +27,9 @@ if($_POST['submit'] == 'Delete'){ //Delete
                             Comment='$P[comment]',
                             UserID='$LoggedUser[ID]',
                             Hidden='$P[hidden]'
-                     WHERE ID='$P[id]'");  //  Time='".sqltime()."',
+                     WHERE ID='$P[id]'");
 	} else { //Create
-		$DB->query("INSERT INTO imagehost_whitelist 
+		$DB->query("INSERT INTO imagehost_whitelist
 			(Imagehost, Link, Comment, UserID, Time, Hidden) VALUES
 			('$P[host]','$P[link]','$P[comment]','$LoggedUser[ID]','".sqltime()."','$P[hidden]')");
 	}
@@ -39,4 +39,3 @@ $Cache->delete_value('imagehost_whitelist');
 
 // Go back
 header('Location: tools.php?action=imghost_whitelist');
-?>

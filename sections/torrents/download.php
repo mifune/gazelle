@@ -1,4 +1,4 @@
-<?
+<?php
 if (!isset($_REQUEST['authkey']) || !isset($_REQUEST['torrent_pass'])) {
 	enforce_login();
 	$TorrentPass = $LoggedUser['torrent_pass'];
@@ -92,12 +92,12 @@ if ($_REQUEST['usetoken'] == 1 && $FreeTorrent == 0) {
 		if (empty($TokenTorrents[$TorrentID]) || $TokenTorrents[$TorrentID]['FreeLeech'] < sqltime()) {
                         $time = time_plus(60*60*24*14); // 14 days
 
-                        // Let the tracker know about this
-                        if (!update_tracker('add_token_fl', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID, 'time' => strtotime($time)))) {
-                                error("Sorry! An error occurred while trying to register your token. Most often, this is due to the tracker being down or under heavy load. Please try again later.");
-                        }
+            // Let the tracker know about this
+            if (!update_tracker('add_token_fl', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID, 'time' => strtotime($time)))) {
+                    error("Sorry! An error occurred while trying to register your token. Most often, this is due to the tracker being down or under heavy load. Please try again later.");
+            }
 
-                        // Update the db.
+			// Update the db.
 			$DB->query("INSERT INTO users_slots (UserID, TorrentID, FreeLeech) VALUES ('$UserID', '$TorrentID', '$time')
 							ON DUPLICATE KEY UPDATE FreeLeech=VALUES(FreeLeech)");
 			$DB->query("UPDATE users_main SET FLTokens = FLTokens - 1 WHERE ID=$UserID");
@@ -140,14 +140,14 @@ if ($_REQUEST['usetoken'] == 1 && $FreeTorrent == 0) {
 		if (empty($TokenTorrents[$TorrentID]) || $TokenTorrents[$TorrentID]['DoubleSeed'] < sqltime()) {
                         $time = time_plus(60*60*24*14); // 14 days
 
-                        // Let the tracker know about this
-                        if (!update_tracker('add_token_ds', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID, 'time' => strtotime($time)))) {
-                                error("Sorry! An error occurred while trying to register your token. Most often, this is due to the tracker being down or under heavy load. Please try again later.");
-                        }
+            // Let the tracker know about this
+            if (!update_tracker('add_token_ds', array('info_hash' => rawurlencode($InfoHash), 'userid' => $UserID, 'time' => strtotime($time)))) {
+                    error("Sorry! An error occurred while trying to register your token. Most often, this is due to the tracker being down or under heavy load. Please try again later.");
+            }
 
-                        // Update the db
-                        $DB->query("INSERT INTO users_slots (UserID, TorrentID, DoubleSeed) VALUES ('$UserID', '$TorrentID', '$time')
-							ON DUPLICATE KEY UPDATE DoubleSeed=VALUES(DoubleSeed)");
+            // Update the db
+            $DB->query("INSERT INTO users_slots (UserID, TorrentID, DoubleSeed) VALUES ('$UserID', '$TorrentID', '$time')
+				ON DUPLICATE KEY UPDATE DoubleSeed=VALUES(DoubleSeed)");
 			$DB->query("UPDATE users_main SET FLTokens = FLTokens - 1 WHERE ID=$UserID");
 
 			// Fix for downloadthemall messing with the cached token count
@@ -161,7 +161,7 @@ if ($_REQUEST['usetoken'] == 1 && $FreeTorrent == 0) {
 			$TokenTorrents[$TorrentID]['DoubleSeed'] = $time;
 			$Cache->cache_value('users_tokens_'.$UserID, $TokenTorrents);
 		}
-        }
+    }
 
 }
 
@@ -170,7 +170,6 @@ $DB->query("INSERT IGNORE INTO users_downloads (UserID, TorrentID, Time) VALUES 
 $GrabbedTorrents = $Cache->get_value('users_torrents_grabbed_' .$UserID );
 $GrabbedTorrents[$TorrentID] =  array('TorrentID'=>$TorrentID) ;
 $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
-
 
 $DB->query("SELECT File FROM torrents_files WHERE TorrentID='$TorrentID'");
 
@@ -200,7 +199,6 @@ $FileName = ($Browser == 'Internet Explorer') ? urlencode(file_string($TorrentNa
 $MaxLength = $DownloadAlt ? 192 : 196;
 $FileName = cut_string($FileName, $MaxLength, true, false);
 $FileName = $DownloadAlt ? $FileName.'.txt' : $FileName.'.torrent';
-
 
 if($DownloadAlt) {
 	header('Content-Type: text/plain; charset=utf-8');

@@ -1,14 +1,14 @@
-<?
+<?php
 if(!check_perms('admin_dnu')) { error(403); }
 
 show_header('Manage do not upload list');
-$DB->query("SELECT 
+$DB->query("SELECT
 	d.ID,
-	d.Name, 
-	d.Comment, 
-	d.UserID, 
-	um.Username, 
-	d.Time 
+	d.Name,
+	d.Comment,
+	d.UserID,
+	um.Username,
+	d.Time
 	FROM do_not_upload as d
 	LEFT JOIN users_main AS um ON um.ID=d.UserID
 	ORDER BY d.Time DESC");
@@ -21,7 +21,7 @@ $DB->query("SELECT
     </tr>
     <tr class="colhead">
         <td width="37%">Name</td>
-        <td width="49%" colspan="2">Comment</td> 
+        <td width="49%" colspan="2">Comment</td>
         <td width="14%">Submit</td>
     </tr>
     <tr class="rowa">
@@ -41,15 +41,15 @@ $DB->query("SELECT
     </tr>
 </table>
 <br/>
-<table> 
+<table>
     <tr class="colhead">
         <td width="37%">Name</td>
         <td width="37%">Comment</td>
         <td width="12%">Added</td>
         <td width="14%">Submit</td>
     </tr>
-<? $Row = 'b';
-while(list($ID, $Name, $Comment, $UserID, $Username, $DNUTime) = $DB->next_record()){ 
+<?php  $Row = 'b';
+while(list($ID, $Name, $Comment, $UserID, $Username, $DNUTime) = $DB->next_record()){
 	$Row = ($Row === 'a' ? 'b' : 'a');
 ?>
     <tr class="row<?=$Row?>">
@@ -72,7 +72,8 @@ while(list($ID, $Name, $Comment, $UserID, $Username, $DNUTime) = $DB->next_recor
 			</td>
 		</form>
 	</tr>
-<? } ?>
+<?php  } ?>
 </table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

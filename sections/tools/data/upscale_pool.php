@@ -1,14 +1,14 @@
-<?
+<?php
 if(!check_perms('site_view_flow')) { error(403); }
 show_header('Upscale Pool');
 ?>
 <div class="thin">
 	<h2>Ratio Watch</h2>
-<?
+<?php
 define('USERS_PER_PAGE', 50);
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
-$RS = $DB->query("SELECT 
+$RS = $DB->query("SELECT
 	SQL_CALC_FOUND_ROWS
 	m.ID,
 	m.Username,
@@ -22,7 +22,7 @@ $RS = $DB->query("SELECT
 	i.RatioWatchEnds,
 	i.RatioWatchDownload,
 	m.RequiredRatio
-	FROM users_main AS m 
+	FROM users_main AS m
 	LEFT JOIN users_info AS i ON i.UserID=m.ID
 	WHERE i.RatioWatchEnds != '0000-00-00 00:00:00'
 	AND m.Enabled = '1'
@@ -39,7 +39,7 @@ if($DB->record_count()) {
 		<p>There are currently <?=number_format($Results)?> users queued by the system and <?=number_format($TotalDisabled)?> already disabled.</p>
 	</div>
 	<div class="linkbox">
-<?
+<?php
 	$Pages=get_pages($Page,$Results,USERS_PER_PAGE,11) ;
 	echo $Pages;
 ?>
@@ -57,7 +57,7 @@ if($DB->record_count()) {
 			<td>Remaining</td>
 			<td>Lifespan</td>
 		</tr>
-<?
+<?php
 	while(list($UserID, $Username, $Uploaded, $Downloaded, $PermissionID, $Enabled, $Donor, $Warned, $Joined, $RatioWatchEnds, $RatioWatchDownload, $RequiredRatio)=$DB->next_record()) {
 	$Row = ($Row == 'b') ? 'a' : 'b';
 
@@ -68,22 +68,21 @@ if($DB->record_count()) {
 			<td><?=get_size($Downloaded)?></td>
 			<td><?=ratio($Uploaded, $Downloaded)?></td>
 			<td><?=number_format($RequiredRatio, 2)?></td>
-			<td><? if(($Downloaded*$RequiredRatio)>$Uploaded) { echo get_size(($Downloaded*$RequiredRatio)-$Uploaded);}?></td>
+			<td><?php  if(($Downloaded*$RequiredRatio)>$Uploaded) { echo get_size(($Downloaded*$RequiredRatio)-$Uploaded);}?></td>
 			<td><?=get_size($Downloaded-$RatioWatchDownload)?></td>
 			<td><?=time_diff($Joined,2)?></td>
 			<td><?=time_diff($RatioWatchEnds)?></td>
-			<td><?//time_diff(strtotime($Joined), strtotime($RatioWatchEnds))?></td>
+			<td><?php //time_diff(strtotime($Joined), strtotime($RatioWatchEnds))?></td>
 		</tr>
-<?	} ?>
+<?php 	} ?>
 	</table>
 	<div class="linkbox">
-<? echo $Pages; ?>
+<?php  echo $Pages; ?>
 	</div>
-<? } else { ?>
+<?php  } else { ?>
 	<h2 align="center">There are currently no users on ratio watch.</h2>
-<? }
+<?php  }
 ?>
 </div>
-<?
+<?php
 show_footer();
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $TorrentID = $_POST['torrentid'];
@@ -10,8 +10,8 @@ $DB->query("SELECT
 	t.Size,
 	t.info_hash,
 	tg.Name,
-	t.Time, 
-	COUNT(x.uid) 
+	t.Time,
+	COUNT(x.uid)
 	FROM torrents AS t
 	LEFT JOIN torrents_group AS tg ON tg.ID=t.GroupID
 	LEFT JOIN xbt_snatched AS x ON x.fid=t.ID
@@ -41,5 +41,5 @@ show_header('Torrent deleted');
 <div class="thin">
 	<h3>Torrent was successfully deleted.</h3>
 </div>
-<?
+<?php
 show_footer();

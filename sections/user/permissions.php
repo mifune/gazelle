@@ -1,4 +1,4 @@
-<?
+<?php
 //TODO: Redo html
 if (!check_perms('admin_manage_permissions')) { error(403); }
 if(!isset($_REQUEST['userid']) || !is_number($_REQUEST['userid'])){ error(404); }
@@ -7,15 +7,14 @@ include(SERVER_ROOT."/classes/permissions_form.php");
 
 list($UserID, $Username, $PermissionID) = array_values(user_info($_REQUEST['userid']));
 
-$DB->query("SELECT 
-		u.CustomPermissions , p1.Name, p2.Name 
-	FROM users_main AS u 
+$DB->query("SELECT
+		u.CustomPermissions , p1.Name, p2.Name
+	FROM users_main AS u
       LEFT JOIN permissions AS p1 ON p1.ID=u.PermissionID
       LEFT JOIN permissions AS p2 ON p2.ID=u.GroupPermissionID
 	WHERE u.ID='$UserID'");
 
 list($Customs, $PermName, $GroupPermName)=$DB->next_record(MYSQLI_NUM, false);
-
 
 $Defaults = get_permissions_for_user($UserID, array());
 
@@ -32,7 +31,7 @@ if (isset($_POST['action'])) {
 	}
 	if (!is_number($_POST['maxcollages']) && !empty($_POST['maxcollages'])) { error("Please enter a valid number of extra personal collages"); }
 	$Delta['MaxCollages'] = $_POST['maxcollages'];
-	
+
 	$Cache->begin_transaction('user_info_heavy_'.$UserID);
 	$Cache->update_row(false, array('CustomPermissions' => $Delta));
 	$Cache->commit_transaction(0);
@@ -74,11 +73,11 @@ function reset() {
 </div>
 <div class="box pad">
 	Before using permissions, please understand that it allows you to both add and remove access to specific features. If you think that to add access to a feature, you need to uncheck everything else, <strong>YOU ARE WRONG</strong>. The checkmarks on the left, which are grayed out, are the standard permissions granted by their class (and donor/artist status), any changes you make to the right side will overwrite this. It's not complicated, and if you screw up, click the defaults link at the top. It will reset the user to their respective features granted by class, then you can check or uncheck the one or two things you want to change. <strong>DO NOT UNCHECK EVERYTHING.</strong>
-</div> 
-    <div class="permission_head  box shadow center"> 
+</div>
+    <div class="permission_head  box shadow center">
         Class Permissions: <?=  make_class_string($PermissionID,true); // $PermName;
             if ($GroupPermName) echo "<br/>Group Permissions: <strong>$GroupPermName</strong>";  ?>
-    </div> 
+    </div>
 <form name="permform" id="permform" method="post" action="" >
 	<table class="permission_head">
 		<tr>
@@ -89,9 +88,10 @@ function reset() {
 	<input type="hidden" name="action" value="permissions" />
 	<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 	<input type="hidden" name="id" value="<?=$_REQUEST['userid']?>" />
-<?
+<?php
 permissions_form();
 ?>
 </form>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

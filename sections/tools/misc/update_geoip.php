@@ -1,25 +1,22 @@
-<?
+<?php
 ini_set('memory_limit', '5G');
 set_time_limit(0);
 
-
 error("I have disabled this page as automatic geoip processing kills the server - geoip can be manually updated... look at the code in sandbox's 2 and 4");
 
-//if (!check_perms('site_debug')) { error(403); }
-
 function get_first_day_current_month($dayofweek = 1){
-    
+
     $current = date('m,Y');
     $current = explode(',', $current);
     return get_first_day($current[0],$current[1],$dayofweek);
 }
 
-function get_first_day($month,$year,$dayofweek = 1,$timeformat="Ymd"){ // sunday =0 
-    
+function get_first_day($month,$year,$dayofweek = 1,$timeformat="Ymd"){ // sunday =0
+
     $dayofweek = $dayofweek % 7; // in case of stupid input
-    
+
     $num = date("w",mktime(0,0,0,$month,1,$year));
-    
+
     if($num==$dayofweek)
         return date($timeformat,mktime(0,0,0,$month,1,$year));
     elseif($num>=0)
@@ -29,25 +26,12 @@ function get_first_day($month,$year,$dayofweek = 1,$timeformat="Ymd"){ // sunday
 
 }
 
-
-
-//$filedate = date('Ym').'04';
 // currently updated on the first tuesday of each month. See http://www.maxmind.com/app/geolite for details
 $filedate = get_first_day_current_month(2);
-
-//http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity_20120904.zip
-//requires wget, unzip commands to be installed
-
-/*  // mifune: temp rem out and see if we can just run the fill geoip bit with uncompressed data manually got
-shell_exec('wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity_'.$filedate.'.zip');
-//shell_exec('wget http://debug.what.cd/GeoLiteCity_'.date('Ym').'01.zip');
-shell_exec('unzip GeoLiteCity_'.$filedate.'.zip');
-shell_exec('rm GeoLiteCity_'.$filedate.'.zip'); */
 
 if(($Locations = file("GeoLiteCity_".$filedate."/GeoLiteCity-Location.csv", FILE_IGNORE_NEW_LINES)) === false) {
 	error("Download or extraction of maxmind database failed<br/>DB: GeoLiteCity_CSV/GeoLiteCity_$filedate.zip");
 }
-
 
 show_header();
 
@@ -98,20 +82,20 @@ if(count($Values) > 0) {
 }
 
 
-$DB->query("INSERT INTO users_geodistribution (Code, Users) 
-                       SELECT g.Code, COUNT(u.ID) AS Users 
-                         FROM geoip_country AS g JOIN users_main AS u ON INET_ATON(u.IP) BETWEEN g.StartIP AND g.EndIP 
-                        WHERE u.Enabled='1' 
-                        GROUP BY g.Code 
+$DB->query("INSERT INTO users_geodistribution (Code, Users)
+                       SELECT g.Code, COUNT(u.ID) AS Users
+                         FROM geoip_country AS g JOIN users_main AS u ON INET_ATON(u.IP) BETWEEN g.StartIP AND g.EndIP
+                        WHERE u.Enabled='1'
+                        GROUP BY g.Code
                      ORDER BY Users DESC");
 
 
-$DB->query("INSERT INTO users_geodistribution (Code, Users) 
-                       SELECT g.Code, COUNT(u.ID) AS Users 
-                         FROM geoip_country AS g JOIN users_main AS u ON u.ip_number BETWEEN g.StartIP AND g.EndIP 
-                        WHERE u.Enabled='1' 
+$DB->query("INSERT INTO users_geodistribution (Code, Users)
+                       SELECT g.Code, COUNT(u.ID) AS Users
+                         FROM geoip_country AS g JOIN users_main AS u ON u.ip_number BETWEEN g.StartIP AND g.EndIP
+                        WHERE u.Enabled='1'
                         AND u.ip_number >'0'
-                        GROUP BY g.Code 
+                        GROUP BY g.Code
                      ORDER BY Users DESC");
 
 show_footer();
@@ -154,7 +138,7 @@ foreach ($Registries as $Registry) {
 
 			$Start = ip2unsigned($Matches[2]);
 			if($Start == 2147483647) { continue; }
-			
+
 			if (!isset($Current)) {
 				$Current = array('StartIP' => $Start, 'EndIP' => $Start + $Matches[3],'Code' => $Matches[1]);
 			} elseif ($Current['Code'] == $Matches[1] && $Current['EndIP'] == $Start) {

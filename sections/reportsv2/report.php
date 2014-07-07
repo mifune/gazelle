@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * This is the frontend of reporting a torrent, it's what users see when
  * they visit reportsv2.php?id=xxx
@@ -23,14 +23,14 @@ show_header('Report Torrent', 'reportsv2');
 	<h2>Report a torrent</h2>
 
 	<div class="head">Report</div>
-	 <div class="box pad"> 
+	 <div class="box pad">
 	<form action="reportsv2.php?action=takereport" enctype="multipart/form-data" method="post" id="report_table">
 		<div>
 			<input type="hidden" name="submit" value="true" />
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<input type="hidden" name="torrentid" value="<?=$TorrentID?>" />
 		</div>
-		<table>  
+		<table>
 			<tr>
 				<td class="label">Torrent :</td>
                 <td><a href="torrents.php?id=<?=$GroupID?>"> <?=$TorrentName?> </a></td>
@@ -39,7 +39,7 @@ show_header('Report Torrent', 'reportsv2');
 				<td class="label">Reason :</td>
 				<td>
 					<select id="type" name="type" onchange="ChangeReportType()">
-<?
+<?php
 		$TypeList = $Types;
 		$Priorities = array();
 		foreach ($TypeList as $Key => $Value) {
@@ -49,18 +49,18 @@ show_header('Report Torrent', 'reportsv2');
 	foreach($TypeList as $Type => $Data) {
 ?>
 						<option value="<?=$Type?>"><?=$Data['title']?></option>
-<? } ?>
+<?php  } ?>
 					</select>
 				</td>
 			</tr>
 		</table>
-			<p><strong>Please give as much as information as you can to help us resolve this quickly.</strong></p> 
+			<p><strong>Please give as much as information as you can to help us resolve this quickly.</strong></p>
 			<div id="dynamic_form">
-				<? 
+				<?php
 				/*
 				 * THIS IS WHERE SEXY AJAX COMES IN
 				 * The following malarky is needed so that if you get sent back here the fields are filled in
-				 */ 
+				 */
 				?>
 				<input id="sitelink" type="hidden" name="sitelink" size="50" value="<?=(!empty($_POST['sitelink']) ? display_str($_POST['sitelink']) : '')?>" />
 				<input id="image" type="hidden" name="image" size="50" value="<?=(!empty($_POST['image']) ? display_str($_POST['image']) : '')?>" />
@@ -70,14 +70,12 @@ show_header('Report Torrent', 'reportsv2');
 
 				<script type="text/javascript">ChangeReportType();</script>
 			</div>
-			
-        <div class="pad center"> 
+
+        <div class="pad center">
             <input type="submit" value="Submit report" />
 		</div>
 	</form>
 		</div>
 </div>
-<?
+<?php
 show_footer();
-?>
-

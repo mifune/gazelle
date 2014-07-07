@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 /**********|| Page to show individual forums || ********************************\
@@ -111,7 +110,7 @@ else {
 	// This is done here so we get the benefit of the caching, and we
 	// don't have to make a database query for each topic on the page
 	$LastRead = $DB->to_array('TopicID');
-	
+
 	$JsonTopics = array();
 	foreach ($Forum as $Topic) {
 		list($TopicID, $Title, $AuthorID, $AuthorName, $Locked, $Sticky, $PostCount, $LastID, $LastTime, $LastAuthorID, $LastAuthorName) = array_values($Topic);
@@ -122,7 +121,7 @@ else {
 		} else {
 			$Read = 'read';
 		}
-		
+
 		$JsonTopics[] = array(
 			'topicId' => (int) $TopicID,
 			'title' => $Title,
@@ -154,4 +153,3 @@ else {
 			)
 		);
 }
-?>

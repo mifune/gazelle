@@ -1,9 +1,9 @@
-<?
+<?php
 /**********|| Page to show individual threads || ********************************\
 
 Things to expect in $_GET:
 	ThreadID: ID of the forum curently being browsed
-	page:	The page the user's on. 
+	page:	The page the user's on.
 	page = 1 is the same as no page
 
 ********************************************************************************/
@@ -15,7 +15,7 @@ $Text = new TEXT;
 
 // Check for lame SQL injection attempts
 $CollageID = $_GET['collageid'];
-if(!is_number($CollageID)) { 
+if(!is_number($CollageID)) {
 	error(0);
 }
 
@@ -59,12 +59,12 @@ show_header('Comments for collage '.$Name, 'comments,bbcode,jquery');
 		<a href="collages.php?id=<?=$CollageID?>"><?=$Name?></a>
 	</h2>
 	<div class="linkbox">
-<?
+<?php
 $Pages=get_pages($Page,$Posts,POSTS_PER_PAGE,9);
 echo $Pages;
 ?>
 	</div>
-<?
+<?php
 
 //---------- Begin printing
 foreach($Thread as $Post){
@@ -72,16 +72,16 @@ foreach($Thread as $Post){
 	list($AuthorID, $Username, $PermissionID, $Paranoia, $Donor, $Warned, $Avatar, $Enabled, $UserTitle,,,$Signature,,$GroupPermissionID) = array_values(user_info($AuthorID));
       $AuthorPermissions = get_permissions($PermissionID);
       list($ClassLevel,$PermissionValues,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight)=array_values($AuthorPermissions);
-            
+
       ?>
 <table class="forum_post box vertical_margin<?=$HeavyInfo['DisableAvatars'] ? ' noavatar' : ''?>" id="post<?=$PostID?>">
 	<tr class="smallhead">
 		<td colspan="2">
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
 				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true, $GroupPermissionID, true)?> <?=time_diff($AddedTime)?>
-<? if (!$ThreadInfo['IsLocked']){ ?>				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','c<?=$CollageID?>','<?=$Username?>');">[Quote]</a><? }
-if (($AuthorID == $LoggedUser['ID'] && time_ago($AddedTime)<USER_EDIT_POST_TIME) || check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>');">[Edit]</a><? }
-if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
+<?php if (!$ThreadInfo['IsLocked']){ ?>				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','c<?=$CollageID?>','<?=$Username?>');">[Quote]</a><? }
+if (($AuthorID == $LoggedUser['ID'] && time_ago($AddedTime)<USER_EDIT_POST_TIME) || check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>');">[Edit]</a><?php }
+if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <?php } ?>
 			</span>
 			<span id="bar<?=$PostID?>" style="float:right;">
                  <a href="reports.php?action=report&amp;type=collages_comment&amp;id=<?=$PostID?>">[Report]</a>
@@ -91,21 +91,21 @@ if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" on
 		</td>
 	</tr>
 	<tr>
-<? if(empty($HeavyInfo['DisableAvatars'])) { ?>
+<?php if(empty($HeavyInfo['DisableAvatars'])) { ?>
 		<td class="avatar" valign="top" rowspan="2">
-<?      if ($Avatar) { ?>
+<?php      if ($Avatar) { ?>
 			<img src="<?=$Avatar?>" class="avatar" style="<?=get_avatar_css($MaxAvatarWidth, $MaxAvatarHeight)?>" alt="<?=$Username ?>'s avatar" />
-<?      } else { ?>
+<?php      } else { ?>
 			<img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
-<?      } 
-        $UserBadges = get_user_badges($AuthorID); 
+<?php      }
+        $UserBadges = get_user_badges($AuthorID);
         if( !empty($UserBadges) ) {  ?>
                <div class="badges">
-<?                  print_badges_array($UserBadges, $AuthorID); ?>
+<?php                  print_badges_array($UserBadges, $AuthorID); ?>
                </div>
-<?      }      ?>
+<?php      }      ?>
 		</td>
-<? }
+<?php }
 $AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
 ?>
 		<td class="body" valign="top">
@@ -115,9 +115,9 @@ $AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
 
 		</td>
 	</tr>
-<? 
+<?php
       if( empty($HeavyInfo['DisableSignatures']) && ($MaxSigLength > 0) && !empty($Signature) ) { //post_footer
-                        
+
             echo '
       <tr>
             <td class="sig"><div id="sig" style="max-height: '.SIG_MAX_HEIGHT. 'px"><div>' . $Text->full_format($Signature, $AllowTags) . '</div></div></td>
@@ -125,12 +125,12 @@ $AllowTags= get_permissions_advtags($AuthorID, false, $AuthorPermissions);
            }
 ?>
 </table>
-<?	}
+<?php	}
 
- 
+
 if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')) {
 	if($ThreadInfo['MinClassWrite'] <= $LoggedUser['Class'] && !$LoggedUser['DisablePosting']) {
-          
+
 ?>
 			<div class="messagecontainer" id="container"><div id="message" class="hidden center messagebar"></div></div>
 				<table id="quickreplypreview" class="forum_post box vertical_margin hidden" style="text-align:left;">
@@ -148,11 +148,11 @@ if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')) {
 					</tr>
 					<tr>
 						<td class="avatar" valign="top">
-                              <? if (!empty($LoggedUser['Avatar'])) {  ?>
+                              <?php if (!empty($LoggedUser['Avatar'])) {  ?>
                                             <img src="<?=$LoggedUser['Avatar']?>" class="avatar" style="<?=get_avatar_css($LoggedUser['MaxAvatarWidth'], $LoggedUser['MaxAvatarHeight'])?>" alt="<?=$LoggedUser['Username']?>'s avatar" />
-                               <? } else { ?>
+                               <?php } else { ?>
                                           <img src="<?=STATIC_SERVER?>common/avatars/default.png" class="avatar" style="<?=get_avatar_css(100, 120)?>" alt="Default avatar" />
-                              <? } ?>
+                              <?php } ?>
 						</td>
 						<td class="body" valign="top">
 							<div id="contentpreview" style="text-align:left;"></div>
@@ -173,16 +173,13 @@ if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')) {
 					<input type="submit" value="Post comment" />
 				</form>
 			</div>
-<?
-          
-          
-          
+<?php
       }
 }
-
 ?>
 	<div class="linkbox">
 		<?=$Pages?>
 	</div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

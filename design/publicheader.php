@@ -1,4 +1,4 @@
-<?
+<?php
 global $LoggedUser, $Languages, $SSL;
 define('FOOTER_FILE',SERVER_ROOT.'/design/publicfooter.php');
 
@@ -11,21 +11,21 @@ define('FOOTER_FILE',SERVER_ROOT.'/design/publicfooter.php');
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="shortcut icon" href="favicon.ico" />
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<? if ($Mobile) { ?>
+<?php if ($Mobile) { ?>
 	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0, user-scalable=no;"/>
 	<link href="<?=STATIC_SERVER ?>styles/mobile/style.css?v=<?=filemtime(SERVER_ROOT.'/static/mobile/style.css')?>" rel="stylesheet" type="text/css" />
-<? } else { ?>
+<?php } else { ?>
 	<link href="<?=STATIC_SERVER ?>styles/public/style.css?v=<?=filemtime(SERVER_ROOT.'/static/styles/public/style.css')?>" rel="stylesheet" type="text/css" />
-<? } ?>
+<?php } ?>
 	<script src="<?=STATIC_SERVER?>functions/sizzle.js" type="text/javascript"></script>
 	<script src="<?=STATIC_SERVER?>functions/script_start.js?v=<?=filemtime(SERVER_ROOT.'/static/functions/script_start.js')?>" type="text/javascript"></script>
 	<script src="<?=STATIC_SERVER?>functions/class_ajax.js?v=<?=filemtime(SERVER_ROOT.'/static/functions/class_ajax.js')?>" type="text/javascript"></script>
 	<script src="<?=STATIC_SERVER?>functions/class_cookie.js?v=<?=filemtime(SERVER_ROOT.'/static/functions/class_cookie.js')?>" type="text/javascript"></script>
 	<script src="<?=STATIC_SERVER?>functions/class_storage.js?v=<?=filemtime(SERVER_ROOT.'/static/functions/class_storage.js')?>" type="text/javascript"></script>
 	<script src="<?=STATIC_SERVER?>functions/global.js?v=<?=filemtime(SERVER_ROOT.'/static/functions/global.js')?>" type="text/javascript"></script>
-<? if ($Mobile) { ?>
+<?php if ($Mobile) { ?>
 	<script src="<?=STATIC_SERVER?>styles/mobile/style.js?v=<?=filemtime(SERVER_ROOT.'/static/mobile/style.js')?>" type="text/javascript"></script>
-<? } 
+<?php } 
 
 ?>
 </head>
@@ -40,9 +40,9 @@ define('FOOTER_FILE',SERVER_ROOT.'/design/publicfooter.php');
 				<ul>
 					<li><a href="index.php">Home</a></li>
 					<li><a href="login.php">Login</a></li>
-<? if (OPEN_REGISTRATION) { ?> 
+<?php if (OPEN_REGISTRATION) { ?> 
 					<li><a href="register.php">Register</a></li>
-<? } ?>
+<?php } ?>
 				</ul>
 			</div>
 

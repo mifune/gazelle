@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 if(!check_perms("site_moderate_forums")) {
 	error(404);
@@ -29,7 +29,7 @@ if(is_number($ThreadID) && is_number($PollOption)) {
 
 	$Cache->delete_value('polls_'.$ThreadID);
 	header("Location: forums.php?action=viewthread&threadid=".$ThreadID);
-	
+
 } else {
 	error(404);
 }

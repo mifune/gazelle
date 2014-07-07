@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * This is the outline page for auto reports, it calls the AJAX functions
  * that actually populate the page and shows the proper header and footer.
@@ -22,7 +22,7 @@ function Taste(torrent_id, report_id, taste) {
 	});
 }
 </script>
-<?
+<?php
 include('header.php');
 ?>
 <div class="thin">
@@ -40,6 +40,5 @@ include('header.php');
 <br />
 <div id="all_reports" class="reports">
 </div>
-<?
+<?php
 show_footer();
-?>

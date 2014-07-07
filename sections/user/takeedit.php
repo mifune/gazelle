@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $UserID = $_REQUEST['userid'];
@@ -6,7 +6,7 @@ if(!is_number($UserID)) {
 	error(404);
 }
 
-//For the entire of this page we should in general be using $UserID not $LoggedUser['ID'] and $U[] not $LoggedUser[]	
+//For the entire of this page we should in general be using $UserID not $LoggedUser['ID'] and $U[] not $LoggedUser[]
 $U = user_info($UserID);
 
 if (!$U) {
@@ -28,11 +28,11 @@ $Val->SetFields('torrentsperpage',1,"inarray","You forgot to select your torrent
 $Val->SetFields('collagecovers',1,"number","You forgot to select your collage option.");
 $Val->SetFields('showtags',1,"number","You forgot to select your show tags option.",array('minlength'=>0,'maxlength'=>1));
 $Val->SetFields('maxtags',1,"number","You forgot to select your maximum tags to show in lists option.",array('minlength'=>0,'maxlength'=>10000));
-$Val->SetFields('avatar',0,'image', 'Avatar: The image URL you entered was not valid.', 
+$Val->SetFields('avatar',0,'image', 'Avatar: The image URL you entered was not valid.',
                  array('regex' => $whitelistregex, 'maxlength' => 255, 'minlength' => 6, 'maxfilesizeKB'=>-1, 'dimensions'=>array(300,500)));
-$Val->SetFields('info',0,'desc','Info',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>20000));	
-$Val->SetFields('signature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength'], 'dimensions'=>array(SIG_MAX_WIDTH, SIG_MAX_HEIGHT)));	
-$Val->SetFields('torrentsignature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength']));	
+$Val->SetFields('info',0,'desc','Info',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>20000));
+$Val->SetFields('signature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength'], 'dimensions'=>array(SIG_MAX_WIDTH, SIG_MAX_HEIGHT)));
+$Val->SetFields('torrentsignature',0,'desc','Signature',array('regex'=>$whitelistregex,'minlength'=>0,'maxlength'=>$Permissions['MaxSigLength']));
 $Val->SetFields('email',1,"email","You did not enter a valid email address.");
 $Val->SetFields('irckey',0,"string","You did not enter a valid IRCKey, must be between 6 and 32 characters long.",array('minlength'=>6,'maxlength'=>32));
 $Val->SetFields('cur_pass',0,"string","You did not enter a valid password, must be between 6 and 40 characters long.",array('minlength'=>6,'maxlength'=>40));
@@ -112,35 +112,25 @@ foreach ($Bounties as $B) {
 }
 // End building $Paranoia
 
-
 //Email change
 $DB->query("SELECT Email FROM users_main WHERE ID=".$UserID);
 list($CurEmail) = $DB->next_record();
 if ($CurEmail != $_POST['email']) {
-	//if(!check_perms('users_edit_profiles')) { // Non-admins have to authenticate to change email
-    // changed- only users can change it here, admins on the user page (with edit_email permission)
-		$DB->query("SELECT PassHash,Secret FROM users_main WHERE ID='".db_string($UserID)."'");
-		list($PassHash,$Secret)=$DB->next_record();
-		if ($PassHash!=make_hash($_POST['cur_pass'],$Secret)) {
-			$Err = "You did not enter the correct password.";
-		}
-	//}
+	$DB->query("SELECT PassHash,Secret FROM users_main WHERE ID='".db_string($UserID)."'");
+	list($PassHash,$Secret)=$DB->next_record();
+	if ($PassHash!=make_hash($_POST['cur_pass'],$Secret)) {
+		$Err = "You did not enter the correct password.";
+	}
 	if(!$Err) {
-		$NewEmail = db_string($_POST['email']);		
-
-	
+		$NewEmail = db_string($_POST['email']);
 		//This piece of code will update the time of their last email change to the current time *not* the current change.
-		//$ChangerIP = db_string($LoggedUser['IP']);
 		$DB->query("UPDATE users_history_emails SET Time='".sqltime()."' WHERE UserID='$UserID' AND Time='0000-00-00 00:00:00'");
 		$DB->query("INSERT INTO users_history_emails
 				(UserID, Email, Time, IP, ChangedbyID) VALUES
 				('$UserID', '$NewEmail', '0000-00-00 00:00:00', '".db_string($_SERVER['REMOTE_ADDR'])."','$LoggedUser[ID]')");
-		
 	} else {
 		error($Err);
 	}
-	
-	
 }
 //End Email change
 
@@ -149,10 +139,10 @@ if (!$Err && ($_POST['cur_pass'] || $_POST['new_pass_1'] || $_POST['new_pass_2']
 	list($PassHash,$Secret)=$DB->next_record();
 
 	if ($PassHash == make_hash($_POST['cur_pass'],$Secret)) {
-		if ($_POST['new_pass_1'] && $_POST['new_pass_2']) { 
-			$ResetPassword = true; 
+		if ($_POST['new_pass_1'] && $_POST['new_pass_2']) {
+			$ResetPassword = true;
 		}
-	} else { 
+	} else {
 		$Err = "You did not enter the correct password.";
 	}
 }
@@ -260,7 +250,6 @@ $Cache->commit_transaction(0);
 
 $Flag = (isset($_POST['flag']))? $_POST['flag']:'';
 
-
 $SQL="UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET
 	i.StyleID='".db_string($_POST['stylesheet'])."',
 	i.StyleURL='".db_string($_POST['styleurl'])."',
@@ -280,8 +269,7 @@ $SQL="UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET
 
 $SQL .= "m.Paranoia='".db_string(serialize($Paranoia))."'";
 
- 
-        
+
 if($ResetPassword) {
 	$ChangerIP = db_string($LoggedUser['IP']);
 	$Secret=make_secret();
@@ -290,11 +278,9 @@ if($ResetPassword) {
 	$DB->query("INSERT INTO users_history_passwords
 		(UserID, ChangerIP, ChangeTime) VALUES
 		('$UserID', '$ChangerIP', '".sqltime()."')");
-
-	
 }
 
-if (isset($_POST['resetpasskey'])) { 
+if (isset($_POST['resetpasskey'])) {
 	$UserInfo = user_heavy_info($UserID);
 	$OldPassKey = db_string($UserInfo['torrent_pass']);
 	$NewPassKey = db_string(make_secret());
@@ -307,7 +293,7 @@ if (isset($_POST['resetpasskey'])) {
 	$Cache->update_row(false, array('torrent_pass'=>$NewPassKey));
 	$Cache->commit_transaction(0);
 	$Cache->delete_value('user_'.$OldPassKey);
-	
+
 	update_tracker('change_passkey', array('oldpasskey' => $OldPassKey, 'newpasskey' => $NewPassKey));
 }
 
@@ -316,31 +302,21 @@ $DB->query($SQL);
 
 
 if (check_perms('site_set_language')) {
-    
+
     $DelLangs = $_POST['del_lang'];
     if (is_array($DelLangs) ) {
 
           $Div = '';
           $SQL_IN ='';
-          foreach($DelLangs as $langID) { //   
+          foreach($DelLangs as $langID) { //
                 $SQL_IN .= "$Div " . (int)$langID ;
                 $Div = ',';
           }
-          /*
-          $BadgesRemoved = '';
-          $Div = '';
-          $DB->query("SELECT country FROM countries WHERE cc IN ( $SQL_IN )");
-          while(list($Name)=$DB->next_record()) {
-                $LangsRemoved .= "$Div $Name";
-                $Div = ',';
-          } */
           if ($SQL_IN) $DB->query("DELETE FROM users_languages WHERE UserID='$UserID' AND LangID IN ( $SQL_IN )");
-
-          //$EditSummary[] = 'Badge'.(count($DelLangs)>1?'s':'')." removed: $LangsRemoved";
     }
 
-    if (isset($_POST['new_lang']) && is_number($_POST['new_lang'])) { 
-        $DB->query("INSERT IGNORE INTO users_languages (UserID, LangID) VALUES ('$UserID', '$_POST[new_lang]' )"); 
+    if (isset($_POST['new_lang']) && is_number($_POST['new_lang'])) {
+        $DB->query("INSERT IGNORE INTO users_languages (UserID, LangID) VALUES ('$UserID', '$_POST[new_lang]' )");
         $Cache->delete_value('user_langs_'.$UserID);
     } elseif ($SQL_IN) {
         $Cache->delete_value('user_langs_'.$UserID);
@@ -352,5 +328,3 @@ if ($ResetPassword) {
 }
 
 header('Location: user.php?action=edit&userid='.$UserID);
-
-?>

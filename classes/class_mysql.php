@@ -1,4 +1,4 @@
-<?
+<?php
 //-----------------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////////////
 /*//-- MySQL wrapper class ----------------------------------------------------------
@@ -168,10 +168,9 @@ class DB_MYSQL {
 	function halt($Msg) {
 		global $LoggedUser, $Cache, $Debug, $argv;
 		$DBError='MySQL: '.strval($Msg).' SQL error: '.strval($this->Errno).' ('.strval($this->Error).')';
-		if ($this->Errno == 1194) { send_irc('PRIVMSG '.ADMIN_CHAN.' :'.$this->Error); }
-		/*if ($this->Errno == 1194) { 
-			preg_match("Table '(\S+)' is marked as crashed and should be repaired", $this->Error, $Matches);
-		} */
+		if ($this->Errno == 1194) { 
+			send_irc('PRIVMSG '.ADMIN_CHAN.' :'.$this->Error); 
+		}
 		$Debug->analysis('!dev DB Error',$DBError,3600*24);
 		if (DEBUG_MODE || check_perms('site_debug') || isset($argv[1])) {
 			echo '<pre>'.display_str($DBError).'</pre>';
@@ -207,7 +206,6 @@ class DB_MYSQL {
 			}
 			$Debug->analysis('Non-Fatal Deadlock:',$Query,3600*24);
 			trigger_error("Database deadlock, attempt $i");
-			
 			sleep($i*rand(2, 5)); // Wait longer as attempts increase
 		}
 		$QueryEndTime=microtime(true);
@@ -226,13 +224,6 @@ class DB_MYSQL {
 		}
 
 		$QueryType = substr($Query,0, 6);
-		/*
-		if ($QueryType == 'DELETE' || $QueryType == 'UPDATE') {
-			if ($this->affected_rows() > 50) {
-				$Debug->analysis($this->affected_rows().' rows altered:',$Query,3600*24);
-			}
-		}
-		*/
 		$this->Row = 0;
 		if ($AutoHandle) { return $this->QueryID; }
 	}
@@ -335,4 +326,3 @@ class DB_MYSQL {
 	}
 
 }
-?>

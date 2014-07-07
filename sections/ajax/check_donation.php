@@ -8,8 +8,4 @@ $numt = (int)$_REQUEST['numt'];
 
 $result = check_bitcoin_balance($address, $numt);
 
-
 echo $result;
-
-
-?>

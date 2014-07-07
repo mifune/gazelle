@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 include(SERVER_ROOT.'/sections/bookmarks/functions.php');
@@ -12,7 +11,7 @@ function header_link($SortKey,$DefaultWay="desc") {
 		if($OrderWay=="desc") { $NewWay="asc"; }
 		else { $NewWay="desc"; }
 	} else { $NewWay=$DefaultWay; }
-	
+
 	return "torrents.php?order_way=".$NewWay."&amp;order_by=".$SortKey."&amp;".get_url(array('order_way','order_by'));
 }
 
@@ -68,7 +67,7 @@ $Queries = array();
 //Simple search
 if(!empty($_GET['searchstr'])) {
 	$Words = explode(' ',strtolower($_GET['searchstr']));
-		
+
 	if(!empty($Words)) {
 		foreach($Words as $Key => &$Word) {
 			if($Word[0] == '!' && strlen($Word) >= 3 && count($Words) >= 2) {
@@ -226,7 +225,7 @@ $TorrentCount = $SS->TotalResults;
 // These ones were not found in the cache, run SQL
 if(!empty($Results['notfound'])) {
 	$SQLResults = get_groups($Results['notfound']);
-	
+
 	if(is_array($SQLResults['notfound'])) { // Something wasn't found in the db, remove it from results
 		reset($SQLResults['notfound']);
 		foreach($SQLResults['notfound'] as $ID) {
@@ -234,7 +233,7 @@ if(!empty($Results['notfound'])) {
 			unset($Results['matches'][$ID]);
 		}
 	}
-	
+
 	// Merge SQL results with sphinx/memcached results
 	foreach($SQLResults['matches'] as $ID=>$SQLResult) {
 		$Results['matches'][$ID] = array_merge($Results['matches'][$ID], $SQLResult);
@@ -253,12 +252,12 @@ if(((!empty($_GET['action']) && strtolower($_GET['action'])=="advanced") || (!em
 
 
 if(count($Results)==0) {
-$DB->query("SELECT 
+$DB->query("SELECT
 	tags.Name,
 	((COUNT(tags.Name)-2)*(SUM(tt.PositiveVotes)-SUM(tt.NegativeVotes)))/(tags.Uses*0.8) AS Score
-	FROM xbt_snatched AS s 
-	INNER JOIN torrents AS t ON t.ID=s.fid 
-	INNER JOIN torrents_group AS g ON t.GroupID=g.ID 
+	FROM xbt_snatched AS s
+	INNER JOIN torrents AS t ON t.ID=s.fid
+	INNER JOIN torrents_group AS g ON t.GroupID=g.ID
 	INNER JOIN torrents_tags AS tt ON tt.GroupID=g.ID
 	INNER JOIN tags ON tags.ID=tt.TagID
 	WHERE s.uid='$LoggedUser[ID]'
@@ -293,9 +292,9 @@ $Bookmarks = all_bookmarks('torrent');
 $JsonGroups = array();
 foreach($Results as $GroupID=>$Data) {
 	list($GroupID2, $GroupName, $TagList, $Torrents, $FreeTorrent, $DoubleSeed, $TotalLeechers, $TotalSeeders, $MaxSize, $TotalSnatched, $GroupTime) = array_values($Data);
-	
+
 	$TagList = explode(' ',str_replace('_','.',$TagList));
-			
+
         list($TorrentID, $Data) = each($Torrents);
 
         $JsonGroups[] = array(

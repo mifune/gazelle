@@ -1,4 +1,4 @@
-<?
+<?php
 class IRC_DB extends DB_MYSQL {
 	function halt($Msg) {
 		global $Bot;
@@ -9,7 +9,7 @@ class IRC_DB extends DB_MYSQL {
 abstract class IRC_BOT {
 	abstract protected function connect_events();
 	abstract protected function channel_events();
-	abstract protected function query_events(); 
+	abstract protected function query_events();
 	abstract protected function listener_events();
 
 	protected $Debug = false;
@@ -26,7 +26,6 @@ abstract class IRC_BOT {
 	public $Restart = 0; //Die by default
 
 	public function __construct() {
-		//ini_set('memory_limit', '12M');
 		restore_error_handler(); //Avoid PHP error logging
 		set_time_limit(0);
 	}
@@ -102,46 +101,12 @@ abstract class IRC_BOT {
 		$this->Whois = $Nick;
 		$this->send_raw("WHOIS $Nick");
 	}
-	
-	/*
-	This function uses blacklisted_ip, which is no longer in RC2. 
-	You can probably find it in old RC1 code kicking aronud if you need it. 
-	protected function ip_check($IP,$Gline=false,$Channel=BOT_REPORT_CHAN) {
-		global $Cache, $DB;
-		if(blacklisted_ip($IP)) {
-			$this->send_to($Channel, 'TOR IP Detected: '.$IP);
-			if ($Gline) {
-				$this->send_raw('GLINE *@'.$IP.' 90d :DNSBL Proxy');
-			}
-		}
-		$IPBans = $Cache->get_value('ip_bans');
-		if(!is_array($IPBans)) {
-			$DB->query("SELECT FromIP, ToIP FROM ip_bans");
-			$IPBans = $DB->to_array();
-			$Cache->cache_value('ip_bans', $IPBans, 0);
-		}
-		foreach($IPBans as $IPBan) {
-			list($FromIP, $ToIP) = $IPBan;
-			$Long = ip2long($IP);
-			if($Long >= $FromIP && $Long <= $ToIP) {
-				$this->send_to($Channel, 'Site IP Ban Detected: '.$IP);
-				if ($Gline) {
-					$this->send_raw('GLINE *@'.$IP.' 90d :IP Ban');
-				}
-			}
-		}
-	}*/
 
 	protected function listen() {
 		global $Cache,$DB;
 		stream_set_timeout($this->Socket, 10000000000);
 		while($this->State == 1){
 			if($this->Data = fgets($this->Socket, 256)) {
-				//IP checks
-				//if(preg_match('/:\*\*\* (?:REMOTE)?CONNECT: Client connecting (?:.*) \[(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\] \[(.+)\]/', $this->Data, $IP)) {
-				//	$this->ip_check($IP[1],true);
-				//}
-
 				if($this->Debug === true) {
 					$this->send_to(BOT_DEBUG_CHAN, $this->Data);
 				}
@@ -184,11 +149,10 @@ abstract class IRC_BOT {
 			if($this->Listened = @socket_accept($this->ListenSocket)) {
 				$this->listener_events();
 			}
-			
+
 			$DB->LinkID = false;
 			$DB->Queries = array();
 			usleep(5000);
 		}
 	}
 }
-?>

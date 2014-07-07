@@ -1,24 +1,23 @@
-<?
+<?php
+error("dont press that!");
 
- error("dont press that!"); 
+$filename = "peersid.txt";
 
-$filename = "peersid.txt"; 
- 
 $input = file($filename);
 
 $i=0;
 
 echo count($input)."<br/>";
- 
+
 $Values = array();
 $fname=1;
 
 $Peers = array();
 
 foreach($input as $key=>$line){
- 
+
     if (strpos($line, "INSERT INTO")!==FALSE){
- 
+
     } else {
         $parts = explode("', '", $line);
         if (count($parts)>1) {
@@ -28,21 +27,16 @@ foreach($input as $key=>$line){
                 if ( !array_key_exists($str, $Peers)){
                     $i++;
                     $parts[1] = substr($parts[1], 0, strlen($parts[1])-4 );
-                    //$Values[] = "('$parts[0]', '$parts[1]'),\n";
-                    //$Peers[$str] = array(0, "('$parts[0]', '$parts[1]'),\n");
                     $Peers[$str] = array(0, db_string($parts[0]) , $parts[1] );
                 } else {
                     $Peers[$str][0]=$Peers[$str][0]+1;
                 }
-            
             }
-        } 
-    } 
+        }
+    }
 }
 
-
 foreach($Peers as $key=>$val){
-                    //$Peers[$str] = array(0, "('$parts[0]', '$parts[1]'),\n");
     $Values[] = "('$val[0]', '$val[1]', '$val[2]'),\n";
 }
 
@@ -51,21 +45,15 @@ foreach($Peers as $key=>$val){
                 break;
             }
 
-
 echo $i;
- 
 
 function saverest($filename, $output){
-    
-    //$filename = 'peersid2.txt';
-    //$somecontent = "Add this to the file\n";
     $handle = fopen($filename, 'w');
-    
-        if ( $handle === FALSE) {
-             echo "Cannot open file ($filename)<br/>";
-             exit;
-        }
-        
+    if ( $handle === FALSE) {
+         echo "Cannot open file ($filename)<br/>";
+         exit;
+    }
+
     // Let's make sure the file exists and is writable first.
     if (is_writable($filename)) {
 
@@ -90,7 +78,3 @@ function saverest($filename, $output){
         return false;
     }
 }
- 
-?>
-
-

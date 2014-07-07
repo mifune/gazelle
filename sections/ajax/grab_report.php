@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('admin_reports')) {
 	error(403);
 }
@@ -13,4 +13,3 @@ if($DB->affected_rows() > 0) {
 } else {
 		echo 'You just tried to grab a resolved or non existent report!';
 }
-?>

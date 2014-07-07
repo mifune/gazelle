@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 if(empty($_REQUEST['action'])) { $_REQUEST['action']=''; }
@@ -29,7 +29,6 @@ switch($_REQUEST['action']) {
 		require(SERVER_ROOT.'/sections/collages/edit_handle.php');
 		break;
 	case 'change_level':
-          
             authorize();
 
             $CollageID = $_POST['collageid'];
@@ -38,16 +37,16 @@ switch($_REQUEST['action']) {
             if (!check_perms('site_collages_manage')){
                 $DB->query("SELECT UserID FROM collages WHERE ID='$CollageID'");
                 list($UserID) = $DB->next_record();
-                if ($UserID != $LoggedUser['ID']) error(403); 
+                if ($UserID != $LoggedUser['ID']) error(403);
             }
-            
+
             $Permissions = $_POST['permission'];
             if(!is_number($Permissions)) error(0);
-            $Permissions=(int)$Permissions; 
+            $Permissions=(int)$Permissions;
             if ($Permissions !=0 && !array_key_exists($Permissions, $ClassLevels)) error(0);
-             
+
             $DB->query("UPDATE collages SET Permissions=$Permissions WHERE ID='$CollageID'");
-            
+
             $Cache->delete_value('collage_'.$CollageID);
             header('Location: collages.php?id='.$CollageID);
 		break;
@@ -84,11 +83,11 @@ switch($_REQUEST['action']) {
 		if(!check_perms('site_collages_personal')) {
 			error(403);
 		}
-		
+
 		$DB->query("SELECT COUNT(ID) FROM collages WHERE UserID='$LoggedUser[ID]' AND CategoryID='0' AND Deleted='0'");
 		list($CollageCount) = $DB->next_record();
-				
-		if($CollageCount >= $LoggedUser['Permissions']['MaxCollages']) { 
+
+		if($CollageCount >= $LoggedUser['Permissions']['MaxCollages']) {
 			list($CollageID) = $DB->next_record();
 			header('Location: collage.php?id='.$CollageID);
 			die();
@@ -107,5 +106,3 @@ switch($_REQUEST['action']) {
 		}
 		break;
 }
-
-?>

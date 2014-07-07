@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_admin_forums')) {
 	error(403);
 }
@@ -26,14 +26,14 @@ $Text = new TEXT;
 $Edits = $Cache->get_value($Type.'_edits_'.$PostID);
 if(!is_array($Edits)) {
 	$DB->query("SELECT ce.EditUser, um.Username, ce.EditTime, ce.Body
-			FROM comments_edits AS ce 
+			FROM comments_edits AS ce
 				JOIN users_main AS um ON um.ID=ce.EditUser
 			WHERE Page = '".$Type."' AND PostID = ".$PostID."
 			ORDER BY ce.EditTime DESC");
 	$Edits = $DB->to_array();
 	$Cache->cache_value($Type.'_edits_'.$PostID, $Edits, 0);
 }
-	
+
 list($UserID, $Username, $Time) = $Edits[$Depth];
 if($Depth != 0) {
 	list(,,,$Body) = $Edits[$Depth - 1];
@@ -61,21 +61,19 @@ if($Depth != 0) {
 
 				<div class="post_content"><?=$Text->full_format($Body, true)?></div>
                         <div class="post_footer">
-<? if($Depth < count($Edits)) { ?>
+<?php if($Depth < count($Edits)) { ?>
 					<a href="#edit_info_<?=$PostID?>" onclick="LoadEdit('<?=$Type?>', <?=$PostID?>, <?=($Depth + 1)?>); return false;">&laquo;</a>
 					<span class="editedby"><?=(($Depth == 0) ? 'Last edited by' : 'Edited by')?>
 					<?=format_username($UserID, $Username) ?> <?=time_diff($Time,2,true,true)?>
                               </span>
-<? } else { ?>
+<?php } else { ?>
 					<em>Original Post</em>
-<? }
+<?php }
 
 if($Depth > 0) { ?>
                               <span class="editedby">
                                   <a href="#edit_info_<?=$PostID?>" onclick="LoadEdit('<?=$Type?>', <?=$PostID?>, <?=($Depth - 1)?>); return false;">&raquo;</a>
                               </span>
-<? } ?>
+<?php } ?>
 
                         </div>
-                        
-                        

@@ -1,5 +1,4 @@
-<?
-
+<?php
 enforce_login();
 if (!isset($_REQUEST['action'])) {
     error(404);
@@ -18,4 +17,3 @@ if (!isset($_REQUEST['action'])) {
             error(0);
     }
 }
-?>

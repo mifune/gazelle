@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * This page is for creating a report using AJAX.
  * It should have the following posted fields:
@@ -40,19 +40,18 @@ if(!isset($_POST['type'])) {
 	die();
 }
 
-
 $ExtraID = $_POST['otherid'];
 
-if(!empty($_POST['usercomment'])) {  
+if(!empty($_POST['usercomment'])) {
 	$Extra = db_string(urldecode($_POST['usercomment']));
-} elseif(!empty($_POST['extra'])) { 
+} elseif(!empty($_POST['extra'])) {
 	$Extra = db_string($_POST['extra']);
-} else { 
+} else {
 	$Extra = "";
 }
-if(!empty($_POST['reporterid']) && is_number($_POST['reporterid'])) { 
+if(!empty($_POST['reporterid']) && is_number($_POST['reporterid'])) {
 	$ReporterID = (int)$_POST['reporterid'];
-} else { 
+} else {
 	$ReporterID = $LoggedUser['ID'];
 }
 
@@ -77,4 +76,3 @@ $Cache->delete_value('reports_torrent_'.$TorrentID);
 $Cache->increment('num_torrent_reportsv2');
 
 echo $ReportID;
-?>

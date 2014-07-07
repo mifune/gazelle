@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $UserID = $LoggedUser['ID'];
@@ -22,5 +22,3 @@ if($DB->record_count() == 0) {
 	error("$StaffIDs[$ReceiverID] already has this conversation in their inbox.");
 	header('Location: inbox.php?action=viewconv&id='.$ConvID);
 }
-//show_footer();
-?>

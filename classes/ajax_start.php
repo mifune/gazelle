@@ -1,4 +1,4 @@
-<?
+<?php
 require 'config.php'; //The config contains all site wide configuration information as well as memcached rules
 require(SERVER_ROOT.'/classes/class_debug.php');
 require(SERVER_ROOT.'/classes/class_cache.php'); //Require the caching class
@@ -13,11 +13,11 @@ $SSL = ($_SERVER['SERVER_PORT'] === '443');
 if (isset($_COOKIE['session'])) { $LoginCookie=$Enc->decrypt($_COOKIE['session']); }
 if(isset($LoginCookie)) {
 	list($SessionID, $UserID)=explode("|~|",$Enc->decrypt($LoginCookie));
-	
+
 	if(!$UserID || !$SessionID) {
 		die('Not logged in!');
 	}
-	
+
 	if(!$Enabled = $Cache->get_value('enabled_'.$UserID)){
 		require(SERVER_ROOT.'/classes/class_mysql.php'); //Require the database wrapper
 		$DB=NEW DB_MYSQL; //Load the database wrapper

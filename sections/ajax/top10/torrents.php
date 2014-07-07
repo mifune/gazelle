@@ -1,4 +1,4 @@
-<?
+<?php
 
 authorize();
 
@@ -128,7 +128,6 @@ print
                 )
         );
 
-
 function generate_torrent_json($Caption, $Tag, $Details, $Limit) {
 	global $LoggedUser;
 	$results = array();
@@ -167,4 +166,3 @@ function generate_torrent_json($Caption, $Tag, $Details, $Limit) {
 		'results' => $results
 		);
 }
-?>

@@ -1,5 +1,4 @@
-<?
- 
+<?php
 if (isset($LoggedUser['PostsPerPage'])) {
 	$PerPage = $LoggedUser['PostsPerPage'];
 } else {
@@ -7,52 +6,47 @@ if (isset($LoggedUser['PostsPerPage'])) {
 }
 
 list($Page,$Limit) = page_limit($PerPage);
- 
+
 $UserID = (int)$LoggedUser['ID'];
- 
- 
+
 $DB->query("SELECT RestrictedForums, PermittedForums FROM users_info WHERE UserID = $UserID");
 list($RestrictedForums, $PermittedForums) = $DB->next_record();
- 
+
 if($PermittedForums) $PermittedForums = "f.ID IN ($PermittedForums) OR ";
 if($RestrictedForums) $RestrictedForums = " AND f.ID NOT IN ($RestrictedForums) ";
 
-   
  // I cannot find any useful way of caching this... problem is this is viewing user dependent, but clearing the cache is any user posting
- 
-      $DB->query("SELECT SQL_CALC_FOUND_ROWS 
-                         f.ID, f.Description, t.ID, f.Name, t.Title, t.LastPostTime, 
-                        (t.NumPosts-1), t.NumViews, t.LastPostID, l.PostID, 
-                         author.ID, author.Username, f.MinClassRead, t.IsLocked, t.IsSticky
-                    FROM forums_topics AS t
-                    JOIN forums AS f ON f.ID = t.ForumID
-                    JOIN users_info AS i ON i.UserID=$UserID 
-                     AND (i.CatchupTime < t.LastPostTime OR i.CatchupTime is null)
-                    JOIN users_main AS author ON author.ID=t.LastPostAuthorID
-               LEFT JOIN forums_last_read_topics AS l ON l.UserID =i.UserID
-                     AND l.TopicID = t.ID
-                   WHERE t.LastPostAuthorID!=$UserID
-                     AND (l.PostID is null OR  l.PostID != t.LastPostID)  
-                     AND ( $PermittedForums  (  f.MinClassRead<=$LoggedUser[Class] $RestrictedForums ) )
-                ORDER BY t.LastPostTime DESC
-                   LIMIT $Limit");
-      
-	$UnreadPosts = $DB->to_array();
-       
+
+$DB->query("SELECT SQL_CALC_FOUND_ROWS
+                   f.ID, f.Description, t.ID, f.Name, t.Title, t.LastPostTime,
+                  (t.NumPosts-1), t.NumViews, t.LastPostID, l.PostID,
+                   author.ID, author.Username, f.MinClassRead, t.IsLocked, t.IsSticky
+              FROM forums_topics AS t
+              JOIN forums AS f ON f.ID = t.ForumID
+              JOIN users_info AS i ON i.UserID=$UserID
+               AND (i.CatchupTime < t.LastPostTime OR i.CatchupTime is null)
+              JOIN users_main AS author ON author.ID=t.LastPostAuthorID
+         LEFT JOIN forums_last_read_topics AS l ON l.UserID =i.UserID
+               AND l.TopicID = t.ID
+             WHERE t.LastPostAuthorID!=$UserID
+               AND (l.PostID is null OR  l.PostID != t.LastPostID)
+               AND ( $PermittedForums  (  f.MinClassRead<=$LoggedUser[Class] $RestrictedForums ) )
+          ORDER BY t.LastPostTime DESC
+             LIMIT $Limit");
+
+$UnreadPosts = $DB->to_array();
+
 $DB->query('SELECT FOUND_ROWS()');
 list($Results) = $DB->next_record();
 
-
 show_header('Unread Posts');
 
-
 $Pages=get_pages($Page,$Results,$PerPage,9);
- 
 
 ?>
 <div class="thin">
-    <? print_latest_forum_topics(); ?>
-              
+    <?php  print_latest_forum_topics(); ?>
+
 	<div class="linkbox pager">
 		<?=$Pages?>
 	</div>
@@ -65,29 +59,21 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
 			<td style="text-align: center;width:7%;">Replies</td>
 			<td style="text-align: center;width:7%;">Views</td>
 		</tr>
-<? if ($Results == 0) { ?>
+<?php  if ($Results == 0) { ?>
             <tr>
                 <td colspan="5" class="center">
-			No unread posts 
+			No unread posts
                 </td>
             </tr>
-<? } else { 
+<?php  } else {
 
         $Row = 'a';
-        /*
-        $DB->query("SELECT RestrictedForums FROM users_info WHERE UserID = $UserID");
-        list($RestrictedForums) = $DB->next_record();
-        $RestrictedForums = explode(',', $RestrictedForums);  */
 
         foreach ($UnreadPosts as $UnreadPost) {
-                list($ForumID, $ForumDescription, $ThreadID, $ForumName, $Title, $LastPostTime, $NumReplies, $NumViews, 
+                list($ForumID, $ForumDescription, $ThreadID, $ForumName, $Title, $LastPostTime, $NumReplies, $NumViews,
                       $LastPostID, $LastReadPostID, $LastAuthorID, $LastPostAuthorName, $MinRead, $Locked, $Sticky) = $UnreadPost;
-                /*
-                if ($LoggedUser['CustomForums'][$ForumID] != 1 && ($MinRead>$LoggedUser['Class'] || array_search($ForumID, $RestrictedForums) !== FALSE)) {
-                    continue;
-                }   */
-                $Row = ($Row == 'a') ? 'b' : 'a'; 
- 
+                $Row = ($Row == 'a') ? 'b' : 'a';
+
                 $Read = 'unread';
 
                 // Removed per request, as distracting
@@ -112,10 +98,10 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
                           <span style="float:right;" class="last_poster">by <?=format_username($LastAuthorID, $LastPostAuthorName)?> <?=time_diff($LastPostTime,1)?></span>
                     </td>
                     <td style="text-align: center;"><?=number_format($NumReplies)?></td>
-                    <td style="text-align: center;"><?=number_format($NumViews)?></td> 
+                    <td style="text-align: center;"><?=number_format($NumViews)?></td>
                 </tr>
-<?          }
-      }         
+<?php           }
+      }
 ?>
 	</table>
 	<div class="linkbox pager">
@@ -124,4 +110,5 @@ $Pages=get_pages($Page,$Results,$PerPage,9);
 	<div class="linkbox">[<a href="forums.php?action=catchup&amp;forumid=all&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up all</a>]</div>
 </div>
 
-<? show_footer(); ?>
+<?php
+show_footer();

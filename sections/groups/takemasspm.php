@@ -1,4 +1,4 @@
-<?
+<?php
 //******************************************************************************//
 //--------------- Take mass pm -------------------------------------------------//
 // This pages handles the backend of the 'send mass pm' function. It checks	 //
@@ -20,7 +20,6 @@ $Message = db_string($_POST['message']);
 
 //******************************************************************************//
 //--------------- Validate data in edit form -----------------------------------//
- 
 
 $Validate->SetFields('groupid','1','number','Invalid group ID.',array('maxlength'=>1000000000, 'minlength'=>1)); // we shouldn't have group IDs higher than a billion either
 $Validate->SetFields('subject','1','string','Invalid subject.',array('maxlength'=>1000, 'minlength'=>1));
@@ -41,19 +40,16 @@ $DB->query('SELECT UserID FROM users_groups WHERE GroupID='.$GroupID);
 if ($DB->record_count()>0) {
     $Users = $DB->collect('UserID');
     if ($SenderID == 0){ // we only want to send a masspm if from system
-        send_pm($Users,0,$Subject,$Message); 
+        send_pm($Users,0,$Subject,$Message);
     } else {
-        foreach ($Users as $UserID) { 
-		send_pm($UserID,($SenderID==$UserID?0:$SenderID),$Subject,$Message); 
+        foreach ($Users as $UserID) {
+		send_pm($UserID,($SenderID==$UserID?0:$SenderID),$Subject,$Message);
         }
     }
 }
+
 $Log = isset($_POST['showsender']) ? "[user]{$LoggedUser['Username']}[/user]" : "System ([user]{$LoggedUser['Username']}[/user])";
 $Log = sqltime()." - [color=purple]Mass PM sent[/color] by $Log - subject: $Subject";
 $DB->query("UPDATE groups SET Log=CONCAT_WS( '\n', '$Log', Log) WHERE ID='$GroupID'");
 
-//write_log("Mass PM sent to usergroup $GroupID by {$LoggedUser['Username']}");
-
 header("Location: groups.php?groupid=$GroupID");
-
-?>

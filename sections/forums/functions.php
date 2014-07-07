@@ -1,29 +1,28 @@
-<?
-
+<?php
 function update_forum_info($ForumID, $AdjustNumTopics = 0, $BeginEndTransaction = true) {
     global $DB, $Cache;
-    
+
     if ($BeginEndTransaction) $Cache->begin_transaction('forums_list');
-        
-    $DB->query("SELECT 
+
+    $DB->query("SELECT
 			t.ID,
 			t.LastPostID,
 			t.Title,
 			p.AuthorID,
 			um.Username,
-			p.AddedTime, 
+			p.AddedTime,
 			(SELECT COUNT(pp.ID) FROM forums_posts AS pp JOIN forums_topics AS tt ON pp.TopicID=tt.ID WHERE tt.ForumID='$ForumID'),
 			t.IsLocked,
 			t.IsSticky
-			FROM forums_topics AS t 
-			JOIN forums_posts AS p ON p.ID=t.LastPostID 
+			FROM forums_topics AS t
+			JOIN forums_posts AS p ON p.ID=t.LastPostID
 			LEFT JOIN users_main AS um ON um.ID=p.AuthorID
 			WHERE t.ForumID='$ForumID'
 			GROUP BY t.ID
 			ORDER BY p.AddedTime DESC LIMIT 1");
 			//ORDER BY t.LastPostID DESC LIMIT 1");
     list($NewLastTopic, $NewLastPostID, $NewLastTitle, $NewLastAuthorID, $NewLastAuthorName, $NewLastAddedTime, $NumPosts, $NewLocked, $NewSticky) = $DB->next_record(MYSQLI_BOTH, false);
-		
+
     $UpdateArray = array(
 			'NumPosts'=>$NumPosts,
 			'LastPostID'=>$NewLastPostID,
@@ -35,15 +34,13 @@ function update_forum_info($ForumID, $AdjustNumTopics = 0, $BeginEndTransaction 
 			'IsLocked'=>$NewLocked,
 			'IsSticky'=>$NewSticky
 			);
-            
-    //$AdjustNumTopics=(int)$AdjustNumTopics;
+
     if ($AdjustNumTopics !=0) { // '-1' or '+1' etc
-                //$AdjustNumTopics = $AdjustNumTopics>0?"+$AdjustNumTopics":$AdjustNumTopics;
                 $SetNumTopics = "NumTopics=NumTopics$AdjustNumTopics, ";
                 $UpdateArray['NumTopics']=$AdjustNumTopics;
     }
     else $SetNumTopics ='';
-            
+
     $SQL = "UPDATE forums SET $SetNumTopics
                     NumPosts='$NumPosts',
                     LastPostTopicID='$NewLastTopic',
@@ -51,13 +48,12 @@ function update_forum_info($ForumID, $AdjustNumTopics = 0, $BeginEndTransaction 
                     LastPostAuthorID='$NewLastAuthorID',
                     LastPostTime='$NewLastAddedTime'
                     WHERE ID='$ForumID'";
-            
+
     $DB->query($SQL);
-		
+
     $Cache->update_row($ForumID, $UpdateArray);
     if ($BeginEndTransaction) $Cache->commit_transaction(0);
 }
-
 
 function get_thread_info($ThreadID, $Return = true, $SelectiveCache = false) {
 	global $DB, $Cache;
@@ -123,36 +119,7 @@ function update_latest_topics() {
             $Cache->delete_value('latest_topics_'.$Class['ID']);
             $Cache->delete_value('latest_topics_nogames_'.$Class['ID']);
         }
-        
-        /*
-        foreach($Classes as $Class) {
-            $Level = $Class['Level'];
-            $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
-                        INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
-                        INNER JOIN forums AS f ON f.ID=ft.ForumID
-                        INNER JOIN users_main AS um ON um.ID=fp.AuthorID
-                        WHERE f.MinClassRead<='$Level'
-                        ORDER BY AddedTime DESC
-                        LIMIT 6");
-            $LatestTopics = $DB->to_array();
-            $Cache->cache_value('latest_topics_'.$Class['ID'], $LatestTopics);
-        }
-        if (is_array($ExcludeForums)) { // check array from config exists
-            $ANDWHERE = " AND ft.ForumID NOT IN (" . implode(",", $ExcludeForums) .") ";
 
-            foreach($Classes as $Class) {
-                $Level = $Class['Level'];
-                $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
-                            INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
-                            INNER JOIN forums AS f ON f.ID=ft.ForumID
-                            INNER JOIN users_main AS um ON um.ID=fp.AuthorID
-                            WHERE f.MinClassRead<='$Level' $ANDWHERE
-                            ORDER BY AddedTime DESC
-                            LIMIT 6");
-                $LatestTopics = $DB->to_array();
-                $Cache->cache_value('latest_topics_nogames_'.$Class['ID'], $LatestTopics);
-            }
-        } */
 }
 
 function print_forums_select($Forums, $ForumCats, $SelectedForumID=false, $ElementID = '') {
@@ -161,35 +128,32 @@ function print_forums_select($Forums, $ForumCats, $SelectedForumID=false, $Eleme
     else $ElementID ='';
 ?>
                 <select name="forumid" <?=$ElementID?>>
-<? 
+<?php
 $OpenGroup = false;
 $LastCategoryID=-1;
 
 foreach ($Forums as $Forum) {
-	//if ($Forum['MinClassRead'] > $LoggedUser['Class']) continue;
-	 
-      if ( !check_forumperm($Forum['ID'], 'Write')) continue;
+  if ( !check_forumperm($Forum['ID'], 'Write')) continue;
 
 	if ($Forum['CategoryID'] != $LastCategoryID) {
 		$LastCategoryID = $Forum['CategoryID'];
 		if($OpenGroup) { ?>
 					</optgroup>
-<?		} ?>
+<?php		} ?>
 					<optgroup label="<?=$ForumCats[$Forum['CategoryID']]?>">
-<?		$OpenGroup = true;
+<?php		$OpenGroup = true;
 	}
 ?>
 						<option value="<?=$Forum['ID']?>"<? if($SelectedForumID == $Forum['ID']) { echo ' selected="selected"';} ?>><?=$Forum['Name']?></option>
-<? } ?>
+<?php } ?>
 					</optgroup>
 				</select>
-<?
+<?php
 }
-
 
 function get_forum_cats(){
     global $Cache, $DB;
-    
+
     $ForumCats = $Cache->get_value('forums_categories');
     if ($ForumCats === false) {
           $DB->query("SELECT ID, Name FROM forums_categories");
@@ -201,9 +165,10 @@ function get_forum_cats(){
     }
     return $ForumCats;
 }
+
 function get_forums_info(){
     global $Cache, $DB;
-    
+
     //This variable contains all our lovely forum data
     if(!$Forums = $Cache->get_value('forums_list')) {
           $DB->query("SELECT
@@ -249,7 +214,7 @@ function get_forums_info(){
 
 function get_thread_views($ThreadID){
     global $Cache, $DB;
-    
+
     $NumViews = $Cache->get_value('thread_views_'.$ThreadID);
     if ( $NumViews===false ) {
           $DB->query("SELECT NumViews FROM forums_topics WHERE ID='$ThreadID'");

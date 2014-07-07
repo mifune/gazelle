@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 include(SERVER_ROOT.'/classes/class_text.php');
@@ -34,7 +34,6 @@ if ($Err) error($Err);
 
 $DB->query("SELECT Name, Body FROM torrents_group WHERE ID = ".$GroupID);
 list($OldName, $Body) = $DB->next_record();
-//$SearchText = db_string($NewName . ' ' . $Text->db_clean_search($Body));
 $SearchText = $NewName . ' ' . db_string($Text->db_clean_search(trim($Body)));
 
 $DB->query("UPDATE torrents_group SET Name='$NewName', SearchText='$SearchText' WHERE ID='$GroupID'");

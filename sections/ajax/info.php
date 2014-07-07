@@ -1,4 +1,4 @@
-<?
+<?php
 //no authorization because this page needs to be accessed to get the authkey
 
 //authorize(true);
@@ -33,5 +33,3 @@ print json_encode(
 		)
 	)
 );
-
-?>

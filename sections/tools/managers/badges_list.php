@@ -1,6 +1,6 @@
-<?
+<?php
 if(!check_perms('site_manage_badges')) { error(403); }
- 
+
 // get all images in badges directory for drop down
 $imagefiles = scandir(STATIC_SERVER.'common/badges');
 $imagefiles= array_diff($imagefiles, array('.','..'));
@@ -10,11 +10,11 @@ function print_select_image($ElementID, $CurrentImage=''){
     global $imagefiles;
 ?>
     <select name="image[<?=$ElementID?>]" id="imagesrc<?=$ElementID?>" onchange="Select_Image('<?=$ElementID?>')" title="Select Image">
-<?      foreach ($imagefiles as $image) {    ?>
+<?php       foreach ($imagefiles as $image) {    ?>
             <option value="<?=$image?>"<?=($image==$CurrentImage?' selected="selected"':'')?>><?=$image?>&nbsp;</option>
-<?      } ?>
+<?php       } ?>
     </select>
-<?
+<?php
 }
 
 show_header('Badges','badges');
@@ -28,12 +28,12 @@ show_header('Badges','badges');
         <table>
             <tr>
                 <td colspan="10" class="head">Add badge(s)</td>
-            </tr> 
+            </tr>
             <tr class="colhead">
                     <td width="10px" rowspan="2">Add</td>
                     <td width="50px" rowspan="2">Image</td>
                     <td colspan="2">Title</td>
-                    <td colspan="5">Description</td> 
+                    <td colspan="5">Description</td>
                     <td width="40px" rowspan="2"></td>
             </tr>
             <tr class="colhead">
@@ -44,21 +44,21 @@ show_header('Badges','badges');
                     <td width="60px">Sort</td>
                     <td width="80px">Type</td>
                     <td width="12%">Cost</td>
-            </tr> 
-            <?
+            </tr>
+            <?php
 
             $numAdds = isset($_REQUEST['numadd'])?(int)$_REQUEST['numadd']:5;
             if ($numAdds<1 || $numAdds > 20) $numAdds = 1;
-    
-            foreach ($BadgeTypes as $valtype) {   
+
+            foreach ($BadgeTypes as $valtype) {
                 $badge_select_html .= '<option value="'.$valtype.'">'.$valtype.'&nbsp;&nbsp;</option>';
             }
-            
-            for($i = 0; $i < $numAdds; $i++) { 
+
+            for($i = 0; $i < $numAdds; $i++) {
                 $ID = "new$i";
-            ?>  
+            ?>
                 <tr class="rowb">
-                    <td rowspan="2" style="vertical-align: top"> 
+                    <td rowspan="2" style="vertical-align: top">
                         <input type="checkbox" id="id_<?=$ID?>" name="id['<?=$ID?>']" value="<?=$ID?>" title="If checked this badge will be created when you click on 'Save changes'" />
                     </td>
                     <td rowspan="2" class="center" id="image<?=$ID?>" style="vertical-align: top;width:40px"> <a id="<?=$ID?>"></a>
@@ -69,14 +69,14 @@ show_header('Badges','badges');
                     </td>
                     <td colspan="5">
                         <input class="long" type="text" name="desc[<?=$ID?>]" id="desc<?=$ID?>" value="awarded for XXXXXX. This user has doneY/achievedZ" onchange="Set_Edit('<?=$ID?>')" title="Description"/>
-                    </td> 
+                    </td>
                     <td rowspan="2">
                         <a href="#" onclick="Fill_From(<?=$i?>,['badge','title','image','imagesrc','desc','type','row','rank','sort','cost'])" title="fill other add forms with this forms values">fill</a>
                     </td>
                 </tr>
                 <tr class="rowb">
                     <td>
-<?                      print_select_image($ID); ?> 
+<?php                       print_select_image($ID); ?>
                     </td>
                     <td>
                         <input class="medium" type="text" name="badge[<?=$ID?>]" id="badge<?=$ID?>" value="new set" onchange="Set_Edit('<?=$ID?>')" title="Set Name (Users can only have one badge from a set, rank determines which badge replaces which when awarded)"/>
@@ -102,9 +102,9 @@ show_header('Badges','badges');
                 <tr class="rowa">
                     <td colspan="10" class="noborder"></td>
                 </tr>
-<?          }       ?>
+<?php           }       ?>
                 <tr class="rowb">
-                    <td colspan="6" style="text-align: right;"> 
+                    <td colspan="6" style="text-align: right;">
                         <input type="hidden" id="totalnum" value="<?=$numAdds?>" />
                         <span style="float:left">
                             <a href="#" onclick="reload_num_forms('badges_list')">reload</a>
@@ -112,15 +112,15 @@ show_header('Badges','badges');
                             add forms
                         </span>
                         <input type="submit" name="create" value="Create" title="Create all badges selected" />
-                    </td> 
+                    </td>
                     <td colspan="4" style="text-align: center;">
                         <label for="returntop">return to top</label>
                         <input type="checkbox" name="returntop" value="1" title="If checked you will return to the top of the page after adding (otherwise you will return to where the new badges are in the list)" />
-                    </td> 
+                    </td>
                 </tr>
         </table>
     </form>
- 
+
     <br/><br/>
     <div class="head"> </div>
     <div class="box pad">
@@ -145,20 +145,20 @@ show_header('Badges','badges');
     </div><br/>
     <div class="head">available images<span style="float:right;"><a href="#" onclick="$('#badgeimages').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(View)':'(Hide)'); return false;">(View)</a></span></div>
     <div id="badgeimages" class="box pad hidden">
-<?      foreach ($imagefiles as $image) {    ?>
+<?php       foreach ($imagefiles as $image) {    ?>
             <div style="display: inline-block;margin: 3px;">
                 <img src="<?=STATIC_SERVER.'common/badges/'.$image?>" title="<?=$image?>" alt="<?=$image?>" />
                 <br/><?=$image?>
             </div>
-<?      } ?>
+<?php       } ?>
     </div>
     <br/>
-    
+
     <div class="head">Manage Badges</div>
     <form id="editbadges" action="tools.php" method="post">
         <input type="hidden" name="action" value="badges_alter" />
         <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-        <table> 
+        <table>
             <tr class="colhead">
                 <td width="10px" rowspan="2">ID<br/>-<br/>Edit</td>
                 <td width="40px" rowspan="2">Image</td>
@@ -174,15 +174,14 @@ show_header('Badges','badges');
                 <td width="60px">Sort</td>
                 <td width="80px">Type</td>
                 <td width="12%">Cost</td>
-            </tr> 
-<?  
+            </tr>
+<?php
             $DB->query("SELECT ID, Badge, Rank, Type, Display, Sort, Cost, Title, Description, Image
                   FROM badges ORDER BY Display, Sort, Rank");
 
             while(list($ID, $Badge, $Rank, $Type, $Display, $Sort, $Cost, $Title, $Description, $Image) = $DB->next_record()){
-                $Row = ($Row === 'a' ? 'b' : 'a');  
-                /*  <input type="hidden" name="id[<?=$ID?>]" value="<?=$ID?>" /> */
-?> 
+                $Row = ($Row === 'a' ? 'b' : 'a');
+?>
                 <tr class="rowb" style="border-top: 1px solid;">
                     <td rowspan="2" style="vertical-align: top">
                         <a id="<?=$ID?>"></a>#<?=$ID?><br/><br/>
@@ -197,14 +196,14 @@ show_header('Badges','badges');
                     <td colspan="5">
                         <input class="long" type="text" name="desc[<?=$ID?>]" value="<?=display_str($Description)?>" title="Description" onchange="Set_Edit(<?=$ID?>)"/>
                     </td>
-                    <td rowspan="2"> 
+                    <td rowspan="2">
                         <input type="checkbox" name="deleteids[]" value="<?=$ID?>" title="If checked this badge will be selected for delete" />
-		 
+
                     </td>
                 </tr>
                 <tr class="rowb">
                     <td >
-<?                      print_select_image($ID, $Image); ?> 
+<?php                       print_select_image($ID, $Image); ?>
                     </td>
                     <td>
                         <input class="medium" type="text" name="badge[<?=$ID?>]" value="<?=display_str($Badge)?>" onchange="Set_Edit(<?=$ID?>)" title="Set Name (Users can only have one badge from a set, rank determines which badge replaces which when awarded)"/>
@@ -220,9 +219,9 @@ show_header('Badges','badges');
                     </td>
                     <td>
                         <select name="type[<?=$ID?>]" title="Badge Type" onchange="Set_Edit(<?=$ID?>)">
-<?                          foreach ($BadgeTypes as $valtype) {   ?>
+<?php                           foreach ($BadgeTypes as $valtype) {   ?>
                                 <option value="<?=$valtype?>"<?=($valtype==$Type?' selected="selected"':'')?>><?=$valtype?>&nbsp;&nbsp;</option>
-<?                          } ?>
+<?php                           } ?>
                         </select>
                     </td>
                     <td>
@@ -232,16 +231,17 @@ show_header('Badges','badges');
                 <tr class="rowa">
                     <td colspan="10" class="noborder"></td>
                 </tr>
-<?          } // style="border-top: 1px solid;"  ?>
+<?php           }   ?>
                 <tr class="rowb">
-                    <td colspan="6" style="text-align: right;"> 
+                    <td colspan="6" style="text-align: right;">
                         <input type="submit" name="saveall" value="Save changes" title="Save changes for all badges selected for editing" />
                     </td>
-                    <td colspan="4" style="text-align: right;"> 
-                        <input type="submit" name="delselected" value="Delete selected" title="Delete selected badges." /> 
+                    <td colspan="4" style="text-align: right;">
+                        <input type="submit" name="delselected" value="Delete selected" title="Delete selected badges." />
                     </td>
                 </tr>
         </table>
     </form>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

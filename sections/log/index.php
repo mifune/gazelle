@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 if (!defined('LOG_ENTRIES_PER_PAGE')) {
@@ -13,10 +13,9 @@ if(!empty($_GET['search'])) {
 } else {
 	$Search = false;
 }
-//$Words = explode(' ', $Search);
 
 $sql = "SELECT
-	SQL_CALC_FOUND_ROWS 
+	SQL_CALC_FOUND_ROWS
 	Message,
 	Time
 	FROM log ";
@@ -26,7 +25,7 @@ if($Search) {
     foreach($Words as $Key => &$Word) {
         $Word = trim($Word);
         $slen = strlen($Word);
-        if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) { 
+        if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) {
             $word = db_string($word);
         } else {
             unset($Words[$Key]);
@@ -38,7 +37,7 @@ if($Search) {
 }
 if(!check_perms('site_view_full_log')) {
 	if($Search) {
-		$sql.=" AND "; 
+		$sql.=" AND ";
 	} else {
 		$sql.=" WHERE ";
 	}
@@ -55,34 +54,34 @@ list($Results) = $DB->next_record();
 $DB->set_query_id($Log);
 ?>
 <div class="thin">
-	<h2>Site log</h2> 
+	<h2>Site log</h2>
 		<form action="" method="get">
 			<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
 				<tr>
 					<td class="label"><strong>Search for:</strong></td>
 					<td>
-						<input type="text" name="search" size="60"<? if (!empty($_GET['search'])) { echo ' value="'.display_str($_GET['search']).'"'; } ?> />
+						<input type="text" name="search" size="60"<?php  if (!empty($_GET['search'])) { echo ' value="'.display_str($_GET['search']).'"'; } ?> />
 						&nbsp;
 						<input type="submit" value="Search log" />
 					</td>
 				</tr>
-			</table>	
-		</form> 
-		
+			</table>
+		</form>
+
 	<div class="linkbox">
-<?
+<?php
 $Pages=get_pages($Page,$Results,LOG_ENTRIES_PER_PAGE,9);
 echo $Pages;
 ?>
 	</div>
-	
+
 	<table cellpadding="6" cellspacing="1" border="0" class="border" width="100%">
 		<tr class="colhead">
 			<td style="width: 180px;"><strong>Time</strong></td>
 			<td><strong>Message</strong></td>
 		</tr>
 
-<?
+<?php
 if($DB->record_count() == 0) {
 	echo '<tr class="nobr"><td colspan="2">Nothing found!</td></tr>';
 }
@@ -126,7 +125,6 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 			case "Torrents":
 			case "torrents": // actually groups but call it torrents to not overely confuse user
                         $TorrentIDs = explode(',', $MessageParts[$i + 1]);
-				//$TorrentID = $MessageParts[$i + 1];
                         $Links='';
                         $Div='';
                         foreach($TorrentIDs as $TorrentID){
@@ -161,7 +159,7 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				$UserID = 0;
 				$User = "";
 				$URL = "";
-                
+
                 if(!$HideName || check_perms('users_view_anon_uploaders')) {
 
                     if ($MessageParts[$i + 1] == "user") {
@@ -186,7 +184,7 @@ while(list($Message, $LogTime) = $DB->next_record()) {
                         $DB->set_query_id($Log);
                         $URL = $Usernames[$User] ? '<a href="user.php?id='.$UserID.'">'.$User."</a>".($Colon?':':'') : $User;
                     }
-                
+
                 } else {
                     $URL = "User";
                     $MessageParts[$i + 1] = '';
@@ -282,10 +280,10 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 				<?=time_diff($LogTime)?>
 			</td>
 			<td>
-				<span<? if($Color) { ?> style="color: <?=$Color ?>;"<? } ?>><?=$Message?></span>
+				<span<?php  if($Color) { ?> style="color: <?=$Color ?>;"<?php  } ?>><?=$Message?></span>
 			</td>
 		</tr>
-<?
+<?php
 }
 ?>
 	</table>
@@ -293,5 +291,5 @@ while(list($Message, $LogTime) = $DB->next_record()) {
 		<?=$Pages?>
 	</div>
 </div>
-<?
-show_footer() ?>
+<?php
+show_footer();

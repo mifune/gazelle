@@ -1,8 +1,5 @@
-<?
-
-
+<?php
 $UserID = $LoggedUser['ID'];
-
 
 if(empty($_GET['action'])) { $Section = 'inbox'; }
 else {
@@ -16,72 +13,20 @@ show_header('Inbox');
 ?>
 <div class="thin">
 	<div class="linkbox">
-<?
+<?php
 
 if($Section == 'inbox') { ?>
 		<a href="inbox.php?action=sentbox">[Sentbox]</a>
-<? } elseif($Section == 'sentbox') { ?>
+<?php  } elseif($Section == 'sentbox') { ?>
 		<a href="inbox.php">[Inbox]</a>
-<? }
-
-?>
+<?php  } ?>
 		<br /><br />
-<?
+<?php
 
 $Sort = empty($_GET['sort']) || $_GET['sort'] != "unread" ? "Date DESC" : "cu.Unread = '1' DESC, DATE DESC";
- /*
-if ($Section == 'sentbox'){
-    
-    $sql = "SELECT
-          SQL_CALC_FOUND_ROWS
-          c.ID,
-          c.Subject,
-          cu2.Unread,
-          cu.Sticky,
-          cu.ForwardedTo,
-          um2.Username AS ForwardedName,
-          cu2.UserID,
-          um.Username,
-          ui.Donor,
-          ui.Warned,
-          um.Enabled,
-          cu.SentDate AS Date, 
-          um.PermissionID
-          FROM pm_conversations AS c
-          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
-          LEFT JOIN pm_conversations_users AS cu2 ON cu2.ConvID=c.ID AND cu2.UserID!='$UserID' AND cu2.ForwardedTo=0
-          LEFT JOIN users_main AS um ON um.ID=cu2.UserID
-          LEFT JOIN users_info AS ui ON ui.UserID=um.ID
-          LEFT JOIN users_main AS um2 ON um2.ID=cu.ForwardedTo";
-    
-} else {
-    
-    $sql = "SELECT
-          SQL_CALC_FOUND_ROWS
-          c.ID,
-          c.Subject,
-          cu.Unread,
-          cu.Sticky,
-          cu.ForwardedTo,
-          um2.Username AS ForwardedName,
-          pms.SenderID,
-          um.Username,
-          ui.Donor,
-          ui.Warned,
-          um.Enabled, 
-          cu.ReceivedDate AS Date, 
-          um.PermissionID
-          FROM pm_conversations AS c
-          LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
-          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID 
-          LEFT JOIN users_main AS um ON um.ID=pms.SenderID
-          LEFT JOIN users_info AS ui ON ui.UserID=um.ID
-          LEFT JOIN users_main AS um2 ON um2.ID=cu.ForwardedTo";
-
-} */
 
 if ($Section == 'sentbox'){
-    
+
     $sql = "SELECT
           SQL_CALC_FOUND_ROWS
           c.ID,
@@ -93,17 +38,16 @@ if ($Section == 'sentbox'){
           ui.Donor,
           ui.Warned,
           um.Enabled,
-          cu.SentDate AS Date, 
+          cu.SentDate AS Date,
           um.PermissionID
           FROM pm_conversations AS c
           LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
           LEFT JOIN pm_conversations_users AS cu2 ON cu2.ConvID=c.ID AND cu2.UserID!='$UserID' AND cu2.ForwardedTo=0
           LEFT JOIN users_main AS um ON um.ID=cu2.UserID
           LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
-    
+
 } else {
- 
-    
+
     $sql = "SELECT
           SQL_CALC_FOUND_ROWS
           c.ID,
@@ -114,16 +58,16 @@ if ($Section == 'sentbox'){
           um.Username,
           ui.Donor,
           ui.Warned,
-          um.Enabled, 
-          cu.ReceivedDate AS Date, 
-          um.PermissionID, 
+          um.Enabled,
+          cu.ReceivedDate AS Date,
+          um.PermissionID,
           um.GroupPermissionID
           FROM pm_conversations AS c
           LEFT JOIN pm_conversations_users AS cu ON cu.ConvID=c.ID AND cu.UserID='$UserID'
-          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID AND pms.SenderID!='$UserID' 
+          LEFT JOIN pm_messages AS pms ON pms.ConvID=c.ID AND pms.SenderID!='$UserID'
           LEFT JOIN users_main AS um ON um.ID=pms.SenderID
           LEFT JOIN users_info AS ui ON ui.UserID=um.ID";
-} 
+}
 
 if(!empty($_GET['search']) && $_GET['searchtype'] == "message") {
 	$sql .=	" JOIN pm_messages AS m ON c.ID=m.ConvID";
@@ -163,12 +107,11 @@ $Pages=get_pages($Page,$NumResults,MESSAGES_PER_PAGE,9);
 echo $Pages;
 ?>
 	</div>
-
-    <div class="head"><?= ($Section == 'sentbox') ? 'Sentbox' : 'Inbox' ?></div>
+     <div class="head"><?= ($Section == 'sentbox') ? 'Sentbox' : 'Inbox' ?></div>
 	<div class="box pad">
-<? if($DB->record_count()==0) { ?>
+<?php  if($DB->record_count()==0) { ?>
 	<h2>Your <?= ($Section == 'sentbox') ? 'sentbox' : 'inbox' ?> is currently empty</h2>
-<? } else { ?>
+<?php  } else { ?>
 		<form action="inbox.php" method="get" id="searchbox">
 			<div>
 				<input type="hidden" name="action" value="<?=$Section?>" />
@@ -176,11 +119,11 @@ echo $Pages;
 				<input type="radio" name="searchtype" value="subject" /> Subject
 				<input type="radio" name="searchtype" value="message" /> Message
 				<span style="float: right;">
-<?			if(empty($_GET['sort']) || $_GET['sort'] != "unread") { ?>
+<?php 			if(empty($_GET['sort']) || $_GET['sort'] != "unread") { ?>
 					<a href="<?=$CurURL?>sort=unread">List unread first</a>
-<?			} else { ?>
+<?php 			} else { ?>
 					<a href="<?=$CurURL?>">List latest first</a>
-<?			} ?>
+<?php 			} ?>
 				</span>
 				<br />
 				<input type="text" name="search" value="Search <?= ($Section == 'sentbox') ? 'Sentbox' : 'Inbox' ?>" style="width: 98%;"
@@ -199,7 +142,7 @@ echo $Pages;
 					<td><?=($Section == 'sentbox')? 'Receiver' : 'Sender' ?></td>
 					<td>Date</td>
 				</tr>
-<?
+<?php
 	$Row = 'a';
 	while(list($ConvID, $Subject, $Unread, $Sticky, $SenderID, $Username, $Donor, $Warned, $Enabled, $Date, $ClassID, $GroupPermID) = $DB->next_record()) {
 		if($Unread === '1') {
@@ -212,28 +155,27 @@ echo $Pages;
 				<tr class="<?=$RowClass?>">
 					<td class="center"><input type="checkbox" name="messages[]" value="<?=$ConvID?>" /></td>
 					<td>
-<?		if($Unread) { echo '<strong>'; } ?>
-<?		if($Sticky) { echo 'Sticky: '; }
+<?php 		if($Unread) { echo '<strong>'; } ?>
+<?php 		if($Sticky) { echo 'Sticky: '; }
 ?>
 						<a href="inbox.php?action=viewconv&amp;id=<?=$ConvID?>"><?=$Subject?></a>
-<?
+<?php
 		if($Unread) { echo '</strong>';} ?>
 					</td>
 					<td><?=format_username($SenderID, $Username, $Donor, $Warned, $Enabled, $ClassID, false, false, $GroupPermID)?></td>
 					<td><?=time_diff($Date)?></td>
 				</tr>
-<?	} ?>
+<?php 	} ?>
 			</table>
-<?          if ($Section == 'inbox') {  ?>
+<?php           if ($Section == 'inbox') {  ?>
 			<input type="submit" name="read" value="Mark as read" />&nbsp;
 			<input type="submit" name="unread" value="Mark as unread" />&nbsp;
-<?		} ?>
+<?php 		} ?>
 			<input type="submit" name="delete" value="Delete message(s)" />
 		</form>
-<? } ?>
+<?php  } ?>
 	</div>
 	<div class="linkbox"><?=$Pages?></div>
 </div>
-<?
+<?php
 show_footer();
-?>

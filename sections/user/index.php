@@ -1,4 +1,4 @@
-<?
+<?php
 //TODO
 /*****************************************************************
 Finish removing the take[action] pages and utilize the index correctly
@@ -39,11 +39,9 @@ switch ($_REQUEST['action']) {
 	case 'edit':
 		include('edit.php');
 		break;
-		
 	case 'takeedit':
 		include('takeedit.php');
 		break;
-
 	case 'invitetree':
 		include(SERVER_ROOT.'/sections/user/invitetree.php');
 		break;
@@ -52,7 +50,7 @@ switch ($_REQUEST['action']) {
 		break;
 	case 'takeinvite':
 		include('takeinvite.php');
-		break;		
+		break;
 	case 'deleteinvite':
 		include('deleteinvite.php');
 		break;
@@ -62,20 +60,19 @@ switch ($_REQUEST['action']) {
 	case 'connchecker':
 		include('connchecker.php');
 		break;
-
 	case 'permissions':
 		include('permissions.php');
 		break;
 	case 'similar':
 		include('similar.php');
-		break;	
+		break;
 	case 'moderate':
 		include('takemoderate.php');
-		break;	
+		break;
 	default:
         if($_REQUEST['action']=='reset_login_watch' && is_number($_POST['loginid']) ) {
             authorize();
-            if (!check_perms('admin_login_watch')) error(403); 
+            if (!check_perms('admin_login_watch')) error(403);
             $DB->query("DELETE FROM login_attempts WHERE ID='$_POST[loginid]'");
         }
 		if (isset($_REQUEST['id'])) {
@@ -84,4 +81,3 @@ switch ($_REQUEST['action']) {
 			header('Location: index.php');
 		}
 }
-?>

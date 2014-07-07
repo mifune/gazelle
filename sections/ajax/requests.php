@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 include(SERVER_ROOT.'/sections/requests/functions.php');
 
@@ -8,15 +7,15 @@ $Queries = array();
 $OrderWays = array('votes', 'bounty', 'created', 'lastvote', 'filled');
 list($Page,$Limit) = page_limit(REQUESTS_PER_PAGE);
 $Submitted = !empty($_GET['submit']);
-					
-//Paranoia					
+
+//Paranoia
 $UserInfo = user_info((int)$_GET['userid']);
 $Perms = get_permissions($UserInfo['PermissionID']);
 $UserClass = $Perms['Class'];
 
 $BookmarkView = false;
 
-if(empty($_GET['type'])) { 
+if(empty($_GET['type'])) {
 	$Title = 'Requests';
 	if(!check_perms('site_see_old_requests') || empty($_GET['showall'])) {
 		$SS->set_filter('visible', array(1));
@@ -204,11 +203,11 @@ if(!empty($SphinxResults['notfound'])) {
 			unset($SphinxResults['matches'][$ID]);
 		}
 	}
-	
+
 	// Merge SQL results with memcached results
 	foreach($SQLResults['matches'] as $ID => $SQLResult) {
 		$SphinxResults['matches'][$ID] = $SQLResult;
-		
+
 		//$Requests['matches'][$ID] = array_merge($Requests['matches'][$ID], $SQLResult);
 		//We ksort because depending on the filter modes, we're given our data in an unpredictable order
 		//ksort($Requests['matches'][$ID]);
@@ -233,22 +232,22 @@ if ($NumResults == 0) {
 	$JsonResults = array();
 	$TimeCompare = 1267643718; // Requests v2 was implemented 2010-03-03 20:15:18
 	foreach ($Requests as $RequestID => $Request) {
-				
-		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description, 
+
+		list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description,
                      $FillerID, $FillerName, $TorrentID, $TimeFilled) = $Request;
-			
+
 		$RequestVotes = get_votes_array($RequestID);
-		
+
 		$VoteCount = count($RequestVotes['Voters']);
-		
+
 		if($CategoryID == 0) {
 			$CategoryName = "Unknown";
 		} else {
 			$CategoryName = $NewCategories[$CategoryID]['name'];
 		}
-		
+
 		$Tags = $Request['Tags'];
-		
+
 		$JsonResults[] = array(
 			'requestId' => (int) $RequestID,
 			'requestorId' => (int) $RequestorID,
@@ -282,4 +281,3 @@ if ($NumResults == 0) {
 			)
 		);
 }
-?>

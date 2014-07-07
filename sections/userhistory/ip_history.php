@@ -1,4 +1,4 @@
-<?
+<?php
 /************************************************************************
 ||------------|| User IP history page ||---------------------------||
 
@@ -18,7 +18,7 @@ if (!is_number($UserID)) { error(404); }
 $DB->query("SELECT um.Username, p.Level AS Class FROM users_main AS um LEFT JOIN permissions AS p ON p.ID=um.PermissionID WHERE um.ID = ".$UserID);
 list($Username, $Class) = $DB->next_record();
 
-if(!check_perms('users_view_ips', $Class)) { 
+if(!check_perms('users_view_ips', $Class)) {
 	error(403);
 }
 
@@ -32,7 +32,7 @@ function ShowIPs(rowname) {
 }
 </script>
 <div class="thin">
-<?
+<?php
 list($Page,$Limit) = page_limit(IPS_PER_PAGE);
 
 if ($UsersOnly == 1) {
@@ -57,8 +57,8 @@ if ($UsersOnly == 1) {
 		ORDER BY h1.StartTime DESC LIMIT $Limit");
 } else {
 	$RS = $DB->query("SELECT SQL_CALC_FOUND_ROWS
-		h1.IP, 
-		h1.StartTime, 
+		h1.IP,
+		h1.StartTime,
 		h1.EndTime,
 		GROUP_CONCAT(h2.UserID SEPARATOR '|'),
 		GROUP_CONCAT(h2.StartTime SEPARATOR '|'),
@@ -91,7 +91,7 @@ $Pages=get_pages($Page,$NumResults,IPS_PER_PAGE,9);
 			<td style="width:20%">Ended</td>
 			<td>Elapsed</td>
 		</tr>
-<?
+<?php
 $Results = $DB->to_array();
 foreach($Results as $Index => $Result) {
 	list($IP, $StartTime, $EndTime, $UserIDs, $UserStartTimes, $UserEndTimes, $Usernames, $UsersEnabled, $UsersDonor, $UsersWarned) = $Result;
@@ -110,18 +110,18 @@ foreach($Results as $Index => $Result) {
 	}
 ?>
 		<tr class="rowa">
-			<td> 
-                <? $cc = geoip($IP);  echo display_ip($IP, $cc);
-                if (check_perms('admin_manage_ipbans')) echo ' [<a href="tools.php?action=ip_ban&userid='.$UserID.'&uip='.display_str($IP).'" title="Ban this users IP ('.display_str($IP).')">IP Ban</a>]'; 
+			<td>
+                <?php  $cc = geoip($IP);  echo display_ip($IP, $cc);
+                if (check_perms('admin_manage_ipbans')) echo ' [<a href="tools.php?action=ip_ban&userid='.$UserID.'&uip='.display_str($IP).'" title="Ban this users IP ('.display_str($IP).')">IP Ban</a>]';
                 echo '<br />'.get_host($IP)?><br />
-			<?=($HasDupe ? 
-			'<a id="toggle'.$Index.'" href="#" onclick="ShowIPs('.$Index.'); return false;">show/hide dupes ('.count($UserIDs).')</a>' 
+			<?=($HasDupe ?
+			'<a id="toggle'.$Index.'" href="#" onclick="ShowIPs('.$Index.'); return false;">show/hide dupes ('.count($UserIDs).')</a>'
 			: '(0)')?></td>
 			<td><?=time_diff($StartTime)?></td>
 			<td><?=time_diff($EndTime)?></td>
 			<td><?=time_diff(strtotime($StartTime), strtotime($EndTime)); ?></td>
 		</tr>
-<?
+<?php
 	if($HasDupe){
 		$HideMe = (count($UserIDs) > 10);
 		foreach ($UserIDs as $Key => $Val) {
@@ -133,12 +133,11 @@ foreach($Results as $Index => $Result) {
 			<td><?=time_diff($UserEndTimes[$Key])?></td>
 			<td><?=time_diff(strtotime($UserStartTimes[$Key]), strtotime($UserEndTimes[$Key])); ?></td>
 		</tr>
-<?
-			
+<?php
 		}
 	}
 ?>
-<?
+<?php
 }
 ?>
 	</table>
@@ -147,6 +146,5 @@ foreach($Results as $Index => $Result) {
 	</div>
 </div>
 
-<?
+<?php
 show_footer();
-?>

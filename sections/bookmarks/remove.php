@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 if (!can_bookmark($_GET['type'])) { error(404); }
@@ -20,4 +20,3 @@ if ($Type == 'torrent') {
 	$Bookmarkers = $DB->collect('UserID');
 	$SS->UpdateAttributes('requests requests_delta', array('bookmarker'), array($_GET['id'] => array($Bookmarkers)), true);
 }
-?>

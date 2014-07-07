@@ -1,4 +1,4 @@
-<?
+<?php
 show_header('Manage Permissions');
 ?>
 <script type="text/javascript" language="javascript">
@@ -17,15 +17,14 @@ function confirmDelete(id) {
 		[<a href="tools.php?action=permissions&amp;id=new&amp;isclass=1">Create a new User Class<!--permission set--></a>]
 		[<a href="tools.php">Back to Tools</a>]
 	</div>
-<?
-//$DB->query("SELECT p.ID,p.Name,p.Level,COUNT(u.ID) FROM permissions AS p LEFT JOIN users_main AS u ON u.PermissionID=p.ID GROUP BY p.ID ORDER BY p.Level ASC");
+<?php
 $DB->query("SELECT p.ID,p.Name,p.Level,p.DisplayStaff,p.MaxSigLength,p.MaxAvatarWidth,
-                   p.MaxAvatarHeight, p.Color, COUNT(u.ID) 
-                   FROM permissions AS p LEFT JOIN users_main AS u ON u.PermissionID=p.ID 
+                   p.MaxAvatarHeight, p.Color, COUNT(u.ID)
+                   FROM permissions AS p LEFT JOIN users_main AS u ON u.PermissionID=p.ID
                    WHERE p.IsUserClass='1'
-                   GROUP BY p.ID 
+                   GROUP BY p.ID
                    ORDER BY p.IsUserClass DESC, p.Level ASC");
-if($DB->record_count()) { 
+if($DB->record_count()) {
 ?>
 	<table>
 		<tr class="colhead">
@@ -38,8 +37,8 @@ if($DB->record_count()) {
 			<td width="10%" class="center">User Count</td>
 			<td width="18%" class="center">Actions</td>
 		</tr>
-<?	while(list($ID,$Name,$Level,$DisplayStaff,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight,$Color,$UserCount)=$DB->next_record()) { 
-             
+<?php 	while(list($ID,$Name,$Level,$DisplayStaff,$MaxSigLength,$MaxAvatarWidth,$MaxAvatarHeight,$Color,$UserCount)=$DB->next_record()) {
+
 ?>
 		<tr>
 			<td class="center"><span style="font-weight:bold;color: #<?=display_str($Color)?>"><?=display_str($Name); ?></span></td>
@@ -51,27 +50,26 @@ if($DB->record_count()) {
 			<td class="center"><?=number_format($UserCount); ?></td>
 			<td class="center">[<a href="tools.php?action=permissions&amp;id=<?=$ID ?>">Edit</a> | <a href="#" onclick="return confirmDelete(<?=$ID?>)">Remove</a>]</td>
 		</tr>
-<?	} ?>
-	</table> 
-<? } else { ?>
+<?php 	} ?>
+	</table>
+<?php  } else { ?>
 	<h3 align="center">There are no permission classes.</h3>
-<? } ?>
-      
+<?php  } ?>
+
       <br/>
       <h2>Group Permissions</h2>
 	<div class="linkbox">
 		[<a href="tools.php?action=permissions&amp;id=new&amp;isclass=0">Create a new Group Permissions</a>]
 		[<a href="tools.php">Back to Tools</a>]
 	</div>
-      
-<?
-//$DB->query("SELECT p.ID,p.Name,p.Level,COUNT(u.ID) FROM permissions AS p LEFT JOIN users_main AS u ON u.PermissionID=p.ID GROUP BY p.ID ORDER BY p.Level ASC");
-$DB->query("SELECT p.ID,p.Name,p.IsUserClass,p.Color, COUNT(u.ID) 
-                   FROM permissions AS p LEFT JOIN users_main AS u ON u.GroupPermissionID=p.ID 
+
+<?php
+$DB->query("SELECT p.ID,p.Name,p.IsUserClass,p.Color, COUNT(u.ID)
+                   FROM permissions AS p LEFT JOIN users_main AS u ON u.GroupPermissionID=p.ID
                    WHERE p.IsUserClass='0'
-                   GROUP BY p.ID 
+                   GROUP BY p.ID
                    ORDER BY p.IsUserClass DESC, p.Level ASC");
-if($DB->record_count()) { 
+if($DB->record_count()) {
 ?>
 	<table style="width:50%;margin:0px auto;">
 		<tr class="colhead">
@@ -80,21 +78,18 @@ if($DB->record_count()) {
 			<td width="8%" class="center">Color</td>
 			<td width="20%" class="center">Actions</td>
 		</tr>
-<?	while(list($ID,$Name,$IsUserClass,$Color,$UserCount)=$DB->next_record()) { 
-             
-?>
+<?php 	while(list($ID,$Name,$IsUserClass,$Color,$UserCount)=$DB->next_record()) {  ?>
 		<tr>
 			<td><?=display_str($Name); ?></td>
 			<td><?=number_format($UserCount); ?></td>
 			<td class="center"><span style="font-weight:bold;display:block;width:100%;height:100%;color:white;background-color: #<?=display_str($Color)?>">#<?=$Color?></span></td>
 			<td class="center">[<a href="tools.php?action=permissions&amp;id=<?=$ID ?>">Edit</a> | <a href="#" onclick="return confirmDelete(<?=$ID?>)">Remove</a>]</td>
 		</tr>
-<?	} ?>
-	</table> 
-<? } else { ?>
+<?php 	} ?>
+	</table>
+<?php  } else { ?>
 	<h3 align="center">There are no group permissions.</h3>
-<? } ?>
+<?php  } ?>
 </div>
-<?
+<?php
 show_footer();
-?>

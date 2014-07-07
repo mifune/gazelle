@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_torrents_notify')) { error(403); }
 
 include(SERVER_ROOT . '/sections/bookmarks/functions.php');
@@ -35,7 +35,7 @@ $Results = $DB->query("SELECT SQL_CALC_FOUND_ROWS
 		unf.Label
 		FROM users_notify_torrents AS unt
 		JOIN torrents AS t ON t.ID=unt.TorrentID
-		JOIN torrents_group AS g ON g.ID = t.GroupID 
+		JOIN torrents_group AS g ON g.ID = t.GroupID
 		LEFT JOIN users_notify_filters AS unf ON unf.ID=unt.FilterID
 		LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
 		WHERE unt.UserID='$LoggedUser[ID]'
@@ -52,26 +52,23 @@ show_header('My notifications','notifications');
 $DB->set_query_id($Results);
 
 $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
-
-
-
 ?>
 <div class="thin">
     <h2>Notifications</h2>
-    <div  class="linkbox"> 
+    <div  class="linkbox">
             [<a href="user.php?action=notify" title="Add or edit notification filters">Add/Edit my notification filters</a>]
     </div>
     <div class="linkbox">
           <?=$Pages?>
     </div>
     <div class="head">Latest notifications <a href="torrents.php?action=notify_clear&amp;auth=<?=$LoggedUser['AuthKey']?>">(clear all)</a> <a href="javascript:SuperGroupClear()">(clear all selected)</a> </div>
-<? 
+<?php
     $NumNotices = $DB->record_count();
     if($NumNotices==0) { ?>
-    <div class="box pad center"> 
+    <div class="box pad center">
            <strong>   No new notifications!  </strong>
     </div>
-<? } else { 
+<?php  } else {
 	$FilterGroups = array();
 	while($Result = $DB->next_record()) {
 		if(!$Result['FilterID']) {
@@ -85,10 +82,10 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
 	}
 	unset($Result);
 ?>
-    <div class="box pad center"> 
+    <div class="box pad center">
            <strong> <?=$NumNotices?> notifications in <?=count($FilterGroups)?> filters </strong>
     </div>
-<?
+<?php
 	foreach($FilterGroups as $ID => $FilterResults) {
 ?>
     <br/>
@@ -108,31 +105,28 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
                 <td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/seeders.png" alt="Seeders" title="Seeders" /></td>
                 <td class="sign"><img src="static/styles/<?=$LoggedUser['StyleName']?>/images/leechers.png" alt="Leechers" title="Leechers" /></td>
           </tr>
-<?
+<?php
 		unset($FilterResults['FilterLabel']);
 		foreach($FilterResults as $Result) {
 			list($TorrentID, $GroupID, $GroupName, $GroupCategoryID, $TorrentTags, $Size, $FileCount,
-				$Snatched, $Seeders, 
+				$Snatched, $Seeders,
 				$Leechers, $NotificationTime, $FreeTorrent, $DoubleSeed, $LogInDB, $UnRead, $FilterLabel, $FilterLabel) = $Result;
-			
+
             $Review = get_last_review($GroupID);
-        
+
             $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>'; // &amp;torrentid='.$TorrentID.'
-				
+
 			$TagLinks=array();
 			if($TorrentTags!='') {
 				$TorrentTags=explode(' ',$TorrentTags);
-				//$MainTag = $TorrentTags[0];
 				foreach ($TorrentTags as $TagKey => $TagName) {
 					$TagName = str_replace('_','.',$TagName);
 					$TagLinks[]='<a href="torrents.php?taglist='.$TagName.'">'.$TagName.'</a>';
 				}
 				$TagLinks = implode(', ', $TagLinks);
 				$TorrentTags='<br /><div class="tags">'.$TagLinks.'</div>';
-			//} else {
-				//$MainTag = $NewCategories[$GroupCategoryID-1]['name'];
 			}
-            
+
             $Icons = torrent_icons(array('FreeTorrent'=>$FreeTorrent,'double_seed'=>$DoubleSeed), $TorrentID, $Review, $Bookmarks);
 
             $IsMarkedForDeletion = $Review['Status'] == 'Warned' || $Review['Status'] == 'Pending';
@@ -144,14 +138,14 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
                 <td class="center cats_cols">
                 <div title="<?=$NewCategories[$GroupCategoryID]['tag']?>"><img src="<?='static/common/caticons/'.$NewCategories[$GroupCategoryID]['image']?>" /></div>
                 </td>
-                <td> 
-                    <?=$Icons?> 
+                <td>
+                    <?=$Icons?>
                     <?=$DisplayName?>
-                    <? if($UnRead) { echo '<strong>New!</strong>'; } ?>
-                      
-                <? if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
+                    <?php  if($UnRead) { echo '<strong>New!</strong>'; } ?>
+
+                <?php  if ($LoggedUser['HideTagsInLists'] !== 1) { ?>
                       <?=$TorrentTags?>
-                <? } ?>
+                <?php  } ?>
                 </td>
                 <td class="center"><?=number_format($FileCount)?></td>
                 <td class="nobr"><?=time_diff($NotificationTime, 1)?></td>
@@ -160,12 +154,12 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
                 <td<?=($Seeders==0)?' class="r00"':''?>><?=number_format($Seeders)?></td>
                 <td><?=number_format($Leechers)?></td>
           </tr>
-<?
+<?php
 		}
 ?>
     </form>
     </table>
-<?
+<?php
 	}
 }
 
@@ -175,6 +169,5 @@ $Pages=get_pages($Page,$TorrentCount,NOTIFICATIONS_PER_PAGE,9);
     </div>
 </div>
 
-<?
+<?php
 show_footer();
-?>

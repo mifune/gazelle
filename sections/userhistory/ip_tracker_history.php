@@ -1,4 +1,4 @@
-<?
+<?php
 /************************************************************************
 ||------------|| User IP history page ||---------------------------||
 
@@ -20,7 +20,7 @@ if (!is_number($UserID)) { error(404); }
 $DB->query("SELECT um.Username, p.Level AS Class FROM users_main AS um LEFT JOIN permissions AS p ON p.ID=um.PermissionID WHERE um.ID = ".$UserID);
 list($Username, $Class) = $DB->next_record();
 
-if(!check_perms('users_view_ips', $Class)) { 
+if(!check_perms('users_view_ips', $Class)) {
 	error(403);
 }
 
@@ -34,7 +34,7 @@ function ShowIPs(rowname) {
 }
 </script>
 <div class="thin">
-<?
+<?php
 list($Page,$Limit) = page_limit(IPS_PER_PAGE);
 
 $TrackerIps = $DB->query("SELECT IP, fid, tstamp FROM xbt_snatched WHERE uid = ".$UserID." AND IP != '' ORDER BY tstamp DESC LIMIT $Limit");
@@ -54,7 +54,7 @@ $Pages=get_pages($Page,$NumResults,IPS_PER_PAGE,9);
 			<td>Torrent</td>
 			<td>Time</td>
 		</tr>
-<?
+<?php
 $Results = $DB->to_array();
 foreach($Results as $Index => $Result) {
 	list($IP, $TorrentID, $Time) = $Result;
@@ -63,12 +63,12 @@ foreach($Results as $Index => $Result) {
 	<tr class="rowa">
 		<td>
                 <?=display_ip($IP, geoip($IP))?><br />
-				<?=get_host($IP)?> 
+				<?=get_host($IP)?>
         </td>
 		<td><a href="torrents.php?torrentid=<?=$TorrentID?>"><?=$TorrentID?></a></td>
 		<td><?=date("Y-m-d g:i:s", $Time)?></td>
 	</tr>
-<?
+<?php
 }
 ?>
 </table>
@@ -77,6 +77,5 @@ foreach($Results as $Index => $Result) {
 </div>
 </div>
 
-<?
+<?php
 show_footer();
-?>

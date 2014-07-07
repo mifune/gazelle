@@ -1,4 +1,4 @@
-<?
+<?php
 if (isset($LoggedUser['ID'])) {
 	if (!isset($_REQUEST['action'])) {
 		include('private.php');
@@ -14,4 +14,3 @@ if (isset($LoggedUser['ID'])) {
 } else {
 	include('public.php');
 }
-?>

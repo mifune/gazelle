@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_torrents_notify')){ error(403); }
 authorize();
 
@@ -55,7 +55,7 @@ if($_POST['id'] && is_number($_POST['id'])){
 		Categories='$CategoryList'
 		WHERE ID='".db_string($_POST['id'])."' AND UserID='$LoggedUser[ID]'");
 } else {
-	$DB->query("INSERT INTO users_notify_filters 
+	$DB->query("INSERT INTO users_notify_filters
 		(UserID, Label, Tags, NotTags, Categories)
 		VALUES
 		('$LoggedUser[ID]','".db_string($_POST['label'])."', '$TagList', '$NotTagList', '$CategoryList')");
@@ -64,4 +64,3 @@ if($_POST['id'] && is_number($_POST['id'])){
 $Cache->delete_value('notify_filters_'.$LoggedUser['ID']);
 
 header('Location: user.php?action=notify');
-?>

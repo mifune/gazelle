@@ -1,13 +1,9 @@
-<?
+<?php
 if (!check_perms('site_manage_tags')) {
     error(403);
 }
 
-   
-//$UseMultiInterface= isset($_REQUEST['multi']);
-
 $UseMultiInterface= true;
-
 
 show_header('Official Tags Manager','tagmanager');
 ?>
@@ -17,7 +13,7 @@ show_header('Official Tags Manager','tagmanager');
 		<a style="font-weight: bold" href="tools.php?action=official_tags">[Tags Manager]</a>
 		<a href="tools.php?action=official_synonyms">[Synonyms Manager]</a>
 	</div>
-<?
+<?php
     if (isset($_GET['rst']) && is_number($_GET['rst'])) {
         $Result = (int) $_GET['rst'];
         $ResultMessage = display_str($_GET['msg']);
@@ -27,7 +23,7 @@ show_header('Official Tags Manager','tagmanager');
         if ($ResultMessage) {
 ?>
             <div class="messagebar<?= $AlertClass ?>"><?= $ResultMessage ?></div>
-<?
+<?php
         }
     }
 ?>
@@ -52,7 +48,7 @@ show_header('Official Tags Manager','tagmanager');
                         <td style="font-weight: bold">Tag</td>
                         <td style="font-weight: bold">Uses</td>
                     </tr>
-                    <?
+                    <?php
                     $i = 0;
                     $DB->query("SELECT ID, Name, Uses FROM tags WHERE TagType='genre' ORDER BY Name ASC");
                     $TagCount = $DB->record_count();
@@ -68,24 +64,24 @@ show_header('Official Tags Manager','tagmanager');
                             <td><?= $TagUses1 ?></td>
                             <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                             <td>
-    <? if ($TagID2) { ?>
+    <?php  if ($TagID2) { ?>
                                     <input type="checkbox" name="oldtags[]" value="<?= $TagID2 ?>" />
-                                <? } ?>
+                                <?php  } ?>
                             </td>
                             <td><a href="torrents.php?taglist=<?= $TagName2 ?>" ><?= $TagName2 ?></a></td>
                             <td><?= $TagUses2 ?></td>
                             <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                             <td>
-    <? if ($TagID3) { ?>
+    <?php  if ($TagID3) { ?>
                                     <input type="checkbox" name="oldtags[]" value="<?= $TagID3 ?>" />
-                        <? } ?>
+                        <?php  } ?>
                             </td>
                             <td><a href="torrents.php?taglist=<?= $TagName3 ?>" ><?= $TagName3 ?></a></td>
                             <td><?= $TagUses3 ?></td>
                         </tr>
-    <?
+    <?php
 }
-?>		
+?>
                     <tr class="<?= (($i % 2) ? 'rowa' : 'rowb') ?>">
                         <td colspan="11"><label for="newtag">New official tag: </label><input type="text" name="newtag" /></td>
                     </tr>
@@ -97,8 +93,8 @@ show_header('Official Tags Manager','tagmanager');
             </form>
         </div>
     </div>
-      
-<? if (check_perms('site_convert_tags')) { ?>
+
+<?php  if (check_perms('site_convert_tags')) { ?>
     <br/>
     <h2>Tags Admin</h2>
 
@@ -110,38 +106,28 @@ show_header('Official Tags Manager','tagmanager');
                 <div class="pad" style="text-align:left">
                     <h3>Permanently Remove Tag</h3>
                     This section allows you to remove a tag completely from the database. <br/>
-                    <strong class="important_text">Note: Use With Caution!</strong> This should only be used to remove things like banned tags, 
-                    <span style="text-decoration: underline">it irreversibly removes the tag and all instances of it in all torrents.</span> 
+                    <strong class="important_text">Note: Use With Caution!</strong> This should only be used to remove things like banned tags,
+                    <span style="text-decoration: underline">it irreversibly removes the tag and all instances of it in all torrents.</span>
                 </div>
-            
-                    <select id="permdeletetagid" name="permdeletetagid" 
-                            onclick="Get_Taglist_All('permdeletetagid', 'all')" >
+
+                    <select id="permdeletetagid" name="permdeletetagid" onclick="Get_Taglist_All('permdeletetagid', 'all')" >
                         <option value="0" selected="selected">click to load ALL tags (might take a while)&nbsp;</option>
-                         
                     </select>
                     <input type="submit" name="deletetagperm" value="Permanently remove tag " title="permanently remove tag" />&nbsp;&nbsp;
             </div>
         </div>
-            
-            
         <div class="tagtable">
-        
             <div class="box pad center shadow">
                 <div class="pad" style="text-align:left">
                     <h3>Recount tag uses</h3>
                     This should never be needed once we go live!<br/>
                     <strong>Note: </strong>  You cannot do any direct harm with this but it may take a while to complete...
                 </div>
-             
                 <input type="submit" name="recountall" value="Recount all tags " title="recounts the uses for every tag in the database" />&nbsp;&nbsp;
             </div>
         </div>
-        
-    </form> 
-<? } ?>
+    </form>
+<?php  } ?>
 </div>
-<?
+<?php
 show_footer();
-?>
-
-

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('admin_data_viewer')) { error(403); }
 show_header('Data Viewer');
 
@@ -24,7 +24,7 @@ if (isset($_REQUEST['query']) && array_key_exists($_REQUEST['query'], $data_view
 			<td>
 				<select name="query">
 					<option value=""></option>
-<?
+<?php
 	foreach ($data_viewer_queries as $query_name => $query_data) {
 		$title = $query_data['title'];
 		$selected = ($query_name == $selected_query) ? ' selected="selected"' : '';
@@ -40,10 +40,8 @@ if (isset($_REQUEST['query']) && array_key_exists($_REQUEST['query'], $data_view
 	</tr>
 </tr>
 </table>
-<?
-?>
-	
-<?
+
+<?php
 define('ROWS_PER_PAGE', 100);
 list($Page,$Limit) = page_limit(ROWS_PER_PAGE);
 
@@ -61,15 +59,15 @@ $DB->set_query_id($RS);
 ?>
 <br />
 <div class="head">Query description</div>
-<div class="box pad">	
-<? echo $data_viewer_queries[$selected_query]['description'] ?>
+<div class="box pad">
+<?php  echo $data_viewer_queries[$selected_query]['description'] ?>
 </div>
 
-<?
+<?php
 if($DB->record_count()) {
 ?>
 	<div class="linkbox">
-<?
+<?php
 	$Pages=get_pages($Page, $Results, ROWS_PER_PAGE, 11, "&amp;action=data_viewer&amp;query={$selected_query}") ;
 	echo $Pages;
 	$rowidx = 0;
@@ -83,36 +81,35 @@ if($DB->record_count()) {
 			<td colspan="100">Results</td>
 		</tr>
 		<tr class="colhead">
-<?
+<?php
 		foreach (array_keys($row) as $key) {
 			echo "<td>" . str_replace('_', ' ', $key) . "</td>\n";
 		}
 ?>
 		</tr>
-<?
+<?php
 		}
 ?>
 		<tr class="row<?=$rowstyle?>">
-<?
+<?php
 		foreach (array_values($row) as $value) {
 			echo "<td>{$value}</td>";
 		}
 ?>
 		</tr>
-<?	
+<?php
 		$rowidx++;
 	}
 ?>
 	</table>
 	<div class="linkbox">
-<? echo $Pages; ?>
+<?php  echo $Pages; ?>
 	</div>
-<? } else { ?>
+<?php  } else { ?>
 	<h2 align="center">No results.</h2>
-<? }
+<?php  }
 }
 ?>
 </div>
-<?
+<?php
 show_footer();
-?>

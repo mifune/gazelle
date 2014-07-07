@@ -1,25 +1,21 @@
- <?
+<?php
 /************************************************************************
 //------------// Main friends page //----------------------------------//
-This page lists a user's friends. 
+This page lists a user's friends.
 
-There's no real point in caching this page. I doubt users load it that 
+There's no real point in caching this page. I doubt users load it that
 much.
 ************************************************************************/
 
-// Number of users per page 
+// Number of users per page
 define('FRIENDS_PER_PAGE', '20');
 
-
-
 show_header("User Groups",'jquery');
- 
-
 
 list($Page,$Limit) = page_limit(FRIENDS_PER_PAGE);
 
 // Main query
-$DB->query("SELECT 
+$DB->query("SELECT
 	g.ID,
 	g.Name,
 	g.Comment,
@@ -28,9 +24,6 @@ $DB->query("SELECT
 	FROM groups AS g
 	LEFT JOIN users_groups AS u ON u.GroupID=g.ID
 	GROUP BY g.ID");
-
-//$Groups = $DB->to_array(false, MYSQLI_BOTH);
-
 
 // Start printing stuff
 ?>
@@ -41,7 +34,7 @@ $DB->query("SELECT
         <p>Usergroups are a way to keep track of a group of users. They can only be seen by staff and are not visible to any users.</p>
         <p>You can use them to carry out group actions like mass PM / promotions / awards etc.</p>
     </div>
-	  
+
     <table>
         <tr class="colhead">
             <td colspan="3">Add group</td>
@@ -49,7 +42,7 @@ $DB->query("SELECT
         <tr >
                 <td width="90%" class="colhead">Name</td>
                 <td width="120px" class="colhead"></td>
-        </tr> 
+        </tr>
         <tr class="rowa">
             <form action="groups.php" method="post">
                 <input type="hidden" name="applyto" value="group" />
@@ -70,17 +63,15 @@ $DB->query("SELECT
                 <td width="90%" colspan="2">Group</td>
                 <td width="120px"></td>
         </tr>
-<? 
+<?php
 if ($DB->record_count()==0){
 ?>
         <tr>
             <td colspan="3">No groups</td>
         </tr>
-<?
+<?php
 } else {
-    
-//$Row = 'b';//
-    while(list($ID, $Name, $Comment, $Log, $Count) = $DB->next_record()){  
+    while(list($ID, $Name, $Comment, $Log, $Count) = $DB->next_record()){
         $Row = ($Row === 'a' ? 'b' : 'a');
 ?>
         <tr class="row<?=$Row?>">
@@ -91,7 +82,7 @@ if ($DB->record_count()==0){
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
                 <td class="center" width="70%">
                     <h3><a href="groups.php?groupid=<?=$ID?>"><?=display_str($Name)?></a></h3>
-                </td> 
+                </td>
                 <td width="20%">
                     <?=$Count?> members
                 </td>
@@ -100,11 +91,10 @@ if ($DB->record_count()==0){
                 </td>
             </form>
         </tr>
-<?  }
+<?php   }
 }      ?>
     </table>
- 
-    
+
 <script type="text/javascript">
         function Toggle_All(open){
             if (open) {
@@ -112,15 +102,12 @@ if ($DB->record_count()==0){
                 jQuery('.togglelink').html('(Hide)');
             } else {
                 $('.friendinfo').hide();
-                jQuery('.togglelink').html('(View)'); 
+                jQuery('.togglelink').html('(View)');
             }
             return false;
         }
 </script>
-<?
-  // end else has results
-?>
+
 </div>
-<?
+<?php
 show_footer();
-?>

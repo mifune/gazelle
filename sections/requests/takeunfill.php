@@ -1,4 +1,4 @@
-<?
+<?php
 //******************************************************************************//
 //--------------- Take unfill request ------------------------------------------//
 
@@ -10,13 +10,13 @@ if(!is_number($RequestID)){
 }
 
 $DB->query("SELECT
-		r.UserID, 
-		r.FillerID, 
+		r.UserID,
+		r.FillerID,
 		r.Title,
 		u.Uploaded,
 		r.TorrentID,
 		r.GroupID
-	FROM requests AS r 
+	FROM requests AS r
 		LEFT JOIN users_main AS u ON u.ID=FillerID
 	WHERE r.ID= ".$RequestID);
 list($UserID, $FillerID, $Title, $Uploaded, $TorrentID, $GroupID) = $DB->next_record();
@@ -41,11 +41,11 @@ if ($RequestVotes['TotalBounty'] > $Uploaded) {
 	// If we can't take it all out of upload, zero that out and add whatever is left as download.
 	$DB->query("UPDATE users_main SET Uploaded = 0 WHERE ID = ".$FillerID);
 	$DB->query("UPDATE users_main SET Downloaded = Downloaded + ".($RequestVotes['TotalBounty']-$Uploaded)." WHERE ID = ".$FillerID);
-    
+
     write_user_log($FillerID, "Removed -". get_size($Uploaded). " from Download AND added +". get_size(($RequestVotes['TotalBounty']-$Uploaded)). " to Upload because [url=/requests.php?action=view&id={$RequestID}]Request $RequestID ({$Title})[/url] was unfilled.");
 } else {
 	$DB->query("UPDATE users_main SET Uploaded = Uploaded - ".$RequestVotes['TotalBounty']." WHERE ID = ".$FillerID);
-    
+
     write_user_log($FillerID, "Removed -". get_size($RequestVotes['TotalBounty']). " because [url=/requests.php?action=view&id={$RequestID}]Request $RequestID ({$Title})[/url] was unfilled.");
 }
 
@@ -68,4 +68,3 @@ if ($GroupID) {
 update_sphinx_requests($RequestID);
 
 header('Location: requests.php?action=view&id='.$RequestID);
-?>

@@ -1,5 +1,4 @@
-<?
-
+<?php
 enforce_login();
 
 if (!isset($_REQUEST['action'])) $_REQUEST['action'] = '';
@@ -17,12 +16,12 @@ switch ($_REQUEST['action']) {
     case 'takenewpost': // == start a staff conversation
         authorize();
         if (!$IsStaff) error(403);
-        
+
         if (empty($_POST['toid']) || !is_number($_POST['toid'])) {
             $DB->query("SELECT ID FROM users_main WHERE Username='".db_string($_POST['user'])."'");
             list($ToID) = $DB->next_record();
         } else $ToID = $_POST['toid'];
-        
+
         if (empty($ToID) || !is_number($ToID)) error(0);
 
         if (empty($_POST['message']) || $_POST['message'] == '') error("No message!");
@@ -36,7 +35,7 @@ switch ($_REQUEST['action']) {
         $Message = db_string($_POST['message']);
         $Subject = db_string($_POST['subject']);
 
-        $DB->query("INSERT INTO staff_pm_conversations 
+        $DB->query("INSERT INTO staff_pm_conversations
                      (Subject, Status, Level, UserID, Date, Unread)
                 VALUES ('$Subject', 'Open', '0', '$ToID', '" . sqltime() . "', true)");
         // New message
@@ -94,7 +93,7 @@ switch ($_REQUEST['action']) {
     case 'user_inbox': // so staff can access the user interface too
         require('user_inbox.php');
         break;
-    case 'staff_inbox': //  
+    case 'staff_inbox': //
     default:
         if ($IsStaff || $IsFLS) {
             require('staff_inbox.php');
@@ -103,4 +102,3 @@ switch ($_REQUEST['action']) {
         }
         break;
 }
-?>

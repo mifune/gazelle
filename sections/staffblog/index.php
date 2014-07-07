@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 if(!check_perms('users_mod')) {
@@ -40,7 +40,7 @@ if(check_perms('admin_manage_blog')) {
 				}
 				header('Location: staffblog.php');
 				break;
-		
+
 			case 'takenewblog':
 				authorize();
 				if (empty($_POST['title'])) {
@@ -48,22 +48,22 @@ if(check_perms('admin_manage_blog')) {
 				}
 				$Title = db_string($_POST['title']);
 				$Body = db_string($_POST['body']);
-				
+
 				$DB->query("INSERT INTO staff_blog (UserID, Title, Body, Time) VALUES ('$LoggedUser[ID]', '".db_string($_POST['title'])."', '".db_string($_POST['body'])."', '".sqltime()."')");
 				$Cache->delete_value('staff_blog');
-				
+
 				send_irc("PRIVMSG ".ADMIN_CHAN." :!blog " . $_POST['title']);
-		
+
 				header('Location: staffblog.php');
 				break;
 		}
 	}
-		
+
 	?>
 		<div class="thin">
                 <div id="quickreplypreview">
                     <div id="contentpreview" style="text-align:left;"></div>
-                </div>  
+                </div>
             </div>
                 <div class="thin">
 			<div class="head">
@@ -72,22 +72,22 @@ if(check_perms('admin_manage_blog')) {
 					<a href="#" onclick="$('#postform').toggle(); this.innerHTML=(this.innerHTML=='(Hide)'?'(Show)':'(Hide)'); return false;"><?=($_REQUEST['action']!='editblog')?'(Show)':'(Hide)'?></a>
 				</span>
 			</div>
-                <div class="box">  
+                <div class="box">
 			<form  id="quickpostform" action="staffblog.php" method="post">
-				<div id="postform" class="pad<?=($_REQUEST['action']!='editblog')?' hidden':''?>">	
+				<div id="postform" class="pad<?=($_REQUEST['action']!='editblog')?' hidden':''?>">
                 <div id="quickreplytext">
 					<input type="hidden" name="action" value="<?=((empty($_GET['action'])) ? 'takenewblog' : 'takeeditblog')?>" />
 					<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 					<input type="hidden" name="author" value="<?=$LoggedUser['Username']; ?>" />
-	<? if(!empty($_GET['action']) && $_GET['action'] == 'editblog'){?> 
-					<input type="hidden" name="blogid" value="<?=$BlogID; ?>" /> 
-	<? }?> 
+	<?php  if(!empty($_GET['action']) && $_GET['action'] == 'editblog'){?>
+					<input type="hidden" name="blogid" value="<?=$BlogID; ?>" />
+	<?php  }?>
 					<h3>Title</h3>
-					<input type="text" name="title" class="long" <? if(!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> /><br />
+					<input type="text" name="title" class="long" <?php  if(!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> /><br />
 					<h3>Body</h3>
-                           <? $Text->display_bbcode_assistant('textbody', true)  ?>
-					<textarea id="textbody" name="body" class="long" rows="15"><? if(!empty($Body)) { echo display_str($Body); } ?></textarea> <br />
-					
+                           <?php  $Text->display_bbcode_assistant('textbody', true)  ?>
+					<textarea id="textbody" name="body" class="long" rows="15"><?php  if(!empty($Body)) { echo display_str($Body); } ?></textarea> <br />
+
                 </div>
                            <br />
 					<div class="center">
@@ -99,11 +99,11 @@ if(check_perms('admin_manage_blog')) {
 		</div>
                 </div>
 		<br />
-<? 
+<?php
 }
 ?>
 <div class="thin">
-<?
+<?php
 if (!$Blog = $Cache->get_value('staff_blog')) {
 	$DB->query("SELECT
 		b.ID,
@@ -126,22 +126,22 @@ foreach ($Blog as $BlogItem) {
 ?>
 				<div class="head">
 					<?=$Title?> - <?=time_diff($BlogTime);?> by <?=$Author?>
-		<? if(check_perms('admin_manage_blog')) { ?> 
+		<?php  if(check_perms('admin_manage_blog')) { ?>
 					- <a href="staffblog.php?action=editblog&amp;id=<?=$BlogID?>">[Edit]</a>
 					<a href="staffblog.php?action=deleteblog&amp;id=<?=$BlogID?>&amp;auth=<?=$LoggedUser['AuthKey']?>" onClick="return confirm('Do you want to delete this?')">[Delete]</a>
-		 <? } ?>
+		 <?php  } ?>
 				</div>
-    
+
 			<div id="blog<?=$BlogID?>" class="box">
 				<div class="pad">
 					<?=$Text->full_format($Body,true)?>
 				</div>
 			</div>
 		<br />
-<? 
+<?php
 }
 ?>
 </div>
-<?
+<?php
 show_footer();
-?>
+

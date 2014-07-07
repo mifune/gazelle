@@ -1,5 +1,4 @@
-<?
-
+<?php
 include(SERVER_ROOT.'/sections/reports/array.php');
 
 if(empty($_GET['type']) || empty($_GET['id']) || !is_number($_GET['id'])) {
@@ -10,7 +9,7 @@ if(!array_key_exists($_GET['type'], $Types)) {
 	error(403);
 }
 $Short = $_GET['type'];
-$Type = $Types[$Short]; 
+$Type = $Types[$Short];
 
 $ID = $_GET['id'];
 
@@ -96,15 +95,15 @@ show_header('Report a '.$Type['title'],'bbcode');
 	<div class="box pad">
 		<p>Following these guidelines will help the moderators deal with your report in a timely fashion. </p>
 		<ul>
-<?
+<?php
 foreach($Type['guidelines'] as $Guideline) {
 ?>
 			<li><?=$Guideline?></li>
-<? } ?>
+<?php  } ?>
 		</ul>
 		<p>In short, please include as much detail as possible when reporting. Thank you. </p>
 	</div>
-<?
+<?php
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 $Text = new TEXT;
@@ -114,7 +113,7 @@ switch($Short) {
 	case "user" :
 ?>
 	<p>You are reporting the user <strong><?=display_str($Username)?></strong></p>
-<?
+<?php
 		break;
 	case "request_update" :
 ?>
@@ -127,7 +126,7 @@ switch($Short) {
 		</tr>
 		<tr>
 			<td><?=display_str($Name)?></td>
-			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>	
+			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>
 			<td><strong><?=($Filled == 0 ? 'No' : 'Yes')?></strong></td>
 		</tr>
 	</table>
@@ -153,7 +152,7 @@ switch($Short) {
 			<input type="submit" value="Submit report" />
 		</form>
 	</div>
-<?
+<?php
 		break;
 	case "request" :
 ?>
@@ -166,11 +165,11 @@ switch($Short) {
 		</tr>
 		<tr>
 			<td><?=display_str($Name)?></td>
-			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>	
+			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>
 			<td><strong><?=($Filled == 0 ? 'No' : 'Yes')?></strong></td>
 		</tr>
 	</table>
-<?	
+<?php
 		break;
 	case "collage" :
 ?>
@@ -181,11 +180,11 @@ switch($Short) {
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><?=display_str($Name)?></td>	
+			<td><?=display_str($Name)?></td>
 			<td><?=$Text->full_format($Desc, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
-<?	
+<?php
 		break;
 	case "thread" :
 ?>
@@ -196,11 +195,11 @@ switch($Short) {
 			<td>Title</td>
 		</tr>
 		<tr>
-			<td><?=display_str($Username)?></td>	
+			<td><?=display_str($Username)?></td>
 			<td><?=display_str($Title)?></td>
 		</tr>
 	</table>
-<?	
+<?php
 		break;
 	case "post" :
 ?>
@@ -211,11 +210,11 @@ switch($Short) {
 			<td>Body</td>
 		</tr>
 		<tr>
-			<td><?=display_str($Username)?></td>	
+			<td><?=display_str($Username)?></td>
 			<td><?=$Text->full_format($Body, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
-<?	
+<?php
 		break;
 	case "requests_comment" :
 	case "torrents_comment" :
@@ -228,12 +227,12 @@ switch($Short) {
 			<td>Body</td>
 		</tr>
 		<tr>
-			<td><?=display_str($Username)?></td>	
+			<td><?=display_str($Username)?></td>
 			<td><?=$Text->full_format($Body, get_permissions_advtags($AuthorID))?></td>
 		</tr>
 	</table>
-<?	
-	break;	   
+<?php
+	break;
 }
 if(empty($NoReason)) {
 ?>
@@ -249,11 +248,9 @@ if(empty($NoReason)) {
 			<input type="submit" value="Submit report" />
 		</form>
 	</div>
-<?
+<?php
 }
 // close <div class="thin"> ?>
 </div>
-<?
+<?php
 show_footer();
-?>
-

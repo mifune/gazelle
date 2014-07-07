@@ -1,4 +1,4 @@
-<?
+<?php
 $P = db_array($_REQUEST);
 enforce_login();
 if(!empty($_REQUEST['friendid']) && !is_number($_REQUEST['friendid'])) {
@@ -31,4 +31,3 @@ if(!empty($_REQUEST['action'])) {
 } else {
 	include(SERVER_ROOT.'/sections/friends/friends.php');
 }
-?>

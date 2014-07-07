@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_view_torrent_peerlist')) error(403,true);
 
 if (!isset($_GET['torrentid']) || !is_number($_GET['torrentid'])) {
@@ -48,23 +48,23 @@ list($NumResults) = $DB->next_record();
 $DB->set_query_id($Result);
 ?>
 
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_peers', $_GET['torrentid'], $NumResults, $Page) ?></div>
-    <? } ?>
-<table> 
-    <?
+    <?php  } ?>
+<table>
+    <?php
     if ($NumResults==0){
-            ?> 
+            ?>
             <tr class="smallhead">
                 <td colspan="11">There are no peers for this torrent</td>
-            </tr> 
-            <?
+            </tr>
+            <?php
     }
     $LastIsSeeder = -1;
-    while (list($PeerUserID, $Size, $Username, $Active, $Connectable, $Uploaded, $Remaining, $UserAgent, 
+    while (list($PeerUserID, $Size, $Username, $Active, $Connectable, $Uploaded, $Remaining, $UserAgent,
             $IsSeeder, $Timespent, $UpSpeed, $DownSpeed, $IP, $Port) = $DB->next_record()) {
-        
- 
+
+
         if ($IsSeeder != $LastIsSeeder) {
             ?>
 
@@ -86,7 +86,7 @@ $DB->set_query_id($Result);
                 <td>Time</td>
                 <td>Client</td>
             </tr>
-            <?
+            <?php
             $LastIsSeeder = $IsSeeder;
         }
         ?>
@@ -94,16 +94,16 @@ $DB->set_query_id($Result);
             <td><?= torrent_username($PeerUserID, $Username, $IsAnon && $PeerUserID == $AuthorID ) ?></td>
             <td><?= ($Active) ? '<span style="color:green">Yes</span>' : '<span style="color:red">No</span>' ?></td>
 
-            <td><?
+            <td><?php
                 if ($Active && $Port && (check_perms('users_mod') || $PeerUserID==$LoggedUser['ID'] ) ) {
                     $link = 'user.php?action=connchecker&checkuser='.$PeerUserID.'&checkip='.$IP.'&checkport='.$Port;
                     if ($Connectable=='yes') echo '<a href="'.$link.'" style="color:green">Yes</a>' ;
                     elseif ($Connectable=='no') echo'<a href="'.$link.'" style="color:red">No</a>';
-                    else echo'<a href="'.$link.'" style="color:darkgrey">?</a>'; 
+                    else echo'<a href="'.$link.'" style="color:darkgrey">?</a>';
                 } else {
                     if ($Connectable=='yes') echo '<span style="color:green">Yes</span>' ;
                     elseif ($Connectable=='no') echo'<span style="color:red">No</span>';
-                    else echo'<span style="color:darkgrey">?</span>'; 
+                    else echo'<span style="color:darkgrey">?</span>';
                 }
                    ?></td>
 
@@ -116,10 +116,10 @@ $DB->set_query_id($Result);
             <td><?= time_span($Timespent) ?></td>
             <td><?= display_str($UserAgent) ?></td>
         </tr>
-        <?
+        <?php
     }
     ?>
 </table>
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_peers', $_GET['torrentid'], $NumResults, $Page) ?></div>
-<? } ?>
+<?php  }

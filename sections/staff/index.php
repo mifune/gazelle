@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 show_header('Staff','bbcode,inbox,jquery');
@@ -26,14 +26,14 @@ $Msg = isset($_REQUEST['msg'])?$_REQUEST['msg']:'';
                               <a href="#"  class="contact_link" onClick="jQuery('#compose').slideToggle('slow');">sending a message to the Staff Inbox</a>
                               <em>Please do not PM individual staff members for support!</em> </p>
             </div>
-		<? print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
+		<?php  print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
 		<br />
     </div>
-<? 
+<?php
 
 if(check_perms('site_staff_page'))  {
-    
-	if( count($FrontLineSupport)>0) { 
+
+	if( count($FrontLineSupport)>0) {
 ?>
 	<div class="head">First-line Support</div>
 	<div class="box pad" style="padding:10px;">
@@ -44,7 +44,7 @@ if(check_perms('site_staff_page'))  {
 				<td width="150px">Last seen</td>
 				<td colspan="2"><strong>Support For</strong></td>
 			</tr>
-<?
+<?php
             $Row = 'a';
             foreach($FrontLineSupport as $Support) {
                 list($ID, $Class, $Username, $Title, $Paranoia, $LastAccess, $SupportFor) = $Support;
@@ -55,7 +55,7 @@ if(check_perms('site_staff_page'))  {
 					<?=format_username($ID, $Username, false, false, true, false, $Title, false)?>
 				</td>
 				<td class="nobr">
-					<? if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by user'; }?>
+					<?php  if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by user'; }?>
 				</td>
 				<td class="nobr">
 					<?=$SupportFor?>
@@ -64,18 +64,16 @@ if(check_perms('site_staff_page'))  {
                     <?=get_user_languages($ID)?>
 				</td>
 			</tr>
-<?          } ?>
+<?php           } ?>
 		</table>
-	</div> 
-<? 
-      } 
+	</div>
+<?php
+      }
 ?>
 
 	<div class="head">Staff</div>
 	<div class="box pad" style="padding:10px;">
-<?
-           /* <p>The staff are the people who run the site.</p>*/
-		
+<?php
 	$CurClass = 0;
 	$CloseTable = false;
 	foreach($Staff as $Support) {
@@ -96,9 +94,9 @@ if(check_perms('site_staff_page'))  {
 				<td width="150px">Last seen</td>
 				<td colspan="2"><strong>Remark</strong></td>
 			</tr>
-<?
+<?php
 		} // End new class header
-		
+
 		// Display staff members for this class
 		$Row = ($Row == 'a') ? 'b' : 'a';
 ?>
@@ -107,7 +105,7 @@ if(check_perms('site_staff_page'))  {
 					<?=format_username($ID, $Username, false, false, true, false, $Title, false)?>
 				</td>
 				<td class="nobr">
-					<? if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by staff member'; }?>
+					<?php  if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by staff member'; }?>
 				</td>
 				<td class="nobr">
 					<?=$Remark?>
@@ -116,17 +114,9 @@ if(check_perms('site_staff_page'))  {
                     <?=get_user_languages($ID)?>
 				</td>
 			</tr>
-<?	} ?>
+<?php 	} ?>
 		</table><br/>
-		<? /*
-	</div>
-       
-	<div class="head">Admins</div>
-	<div class="box pad" style="padding:10px;">
-            <p>Admins are staff who do things like fix the site.</p>
-             
-             */  ?>
-<?
+<?php
 	$CurClass = 0;
 	$CloseTable = false;
 	foreach ($Admins as $StaffMember) {
@@ -147,9 +137,9 @@ if(check_perms('site_staff_page'))  {
 				<td width="150px">Last seen</td>
 				<td colspan="2"><strong>Remark</strong></td>
 			</tr>
-<?
+<?php
 		} // End new class header
-		
+
 		// Display staff members for this class
 		$Row = ($Row == 'a') ? 'b' : 'a';
 ?>
@@ -158,7 +148,7 @@ if(check_perms('site_staff_page'))  {
 					<?=format_username($ID, $Username, false, false, true, false, $Title, false)?>
 				</td>
 				<td class="nobr">
-					<? if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by staff member'; }?>
+					<?php  if (check_paranoia('lastseen', $Paranoia, $Class)) { echo time_diff($LastAccess,2,true,false,0); } else { echo 'Hidden by staff member'; }?>
 				</td>
 				<td class="nobr">
 					<?=$Remark?>
@@ -167,16 +157,15 @@ if(check_perms('site_staff_page'))  {
                     <?=get_user_languages($ID)?>
 				</td>
 			</tr>
-<?	} ?>
+<?php 	} ?>
 		</table><br/>
-		
+
 	</div>
 
-<?
-} 
+<?php
+}
 ?>
-    
+
 </div>
-<?
+<?php
 show_footer();
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 $StaffIDs = $Cache->get_value("staff_ids");
@@ -34,11 +34,7 @@ switch($_REQUEST['action']) {
 		break;
 	case 'get_post':
 		require('get_post.php');
-		break;		
-    /*  //forward processing changed - now sends to compose.php (and starts a new conversation)
-	case 'forward':
-		require('forward.php');
-		break; */
+		break;
 	default:
 		require(SERVER_ROOT.'/sections/inbox/inbox.php');
 }

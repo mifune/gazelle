@@ -1,4 +1,4 @@
-<?
+<?php
 //Useful: http://www.robtex.com/cnet/
 $AllowedProxies = array(
 	//Opera Turbo (may include opera owned IPs that aren't used for Turbo, but shouldn't run much risk of exploitation)
@@ -20,19 +20,19 @@ function proxyCheck($IP) {
 		if (strlen($IP) < strlen($AllowedProxies[$i])) {
 			continue;
 		}
-		
+
 		//since we're matching bit for bit iterating from the start
 		for ($j=0,$jl=strlen($IP);$j<$jl;++$j) {
 			//completed iteration and no inequality
 			if ($j == $jl-1 && $IP[$j] === $AllowedProxies[$i][$j]) {
 				return true;
 			}
-			
+
 			//wildcard
 			if ($AllowedProxies[$i][$j] === '*') {
 				return true;
 			}
-			
+
 			//inequality found
 			if ($IP[$j] !== $AllowedProxies[$i][$j]) {
 				break;

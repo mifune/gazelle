@@ -1,4 +1,4 @@
-<?
+<?php
 ini_set('memory_limit', -1);
 //~~~~~~~~~~~ Main bookmarks page ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
@@ -29,8 +29,8 @@ if($Data) {
 	list($K, list($TorrentList, $CollageDataList)) = each($Data);
 } else {
 	// Build the data for the collage and the torrent list
-	$DB->query("SELECT 
-		bt.GroupID, 
+	$DB->query("SELECT
+		bt.GroupID,
 		tg.Image,
 		tg.NewCategoryID,
 		bt.Time
@@ -38,7 +38,7 @@ if($Data) {
 		JOIN torrents_group AS tg ON tg.ID=bt.GroupID
 		WHERE bt.UserID='$UserID'
 		ORDER BY bt.Time");
-	
+
 	$GroupIDs = $DB->collect('GroupID');
 	$CollageDataList=$DB->to_array('GroupID', MYSQLI_ASSOC);
 	if(count($GroupIDs)>0) {
@@ -51,7 +51,6 @@ if($Data) {
 
 $Title = ($Sneaky)?"$Username's bookmarked torrents":'Your bookmarked torrents';
 
-
 // Loop through the result set, building up $Collage and $TorrentTable
 // Then we print them.
 $Collage = array();
@@ -63,10 +62,10 @@ $Tags = array();
 foreach ($TorrentList as $GroupID=>$Group) {
 	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $Image, $GroupCategoryID, $AddedTime) = array_values($CollageDataList[$GroupID]);
-	
+
 	// Handle stats and stuff
 	$NumGroups++;
-	
+
 	$TagList = explode(' ',str_replace('_','.',$TagList));
 
 	$TorrentTags = array();
@@ -85,15 +84,15 @@ foreach ($TorrentList as $GroupID=>$Group) {
 	$TorrentTags='<br /><div class="tags">'.$TorrentTags.'</div>';
 
 	$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-	
+
 	// Start an output buffer, so we can store this output in $TorrentTable
-	ob_start(); 
-        // Viewing a type that does not require grouping
+	ob_start();
+    // Viewing a type that does not require grouping
 
     list($TorrentID, $Torrent) = each($Torrents);
 
     $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-        
+
     if ($Torrent['ReportCount'] > 0) {
             $Title = "This torrent has ".$Torrent['ReportCount']." active ".($Torrent['ReportCount'] > 1 ?'reports' : 'report');
             $DisplayName .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
@@ -103,14 +102,13 @@ foreach ($TorrentList as $GroupID=>$Group) {
     if($AddExtra) $DisplayName .= $AddExtra;
 
 	$TorrentTable.=ob_get_clean();
-	
+
 	// Album art
-	
+
 	ob_start();
-	
+
 	$DisplayName = $GroupName;
 	$Collage[]=ob_get_clean();
-	
 }
 
 uasort($Tags, 'compare');
@@ -154,4 +152,3 @@ print
 			)
 		)
 	);
-?>

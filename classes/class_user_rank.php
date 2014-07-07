@@ -1,35 +1,34 @@
-<?
-
+<?php
 define('PREFIX', 'percentiles_'); // Prefix for memcache keys, to make life easier
 
 class USER_RANK {
-	
+
 	// Returns a 101 row array (101 percentiles - 0 - 100), with the minimum value for that percentile as the value for each row
 	// BTW - ingenious
 	function build_table($MemKey, $Query) {
 		global $Cache,$DB;
-		
+
 		$DB->query("DROP TEMPORARY TABLE IF EXISTS temp_stats");
-		
+
 		$DB->query("CREATE TEMPORARY TABLE temp_stats
 			(ID int(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 			Val bigint(20) NOT NULL);");
-		
+
 		$DB->query("INSERT INTO temp_stats (Val) ".$Query);
-		
+
 		$DB->query("SELECT COUNT(ID) FROM temp_stats");
 		list($UserCount) = $DB->next_record();
-		
+
 		$DB->query("SELECT MIN(Val) FROM temp_stats GROUP BY CEIL(ID/(".(int)$UserCount."/100));");
-		
+
 		$Table = $DB->to_array();
-		
+
 		// Give a little variation to the cache length, so all the tables don't expire at the same time
-		$Cache->cache_value($MemKey, $Table, 3600*24*rand(800,1000)*0.001); 
-		
+		$Cache->cache_value($MemKey, $Table, 3600*24*rand(800,1000)*0.001);
+
 		return $Table;
 	}
-	
+
 	function table_query($TableName) {
 		switch($TableName) {
 			case 'uploaded':
@@ -54,17 +53,17 @@ class USER_RANK {
 		}
 		return $Query;
 	}
-	
+
 	function get_rank($TableName, $Value) {
 		if($Value == 0) { return 0; }
 		global $Cache, $DB;
-			
+
 		$Table = $Cache->get_value(PREFIX.$TableName);
 		if(!$Table) {
 			//Cache lock!
 			$Lock = $Cache->get_value(PREFIX.$TableName."_lock");
 			if($Lock) {
-				?><script type="script/javascript">setTimeout('window.location="http://<?=NONSSL_SITE_URL?><?=$_SERVER['REQUEST_URI']?>"', 5)</script><?
+				?><script type="script/javascript">setTimeout('window.location="http://<?=NONSSL_SITE_URL?><?=$_SERVER['REQUEST_URI']?>"', 5)</script><?php
 			} else {
 				$Cache->cache_value(PREFIX.$TableName."_lock", '1', 10);
 				$Table = $this->build_table(PREFIX.$TableName, $this->table_query($TableName));
@@ -80,7 +79,7 @@ class USER_RANK {
 		}
 		return 100; // 100th percentile
 	}
-	
+
 	function overall_score($Uploaded, $Downloaded, $Uploads, $Requests, $Posts, $Bounty, $Ratio){
 		// We can do this all in 1 line, but it's easier to read this way
 		if($Ratio>1) { $Ratio = 1; }
@@ -94,10 +93,7 @@ class USER_RANK {
 		$TotalScore /= (15+8+25+2+1+1);
 		$TotalScore *= $Ratio;
 		return $TotalScore;
-		
+
 	}
-	
+
 }
-
-
-?>

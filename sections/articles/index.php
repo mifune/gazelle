@@ -1,4 +1,4 @@
-<?
+<?php
 enforce_login();
 
 include(SERVER_ROOT.'/sections/articles/functions.php');
@@ -15,12 +15,10 @@ if ($LoggedUser['Class']>=STAFF_LEVEL){ // only interested in staff classes
 
 if (isset($_REQUEST['topic'])) {
     include(SERVER_ROOT.'/sections/articles/article.php');
-    
+
 } elseif (isset($_REQUEST['searchtext'])) {
     include(SERVER_ROOT.'/sections/articles/results.php');
-    
-} else { 
+
+} else {
     error(0);
 }
- 
-?>

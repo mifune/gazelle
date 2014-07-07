@@ -1,7 +1,5 @@
 <?php
-
-
-authorize(true);  
+authorize(true);
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 $Text = new TEXT;
@@ -54,7 +52,6 @@ $DB->query("SELECT
 //TODO: Handle this more gracefully.
 if ($DB->record_count() == 0) { // If user doesn't exist
 	die();
-	//header("Location: log.php?search=User+".$UserID);
 }
 
 list($Username, $Email, $LastAccess, $IP, $Class, $Uploaded, $Downloaded, $RequiredRatio, $Enabled, $Paranoia, $Invites, $CustomTitle, $torrent_pass, $DisableLeech, $JoinDate, $Info, $Avatar, $Country, $Donor, $Warned, $ForumPosts, $InviterID, $DisableInvites, $InviterName, $RatioWatchEnds, $RatioWatchDownload) = $DB->next_record(MYSQLI_NUM, array(9,11));
@@ -70,10 +67,6 @@ foreach($Paranoia as $P) {
 		$ParanoiaLevel++;
 	}
 }
-
-// Raw time is better for JSON.
-//$JoinedDate = time_diff($JoinDate);
-//$LastAccess = time_diff($LastAccess);
 
 function check_paranoia_here($Setting) {
 	global $Paranoia, $Class, $UserID;
@@ -266,5 +259,3 @@ print json_encode(array('status' => 'success',
 						)
 					)
 				); // <- He's sad.
-?>
-

@@ -1,14 +1,14 @@
-<?
+<?php
 if(!check_perms('admin_imagehosts')) { error(403); }
 
 show_header('Manage imagehost whitelist');
-$DB->query("SELECT 
+$DB->query("SELECT
 	w.ID,
-	w.Imagehost, 
-	w.Link, 
-	w.Comment, 
-	w.UserID, 
-	um.Username, 
+	w.Imagehost,
+	w.Link,
+	w.Comment,
+	w.UserID,
+	um.Username,
 	w.Time ,
       w.Hidden
 	FROM imagehost_whitelist as w
@@ -74,8 +74,8 @@ $DB->query("SELECT
 		<td width="10%"><span title="hidden items will not be displayed to the user but will still be allowed in bbcode">
                     Submit</span></td>
     </tr>
-<? $Row = 'b';
-while(list($ID, $Host, $Link, $Comment, $UserID, $Username, $WLTime, $Hide) = $DB->next_record()){  
+<?php  $Row = 'b';
+while(list($ID, $Host, $Link, $Comment, $UserID, $Username, $WLTime, $Hide) = $DB->next_record()){
 	$Row = ($Row === 'a' ? 'b' : 'a');
 ?>
     <tr class="row<?=$Row?>">
@@ -93,7 +93,7 @@ while(list($ID, $Host, $Link, $Comment, $UserID, $Username, $WLTime, $Hide) = $D
 				<input class="long"  type="text" name="comment" value="<?=display_str($Comment)?>" />
 			</td>
 		<td>
-			<input type="checkbox" name="show" value="1" <? if(!$Hide)echo ' checked="checked"';?> />
+			<input type="checkbox" name="show" value="1" <?php  if(!$Hide)echo ' checked="checked"';?> />
 		</td>
 			<td>
 				<?=format_username($UserID, $Username)?><br />
@@ -105,7 +105,8 @@ while(list($ID, $Host, $Link, $Comment, $UserID, $Username, $WLTime, $Hide) = $D
 			</td>
 		</form>
 	</tr>
-<? } ?>
-</table> 
+<?php  } ?>
+</table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

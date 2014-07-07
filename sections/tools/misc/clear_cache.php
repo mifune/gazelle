@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('users_mod') || !check_perms('admin_clear_cache')) {
 	error(403);
 }
@@ -23,7 +23,7 @@ else if(!empty($_GET['key']) && $_GET['type'] == "clear") {
 ?>
     <div class="thin">
 	<h2>Clear a cache key</h2>
-	
+
 	<form method="get" action="" name="clear_cache">
 		<input type="hidden" name="action" value="clear_cache" />
 		<table cellpadding="2" cellspacing="1" border="0" align="center">
@@ -39,15 +39,15 @@ else if(!empty($_GET['key']) && $_GET['type'] == "clear") {
                                         <input type="submit" name="flush" value="Flush all Cache Keys" class="submit" />
 				</td>
 			</tr>
-<? if(!empty($_GET['key']) && $_GET['type'] == "view") { ?>
+<?php  if(!empty($_GET['key']) && $_GET['type'] == "view") { ?>
 			<tr>
 				<td colspan="2">
-					<pre><? var_dump($Cache->get_value($_GET['key'])); ?></pre>
+					<pre><?php  var_dump($Cache->get_value($_GET['key'])); ?></pre>
 				</td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 	</form>
     </div>
-<?
+<?php
 show_footer();

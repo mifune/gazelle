@@ -1,4 +1,4 @@
-<?
+<?php
 
 //******************************************************************************//
 //----------------- Take request -----------------------------------------------//
@@ -30,23 +30,23 @@ if($NewRequest) {
 	if(!is_number($RequestID)) {
 		error(0);
 	}
-	
+
 	$Request = get_requests(array($RequestID));
 	$Request = $Request['matches'][$RequestID];
 	if(empty($Request)) {
 		error(404);
 	}
-	
+
 	list($RequestID, $RequestorID, $RequestorName, $TimeAdded, $LastVote, $CategoryID, $Title, $Image, $Description,
 	     $FillerID, $FillerName, $TorrentID, $TimeFilled, $GroupID) = $Request;
 	$VoteArray = get_votes_array($RequestID);
 	$VoteCount = count($VoteArray['Voters']);
-	
+
 	$IsFilled = !empty($TorrentID);
-	
+
 	$ProjectCanEdit = (check_perms('project_team') && !$IsFilled && (($CategoryID == 0)));
 	$CanEdit = ((!$IsFilled && $LoggedUser['ID'] == $RequestorID && $VoteCount < 2) || $ProjectCanEdit || check_perms('site_moderate_requests'));
-	
+
 	if(!$CanEdit) {
 		error(403);
 	}
@@ -98,16 +98,12 @@ if(empty($_POST['description'])) {
 if(empty($_POST['image'])) {
 	$Image = "";
 } else {
-    
       $Result = validate_imageurl($_POST['image'], 12, 255, get_whitelist_regex());
       if($Result!==TRUE) $Err = $Result;
       else $Image = trim($_POST['image']);
-       
 }
 
-
 $Text->validate_bbcode($_POST['description'],  get_permissions_advtags($LoggedUser['ID']));
-      
 
 if(!empty($Err)) {
 	error($Err);
@@ -118,16 +114,16 @@ if(!empty($Err)) {
 }
 
 if($NewRequest) {
-        $DB->query("INSERT INTO requests (     
+        $DB->query("INSERT INTO requests (
                             UserID, TimeAdded, LastVote, CategoryID, Title, Image, Description, Visible)
                     VALUES
                             (".$LoggedUser['ID'].", '".sqltime()."', '".sqltime()."',  ".$CategoryID.", '".db_string($Title)."', '".db_string($Image)."', '".db_string($Description)."', '1')");
 
         $RequestID = $DB->inserted_id();
 } else {
-        $DB->query("UPDATE requests 
+        $DB->query("UPDATE requests
         SET CategoryID = ".$CategoryID.",
-                Title = '".db_string($Title)."', 
+                Title = '".db_string($Title)."',
                 Image = '".db_string($Image)."',
                 Description = '".db_string($Description)."'
         WHERE ID = ".$RequestID);
@@ -137,7 +133,6 @@ if($NewRequest) {
 if(!$NewRequest) {
 	$DB->query("DELETE FROM requests_tags WHERE RequestID = ".$RequestID);
 }
-
 
 $Tags = explode(' ', strtolower($NewCategories[$CategoryID]['tag']." ".$Tags));
 
@@ -154,9 +149,9 @@ foreach ($Tags as $Tag) {
                             ('$Tag', $LoggedUser[ID], 1)
                             ON DUPLICATE KEY UPDATE Uses=Uses+1;");
                 $TagID = $DB->inserted_id();
-	
+
                 $DB->query("INSERT IGNORE INTO requests_tags
-					(TagID, RequestID) VALUES 
+					(TagID, RequestID) VALUES
 					($TagID, $RequestID)");
             }
         }
@@ -164,33 +159,28 @@ foreach ($Tags as $Tag) {
 // replace the original tag array with corrected tags
 $Tags = $TagsAdded;
 
-
 if($NewRequest) {
 	//Remove the bounty and create the vote
-	$DB->query("INSERT INTO requests_votes 
+	$DB->query("INSERT INTO requests_votes
 					(RequestID, UserID, Bounty)
 				VALUES
 					(".$RequestID.", ".$LoggedUser['ID'].", ".$Bytes.")");
-	
+
 	$DB->query("UPDATE users_main SET Uploaded = (Uploaded - ".$Bytes.") WHERE ID = ".$LoggedUser['ID']);
 	$Cache->delete_value('user_stats_'.$LoggedUser['ID']);
 
     write_user_log($LoggedUser['ID'], "Removed -". get_size($Bytes). " for new request [url=/requests.php?action=view&id={$RequestID}]{$Title}[/url] with ". get_size($Bytes). " bounty.");
-    
-	
+
     $Announce = "'".$Title."' - http://".NONSSL_SITE_URL."/requests.php?action=view&id=".$RequestID." - ".implode(" ", $Tags);
-        
+
 	send_irc('PRIVMSG #'.NONSSL_SITE_URL.'-requests :'.$Announce);
-    
+
     write_log("Request $RequestID ($Title) created with " . get_size($Bytes). " bounty by ". $LoggedUser['Username']);
-	
+
 } else {
 	$Cache->delete_value('request_'.$RequestID);
 }
 
-        
-
 update_sphinx_requests($RequestID);
 
 header('Location: requests.php?action=view&id='.$RequestID);
-?>

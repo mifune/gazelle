@@ -1,11 +1,10 @@
-<?
+<?php
 /*************************************************************************\
 //--------------Take moderation -----------------------------------------//
 
 
 
 \*************************************************************************/
-
 
 // Are they being tricky blighters?
 if (!$_POST['userid'] || !is_number($_POST['userid'])) {
@@ -33,23 +32,22 @@ $Pass2 = db_string($_POST['ChangePassword2']);
 $Email = db_string($_POST['ChangeEmail']);
 $Warned = (isset($_POST['Warned']))? 1 : 0;
 
-
 $AddBadges = $_POST['addbadge'];
 $DelBadges = $_POST['delbadge'];
-    
-    
+
+
 $AdjustUpValue = ($_POST['adjustupvalue']  == "" ? 0 : $_POST['adjustupvalue']);
 if ( isset($AdjustUpValue) && $AdjustUpValue[0]=='+') $AdjustUpValue = substr($AdjustUpValue, 1);
-if (is_numeric($AdjustUpValue)){ 
+if (is_numeric($AdjustUpValue)){
     $ByteMultiplier = isset($_POST['adjustup']) ? strtolower($_POST['adjustup']) : 'kb';
     $AdjustUpValue = get_bytes($AdjustUpValue.$ByteMultiplier);
 } else {
     $AdjustUpValue = 0;
 }
-        
+
 $AdjustDownValue = ($_POST['adjustdownvalue']  == "" ? 0 : $_POST['adjustdownvalue']);
 if ( isset($AdjustDownValue) && $AdjustDownValue[0]=='+') $AdjustDownValue = substr($AdjustDownValue, 1);
-if (is_numeric($AdjustDownValue)){ 
+if (is_numeric($AdjustDownValue)){
     $ByteMultiplier = isset($_POST['adjustdown']) ? strtolower($_POST['adjustdown']) : 'kb';
     $AdjustDownValue = get_bytes($AdjustDownValue.$ByteMultiplier);
 } else {
@@ -59,7 +57,7 @@ if (is_numeric($AdjustDownValue)){
 if(!is_numeric($AdjustUpValue) || !is_numeric($AdjustDownValue)) {
     error(0);
 }
- 
+
 $FLTokens = (int)$_POST['FLTokens'];
 $BonusCredits = (float)$_POST['BonusCredits'];
 $PersonalFreeLeech = (int)$_POST['PersonalFreeLeech'];
@@ -108,9 +106,6 @@ $HeavyUpdates = array();
 $LightUpdates = array();
 
 // Get user info from the database
-
-
-
 $DB->query("SELECT
 	m.Username,
 	m.IP,
@@ -171,9 +166,7 @@ if(!check_perms('users_mod', $Cur['Class'])) {
 	die();
 }
 
-// Gotten user info
-
-// mifune: lets put an error trap here for the mysterious 'random' error that wipes a users account...
+// lets put an error trap here for the mysterious 'random' error that wipes a users account...
 // important: do not remove this without trapping for blank username somewhere else!
 if ($Class==0 || $Username=='') {
     ksort($_POST, SORT_FLAG_CASE | SORT_STRING);ksort($Cur, SORT_FLAG_CASE | SORT_STRING);
@@ -200,9 +193,9 @@ if ($_POST['UserStatus']=="delete" && check_perms('users_delete_users')) {
 	$DB->query("DELETE FROM users_main WHERE id=".$UserID);
 	$DB->query("DELETE FROM users_info WHERE UserID=".$UserID);
 	$Cache->delete_value('user_info_'.$UserID);
-	
+
 	update_tracker('remove_user', array('passkey' => $Cur['torrent_pass']));
-	
+
 	header("Location: log.php?search=User+".$UserID);
 	die();
 }
@@ -254,23 +247,21 @@ if (($_POST['ResetSession'] || $_POST['LogOut']) && check_perms('users_logout'))
 	$Cache->delete_value('user_info_heavy_'.$UserID);
 	$Cache->delete_value('user_stats_'.$UserID);
 	$Cache->delete_value('enabled_'.$UserID);
-	
+
 	$EditSummary[]='reset user cache';
-    
+
 	if($_POST['LogOut']) {
 		$DB->query("SELECT SessionID FROM users_sessions WHERE UserID='$UserID'");
 		while(list($SessionID) = $DB->next_record()) {
 			$Cache->delete_value('session_'.$UserID.'_'.$SessionID);
 		}
 		$Cache->delete_value('users_sessions_'.$UserID);
-		
-		
+
+
 		$DB->query("DELETE FROM users_sessions WHERE UserID='$UserID'");
         $EditSummary[]='forcibly logged out user';
-		
 	}
 }
-
 
 // Start building SQL query and edit summary
 if ($Classes[$Class]['Level']!=$Cur['Class'] && (
@@ -289,14 +280,14 @@ if ($Classes[$Class]['Level']!=$Cur['Class'] && (
 	}
 }
 
-if($GroupPerm!=$Cur['GroupPermissionID'] && 
+if($GroupPerm!=$Cur['GroupPermissionID'] &&
         (check_perms('admin_manage_permissions',  $Cur['Class']) || check_perms('user_group_permissions',  $Cur['Class']) )) {
-    
+
       if($GroupPerm!=0) {
           $DB->query("SELECT Name FROM permissions WHERE ID='$GroupPerm' AND IsUserClass='0'");
           if($DB->record_count() > 0) {
               list($PermName) = $DB->next_record(MYSQLI_NUM);
-          } else 
+          } else
               error("Input Error: Cound not find GroupPerm with ID='$GroupPerm'");
       } else {
           $PermName = 'none';
@@ -326,8 +317,6 @@ if ($Title!=db_string($Cur['Title']) && check_perms('users_edit_titles')) {
       $len = mb_strlen($_POST['Title'], "UTF-8");
 	if ( $len > 32) {
 		error("Title length: $len. Custom titles can be at most 32 characters. (max 128 bytes for multibyte strings)");
-		//header("Location: user.php?id=".$UserID);
-		//die();
 	} else {
 		$UpdateSet[]="Title='$Title'";
 		$EditSummary[]="title changed to $Title";
@@ -355,44 +344,44 @@ if ($Visible!=$Cur['Visible']  && check_perms('users_make_invisible')) {
 
 
 if (is_array($AddBadges) && check_perms('users_edit_badges')) {
- 
+
       foreach($AddBadges as &$AddBadgeID) {
             $AddBadgeID = (int)$AddBadgeID;
       }
       $SQL_IN = implode(',',$AddBadges);
       $DB->query("SELECT ID, Title, Badge, Rank, Image FROM badges WHERE ID IN ( $SQL_IN ) ORDER BY Badge, Rank DESC");
       $BadgeInfos = $DB->to_array();
-      
-      $SQL = ''; $Div = ''; $BadgesAdded = ''; 
+
+      $SQL = ''; $Div = ''; $BadgesAdded = '';
       $Badges = array();
       foreach($BadgeInfos as $BadgeInfo) {
           list($BadgeID, $Name, $Badge, $Rank, $Image) = $BadgeInfo;
-          
+
           if (!array_key_exists($Badge, $Badges)){
               // only the highest rank in any set will be added
-              $Badges[$Badge] = $Rank; 
+              $Badges[$Badge] = $Rank;
               $Tooltip = db_string( display_str($_POST['addbadge'.$BadgeID]) );
               $SQL .= "$Div ('$UserID', '$BadgeID', '$Tooltip')";
               $BadgesAdded .= "$Div $Name";
               $Div = ',';
 
-              send_pm($UserID, 0, "Congratulations you have been awarded the $Name", 
+              send_pm($UserID, 0, "Congratulations you have been awarded the $Name",
                                 "[center][br][br][img]http://".SITE_URL.'/'.STATIC_SERVER."common/badges/{$Image}[/img][br][br][size=5][color=white][bg=#0261a3][br]{$Tooltip}[br][br][/bg][/color][/size][/center]");
 
           }
       }
       $DB->query("INSERT INTO users_badges (UserID, BadgeID, Description) VALUES $SQL");
-      
+
       foreach($Badges as $Badge=>$Rank) {
             // remove lower ranked badges of same badge set
             $Badge = db_string($Badge);
-            $DB->query("DELETE ub 
+            $DB->query("DELETE ub
                               FROM users_badges AS ub
                            JOIN badges AS b ON ub.BadgeID=b.ID
                                AND b.Badge='$Badge' AND b.Rank<$Rank
                              WHERE ub.UserID='$UserID'");
       }
- 
+
       $Cache->delete_value('user_badges_ids_'.$UserID);
       $Cache->delete_value('user_badges_'.$UserID);
       $Cache->delete_value('user_badges_'.$UserID.'_limit');
@@ -401,19 +390,19 @@ if (is_array($AddBadges) && check_perms('users_edit_badges')) {
 
 
 if (is_array($DelBadges) && check_perms('users_edit_badges')) {
-	
+
       $Div = '';
       $SQL_IN ='';
-      foreach($DelBadges as $UserBadgeID) { //  
+      foreach($DelBadges as $UserBadgeID) { //
             $UserBadgeID = (int)$UserBadgeID;
             $SQL_IN .= "$Div $UserBadgeID";
             $Div = ',';
       }
       $BadgesRemoved = '';
       $Div = '';
-      $DB->query("SELECT b.Title 
-                    FROM users_badges AS ub 
-                    LEFT JOIN badges AS b ON ub.BadgeID=b.ID 
+      $DB->query("SELECT b.Title
+                    FROM users_badges AS ub
+                    LEFT JOIN badges AS b ON ub.BadgeID=b.ID
                     WHERE ub.ID IN ( $SQL_IN )");
       while(list($Name)=$DB->next_record()) {
             $BadgesRemoved .= "$Div $Name";
@@ -426,10 +415,6 @@ if (is_array($DelBadges) && check_perms('users_edit_badges')) {
       $EditSummary[] = 'Badge'.(count($DelBadges)>1?'s':'')." removed: $BadgesRemoved";
 }
 
-
-
-
-
 if ($AdjustUpValue != 0 && ((check_perms('users_edit_ratio') && $UserID != $LoggedUser['ID'])
                         || (check_perms('users_edit_own_ratio') && $UserID == $LoggedUser['ID'])) ){
       $Uploaded = $Cur['Uploaded'] + $AdjustUpValue;
@@ -438,6 +423,7 @@ if ($AdjustUpValue != 0 && ((check_perms('users_edit_ratio') && $UserID != $Logg
 	$EditSummary[]="uploaded changed from ".get_size($Cur['Uploaded'])." to ".get_size($Uploaded);
 	$Cache->delete_value('user_stats_'.$UserID);
 }
+
 if ($AdjustDownValue != 0 && ((check_perms('users_edit_ratio') && $UserID != $LoggedUser['ID'])
                         || (check_perms('users_edit_own_ratio') && $UserID == $LoggedUser['ID']))){
       $Downloaded = $Cur['Downloaded'] + $AdjustDownValue;
@@ -474,10 +460,9 @@ if ($PersonalFreeLeech != 1 && ($PersonalFreeLeech > 1 || ($PersonalFreeLeech ==
     $EditSummary[]="Personal Freeleech changed from ".$before." to ".$after;
     $HeavyUpdates['personal_freeleech'] = $time;
     update_tracker('set_personal_freeleech', array('passkey' => $Cur['torrent_pass'], 'time' => strtotime($time)));
-    
 }
 
-if ($BonusCredits!=$Cur['Credits'] && ((check_perms('users_edit_credits') && $UserID != $LoggedUser['ID']) 
+if ($BonusCredits!=$Cur['Credits'] && ((check_perms('users_edit_credits') && $UserID != $LoggedUser['ID'])
                         || (check_perms('users_edit_own_credits') && $UserID == $LoggedUser['ID']))) {
         $UpdateSet[]="Credits=".$BonusCredits;
         $Creditschange = $BonusCredits - $Cur['Credits'];
@@ -485,11 +470,11 @@ if ($BonusCredits!=$Cur['Credits'] && ((check_perms('users_edit_credits') && $Us
         else $Creditschange = number_format ($Creditschange);
         $BonusSummary = sqltime()." | $Creditschange | ".ucfirst("credits set to $BonusCredits from {$Cur['Credits']} by {$LoggedUser['Username']}");
         $UpdateSet[]="i.BonusLog=CONCAT_WS( '\n', '$BonusSummary', i.BonusLog)";
-                
+
         $EditSummary[]="Bonus Credits changed from ".$Cur['Credits']." to ".$BonusCredits;
 	  $Cache->delete_value('user_stats_'.$UserID);
         $HeavyUpdates['Credits'] = $BonusCredits;
-        
+
 }
 
 
@@ -513,9 +498,9 @@ if ($Warned == 1 && $Cur['Warned']=='0000-00-00 00:00:00' && check_perms('users_
 	$LightUpdates['Warned']='0000-00-00 00:00:00';
 
 } elseif ($Warned == 1 && $ExtendWarning!='---' && check_perms('users_warn')) {
-	
+
 	send_pm($UserID,0,db_string('Your warning has been extended'),db_string("Your warning has been extended by $ExtendWarning week(s) by [url=/user.php?id={$LoggedUser['ID']}]{$LoggedUser['Username']}[/url]. The reason given was: $WarnReason"));
-	
+
 	$UpdateSet[]="Warned=Warned + INTERVAL $ExtendWarning WEEK";
 	$Msg = "warning extended by $ExtendWarning week(s)";
 	if ($WarnReason) { $Msg.=" for $WarnReason"; }
@@ -563,7 +548,6 @@ if(empty($RestrictedForums) && empty($PermittedForums)) {
 	}
 }
 
-
 if ($DisableAvatar!=$Cur['DisableAvatar'] && check_perms('users_disable_any')) {
 	$UpdateSet[]="DisableAvatar='$DisableAvatar'";
 	$EditSummary[]="avatar status changed";
@@ -586,8 +570,8 @@ if ($DisableLeech!=$Cur['can_leech'] && check_perms('users_disable_any')) {
 
 if ($DisableInvites!=$Cur['DisableInvites'] && check_perms('users_disable_any')) {
 	$UpdateSet[]="DisableInvites='$DisableInvites'";
-	if ($DisableInvites == 1) { 
-		//$UpdateSet[]="Invites='0'"; 
+	if ($DisableInvites == 1) {
+		//$UpdateSet[]="Invites='0'";
 		if (!empty($UserReason)) {
 			send_pm($UserID, 0, db_string('Your invite privileges have been disabled'),db_string("Your invite privileges have been disabled. The reason given was: $UserReason."));
             }
@@ -692,7 +676,7 @@ if ($EnableUser!=$Cur['Enabled'] && check_perms('users_disable_users')) {
 			$UpdateSet[]="i.RatioWatchEnds='0000-00-00 00:00:00'";
 			$CanLeech = 1;
 			$UpdateSet[]="m.can_leech='1'";
-			$UpdateSet[]="i.RatioWatchDownload='0'";	
+			$UpdateSet[]="i.RatioWatchDownload='0'";
 		} else {
 			$EnableStr .= ' (Ratio: '.number_format($Cur['Uploaded']/$Cur['Downloaded'],2).', RR: '.number_format($Cur['RequiredRatio'],2).')';
 			if ($Cur['RatioWatchEnds'] != '0000-00-00 00:00:00') {
@@ -746,12 +730,12 @@ Please visit us soon so we can help you resolve this matter.");
 
 if($SendConfirmMail) {
 	$EditSummary[]="confirmation email resent to ".$ConfirmEmail;
-    
+
     include(SERVER_ROOT.'/classes/class_templates.php');
-			
+
     $TPL=NEW TEMPLATE;
 	$TPL->open(SERVER_ROOT.'/templates/new_registration.tpl');
-			
+
     $TPL->set('Username',$_POST['Username']);
     $TPL->set('TorrentKey',$Cur['torrent_pass']);
     $TPL->set('SITE_NAME',SITE_NAME);
@@ -785,7 +769,7 @@ if ($Pass) {
 	$UpdateSet[]="Secret='$Secret'";
 	$UpdateSet[]="PassHash='".db_string(make_hash($Pass,$Secret))."'";
 	$EditSummary[]='password reset';
-       
+
 	$Cache->delete_value('user_info_'.$UserID);
         $Cache->delete_value('user_info_heavy_'.$UserID);
         $Cache->delete_value('user_stats_'.$UserID);
@@ -796,19 +780,18 @@ if ($Pass) {
 		$Cache->delete_value('session_'.$UserID.'_'.$SessionID);
 	}
         $Cache->delete_value('users_sessions_'.$UserID);
-        
-	
+
 	$DB->query("DELETE FROM users_sessions WHERE UserID='$UserID'");
 }
 
 if ($Email){
     if (!check_perms('users_edit_email')) error(403);
-              
+
     if ($Email > 255 ) error ("Email field is too long");
     if (!preg_match("/^".EMAIL_REGEX."$/i", $Email)) error("You did not enter a valid email address:<br/>$Email");
 	$UpdateSet[]="Email='$Email'";
 	$EditSummary[]="email changed from $Cur[Email] to $Email";
-    
+
 	//This piece of code will update the time of their last email change to the current time *not* the current change.
 	$DB->query("UPDATE users_history_emails SET Time='".sqltime()."' WHERE UserID='$UserID' AND Time='0000-00-00 00:00:00'");
 	$DB->query("INSERT INTO users_history_emails
@@ -816,12 +799,9 @@ if ($Email){
 				('$UserID', '$Email', '0000-00-00 00:00:00', '".db_string($_SERVER['REMOTE_ADDR'])."', '$LoggedUser[ID]')");
 }
 
-
 if (empty($UpdateSet) && empty($EditSummary)) {
 	if(!$Reason) {
 		if (str_replace("\r", '', $Cur['AdminComment']) != str_replace("\r", '', $AdminComment)) {
-            //if (!check_perms('users_admin_notes')) error(403);
-			//$UpdateSet[]="AdminComment='$AdminComment'";
             if (check_perms('users_admin_notes')) $UpdateSet[]="AdminComment='$AdminComment'";
 		} else {
 			header("Location: user.php?id=$UserID");
@@ -845,18 +825,14 @@ $Summary = '';
 if ($EditSummary) {
 	$Summary = implode(', ', $EditSummary)." by ".$LoggedUser['Username'];
 	$Summary = sqltime().' - '.ucfirst($Summary);
-	
+
 	if ($Reason){
 		$Summary .= "\nReason: ".$Reason;
 	}
-	
-	
-	
+
 	$Summary .= "\n".$AdminComment;
 } elseif (empty($UpdateSet) && empty($EditSummary) && $Cur['AdminComment']==$_POST['AdminComment']) {
 	$Summary = sqltime().' - '.'Comment added by '.$LoggedUser['Username'].': '.$Reason."\n";
-	
-	
 }
 
 
@@ -866,9 +842,6 @@ if(!empty($Summary)) {
 	$UpdateSet[]="AdminComment='$AdminComment'";
 }
 
-// Update cache
-
-
 // Build query
 
 $SET = implode(', ', $UpdateSet);
@@ -876,7 +849,6 @@ $SET = implode(', ', $UpdateSet);
 $sql = "UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$UserID'";
 
 // Perform update
-//die($sql);
 $DB->query($sql);
 
 if(isset($ClearStaffIDCache)) {
@@ -909,4 +881,3 @@ function translateLeechStatus($status) {
 			return $status;
 	}
 }
-?>

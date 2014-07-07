@@ -1,16 +1,15 @@
-<?
+<?php
 if(!check_perms('users_view_ips')) { error(403); }
 show_header('Dupe IPs');
 ?>
 <div class="thin">
 	<h2>Dupe IPs</h2>
-<?
+<?php
 define('USERS_PER_PAGE', 50);
 define('IP_OVERLAPS', 5);
 list($Page,$Limit) = page_limit(USERS_PER_PAGE);
 
-
-$RS = $DB->query("SELECT 
+$RS = $DB->query("SELECT
 	SQL_CALC_FOUND_ROWS
 	m.ID,
 	m.IP,
@@ -21,7 +20,7 @@ $RS = $DB->query("SELECT
 	i.Warned,
 	i.JoinDate,
 	(SELECT COUNT(DISTINCT h.UserID) FROM users_history_ips AS h WHERE h.IP=m.IP) AS Uses
-	FROM users_main AS m 
+	FROM users_main AS m
 	LEFT JOIN users_info AS i ON i.UserID=m.ID
 	WHERE (SELECT COUNT(DISTINCT h.UserID) FROM users_history_ips AS h WHERE h.IP=m.IP) >= ".IP_OVERLAPS."
 	AND m.Enabled = '1'
@@ -34,7 +33,7 @@ $DB->set_query_id($RS);
 if($DB->record_count()) {
 ?>
 	<div class="linkbox">
-<?
+<?php
 	$Pages=get_pages($Page,$Results,USERS_PER_PAGE, 11) ;
 	echo $Pages;
 ?>
@@ -46,7 +45,7 @@ if($DB->record_count()) {
 			<td>Dupes</td>
 			<td>Registered</td>
 		</tr>
-<?
+<?php
 	while(list($UserID, $IP, $Username, $PermissionID, $Enabled, $Donor, $Warned, $Joined, $Uses)=$DB->next_record()) {
 	$Row = ($Row == 'b') ? 'a' : 'b';
 ?>
@@ -56,16 +55,15 @@ if($DB->record_count()) {
 			<td><?=display_str($Uses)?></td>
 			<td><?=time_diff($Joined)?></td>
 		</tr>
-<?	} ?>
+<?php 	} ?>
 	</table>
 	<div class="linkbox">
-<? echo $Pages; ?>
+<?php  echo $Pages; ?>
 	</div>
-<? } else { ?>
+<?php  } else { ?>
 	<h2>There are currently no users with more than <?=IP_OVERLAPS?> IP overlaps.</h2>
-<? }
+<?php  }
 ?>
 </div>
-<?
+<?php
 show_footer();
-?>

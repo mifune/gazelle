@@ -1,4 +1,4 @@
-<?
+<?php
 function class_list($Selected=0){
 	global $Classes;
 	$Return = '';
@@ -62,7 +62,7 @@ $DB->query('SELECT
 		<td>Autolock</td>
 		<td>Submit</td>
 	</tr>
-<?
+<?php
 $Row = 'b';
 while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClassWrite, $MinClassCreate, $AutoLock) = $DB->next_record()){
 	$Row = ($Row === 'a' ? 'b' : 'a');
@@ -74,11 +74,11 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<td>
 				<select name="categoryid">
-<?	reset($ForumCats);
+<?php 	reset($ForumCats);
 	foreach ($ForumCats as $CurCat => $CatName) {
 ?>
-					<option value="<?=$CurCat?>" <? if($CurCat == $CategoryID) { echo ' selected="selected"'; } ?>><?=$CatName?></option>
-<?	} ?>
+					<option value="<?=$CurCat?>" <?php  if($CurCat == $CategoryID) { echo ' selected="selected"'; } ?>><?=$CatName?></option>
+<?php 	} ?>
 				</select>
 			</td>
 			<td>
@@ -92,17 +92,17 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 			</td>
 			<td>
 				<select name="minclassread">
-					<?=class_list($MinClassRead)?> 
+					<?=class_list($MinClassRead)?>
 				</select>
 			</td>
 			<td>
 				<select name="minclasswrite">
-					<?=class_list($MinClassWrite)?> 
+					<?=class_list($MinClassWrite)?>
 				</select>
 			</td>
 			<td>
 				<select name="minclasscreate">
-					<?=class_list($MinClassCreate)?> 
+					<?=class_list($MinClassCreate)?>
 				</select>
 			</td>
 			<td>
@@ -112,10 +112,10 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 				<input type="submit" name="submit" value="Edit" />
 				<input type="submit" name="submit" value="Delete" />
 			</td>
-			
+
 		</form>
 	</tr>
-<?
+<?php
 }
 ?>
 	<tr>
@@ -127,10 +127,10 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
 			<td>
 				<select name="categoryid">
-<?	reset($ForumCats);
+<?php 	reset($ForumCats);
 	while(list($CurCat, $CatName) = each($ForumCats)) { ?>
-					<option value="<?=$CurCat?>" <? if($CurCat == $CategoryID) { echo ' selected="selected"'; } ?>><?=$CatName?></option>
-<?	} ?>
+					<option value="<?=$CurCat?>" <?php  if($CurCat == $CategoryID) { echo ' selected="selected"'; } ?>><?=$CatName?></option>
+<?php 	} ?>
 				</select>
 			</td>
 			<td>
@@ -144,17 +144,17 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 			</td>
 			<td>
 				<select name="minclassread">
-					<?=class_list()?> 
+					<?=class_list()?>
 				</select>
 			</td>
 			<td>
 				<select name="minclasswrite">
-					<?=class_list()?> 
+					<?=class_list()?>
 				</select>
 			</td>
 			<td>
 				<select name="minclasscreate">
-					<?=class_list()?> 
+					<?=class_list()?>
 				</select>
 			</td>
 			<td>
@@ -163,9 +163,10 @@ while(list($ID, $CategoryID, $Sort, $Name, $Description, $MinClassRead, $MinClas
 			<td>
 				<input type="submit" value="Create" />
 			</td>
-			
+
 		</form>
 	</tr>
 </table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

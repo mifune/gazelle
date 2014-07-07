@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
 $Text = new TEXT;
 
@@ -22,4 +22,3 @@ $DB->query("DELETE FROM collages_comments WHERE ID='$PostID'");
 
 $Cache->delete_value('collage_'.$CollageID);
 $Cache->delete('collage_'.$CollageID.'_catalogue_0'); //Because these never exceed 500 posts, and I'm really tired right now.
-?>

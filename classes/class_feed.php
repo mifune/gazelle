@@ -1,4 +1,4 @@
-<?
+<?php
 class FEED {
 	var $UseSSL = false; // If we're using SSL for blog and news links
 
@@ -43,31 +43,30 @@ class FEED {
 	}
     //specialised creator function for torrent items
 	function torrent($Title, $Description, $Page, $DownLink, $InfoHash, $TorrentName, $TorrentSize, $ContentSize, $ContentSizeHR, $Creator, $Domain, $Category='', $Tags='') {
-		
-                $Date = date("r");
-		
+		$Date = date("r");
+
 		$Site = $this->UseSSL ? 'https://'.SSL_SITE_URL : 'http://'.NONSSL_SITE_URL;
 		$Item = "\t\t<item>\n";
 
-                $Item .= "\t\t\t<title><![CDATA[$Title]]></title>\n";
+        $Item .= "\t\t\t<title><![CDATA[$Title]]></title>\n";
 		$Item .= "\t\t\t<link>$Site/$Page</link>\n";
-                $Item .= "\t\t\t<category domain=\"$Site/$Domain\"><![CDATA[$Category]]></category>\n";
+        $Item .= "\t\t\t<category domain=\"$Site/$Domain\"><![CDATA[$Category]]></category>\n";
 		$Item .= "\t\t\t<pubDate>$Date</pubDate>\n";
 		$Item .= "\t\t\t<description><![CDATA[$Description]]></description>\n";
-                $Item .= "\t\t\t<tags><![CDATA[$Tags]]></tags>\n";
+        $Item .= "\t\t\t<tags><![CDATA[$Tags]]></tags>\n";
 		$Item .= "\t\t\t<dc:creator>$Creator</dc:creator>\n";
-                $Item .= "\t\t\t<enclosure url=\"$Site/$DownLink\" length=\"$TorrentSize\" type=\"application/x-bittorrent\" />\n";
-                $Item .= "\t\t\t<comments>$Site/$Page</comments>\n";
+        $Item .= "\t\t\t<enclosure url=\"$Site/$DownLink\" length=\"$TorrentSize\" type=\"application/x-bittorrent\" />\n";
+        $Item .= "\t\t\t<comments>$Site/$Page</comments>\n";
 		$Item .= "\t\t\t<guid>$Site/$Page</guid>\n";
-                
-                $Item .= "\t\t\t<torrent xmlns=\"http://xmlns.ezrss.it/0.1/\">\n";
-                $Item .= "\t\t\t\t<fileName><![CDATA[$TorrentName]]></fileName>\n";
-                $Item .= "\t\t\t\t<infoHash><![CDATA[$InfoHash]]></infoHash>\n";
-                $Item .= "\t\t\t\t<contentLength>$ContentSize</contentLength>\n";
-                $Item .= "\t\t\t\t<contentLengthHR>$ContentSizeHR</contentLengthHR>\n";
-                $Item .= "\t\t\t</torrent>\n";
-                
-                $Item .= "\t\t</item>\n";
+
+        $Item .= "\t\t\t<torrent xmlns=\"http://xmlns.ezrss.it/0.1/\">\n";
+        $Item .= "\t\t\t\t<fileName><![CDATA[$TorrentName]]></fileName>\n";
+        $Item .= "\t\t\t\t<infoHash><![CDATA[$InfoHash]]></infoHash>\n";
+        $Item .= "\t\t\t\t<contentLength>$ContentSize</contentLength>\n";
+        $Item .= "\t\t\t\t<contentLengthHR>$ContentSizeHR</contentLengthHR>\n";
+        $Item .= "\t\t\t</torrent>\n";
+
+        $Item .= "\t\t</item>\n";
 
 		return $Item;
 	}

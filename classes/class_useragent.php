@@ -1,4 +1,4 @@
-<?
+<?php
 class USER_AGENT {
 	var $Browsers = array(
 		//Less popular
@@ -32,17 +32,9 @@ class USER_AGENT {
 		'Namoroka'			=> 'Firefox (Experimental)',
 		'AppleWebKit'		=> 'WebKit',
 		'Mozilla'			=> 'Mozilla'
-		//Weird shit
-		/*
-		'WWW-Mechanize'		=> 'Perl',
-		'Wget'				=> 'Wget',
-		'BTWebClient'		=> 'µTorrent',
-		'Transmission'		=> 'Transmission',
-		'Java'				=> 'Java',
-		'RSS'				=> 'RSS Downloader'
-		*/
+
 	);
-	
+
 	var $OperatingSystems = array(
 		//Mobile
 		'SymbianOS'			=> 'Symbian',
@@ -92,20 +84,11 @@ class USER_AGENT {
 		'unix'				=> 'Unix',
 		'Sun OS'			=> 'Sun',
 		'Sun'				=> 'Sun',
-		//Weird shit
-		/*
-		'WWW-Mechanize'		=> 'Perl',
-		'Wget'				=> 'Wget',
-		'BTWebClient'		=> 'µTorrent',
-		'Transmission'		=> 'Transmission',
-		'Java'				=> 'Java',
-		'RSS'				=> 'RSS Downloader',
-		*/
 		//Catch-all
 		'win'				=> 'Windows',
 		'mac'				=> 'Mac OS X'
 	);
-	
+
 	public function operating_system(&$UserAgentString) {
 		if (empty($UserAgentString)) {
 			return 'Hidden';
@@ -119,19 +102,19 @@ class USER_AGENT {
 		}
 		return $Return;
 	}
-	
+
 	public function mobile(&$UserAgentString) {
 		if (strpos($UserAgentString, 'iPad')) {
 			return false;
 		}
-		
+
 		//Mobi catches Mobile
-		if (/*strpos($UserAgentString, 'Mobile') || */strpos($UserAgentString, 'Device') || strpos($UserAgentString, 'Mobi') || strpos($UserAgentString, 'Mini') || strpos($UserAgentString, 'webOS')) {
+		if (strpos($UserAgentString, 'Device') || strpos($UserAgentString, 'Mobi') || strpos($UserAgentString, 'Mini') || strpos($UserAgentString, 'webOS')) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public function browser(&$UserAgentString) {
 		if (empty($UserAgentString)) {
 			return 'Hidden';

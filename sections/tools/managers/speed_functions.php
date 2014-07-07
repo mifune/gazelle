@@ -1,6 +1,4 @@
-    
-<?
- 
+<?php
 // The "order by x" links on columns headers
 function header_link($SortKey, $DefaultWay = "desc") {
     global $Action, $OrderBy, $OrderWay;
@@ -39,63 +37,15 @@ function speed_span($speed, $highlightlimit, $color, $text) {
 function print_speed_option($speed, $selected_speed){
 ?>
     <option value="<?=$speed?>" <?=($selected_speed==$speed?' selected="selected"':'');?>>&nbsp;<?=get_size($speed);?>/s&nbsp;&nbsp;</option>
-<?
-}
-
-/*
-function get_user_notcheatslist() {
-    global $DB;
-    $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
-                                 ui.Donor, ui.Warned, um.Enabled, um.PermissionID
-                  FROM users_not_cheats AS wl
-             LEFT JOIN users_main AS um ON um.ID=wl.UserID
-             LEFT JOIN users_info AS ui ON ui.UserID=wl.UserID
-             LEFT JOIN users_main AS um2 ON um2.ID=wl.StaffID
-              ORDER BY Time DESC");
-    
-    $Userlist = $DB->to_array('UserID');
-    return $Userlist;
-}
-
-function print_user_notcheatslist() {
-    $Userlist = get_user_notcheatslist();
-    print_user_list($Userlist,'excludelist','Exclude users list','watchedgreen', 
-            'Users in this list will be excluded from the multiban function and will not be shown on the cheats page');
-    return $Userlist;
-}
- 
-function get_user_watchlist() {
-    global $DB;
-    $DB->query("SELECT wl.UserID, um.Username, StaffID, um2.Username AS Staffname, Time, wl.Comment, 
-                                 ui.Donor, ui.Warned, um.Enabled, um.PermissionID
-                  FROM users_watch_list AS wl
-             LEFT JOIN users_main AS um ON um.ID=wl.UserID
-             LEFT JOIN users_info AS ui ON ui.UserID=wl.UserID
-             LEFT JOIN users_main AS um2 ON um2.ID=wl.StaffID
-              ORDER BY Time DESC");
-    
-    $Watchlist = $DB->to_array('UserID');
-    return $Watchlist;
-}
-
-
-function print_user_watchlist() {
-    $Watchlist = get_user_watchlist();
-    print_user_list($Watchlist,'watchlist','User watch list','watchedred', 'Users in the watch list will have their records retained until they are manually deleted. You can use this information to help detect ratio cheaters.<br/>
-                    note: use the list sparingly - this can quickly fill the database with a huge number of records.');
-    return $Watchlist;
-} */
-
-
-
+<?php }
 
 function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
-    
-?> 
+
+?>
         <div class="head"><?=$Title?> &nbsp;<img src="static/common/symbols/<?=$TitleIcon?>.png" alt="view" /><span style="float:right;"><a href="#" onclick="$('#<?=$ListType?>').toggle();this.innerHTML=this.innerHTML=='(hide)'?'(view)':'(hide)';">(hide)</a></span>&nbsp;</div>
         <table id="<?=$ListType?>" class="">
-            <tr class="rowa"> 
-                <td colspan="6" style="text-align: left;color:grey"> 
+            <tr class="rowa">
+                <td colspan="6" style="text-align: left;color:grey">
                     <?=$Help?>
                 </td>
             </tr>
@@ -108,23 +58,20 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
                 <!--<td class="center" width="100px" title="keep torrent records related to this user">keep torrents</td>-->
                 <td class="center" width="120px"></td>
             </tr>
-<?
-            $row = 'a';
+<?php             $row = 'a';
             if(count($Userlist)==0){
-?> 
+?>
                     <tr class="rowb">
                         <td class="center" colspan="7">no users on <?=$Title?></td>
                     </tr>
-<?
-            } else {
+<?php             } else {
                 foreach ($Userlist as $Watched) {
                     list($UserID, $Username, $StaffID, $Staffname, $Time, $Comment,
                                        $IsDonor, $Warned, $Enabled, $ClassID) = $Watched;
                     $row = ($row === 'b' ? 'a' : 'b');
-?> 
-    
+?>
+
                     <tr class="row<?=$row?>">
-                     
                             <td class="center">
                                 <a href="?action=speed_records&viewspeed=<?=$ViewSpeed?>&userid=<?=$UserID?>" title="View records for just <?=$Username?>"><img src="static/common/symbols/view.png" alt="view" /></a>
 <?                          if ($ListType=='watchlist' && $Enabled=='1'){ ?>
@@ -152,8 +99,7 @@ function print_user_list($Userlist,$ListType,$Title,$TitleIcon,$Help) {
             }
 ?>
     </table>
-<?
-    //return $Userlist;
+<?php     //return $Userlist;
 }
 
 ?>

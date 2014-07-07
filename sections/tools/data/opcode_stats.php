@@ -1,4 +1,4 @@
-<?
+<?php
 //TODO: Accelerator cache keys, removed scripts (stats here and a class to manage them (we'd probably never use it, but I like completeness))
 //INFO: http://bart.eaccelerator.net/doc/phpdoc/
 //INFO: http://bakery.cakephp.org/articles/view/eaccelerator-cache-engine - pertains to potential todo for eAccelerator cache class
@@ -18,7 +18,6 @@ if (isset($_POST['submit'])) {
 	}
 	if (function_exists('eaccelerator_optimizer')) {
 		if($_POST['optimize'] == 1) {
-		
 			authorize();
 
 			eaccelerator_optimizer(true);
@@ -26,7 +25,7 @@ if (isset($_POST['submit'])) {
 			eaccelerator_optimizer(false);
 		}
 	}
-	
+
 	if (isset($_POST['clear'])) {
 		authorize();
 		eaccelerator_clear();
@@ -42,11 +41,9 @@ if (isset($_POST['submit'])) {
 		eaccelerator_purge();
 	}
 }
+
 $Opcode = eaccelerator_info();
 $CachedScripts = eaccelerator_cached_scripts();
-//$RemovedScripts = eaccelerator_removed_scripts();
-
-
 
 show_header("Opcode Stats");
 ?>
@@ -63,10 +60,10 @@ show_header("Opcode Stats");
 					<td>
 						<input type="checkbox" name="cache" value="1" id="cache"<?=($Opcode['cache'])?' checked="checked"':''?> />
 						<label for="cache">Cache</label>
-<? if (function_exists('eaccelerator_optimizer')) { ?>
+<?php  if (function_exists('eaccelerator_optimizer')) { ?>
 						<input type="checkbox" name="optimize" value="1" id="optimize"<?=($Opcode['optimizer'])?' checked="checked"':''?> />
 						<label for="optimize">Optimize</label>
-<? } ?>
+<?php  } ?>
 					</td>
 				</tr>
 				<tr>
@@ -85,7 +82,7 @@ show_header("Opcode Stats");
 						<input type="submit" name="submit" value="Update" />
 					</td>
 				</tr>
-			</table>	
+			</table>
 		</form>
 	</div>
 	<br /><br />
@@ -107,11 +104,11 @@ show_header("Opcode Stats");
 			<td>Removed Scripts:</td>
 			<td><?=number_format($Opcode['removedScripts'])?></td>
 			<td>Cached Keys:</td>
-<? if (function_exists('eaccelerator_get')) { ?>
+<?php  if (function_exists('eaccelerator_get')) { ?>
 			<td><?=number_format($Opcode['cachedKeys'])?></td>
-<? } else { ?>
+<?php  } else { ?>
 			<td>N/A</td>
-<? } ?>
+<?php  } ?>
 		</tr>
 	</table>
 	<br /><br />
@@ -122,7 +119,7 @@ show_header("Opcode Stats");
 		<td>Size</td>
 		<td>Hits</td>
 	</tr>
-<?
+<?php
 if(count($CachedScripts) == 0) { // Uh-oh, try again.
 	echo '<tr><td colspan="5">No scripts cached.</td></tr>';
 }
@@ -137,9 +134,10 @@ foreach ($CachedScripts as $Script) {
 			<td><?=get_size($Size)?></td>
 			<td><?=number_format($Hits)?></td>
 		</tr>
-<?
+<?php
 }
 ?>
 	</table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

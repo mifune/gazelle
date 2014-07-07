@@ -1,6 +1,6 @@
-<?
+<?php
 /*
- * This is the backend of the AJAXy reports resolve (When you press the shiny submit button). 
+ * This is the backend of the AJAXy reports resolve (When you press the shiny submit button).
  * This page shouldn't output anything except in error, if you do want output, it will be put
  * straight into the table where the report used to be. Currently output is only given when
  * a collision occurs or a POST attack is detected.
@@ -10,7 +10,6 @@ if(!check_perms('admin_reports')) {
 	error(403);
 }
 authorize();
-
 
 //Don't escape: Log message, Admin message
 $Escaped = db_array($_POST, array('log_message','admin_message', 'raw_name'));
@@ -74,7 +73,7 @@ if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss
 			 $Comment = "Report was dismissed as invalid";
 		}
 	}
-	
+
 	$DB->query("UPDATE reportsv2 SET
 	Status='Resolved',
 	LastChangeTime='".sqltime()."',
@@ -82,7 +81,7 @@ if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss
 	ResolverID='".$LoggedUser['ID']."'
 	WHERE ID='".$ReportID."'
 	AND Status <> 'Resolved'");
-	
+
 	if($DB->affected_rows() > 0) {
 		$Cache->delete_value('num_torrent_reportsv2');
 		$Cache->delete_value('reports_torrent_'.$TorrentID);
@@ -98,7 +97,7 @@ if(($Escaped['resolve_type'] == "manual" || $Escaped['resolve_type'] == "dismiss
                 </td>
             </tr>
         </table>
-<?
+<?php
 	}
 	die();
 }
@@ -118,7 +117,7 @@ if(!isset($Escaped['resolve_type'])) {
 $DB->query("SELECT ID FROM torrents WHERE ID = ".$TorrentID);
 $TorrentExists = ($DB->record_count() > 0);
 if(!$TorrentExists) {
-	$DB->query("UPDATE reportsv2 
+	$DB->query("UPDATE reportsv2
 		SET Status='Resolved',
 		LastChangeTime='".sqltime()."',
 		ResolverID='".$LoggedUser['ID']."',
@@ -130,7 +129,7 @@ if(!$TorrentExists) {
 
 if($Report) {
 	//Resolve with a parallel check
-	$DB->query("UPDATE reportsv2 
+	$DB->query("UPDATE reportsv2
 		SET Status='Resolved',
 			LastChangeTime='".sqltime()."',
 			ResolverID='".$LoggedUser['ID']."'
@@ -143,7 +142,7 @@ if($DB->affected_rows() > 0 || !$Report) {
 	//We did, lets do all our shit
 	if($Report) { $Cache->decrement('num_torrent_reportsv2'); }
 
-	
+
 	if(isset($Escaped['upload'])) {
 		$Upload = true;
 	} else {
@@ -178,7 +177,7 @@ if($DB->affected_rows() > 0 || !$Report) {
 		$Cache->delete_value('torrents_details_'.$GroupID);
 		$SendPM = true;
 	}
-	
+
 	//Log and delete
 	if(isset($Escaped['delete']) && check_perms('users_mod')) {
 		$DB->query("SELECT Username FROM users_main WHERE ID = ".$UploaderID);
@@ -190,7 +189,7 @@ if($DB->affected_rows() > 0 || !$Report) {
 		}
 		$DB->query("SELECT GroupID FROM torrents WHERE ID = ".$TorrentID);
 		list($GroupID) = $DB->next_record();
-        
+
         if($ResolveType['title']=='Dupe' && isset($Escaped['extras_id'])) {
             //------ if deleting a dupe pm peers with the duped torrents id
 			$ExtraIDs = explode(" ", $Escaped['extras_id']);
@@ -198,11 +197,11 @@ if($DB->affected_rows() > 0 || !$Report) {
                 if(!is_number($ExtraID)) error(0);
             }
             $ExtraIDs = implode(',', $ExtraIDs);
-            
+
             $DB->query("SELECT DISTINCT uid FROM xbt_snatched WHERE fid = '$TorrentID'
                         UNION
                         SELECT DISTINCT uid FROM xbt_files_users WHERE fid = '$TorrentID'");
-            
+
             if ($DB->record_count()>0) {
                 $Peers = $DB->collect('uid');
                 $Message = "Torrent ".$TorrentID." (".$RawName.") was deleted for being a dupe.[br][br]";
@@ -211,17 +210,17 @@ if($DB->affected_rows() > 0 || !$Report) {
 				$DB->query("SELECT tg.ID, tg.Name, t.Time, t.Size, t.UserID, um.Username
 							  FROM torrents AS t JOIN torrents_group AS tg ON tg.ID=t.GroupID
 							  LEFT JOIN users_main AS um ON um.ID=t.UserID
-							 WHERE tg.ID IN ($ExtraIDs) 
+							 WHERE tg.ID IN ($ExtraIDs)
 							 ORDER BY t.Time DESC");
                 while(list($xID, $xName, $xTime, $xSize, $xUserID, $xUsername) = $DB->next_record()) {
 					$Message .= "[br][url=/torrents.php?id=$xID]{$xName}[/url] (". get_size($xSize).") uploaded by [url=/user.php?id=$xUserID]{$xUsername}[/url] " .time_diff($xTime,2,false,false);
                 }
                 $Message .= "[br][br]You should be able to join the torrent already here by grabbing its torrent file and doing a force recheck in your torrent client.[br][br]See the [url=/articles.php?topic=unseeded]Reseed a torrent[/url] article for details.";
-                send_pm($Peers, 0, db_string('A torrent you were a peer on was deleted'), db_string($Message)); 
+                send_pm($Peers, 0, db_string('A torrent you were a peer on was deleted'), db_string($Message));
             }
- 
+
         }
-        
+
 		delete_torrent($TorrentID);
 		write_log($Log);
 		$Log = "deleted torrent for the reason: ".$ResolveType['title'].". ( ".$Escaped['log_message']." )";
@@ -229,39 +228,39 @@ if($DB->affected_rows() > 0 || !$Report) {
 	} else {
 		$Log = "No log message (Torrent wasn't deleted)";
 	}
-	
+
 	//Warnings / remove upload
 	if($Upload) {
 		$Cache->begin_transaction('user_info_heavy_'.$UploaderID);
 		$Cache->update_row(false, array('DisableUpload' => '1'));
 		$Cache->commit_transaction(0);
-	
+
 		$DB->query("UPDATE users_info SET
 			DisableUpload='1'
 			WHERE UserID=".$UploaderID);
 	}
-	
+
       if($Bounty && $ReporterID){
           $Bounty = (int)$ResolveType['resolve_options']['bounty'];
           if ($Bounty>0){
-              
+
                 $SET = "m.Credits=(m.Credits+$Bounty)";
-                $Summary = sqltime()." - User received a bounty payment of $Bounty credits.";	
+                $Summary = sqltime()." - User received a bounty payment of $Bounty credits.";
                 $SET .=",i.AdminComment=CONCAT_WS( '\n', '".db_string($Summary)."', i.AdminComment)";
                 $Summary = sqltime()." | +$Bounty credits | You got a bounty payment.";
                 $SET .=",i.BonusLog=CONCAT_WS( '\n', '".db_string($Summary)."', i.BonusLog)";
-                
+
                 $DB->query("UPDATE users_main AS m JOIN users_info AS i ON m.ID=i.UserID SET $SET WHERE m.ID='$ReporterID'");
                 $Cache->delete_value('user_stats_'.$ReporterID);
-            
+
                 $Body = "Thank-you for your {$ResolveType['title']} report re: [url=http://".NONSSL_SITE_URL."/torrents.php?torrentid=$TorrentID]{$RawName}[/url]\n\nYou received a bounty payment of $Bounty credits.";
-               
+
                 send_pm($ReporterID, 0, "Received Bounty Payment", db_string($Body));
           }
       }
-      
+
 	if($Warning > 0) {
-		$WarnLength = $Warning * (7*24*60*60); 
+		$WarnLength = $Warning * (7*24*60*60);
 		$Reason = "Uploader of torrent (".$TorrentID.") ".$RawName." which was resolved with the preset: ".$ResolveType['title'].".";
 		if($Escaped['admin_message']) {
 			$Reason .= " (".$Escaped['admin_message'].").";
@@ -285,13 +284,13 @@ if($DB->affected_rows() > 0 || !$Report) {
 		}
 		if($AdminComment) {
 			$AdminComment = date("Y-m-d").' - '.$AdminComment."\n\n";
-				
+
 			$DB->query("UPDATE users_info SET
 				AdminComment=CONCAT('".db_string($AdminComment)."',AdminComment)
 				WHERE UserID='".db_string($UploaderID)."'");
 		}
 	}
-	
+
 	//PM
 	if($Escaped['uploader_pm'] || $Warning > 0 || isset($Escaped['delete']) || $SendPM) {
 		if(isset($Escaped['delete'])) {
@@ -299,17 +298,17 @@ if($DB->affected_rows() > 0 || !$Report) {
 		} else {
 			$PM = "[url=http://".NONSSL_SITE_URL."/torrents.php?torrentid=".$TorrentID."]Your above torrent[/url] was reported but not deleted.\n\n";
 		}
-		
+
 		$Preset = $ResolveType['resolve_options']['pm'];
-		
+
 		if($Preset != "") {
 			 $PM .= "Reason: ".$Preset;
 		}
-		
+
 		if($Warning > 0) {
-			$PM .= "\nThis has resulted in a [url=/articles.php?topic=rules]$Warning week warning.[/url]\n";	
+			$PM .= "\nThis has resulted in a [url=/articles.php?topic=rules]$Warning week warning.[/url]\n";
 		}
-		
+
 		if($Upload) {
 			$PM .= "This has ".($Warning > 0 ? 'also ' : '')."resulted in you losing your upload privileges.";
 		}
@@ -317,21 +316,21 @@ if($DB->affected_rows() > 0 || !$Report) {
 		if($Log) {
 			$PM = $PM."\nLog Message: ".$Log."\n";
 		}
-		
+
 		if($Escaped['uploader_pm']) {
-			$PM .= "\nMessage from ".$LoggedUser['Username'].": ".$PMMessage;	
+			$PM .= "\nMessage from ".$LoggedUser['Username'].": ".$PMMessage;
 		}
-		
+
 		$PM .= "\n\nReport was handled by [user]".$LoggedUser['Username']."[/user].";
-		
+
 		send_pm($UploaderID, 0, db_string($Escaped['raw_name']), db_string($PM));
 	}
 
 	$Cache->delete_value('reports_torrent_'.$TorrentID);
 	$Cache->delete_value('torrent_group_'.$GroupID);
-        
+
 	//Now we've done everything, update the DB with values
-	if($Report) { 
+	if($Report) {
         if ($ResolveType['title']=='Dupe') {
             $CreditSQL = ",Credit='1'";
         }
@@ -353,6 +352,5 @@ if($DB->affected_rows() > 0 || !$Report) {
 			</td>
 		</tr>
 	</table>
-<?
+<?php
 }
-?>

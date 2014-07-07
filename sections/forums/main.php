@@ -1,4 +1,4 @@
-<?
+<?php
 if (isset($LoggedUser['PostsPerPage'])) {
 	$PerPage = $LoggedUser['PostsPerPage'];
 } else {
@@ -30,8 +30,8 @@ if(!empty($TopicIDs)) {
 show_header('Forums');
 ?>
 <div class="thin">
-<? print_latest_forum_topics(); ?>
-    
+<?php print_latest_forum_topics(); ?>
+
 	<div class="linkbox">
 		[<a href="#" onclick="$('#searchforum').toggle(); this.innerHTML = (this.innerHTML == 'Search all forums'?'Hide Search':'Search all forums'); return false;">Search all forums</a>]&nbsp;
 		[<a href="forums.php?action=unread">Unread Posts</a>]
@@ -40,7 +40,7 @@ show_header('Forums');
                             <br />
 				<div class="head">Search all forums</div>
 				<form action="forums.php" method="get">
-					<table cellpadding="6" cellspacing="1" border="0" class="border">	
+					<table cellpadding="6" cellspacing="1" border="0" class="border">
 						<input type="hidden" name="action" value="search" />
 						<tr>
 							<td><strong>Search for:</strong></td><td><input type="text" id="searchbox" name="search" size="70" /></td>
@@ -48,9 +48,9 @@ show_header('Forums');
 						<tr>
 							<td><strong>Search in:</strong></td>
 							<td>
-								<input type="radio" name="type" id="type_title" value="title" checked="checked" /> 
+								<input type="radio" name="type" id="type_title" value="title" checked="checked" />
 								<label for="type_title">Titles</label>
-								<input type="radio" name="type" id="type_body" value="body" /> 
+								<input type="radio" name="type" id="type_body" value="body" />
 								<label for="type_body">Post bodies</label>
 							</td>
 						<tr>
@@ -63,7 +63,7 @@ show_header('Forums');
 			</div>
 		</div>
 	</div>
-<?
+<?php
 $Row = 'a';
 $LastCategoryID=0;
 $OpenTable = false;
@@ -84,8 +84,8 @@ foreach ($Forums as $Forum) {
 		$LastCategoryID=$CategoryID;
 		if($OpenTable) { ?>
 	</table>
-<? 		} ?>
-                
+<?php 		} ?>
+
 <div class="head"><?=$ForumCats[$CategoryID]?></div>
 	<table class="forum_index">
 		<tr class="colhead">
@@ -96,19 +96,14 @@ foreach ($Forums as $Forum) {
 			<td style="text-align: center;width:7%;">Topics</td>
 			<td style="text-align: center;width:7%;">Posts</td>
 		</tr>
-<?
+<?php
 		$OpenTable = true;
 	}
-      // (!$Locked || $Sticky) && //-  remove this and let locked unsticky topics show up too if a staff has posted in it
 	if( $LastPostID != 0 && ((empty($LastRead[$LastTopicID]) || $LastRead[$LastTopicID]['PostID'] < $LastPostID) && strtotime($LastTime)>$LoggedUser['CatchupTime'])) {
 		$Read = 'unread';
 	} else {
 		$Read = 'read';
 	}
-/*  Removed per request, as distracting  
-	if($Locked) { $Read .= "_locked"; }
-	if($Sticky) { $Read .= "_sticky"; }
- */
 ?>
 	<tr class="row<?=$Row?>">
 		<td class="<?=$Read?>" title="<?=ucfirst($Read)?>"></td>
@@ -117,31 +112,29 @@ foreach ($Forums as $Forum) {
 				<a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>" title="<?=$ForumDescription?>"><?=display_str($ForumName)?></a>
 			</h4>
 		</td>
-		<!--<td style="">
-            <span class="forum_desc" style="font-style: italic"><?=$ForumDescription?></span>
-        </td>-->
-<? if ($NumPosts == 0) { ?>
+<?php if ($NumPosts == 0) { ?>
 		<td colspan="3">
 			There are no topics here<?=($MinCreate<=$LoggedUser['Class']) ? ', <a href="forums.php?action=new&amp;forumid='.$ForumID.'">'.'create one'.'</a>' : ''?>.
 		</td>
-<? } else { ?>
+<?php } else { ?>
 		<td>
 			<span style="float:left;" class="last_topic">
 				<a href="forums.php?action=viewthread&amp;threadid=<?=$LastTopicID?>" title="<?=display_str($LastTopic)?>"><?=display_str(cut_string($LastTopic, 50, 0))?></a>
 			</span>
-<? if (!empty($LastRead[$LastTopicID])) { ?>
+<?php if (!empty($LastRead[$LastTopicID])) { ?>
 			<span style="float: left;" class="last_read" title="Jump to last read">
 				<a href="forums.php?action=viewthread&amp;threadid=<?=$LastTopicID?>&amp;page=<?=$LastRead[$LastTopicID]['Page']?>#post<?=$LastRead[$LastTopicID]['PostID']?>"></a>
 			</span>
-<? } ?>
+<?php } ?>
 			<span style="float:right;" class="last_poster">by <?=format_username($LastAuthorID, $LastPostAuthorName)?> <?=time_diff($LastTime,1)?></span>
 		</td>
 		<td style="text-align: center;"><?=number_format($NumTopics)?></td>
 		<td style="text-align: center;"><?=number_format($NumPosts)?></td>
-<? } ?>
+<?php } ?>
 	</tr>
-<? } ?>
+<?php } ?>
 	</table>
 	<div class="linkbox">[<a href="forums.php?action=catchup&amp;forumid=all&amp;auth=<?=$LoggedUser['AuthKey']?>">Catch up all</a>]</div>
 </div>
-<? show_footer();
+<?php
+show_footer();

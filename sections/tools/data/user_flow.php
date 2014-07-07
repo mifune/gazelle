@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('site_view_flow')) { error(403); }
 
 //Timeline generation
@@ -33,7 +33,6 @@ if(!isset($_GET['page'])) {
 	}
 }
 //End timeline generation
-
 
 define('DAYS_PER_PAGE', 100);
 list($Page,$Limit) = page_limit(DAYS_PER_PAGE);
@@ -101,13 +100,13 @@ list($Results) = $DB->next_record();
 show_header('User Flow');
 ?>
 <div class="thin">
-<? if(!isset($_GET['page'])) { ?>
+<?php  if(!isset($_GET['page'])) { ?>
 	<div class="box pad">
 		<img src="http://chart.apis.google.com/chart?cht=lc&chs=820x160&chco=000D99,99000D&chg=0,-1,1,1&chxt=y,x&chxs=0,h&chxl=1:|<?=implode('|',$Labels)?>&chxr=0,0,<?=$Max?>&chd=t:<?=implode(',',$InFlow)?>|<?=implode(',',$OutFlow)?>&chls=2,4,0&chdl=New+Registrations|Disabled+Users&amp;chf=bg,s,FFFFFF00" />
 	</div>
-<? } ?>
+<?php  } ?>
 	<div class="linkbox">
-<?
+<?php
 $Pages=get_pages($Page,$Results,DAYS_PER_PAGE,11) ;
 echo $Pages;
 ?>
@@ -118,11 +117,11 @@ echo $Pages;
 			<td>(+) Joined</td>
 			<td>(-) Manual</td>
 			<td>(-) Ratio</td>
-			<td>(-) Inactivity</td>			
+			<td>(-) Inactivity</td>
 			<td>(-) Total</td>
 			<td>Net Growth</td>
 		</tr>
-<?
+<?php
 	$DB->set_query_id($RS);
 	while(list($Date, $Month, $Joined, $Manual, $Ratio, $Inactivity)=$DB->next_record()) {
 	$TotalOut = $Ratio + $Inactivity + $Manual;
@@ -137,10 +136,11 @@ echo $Pages;
 			<td><?=number_format($TotalOut)?></td>
 			<td><?=number_format($TotalGrowth)?></td>
 		</tr>
-<?	} ?>
+<?php 	} ?>
 	</table>
 	<div class="linkbox">
 		<?=$Pages?>
 	</div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

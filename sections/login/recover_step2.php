@@ -1,4 +1,4 @@
-<?
+<?php
 show_header('Recover Password','validate');
 echo $Validate->GenerateJS('recoverform');
 ?>
@@ -6,12 +6,12 @@ echo $Validate->GenerateJS('recoverform');
 	<input type="hidden" name="key" value="<?=display_str($_REQUEST['key'])?>" />
 	<div style="width:320px;">
 		<font class="titletext">Reset your password - Final Step</font><br /><br />
-<?
+<?php
 if(empty($Reset)) {
 	if(!empty($Err)) {
 ?>
 		<font color="red"><strong><?=display_str($Err)?></strong></font><br /><br />
-<?	} ?>
+<?php 	} ?>
 		Please choose a password between 6 and 15 characters long<br /><br />
 		<table cellpadding="2" cellspacing="1" border="0" align="center">
 			<tr valign="top">
@@ -26,12 +26,11 @@ if(empty($Reset)) {
 				<td colspan="2" align="right"><input type="submit" name="reset" value="Reset!" class="submit" /></td>
 			</tr>
 		</table>
-<? } else { ?>
+<?php  } else { ?>
 		Your password has been succesfully reset.<br />
 		Please <a href="login.php">click here</a> to log in using your new password.
-<? } ?>
+<?php  } ?>
 	</div>
 </form>
-<?
+<?php
 show_footer();
-?>

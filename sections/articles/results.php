@@ -1,12 +1,11 @@
-<?
- 
+<?php
 $Searchtext = trim($_REQUEST['searchtext']);
 
 $DB->query("SELECT TopicID, Title, Description, Category, SubCat, MinClass
-                  FROM articles 
+                  FROM articles
                  WHERE Category!='2'
-                   AND MinClass<='$StaffClass' 
-                   AND MATCH (Title,Description,Body) AGAINST ('".db_string($Searchtext)."' IN BOOLEAN MODE)"); // 
+                   AND MinClass<='$StaffClass'
+                   AND MATCH (Title,Description,Body) AGAINST ('".db_string($Searchtext)."' IN BOOLEAN MODE)"); //
 $Articles = $DB->to_array();
 //$DB->query("SELECT FOUND_ROWS()");
 //list($NumResults) = $DB->next_record();
@@ -17,8 +16,8 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
 
 <div class="thin">
     <h2>Search Results</h2>
-    
-    <div class="head">Search Articles</div> 
+
+    <div class="head">Search Articles</div>
     <form method="get" action="articles.php">
         <table>
             <tr class="box">
@@ -33,19 +32,19 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
         </table>
     </form>
     <br/>
-    
+
     <div class="head"><?=$NumResults?> Search Results</div>
     <table width="100%" class="topic_list">
             <tr class="colhead">
                     <td colspan="2">Searched for: <?=$Searchtext?></td>
                     <td>Found <?=$NumResults?> result<? if($NumResults!=1) echo"s";?></td>
             </tr>
-<?
-    $Row = 'a'; 
- 
+<?php
+    $Row = 'a';
+
     foreach($Articles as $Article) {
         list($TopicID, $Title, $Description, $Category, $SubCat, $MinClass) = $Article;
-        
+
         $Row = ($Row == 'a') ? 'b' : 'a';
 ?>
             <tr class="row<?=$Row?>">
@@ -58,18 +57,17 @@ show_header( "Articles>Search Results", 'browse,overlib,bbcode');
                     </td>
                     <td>
                             <?=display_str($Description)?>
-<?                  if($MinClass) { ?>
+<?php               if($MinClass) { ?>
                         <span style="float:right">
                             <?="[{$ClassLevels[$MinClass][Name]}+]"?>
                         </span>
-<?                  } ?>
+<?php               } ?>
                     </td>
             </tr>
-<?  } ?>
+<?php  } ?>
     </table>
 </div>
 
 
-<?
+<?php
 show_footer();
-?>

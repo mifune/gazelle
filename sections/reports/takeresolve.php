@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 if(!check_perms('admin_reports') && !check_perms('project_team') && !check_perms('site_moderate_forums')) {
@@ -29,18 +29,17 @@ $Comment = sqltime()." - Resolved by {$LoggedUser['Username']}";
 if (isset($_POST['comment'])) $Comment .= " - {$_POST['comment']}";
 $Comment=db_string($Comment);
 
-$DB->query("UPDATE reports 
+$DB->query("UPDATE reports
 			SET Status='Resolved',
 				ResolvedTime='".sqltime()."',
 				ResolverID='{$LoggedUser['ID']}',
 				Comment=CONCAT_WS( '\n', Comment, '$Comment')
 			WHERE ID='".db_string($ReportID)."'");
 
-                        
 if ($ConvID && $ConvID>0){
     $DB->query("UPDATE staff_pm_conversations SET Status='Resolved', ResolverID=".$LoggedUser['ID']." WHERE ID=$ConvID");
     $Cache->delete_value('staff_pm_new_'.$LoggedUser['ID']);
-    $Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']); 
+    $Cache->delete_value('num_staff_pms_'.$LoggedUser['ID']);
 }
 
 $Channels = array();
@@ -55,7 +54,6 @@ if(in_array($Type, array('collages_comment', 'post', 'requests_comment', 'thread
 	$Cache->decrement('num_forum_reports');
 }
 
-
 $DB->query("SELECT COUNT(ID) FROM reports WHERE Status = 'New'");
 list($Remaining) = $DB->next_record();
 
@@ -64,8 +62,6 @@ foreach($Channels as $Channel) {
 }
 
 $Cache->delete_value('num_other_reports');
-
-
 
 header('Location: reports.php');
 ?>

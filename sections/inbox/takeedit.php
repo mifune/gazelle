@@ -1,4 +1,4 @@
-<?
+<?php
 authorize();
 
 $UserID = $LoggedUser['ID'];
@@ -31,4 +31,3 @@ if(isset($_POST['delete'])) {
 	}
 }
 header('Location: inbox.php');
-?>

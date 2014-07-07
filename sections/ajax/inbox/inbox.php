@@ -1,6 +1,4 @@
-<?
-
-
+<?php
 $UserID = $LoggedUser['ID'];
 
 
@@ -109,4 +107,3 @@ print
 			)
 		)
 	);
-?>

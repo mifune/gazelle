@@ -1,5 +1,4 @@
-<?
-
+<?php
 include(SERVER_ROOT.'/sections/staffpm/functions.php');
 
 show_header('Staff PMs', 'staffpm,bbcode,inbox,jquery');
@@ -7,16 +6,16 @@ show_header('Staff PMs', 'staffpm,bbcode,inbox,jquery');
 // Get messages
 $StaffPMs = $DB->query("
 	SELECT
-		ID, 
-		Subject, 
-		UserID, 
-		Status, 
-		Level, 
-		AssignedToUser, 
-		Date, 
+		ID,
+		Subject,
+		UserID,
+		Status,
+		Level,
+		AssignedToUser,
+		Date,
 		Unread
-	FROM staff_pm_conversations 
-	WHERE UserID=".$LoggedUser['ID']." 
+	FROM staff_pm_conversations
+	WHERE UserID=".$LoggedUser['ID']."
 	ORDER BY Status, Date DESC"
 );
 
@@ -35,16 +34,16 @@ $Msg = isset($_REQUEST['msg'])?$_REQUEST['msg']:'';
           <div class="center">
                 <a href="#" onClick="jQuery('#compose').slideToggle('slow');">[Compose New]</a>
           </div>
-		<? print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
+		<?php  print_compose_staff_pm(!$Show, $Assign, $Subject, $Msg);  ?>
       </div>
 	<div class="box pad shadow" id="inbox">
-<?
+<?php
 
 if ($DB->record_count() == 0) {
 	// No messages
 ?>
 		<h2>No messages</h2>
-<?
+<?php
 
 } else {
 	// Messages, draw table
@@ -60,7 +59,7 @@ if ($DB->record_count() == 0) {
 					<td width="15%">Assigned to</td>
                               <td width="10%">Status</td>
 				</tr>
-<?
+<?php
 	// List messages
 	$Row = 'a';
 	$ShowBox = 1;
@@ -74,54 +73,52 @@ if ($DB->record_count() == 0) {
 
 		if ($Status == 'Resolved') { $ShowBox++; }
 		if ($ShowBox == 2) {
-			// First resolved PM
-                // close multiresolve form  , end table, start new table for already resolved staff messages
+		// First resolved PM
+        // close multiresolve form  , end table, start new table for already resolved staff messages
 ?>
 			</table>
 			<input type="submit" value="Resolve selected" />
 		</form>
-		 
+
 			<br />
 			<h3>Resolved messages</h3>
-			<table>	
+			<table>
 				<tr class="colhead">
 					<td width="50%">Subject</td>
 					<td>Date</td>
 					<td width="15%">Assigned to</td>
                               <td width="10%">Status</td>
 				</tr>
-<?
+<?php
 		}
 
 		// Get assigned
 		$Assigned = ($Level == 0) ? "First Line Support" : $ClassLevels[$Level]['Name'];
 		// No + on Sysops
 		if ($Assigned != 'Sysop') { $Assigned .= "+"; }
-			
+
 		// Table row
 ?>
 				<tr class="<?=$RowClass?>">
-					<? // if we are still in first table it is appropriate to draw resolve checkbox
-                              if ($ShowBox == 1) echo '<td class="center"><input type="checkbox" name="id[]" value="<?=$ID?>" /></td>';?>
+					<?php  // if we are still in first table it is appropriate to draw resolve checkbox
+                    if ($ShowBox == 1) echo '<td class="center"><input type="checkbox" name="id[]" value="<?=$ID?>" /></td>';?>
 					<td><a href="staffpm.php?action=viewconv&amp;id=<?=$ID?>"><?=display_str($Subject)?></a></td>
 					<td><?=time_diff($Date, 2, true)?></td>
 					<td><?=$Assigned?></td>
 					<td><?=$Status?></td>
 				</tr>
-<?
+<?php
 		$DB->set_query_id($StaffPMs);
 	}
 
-	// Close table 
+	// Close table
 ?>
 			</table>
-<?
+<?php
 }
 ?>
 	</div>
 </div>
-<?
-
+<?php
 show_footer();
 
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 function display_perm($Key,$Title,$ToolTip='') {
 	global $Values;
       if (!$ToolTip)$ToolTip=$Title;
@@ -12,7 +12,7 @@ show_header('Manage Permissions','validate');
 
 echo $Val->GenerateJS('permform');
 
-      if(isset($_REQUEST['isclass']) &&  $_REQUEST['isclass']=='1') $IsUserClass = true; 
+if(isset($_REQUEST['isclass']) &&  $_REQUEST['isclass']=='1') $IsUserClass = true;
 ?>
 <form name="permform" id="permform" method="post" action="" onsubmit="return formVal();">
 	<input type="hidden" name="action" value="permissions" />
@@ -24,7 +24,7 @@ echo $Val->GenerateJS('permform');
 		[<a href="tools.php">Back to Tools</a>]
 	</div>
 	<table class="permission_head">
-<?      if($IsUserClass)   {     ?>
+<?php if($IsUserClass) {     ?>
 		<tr>
 			<td class="label">User Class<!--Permission Name--></td>
 			<td><input type="text" name="name" id="name" value="<?=(!empty($Name) ? display_str($Name) : '')?>" /></td>
@@ -49,33 +49,34 @@ echo $Val->GenerateJS('permform');
 		</tr>
 		<tr>
 			<td class="label">Show on Staff page</td>
-			<td><input type="checkbox" name="displaystaff" value="1" <? if (!empty($DisplayStaff)) { ?>checked<? } ?> /></td>
+			<td><input type="checkbox" name="displaystaff" value="1" <?php  if (!empty($DisplayStaff)) { ?>checked<?php  } ?> /></td>
 		</tr>
 		<tr>
 			<td class="label">Maximum number of personal collages</td>
 			<td><input type="text" name="maxcollages" size="5" value="<?=$Values['MaxCollages']?>" /></td>
 		</tr>
-<?      } else {    ?>
+<?php   } else {    ?>
 		<tr>
 			<td class="label">Group Permission</td>
 			<td><input type="text" name="name" id="name" value="<?=(!empty($Name) ? display_str($Name) : '')?>" /></td>
-		</tr> 
+		</tr>
 		<tr>
 			<td class="label">Rank Color</td>
 			<td><input type="text" name="color" style="font-weight:bold;color: #<?=display_str($Color)?>" value="<?=(!empty($Color) ? display_str($Color) : '')?>" /></td>
 		</tr>
-<?      }
+<?php       }
 
 if (is_numeric($_REQUEST['id'])) { ?>
 		<tr>
 			<td class="label">Current users in this class</td>
 			<td><?=number_format($UserCount)?></td>
 		</tr>
-<? } ?>
+<?php  } ?>
 	</table>
-<?
+<?php
 include(SERVER_ROOT."/classes/permissions_form.php");
 permissions_form();
 ?>
 </form>
-<? show_footer(); ?>
+<?php
+show_footer();

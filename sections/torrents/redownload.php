@@ -1,4 +1,4 @@
-<?
+<?php
 if (!check_force_anon($_GET['userid'])) {
     // then you dont get to see any torrents for any uploader!
      error(403);
@@ -24,7 +24,7 @@ require(SERVER_ROOT.'/classes/class_zip.php');
 if (empty($_GET['type'])) {
 	error(0);
 } else {
-	
+
 	switch ($_GET['type']) {
 		case 'uploads':
 			if(!check_paranoia('uploads', $User['Paranoia'], $UserClass, $UserID)) { error(PARANOIA_MSG); }
@@ -57,16 +57,16 @@ if ($UserID!=$LoggedUser['ID'] && !check_perms('users_view_anon_uploaders')) {
 
 ZIP::unlimit();
 
-$DB->query("SELECT 
+$DB->query("SELECT
 	DATE_FORMAT(".$Month.",'%b \'%y') AS Month,
 	t.GroupID,
 	tg.Name,
 	t.Size,
 	f.File
-	FROM torrents as t 
-	JOIN torrents_group AS tg ON t.GroupID=tg.ID 
+	FROM torrents as t
+	JOIN torrents_group AS tg ON t.GroupID=tg.ID
 	LEFT JOIN torrents_files AS f ON t.ID=f.TorrentID
-	".$SQL." 
+	".$SQL."
 	GROUP BY t.ID");
 $Downloads = $DB->to_array(false,MYSQLI_NUM,false);
 

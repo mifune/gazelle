@@ -1,22 +1,8 @@
-<?
-//set_time_limit(0);
-//error_reporting(E_ALL); // was 0 (off)
- 
- 
-
-
- 
-
+<?php
 $time_start = microtime(true);
 
-        
-  
 $DoFix = isset($_POST['submit']) && $_POST['submit']=='Fix Titles';
 $WordLength = isset($_POST['wordlength'])? (int)$_POST['wordlength'] : 64;
-
- 
-
-   
 
 show_header("Fix Torrent Titles");
 
@@ -24,31 +10,24 @@ $DB->query("SELECT ID, Name FROM torrents_group WHERE CHAR_LENGTH(Name)>$WordLen
 
 $numtorrents = $DB->record_count();
 
-
 ?>
 <div class="thin">
     <h2>Fix Torrent Titles</h2>
-        
+
     <form method="post" action="" name="create_user">
         <div class="head"></div>
         <div class="box pad">
             <input type="hidden" name="action" value="sandbox3" />
             <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
             Max Word length in titles: <input type="text" name="wordlength" size="3" value="<?=$WordLength?>" /><br/>
-<?
-        
+<?php
         echo "Selected $numtorrents torrents for examination (max wordlength=$WordLength) ... <br/><br/><code class=\"bbcode\">";
 
         $i=0;
         $updaterow = array();
 
-        //while (($row = mysqli_fetch_assoc($result))) {
         while ( list($ID, $Title) = $DB->next_record()  ) {
-
-            //$Title = $row['Name'];
             $Words = explode(' ', $Title);
-            //uasort($Words, 'tsort'); 
-
             $found = false;
             foreach($Words as &$word) {
                 $len = strlen($word);
@@ -67,27 +46,15 @@ $numtorrents = $DB->record_count();
                 $Title = implode(' ', $Words);
                 echo "New: $Title<br/>";
 
-                $updaterow[] = "(" . $ID . ", '" . db_string($Title) . "')"; 
+                $updaterow[] = "(" . $ID . ", '" . db_string($Title) . "')";
                 $i++;
             }
-
-             /* 
-        SELECT id, name
-        FROM emp.torrents
-        WHERE CHAR_LENGTH( name ) >64
-        AND name NOT
-        REGEXP '[[:blank:]]+'
-        ORDER BY id
-        LIMIT 0 , 30
-              */ 
         }
 
         if ($DoFix && $i>0){
-
-            $DB->query("INSERT INTO torrents_group (ID, Name) VALUES " 
-                    . implode(',', $updaterow) 
+            $DB->query("INSERT INTO torrents_group (ID, Name) VALUES "
+                    . implode(',', $updaterow)
                     . " ON DUPLICATE KEY UPDATE Name=Values(Name)");
-
         }
 
 
@@ -95,24 +62,17 @@ $numtorrents = $DB->record_count();
 
         $time = microtime(true) - $time_start;
         echo "<br/>execution time: $time seconds<br/>";
-        
 ?>
-        
             <input type="submit" name="submit" value="Search" />
         </div>
-    
-<? if (!$DoFix) {  ?>
+
+<?php  if (!$DoFix) {  ?>
         <div class="head"></div>
-        <div class="box pad">     
+        <div class="box pad">
             <input type="submit" name="submit" value="Fix Titles" />
         </div>
-<? }  ?>
+<?php  }  ?>
     </form>
 </div>
-<?
-
+<?php
 show_footer();
-
-
-
-?>

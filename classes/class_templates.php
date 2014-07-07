@@ -1,4 +1,4 @@
-<?
+<?php
 // Example :
 // $TPL = new TEMPLATE;
 // $TPL->open('inv.tpl');
@@ -78,4 +78,3 @@ class TEMPLATE {
 		}
 	}
 }
-?>

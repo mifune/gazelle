@@ -1,4 +1,4 @@
-<?
+<?php
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
@@ -12,42 +12,41 @@ if($TotalCredits != $LoggedUser['TotalCredits']){
 
 enforce_login();
 show_header('Bonus Shop','bonus,bbcode');
-  
-            
+
 $ShopItems = get_shop_items($LoggedUser['ID']);
 ?>
 <div class="thin">
 	<h2>Bonus shop</h2>
             <div class="box pad shadow">
-<? 
+<?php
                 $creditinfo = get_article('creditsinline');
-                if($creditinfo) echo $Text->full_format($creditinfo, true);  
+                if($creditinfo) echo $Text->full_format($creditinfo, true);
 ?>
             </div>
             <div class="box pad shadow" id="bonusdiv">
                 <h3 class="center">Credits: <?=number_format($LoggedUser['TotalCredits'],2)?></h3>
             </div>
- <?         if(!empty($_REQUEST['result'])){  ?>
+ <?php      if(!empty($_REQUEST['result'])){  ?>
                 <div class="box pad shadow">
-                    <h3 class="center"><?=display_str($_REQUEST['result'])?></h3> 
+                    <h3 class="center"><?=display_str($_REQUEST['result'])?></h3>
                 </div>
-<?          }  ?>
-            
+<?php       }  ?>
+
 	<div class="head">Bonus Shop</div>
-            
+
 		<table class="bonusshop">
 			<tr class="smallhead">
 				<td width="120px">Title</td>
 				<td width="530px" colspan="2">Description</td>
 				<td width="90px" colspan="2">Price</td>
 			</tr>
-<?
+<?php
 	$Row = 'a';
       $UserBadgeIDs = get_user_shop_badges_ids($LoggedUser['ID']);
 	foreach($ShopItems as $BonusItem) {
 		list($ItemID, $Title, $Description, $Action, $Value, $Cost, $Image, $Badge, $Rank, $UserRank) = $BonusItem;
-            $IsBadge = $Action=='badge'; 
-            $IsBuyGB = $Action=='gb'; 
+            $IsBadge = $Action=='badge';
+            $IsBuyGB = $Action=='gb';
             $DescExtra='';
             // if user already has badge item dont allow buy
             if ($IsBadge && in_array($Value, $UserBadgeIDs)) {
@@ -60,7 +59,7 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                 $CanBuy = is_float((float)$LoggedUser['TotalCredits']) ? $LoggedUser['TotalCredits'] >= $Cost: false;
                 $BGClass= ($CanBuy?' itembuy' :' itemnotbuy');
                 if ($IsBuyGB && $LoggedUser['BytesDownloaded'] < get_bytes($Value.'gb') ) {
-                    $DescExtra = "<br/>(WARNING: will only remove ".get_size($LoggedUser['BytesDownloaded']) .")";  
+                    $DescExtra = "<br/>(WARNING: will only remove ".get_size($LoggedUser['BytesDownloaded']) .")";
                 }
                 if($IsBadge ) {
                     if ($LastBadge==$Badge) {
@@ -69,23 +68,23 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                     } elseif($Rank < $UserRank) {
                         $CanBuy = false;
                         $BGClass = ' itemduplicate';
-                    } else 
+                    } else
                         $LastBadge=$Badge;
                 }
             }
 		$Row = ($Row == 'a') ? 'b' : 'a';
-?> 
+?>
 			<tr class="row<?=$Row.$BGClass?>">
 				<td width="160px"><strong><?=display_str($Title) ?></strong></td>
-				<td style="border-right:none;" <? if(!$Image) { echo 'colspan="2"'; } ?>><?=display_str($Description).$DescExtra?></td>
-                    <?  if ($Image) {  ?>
+				<td style="border-right:none;" <?php if(!$Image) { echo 'colspan="2"'; } ?>><?=display_str($Description).$DescExtra?></td>
+                    <?php if ($Image) {  ?>
                         <td style="border-left:none;width:160px;text-align:center;">
                             <div class="badge">
                                 <img src="<?=STATIC_SERVER.'common/badges/'.$Image?>" title="<?=$Title?>" alt="<?=$Title?>" />
                             </div>
                         </td>
-                   <?   }
-                   
+                   <?php   }
+
                         if (strpos($Action, 'give') !== false) {
                             $OnSubmit = 'onsubmit="return SetUsername(\'othername'.$ItemID.'\'); "';
                         } elseif ($Action == 'title') {
@@ -98,22 +97,21 @@ $ShopItems = get_shop_items($LoggedUser['ID']);
                    ?>
 				<td width="60px" style="text-align: center;"><strong><?=number_format($Cost) ?>c</strong></td>
 				<td width="60px" style="text-align: center;">
-                            <form method="post" action="" <?=$OnSubmit?>>  
+                            <form method="post" action="" <?=$OnSubmit?>>
                                 <input type="hidden" name="action" value="buy" />
                                 <input type="hidden" id="othername<?=$ItemID?>" name="othername" value="" />
                                 <input type="hidden" name="shopaction" value="<?=$Action?>" />
                                 <input type="hidden" name="userid" value="<?=$LoggedUser['ID']?>" />
                                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-                                <input type="hidden" name="itemid" value="<?=$ItemID?>" /> 
+                                <input type="hidden" name="itemid" value="<?=$ItemID?>" />
                                 <input class="shopbutton<?=($CanBuy ? ' itembuy' : ' itemnotbuy')?>" name="submit" value="<?=($CanBuy?'Buy':'x')?>" type="submit"<?=($CanBuy ? '' : ' disabled="disabled"')?> />
-                                <? if($Action == 'title') echo '<input type="hidden" id="title'.$ItemID.'" name="title" value="" />'; ?>
-                                <? if($Action == 'ufl') echo '<input type="hidden" id="torrentid'.$ItemID.'" name="torrentid" value="" />'; ?>
+                                <?php if($Action == 'title') echo '<input type="hidden" id="title'.$ItemID.'" name="title" value="" />'; ?>
+                                <?php if($Action == 'ufl') echo '<input type="hidden" id="torrentid'.$ItemID.'" name="torrentid" value="" />'; ?>
                             </form>
 				</td>
 			</tr>
-<?	} ?>
-		</table> 
+<?php	} ?>
+		</table>
 </div>
-<?
+<?php
 show_footer();
-?>

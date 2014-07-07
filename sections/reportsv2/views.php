@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * This page is to outline all the sexy views build into reports v2.
  * It's used as the main page as it also lists the current reports by type
@@ -24,7 +24,7 @@ $Owner = display_str($Owner);
 <div class="head">history</div>
 <div class="box pad">
 	<table><tr><td style="width: 50%;">
-<?
+<?php
 $DB->query("SELECT um.ID, um.Username, COUNT(r.ID) AS Reports FROM reportsv2 AS r JOIN users_main AS um ON um.ID=r.ResolverID WHERE r.LastChangeTime > NOW() - INTERVAL 24 HOUR GROUP BY r.ResolverID ORDER BY Reports DESC");
 $Results = $DB->to_array();
 ?>
@@ -34,17 +34,17 @@ $Results = $DB->to_array();
 				<td class="head colhead_dark">Username</td>
 				<td class="head colhead_dark">Reports</td>
 			</tr>
-<? foreach($Results as $Result) {
+<?php  foreach($Results as $Result) {
 	list($UserID, $Username, $Reports) = $Result;
 ?>
 			<tr>
 				<td><a href="reportsv2.php?view=resolver&amp;id=<?=$UserID?>"><?=$Username?></a></td>
 				<td><?=$Reports?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 		<br />
-<?
+<?php
 $DB->query("SELECT um.Username, COUNT(r.ID) AS Reports FROM reportsv2 AS r JOIN users_main AS um ON um.ID=r.ResolverID WHERE r.LastChangeTime > NOW() - INTERVAL 1 WEEK GROUP BY r.ResolverID ORDER BY Reports DESC");
 $Results = $DB->to_array();
 ?>
@@ -54,17 +54,17 @@ $Results = $DB->to_array();
 				<td class="head colhead_dark">Username</td>
 				<td class="head colhead_dark">Reports</td>
 			</tr>
-<? foreach($Results as $Result) {
+<?php  foreach($Results as $Result) {
 	list($Username, $Reports) = $Result;
 ?>
 			<tr>
 				<td><?=$Username?></td>
 				<td><?=$Reports?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 		<br />
-<?
+<?php
 $DB->query("SELECT um.Username, COUNT(r.ID) AS Reports FROM reportsv2 AS r JOIN users_main AS um ON um.ID=r.ResolverID WHERE r.LastChangeTime > NOW() - INTERVAL 1 MONTH GROUP BY r.ResolverID ORDER BY Reports DESC");
 $Results = $DB->to_array();
 ?>
@@ -74,17 +74,17 @@ $Results = $DB->to_array();
 				<td class="head colhead_dark">Username</td>
 				<td class="head colhead_dark">Reports</td>
 			</tr>
-<? foreach($Results as $Result) {
+<?php  foreach($Results as $Result) {
 	list($Username, $Reports) = $Result;
 ?>
 			<tr>
 				<td><?=$Username?></td>
 				<td><?=$Reports?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 		<br />
-<?
+<?php
 $DB->query("SELECT um.Username, COUNT(r.ID) AS Reports FROM reportsv2 AS r JOIN users_main AS um ON um.ID=r.ResolverID GROUP BY r.ResolverID ORDER BY Reports DESC");
 $Results = $DB->to_array();
 ?>
@@ -94,14 +94,14 @@ $Results = $DB->to_array();
 				<td class="head colhead_dark">Username</td>
 				<td class="head colhead_dark">Reports</td>
 			</tr>
-<? foreach($Results as $Result) {
+<?php  foreach($Results as $Result) {
 	list($Username, $Reports) = $Result;
 ?>
 			<tr>
 				<td><?=$Username?></td>
 				<td><?=$Reports?></td>
 			</tr>
-<? } ?>
+<?php  } ?>
 		</table>
 		<br />
 		<h3>Different view modes by person</h3>
@@ -169,19 +169,9 @@ $Results = $DB->to_array();
 		<strong>For browsing anything more complicated than these, use the search feature.</strong>-->
 	</td>
 	<td style="vertical-align: top;">
-<?
-	/*$DB->query("SELECT r.ResolverID,
-						um.Username, 
-						COUNT(r.ID) AS Count,
-						COUNT(tasted.Tasted) AS Tasted
-				FROM reportsv2 AS r
-				LEFT JOIN users_main AS um ON r.ResolverID=um.ID
-				LEFT JOIN torrents AS tasted ON tasted.ID=r.TorrentID AND tasted.Tasted = '1'
-				WHERE r.Status = 'InProgress'
-				GROUP BY r.ResolverID"); */
-
+<?php
 	$DB->query("SELECT r.ResolverID,
-						um.Username, 
+						um.Username,
 						COUNT(r.ID) AS Count
 				FROM reportsv2 AS r
 				LEFT JOIN users_main AS um ON r.ResolverID=um.ID
@@ -195,8 +185,8 @@ $Results = $DB->to_array();
 				<td class="colhead">Staff member</td>
 				<td class="colhead">Current Count</td>
 			</tr>
-		
-	<?	
+
+	<?php
 		foreach($Staff as $Array) {	?>
 			<tr>
 				<td>
@@ -204,16 +194,16 @@ $Results = $DB->to_array();
 				</td>
 				<td><?=$Array['Count']?></td>
 			</tr>
-	<?	
+	<?php
 		}
 	?>
 		</table>
 		<br />
 		<h3>Different view modes by report type</h3>
-<?
+<?php
 	$DB->query("SELECT 	r.Type,
 						COUNT(r.ID) AS Count
-				FROM reportsv2 AS r 
+				FROM reportsv2 AS r
 				WHERE r.Status='New'
 				GROUP BY r.Type");
 	$Current = $DB->to_array();
@@ -224,7 +214,7 @@ $Results = $DB->to_array();
 				<td class="colhead">Type</td>
 				<td class="colhead">Current Count</td>
 			</tr>
-<?
+<?php
 		foreach($Current as $Array) {
 			//Ugliness
 				if(!empty($Types[$Array['Type']])) {
@@ -239,7 +229,7 @@ $Results = $DB->to_array();
 					<?=$Array['Count']?>
 				</td>
 			</tr>
-<?
+<?php
 		}
 	}
 ?>
@@ -247,6 +237,5 @@ $Results = $DB->to_array();
 	</td></tr></table>
 </div>
 </div>
-<?
+<?php
 show_footer();
-?>

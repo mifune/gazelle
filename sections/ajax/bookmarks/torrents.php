@@ -1,4 +1,4 @@
-<?
+<?php
 ini_set('memory_limit', -1);
 //~~~~~~~~~~~ Main bookmarks page ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
@@ -29,8 +29,8 @@ if($Data) {
 	list($K, list($TorrentList, $CollageDataList)) = each($Data);
 } else {
 	// Build the data for the collage and the torrent list
-	$DB->query("SELECT 
-		bt.GroupID, 
+	$DB->query("SELECT
+		bt.GroupID,
 		tg.Image,
 		tg.NewCategoryID,
 		bt.Time
@@ -38,7 +38,7 @@ if($Data) {
 		JOIN torrents_group AS tg ON tg.ID=bt.GroupID
 		WHERE bt.UserID='$UserID'
 		ORDER BY bt.Time");
-	
+
 	$GroupIDs = $DB->collect('GroupID');
 	$CollageDataList=$DB->to_array('GroupID', MYSQLI_ASSOC);
 	if(count($GroupIDs)>0) {
@@ -63,10 +63,10 @@ $Tags = array();
 foreach ($TorrentList as $GroupID=>$Group) {
 	list($GroupID, $GroupName, $TagList, $Torrents) = array_values($Group);
 	list($GroupID2, $Image, $GroupCategoryID, $AddedTime) = array_values($CollageDataList[$GroupID]);
-	
+
 	// Handle stats and stuff
 	$NumGroups++;
-		
+
 	$TagList = explode(' ',str_replace('_','.',$TagList));
 
 	$TorrentTags = array();
@@ -85,27 +85,27 @@ foreach ($TorrentList as $GroupID=>$Group) {
 	$TorrentTags='<br /><div class="tags">'.$TorrentTags.'</div>';
 
 	$DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
-	
+
 	// Start an output buffer, so we can store this output in $TorrentTable
-	ob_start(); 
-            		
+	ob_start();
+
         list($TorrentID, $Torrent) = each($Torrents);
 
         $DisplayName = '<a href="torrents.php?id='.$GroupID.'" title="View Torrent">'.$GroupName.'</a>';
 
         if(!empty($Torrent['FreeTorrent'])) {
-                $DisplayName .=' <strong>Freeleech!</strong>'; 
+                $DisplayName .=' <strong>Freeleech!</strong>';
         }
 
 	$TorrentTable.=ob_get_clean();
-	
+
 	// Album art
-	
+
 	ob_start();
-	
+
 	$DisplayName = $GroupName;
 	$Collage[]=ob_get_clean();
-	
+
 }
 
 uasort($Tags, 'compare');
@@ -149,4 +149,3 @@ print
 			)
 		)
 	);
-?>

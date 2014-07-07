@@ -1,6 +1,5 @@
-<?
+<?php
 if(!check_perms('site_manage_shop')) { error(403); }
- 
 
 show_header('Manage Shop');
 
@@ -33,7 +32,7 @@ function Select_Action(element_id) {
 		<td>
 			<input class="medium" type="text" name="name" value="new name" />
 		</td>
-		<td> 
+		<td>
 			<input class="long" type="text" name="desc" value="description" />
 		</td>
 		<td>
@@ -41,9 +40,9 @@ function Select_Action(element_id) {
 		</td>
 		<td>
                 <select name="shopaction" id="shopaction0" onchange="Select_Action(0)">
-<?                  foreach ($ShopActions as $act) {   ?>
+<?php                   foreach ($ShopActions as $act) {   ?>
                         <option value="<?=$act?>"><?=$act?>&nbsp;&nbsp;</option>
-<?                  } ?>
+<?php                   } ?>
                 </select>
 		</td>
 		<td>
@@ -69,13 +68,13 @@ function Select_Action(element_id) {
 		<input type="hidden" name="action" value="shop_alter" />
 		<input type="hidden" name="autosynch" value="autosynch" />
 		<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-            	
+
             <label for="sort" style="margin-left:40px">Add sort values starting from this number</label>
 			<input size="3" type="text" name="sort" value="100" />
-            
+
             <input class="medium" style="margin-left:40px"  type="checkbox" value="1" name="delete" checked="checked" title="If checked all current badge items will be removed from the shop before adding items from badge table" />
             <label for="delete">Delete current badges before insertion</label>
-		
+
 		<input type="submit" style="margin-left:40px" value="Auto synchronise shop items from badges table" />
     </form>
 </div><br/>
@@ -90,13 +89,13 @@ function Select_Action(element_id) {
 		<td width="70px">Cost</td>
 		<td width="120px"></td>
     </tr>
-<? 
+<?php
 
 $DB->query("SELECT
-                        s.ID, 
-                        s.Title, 
-                        s.Description, 
-                        s.Action, 
+                        s.ID,
+                        s.Title,
+                        s.Description,
+                        s.Action,
                         s.Value,
                         IF(Action='badge',b.Cost,s.Cost) AS Cost,
                         s.Sort
@@ -104,7 +103,7 @@ $DB->query("SELECT
                     LEFT JOIN badges AS b ON b.ID=s.Value
 			ORDER BY s.Sort");
 $Row = 'b';
-while(list($ID, $Title, $Description, $ShopAction, $Value, $Cost, $Sort) = $DB->next_record()){  
+while(list($ID, $Title, $Description, $ShopAction, $Value, $Cost, $Sort) = $DB->next_record()){
 	$Row = ($Row === 'a' ? 'b' : 'a');
 ?>
     <tr class="row<?=$Row?>">
@@ -112,11 +111,11 @@ while(list($ID, $Title, $Description, $ShopAction, $Value, $Cost, $Sort) = $DB->
                 <input type="hidden" name="action" value="shop_alter" />
                 <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
                 <input type="hidden" name="id" value="<?=$ID?>" />
-                
+
 		<td>
 			<input class="medium" type="text" name="name" value="<?=$Title?>" />
 		</td>
-		<td> 
+		<td>
 			<input class="long" type="text" name="desc" value="<?=$Description?>" />
 		</td>
 		<td>
@@ -124,9 +123,9 @@ while(list($ID, $Title, $Description, $ShopAction, $Value, $Cost, $Sort) = $DB->
 		</td>
 		<td>
                 <select name="shopaction" id="shopaction<?=$ID?>" onchange="Select_Action(<?=$ID?>)">
-<?                  foreach ($ShopActions as $act) {   ?>
+<?php                   foreach ($ShopActions as $act) {   ?>
                         <option value="<?=$act?>"<?=($act==$ShopAction?' selected="selected" ':'')?>><?=$act?>&nbsp;&nbsp;</option>
-<?                  } ?>
+<?php                   } ?>
                 </select>
 		</td>
 		<td>
@@ -141,7 +140,8 @@ while(list($ID, $Title, $Description, $ShopAction, $Value, $Cost, $Sort) = $DB->
 		</td>
 	  </form>
     </tr>
-<? }  ?>
+<?php  }  ?>
 </table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

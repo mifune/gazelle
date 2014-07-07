@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize(true);
 
 if(!check_perms('site_torrents_notify')) {
@@ -42,7 +41,7 @@ $Results = $DB->query("SELECT SQL_CALC_FOUND_ROWS
 		unf.Label
 		FROM users_notify_torrents AS unt
 		JOIN torrents AS t ON t.ID=unt.TorrentID
-		JOIN torrents_group AS g ON g.ID = t.GroupID 
+		JOIN torrents_group AS g ON g.ID = t.GroupID
 		LEFT JOIN users_notify_filters AS unf ON unf.ID=unt.FilterID
 		LEFT JOIN torrents_logs_new AS tln ON tln.TorrentID=t.ID
 		WHERE unt.UserID='$LoggedUser[ID]'
@@ -82,11 +81,11 @@ foreach($FilterGroups as $ID => $FilterResults) {
 	unset($FilterResults['FilterLabel']);
 	foreach($FilterResults as $Result) {
 		list($TorrentID, $GroupID, $GroupName, $GroupCategoryID, $TorrentTags, $Size, $FileCount,
-			$Snatched, $Seeders, $Leechers, $NotificationTime, $FreeTorrent, $DoubleSeed, $LogInDB, 
+			$Snatched, $Seeders, $Leechers, $NotificationTime, $FreeTorrent, $DoubleSeed, $LogInDB,
                         $UnRead) = $Result;
-		
+
 		if ($Unread) $NumNew++;
-		
+
 		$JsonNotifications[] = array(
 			'torrentId' => (int) $TorrentID,
 			'groupId' => (int) $GroupID,
@@ -119,5 +118,3 @@ print
 			)
 		)
 	);
-
-?>

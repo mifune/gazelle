@@ -1,5 +1,4 @@
-<?
-
+<?php
 function notify ($Channel, $Message) {
 	global $LoggedUser;
 	send_irc("PRIVMSG ".$Channel." :".$Message." error by ".(!empty($LoggedUser['ID']) ? "http://".NONSSL_SITE_URL."/user.php?id=".$LoggedUser['ID'] ." (".$LoggedUser['Username'].")" : $_SERVER['REMOTE_ADDR']." (".geoip($_SERVER['REMOTE_ADDR']).")")." accessing http://".NONSSL_SITE_URL."".$_SERVER['REQUEST_URI'].(!empty($_SERVER['HTTP_REFERER'])? " from ".$_SERVER['HTTP_REFERER'] : ''));
@@ -51,7 +50,7 @@ if(!empty($_GET['e']) && in_array($_GET['e'],$Errors)) {
 			<?=$Description?>
 		</div>
 	</div>
-<?
+<?php
 		show_footer();
 	} else {
 		echo json_encode($Description);

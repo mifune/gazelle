@@ -1,9 +1,8 @@
-<?
+<?php
 //TODO: Clean up this fucking mess
 /*
 Forums search result page
 */
-
 
 list($Page,$Limit) = page_limit(POSTS_PER_PAGE);
 
@@ -53,12 +52,12 @@ if(isset($_GET['forums']) && is_array($_GET['forums'])) {
 if(!empty($_GET['threadid'])) {
 	$ThreadID = db_string($_GET['threadid']);
 	$Type='body';
-	$SQL = "SELECT Title FROM forums_topics AS t 
+	$SQL = "SELECT Title FROM forums_topics AS t
 				JOIN forums AS f ON f.ID=t.ForumID
 				WHERE f.MinClassRead <= '$LoggedUser[Class]'
 				AND t.ID=$ThreadID";
 	if(!empty($RestrictedForums)) {
-		$SQL .= " AND f.ID NOT IN ('".$RestrictedForums."')";	
+		$SQL .= " AND f.ID NOT IN ('".$RestrictedForums."')";
 	}
 	$DB->query($SQL);
 	if (list($Title) = $DB->next_record()) {
@@ -85,14 +84,14 @@ show_header('Forums'.' > '.'Search');
 					<input type="text" name="search" size="70" value="<?=display_str($Search)?>" />
 				</td>
 			</tr>
-<?
-if (empty($ThreadID)) { ?>			
+<?php
+if (empty($ThreadID)) { ?>
 			<tr>
 				<td class=""><strong>Search in:</strong></td>
 				<td>
-					<input type="radio" name="type" id="type_title" value="title" <? if($Type == 'title') { echo 'checked="checked" '; }?>/> 
+					<input type="radio" name="type" id="type_title" value="title" <?php  if($Type == 'title') { echo 'checked="checked" '; }?>/>
 					<label for="type_title">Titles</label>
-					<input type="radio" name="type" id="type_body" value="body" <? if($Type == 'body') { echo 'checked="checked" '; }?>/> 
+					<input type="radio" name="type" id="type_body" value="body" <?php  if($Type == 'body') { echo 'checked="checked" '; }?>/>
 					<label for="type_body">Post bodies</label>
 				</td>
 			</tr>
@@ -100,9 +99,8 @@ if (empty($ThreadID)) { ?>
 				<td class=""><strong>Forums:</strong></td>
 				<td>
 		<table class="cat_list">
-	
-							
-	<?// List of forums
+
+	<?php // List of forums
 	$Open = false;
 	$LastCategoryID = -1;
 	$Columns = 0;
@@ -111,20 +109,19 @@ if (empty($ThreadID)) { ?>
 		if (!check_forumperm($Forum['ID'])) {
 			continue;
 		}
-		
+
 		$Columns++;
-		
+
 		if ($Forum['CategoryID'] != $LastCategoryID) {
 			$LastCategoryID = $Forum['CategoryID'];
 			if($Open) {
 				if ($Columns%5) { ?>
 				<td colspan="<?=(5-($Columns%5))?>"></td>
-<? 			
+<?php
 				}
-
 ?>
 			</tr>
-<?		
+<?php
 			}
 			$Columns = 0;
 			$Open = true;
@@ -133,25 +130,25 @@ if (empty($ThreadID)) { ?>
 				<td colspan="5"><h3><?=$ForumCats[$Forum['CategoryID']]?></h3></td>
 			</tr>
 			<tr  class="">
-<?		} elseif ($Columns%5  == 0) { ?>
+<?php 		} elseif ($Columns%5  == 0) { ?>
 			</tr>
 			<tr class="">
-<?		} ?>
+<?php 		} ?>
 				<td>
-					<input type="checkbox" name="forums[]" value="<?=$Forum['ID']?>" id="forum_<?=$Forum['ID']?>"<? if(isset($_GET['forums']) && in_array($Forum['ID'], $_GET['forums'])) { echo ' checked="checked"';} ?> />
+					<input type="checkbox" name="forums[]" value="<?=$Forum['ID']?>" id="forum_<?=$Forum['ID']?>"<?php  if(isset($_GET['forums']) && in_array($Forum['ID'], $_GET['forums'])) { echo ' checked="checked"';} ?> />
 					<label for="forum_<?=$Forum['ID']?>"><?=$Forum['Name']?></label>
 				</td>
-<? 	}
+<?php  	}
 	if ( $Columns%5 == 0) { ?>
 				<td colspan="<?=(5-($Columns%5))?>"></td>
-<?	} ?>
+<?php 	} ?>
 			</tr>
 		</table>
 					</td>
 				</tr>
-<? } else { ?>
+<?php  } else { ?>
 				<input type="hidden" name="threadid" value="<?=$ThreadID?>" />
-<? } ?>
+<?php  } ?>
 				<tr>
 					<td class=""><strong>Username:</strong></td>
 					<td>
@@ -163,17 +160,17 @@ if (empty($ThreadID)) { ?>
 						<input type="submit" value="Search" />
 					</td>
 				</tr>
-			</table>	
+			</table>
 		</form>
 	<div class="linkbox">
-<?
+<?php
 
 // Break search string down into individual words
 $Words = explode(' ',  $Search);
 foreach($Words as $Key => &$Word) {
     $Word = trim($Word);
     $slen = strlen($Word);
-	if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) { 
+	if($slen > 2 || $Word[0] != '!' &&  $slen >= 2) {
         $word = db_string($word);
 	} else {
         unset($Words[$Key]);
@@ -192,7 +189,7 @@ if($Type == 'body') {
 		FROM forums_posts AS p
 		JOIN forums_topics AS t ON t.ID=p.TopicID
 		JOIN forums AS f ON f.ID=t.ForumID
-		WHERE 
+		WHERE
 		((f.MinClassRead<='$LoggedUser[Class]'";
 	if(!empty($RestrictedForums)) {
 		$sql.=" AND f.ID NOT IN ('".$RestrictedForums."')";
@@ -208,10 +205,6 @@ if($Type == 'body') {
 	$sql .= implode("%' AND p.Body LIKE '%", $Words);
 	$sql .= "%' ";
 
-	//$sql .= "LOCATE('";
-	//$sql .= implode("', p.Body) AND LOCATE('", $Words);
-	//$sql .= "', p.Body) ";
-
 	if(isset($SearchForums)) {
 		$sql.=" AND f.ID IN ($SearchForums)";
 	}
@@ -221,11 +214,11 @@ if($Type == 'body') {
 	if(!empty($ThreadID)) {
 		$sql.=" AND t.ID='$ThreadID' ";
 	}
-	
+
 	$sql .= "ORDER BY p.AddedTime DESC LIMIT $Limit";
-	
+
 } else {
-	$sql = "SELECT SQL_CALC_FOUND_ROWS 
+	$sql = "SELECT SQL_CALC_FOUND_ROWS
 		t.ID,
 		t.Title,
 		t.ForumID,
@@ -233,9 +226,9 @@ if($Type == 'body') {
 		t.LastPostTime,
 		'',
 		''
-		FROM forums_topics AS t 
+		FROM forums_topics AS t
 		JOIN forums AS f ON f.ID=t.ForumID
-		WHERE 
+		WHERE
 		((f.MinClassRead<='$LoggedUser[Class]'";
 	if(!empty($RestrictedForums)) {
 		$sql.=" AND f.ID NOT IN ('".$RestrictedForums."')";
@@ -273,9 +266,9 @@ echo $Pages;
 		<td><?=(!empty($ThreadID))?'Post Begins':'Topic'?></td>
 		<td>Time</td>
 	</tr>
-<? if($DB->record_count() == 0) { ?>
+<?php  if($DB->record_count() == 0) { ?>
 		<tr><td colspan="3">Nothing found!</td></tr>
-<? }
+<?php  }
 
 $Row = 'a'; // For the pretty colours
 while(list($ID, $Title, $ForumID, $ForumName, $LastTime, $PostID) = $DB->next_record()) {
@@ -287,20 +280,20 @@ while(list($ID, $Title, $ForumID, $ForumName, $LastTime, $PostID) = $DB->next_re
 				<a href="forums.php?action=viewforum&amp;forumid=<?=$ForumID?>"><?=$ForumName?></a>
 			</td>
 			<td>
-<? if(empty($ThreadID)) { ?>
+<?php  if(empty($ThreadID)) { ?>
 				<a href="forums.php?action=viewthread&amp;threadid=<?=$ID?>"><?=cut_string($Title, 80); ?></a>
-<? } else { ?>
+<?php  } else { ?>
 				<?=cut_string($Title, 80); ?>
-<? }
+<?php  }
    if ($Type == 'body') { ?>
-				<span style="float: right;" class="last_read" title="Jump to post"><a href="forums.php?action=viewthread&amp;threadid=<?=$ID?><? if(!empty($PostID)) { echo '&amp;postid='.$PostID.'#post'.$PostID; } ?>"></a></span>
-<? } ?>
+				<span style="float: right;" class="last_read" title="Jump to post"><a href="forums.php?action=viewthread&amp;threadid=<?=$ID?><?php  if(!empty($PostID)) { echo '&amp;postid='.$PostID.'#post'.$PostID; } ?>"></a></span>
+<?php  } ?>
 			</td>
 			<td>
 				<?=time_diff($LastTime)?>
 			</td>
 		</tr>
-<?
+<?php
 }
 
 ?>
@@ -310,4 +303,5 @@ while(list($ID, $Title, $ForumID, $ForumName, $LastTime, $PostID) = $DB->next_re
 		<?=$Pages?>
 	</div>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer(); ?>

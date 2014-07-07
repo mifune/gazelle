@@ -1,5 +1,4 @@
-<?
-
+<?php
 /* -- Script Start Class -------------------------------- */
 /* ------------------------------------------------------ */
 /* This isnt really a class but a way to tie other	  */
@@ -12,12 +11,6 @@
 /* * ***************************************************** */
 
 require 'config.php'; //The config contains all site wide configuration information
-
-
-//if (!isset($_GET['in'])) {
-    //require SERVER_ROOT . '/redirect_index.php';
-    //die();
-//} 
 
 //Deal with dumbasses
 if (isset($_REQUEST['info_hash']) && isset($_REQUEST['peer_id'])) {
@@ -96,7 +89,7 @@ $Debug->set_flag('start user handling');
 // Get permissions
 list($Classes, $ClassLevels, $ClassNames) = $Cache->get_value('classes');
 if (!$Classes || !$ClassLevels) {
-    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName, IsUserClass FROM permissions ORDER BY IsUserClass, Level"); //WHERE IsUserClass='1' 
+    $DB->query("SELECT ID, Name, Level, Color, LOWER(REPLACE(Name,' ','')) AS ShortName, IsUserClass FROM permissions ORDER BY IsUserClass, Level"); //WHERE IsUserClass='1'
     $Classes = $DB->to_array('ID');
     $ClassLevels = $DB->to_array('Level');
     $ClassNames = $DB->to_array('ShortName');
@@ -290,7 +283,7 @@ list($Sitewide_Freeleech, $FullLogging) = $DB->next_record();
 $Sitewide_Freeleech_On = $Sitewide_Freeleech > sqltime();
 
 
-// full logging for analysing bots! 
+// full logging for analysing bots!
 if ($FullLogging!='0') {
     $uri = $_SERVER['REQUEST_URI'];
     if($FullLogging=='3' ||
@@ -301,7 +294,7 @@ if ($FullLogging!='0') {
             $keys = implode("|", array_keys($_REQUEST));
             $vars = "~$keys~$vars";
         }
-        $DB->query("INSERT INTO full_log (userID, time, ip, ipnum, request, variables) 
+        $DB->query("INSERT INTO full_log (userID, time, ip, ipnum, request, variables)
                          VALUES ( '$LoggedUser[ID]' , '".db_string(sqltime())."', '".db_string($RealIP)."', '" . ip2unsigned($RealIP) . "',
                                   '".db_string($uri)."', '".db_string($_SERVER['REQUEST_METHOD']. $vars )."' )");
     }
@@ -345,8 +338,8 @@ function user_info($UserID) {
 			m.Title,
 			i.CatchupTime,
 			m.Visible,
-                  m.Signature,
-                  i.TorrentSignature,
+            m.Signature,
+            i.TorrentSignature,
 			m.GroupPermissionID,
             m.ipcc
 			FROM users_main AS m
@@ -372,7 +365,7 @@ function user_info($UserID) {
 		$UserInfo['Warned'] = '0000-00-00 00:00:00';
 		$Cache->cache_value('user_info_'.$UserID, $UserInfo, 2592000);
 	}
-	
+
 	// Image proxy
 	if(check_perms('site_proxy_images') && !empty($UserInfo['Avatar'])) {
 		$UserInfo['Avatar'] = 'http'.($SSL?'s':'').'://'.SITE_URL.'/image.php?c=1&amp;avatar='.$UserID.'&amp;i='.urlencode($UserInfo['Avatar']);
@@ -410,18 +403,18 @@ function user_heavy_info($UserID) {
 			i.RestrictedForums,
 			i.PermittedForums,
 			m.FLTokens,
-                        m.personal_freeleech,
-                  m.Credits,
-                    i.SupportFor,
-                    i.BlockPMs,
-                    i.CommentsNotify,
-                    i.TimeZone,
-                    i.SuppressConnPrompt,
-                i.DisableForums,
-                i.DisableTagging,
-                i.DisableSignature,
-                i.DisableTorrentSig,
-                i.DisableIRC
+            m.personal_freeleech,
+            m.Credits,
+            i.SupportFor,
+            i.BlockPMs,
+            i.CommentsNotify,
+            i.TimeZone,
+            i.SuppressConnPrompt,
+            i.DisableForums,
+            i.DisableTagging,
+            i.DisableSignature,
+            i.DisableTorrentSig,
+            i.DisableIRC
 			FROM users_main AS m
 			INNER JOIN users_info AS i ON i.UserID=m.ID
 			WHERE m.ID='$UserID'");
@@ -439,14 +432,14 @@ function user_heavy_info($UserID) {
             $RestrictedForums = array();
         }
         unset($HeavyInfo['RestrictedForums']);
-        
+
         if (!empty($HeavyInfo['PermittedForums'])) {
             $PermittedForums = explode(',', $HeavyInfo['PermittedForums']);
         } else {
             $PermittedForums = array();
         }
         unset($HeavyInfo['PermittedForums']);
-        
+
         if (!empty($PermittedForums) || !empty($RestrictedForums)) {
             $HeavyInfo['CustomForums'] = array();
             foreach ($RestrictedForums as $ForumID) {
@@ -464,45 +457,45 @@ function user_heavy_info($UserID) {
             $HeavyInfo = array_merge($HeavyInfo, $HeavyInfo['SiteOptions']);
         }
         unset($HeavyInfo['SiteOptions']);
-        
+
         //if (!isset($HeavyInfo['MaxTags'])) $HeavyInfo['MaxTags'] = 16;
-                
+
         if (!empty($HeavyInfo['Badges'])) {
             $HeavyInfo['Badges'] = unserialize($HeavyInfo['Badges']);
             //$HeavyInfo = array_merge($HeavyInfo, $HeavyInfo['Badges']);
         } else {
             $HeavyInfo['Badges'] = array();
         }
-        
+
         if (empty($HeavyInfo['TimeZone']) || $HeavyInfo['TimeZone'] == '')
             $HeavyInfo['TimeOffset'] = 0;
         else {
             $HeavyInfo['TimeOffset'] = get_timezone_offset($HeavyInfo['TimeZone']);
         }
-            
+
         $Cache->cache_value('user_info_heavy_' . $UserID, $HeavyInfo, 0);
     }
-    // add this here for implementation to live server (so logged in users dont get blank tags) 
+    // add this here for implementation to live server (so logged in users dont get blank tags)
     // but can move up a few lines to inside if statements at some point in the future.
-    if (!isset($HeavyInfo['MaxTags'])) $HeavyInfo['MaxTags'] = 100; 
-    
+    if (!isset($HeavyInfo['MaxTags'])) $HeavyInfo['MaxTags'] = 100;
+
     return $HeavyInfo;
 }
 
 /**
  * get the users seed leech info (caches for 15 mins)
- * 
- * @param int $UserID 
+ *
+ * @param int $UserID
  * @return array Returns array('Seeding'=>$Seeding, 'Leeching'=>$Leeching)
  */
-function user_peers($UserID) { 
+function user_peers($UserID) {
     global $DB, $Cache;
     $PeerInfo = $Cache->get_value('user_peers_' . $UserID);
     if ($PeerInfo===false) {
-        $DB->query("SELECT IF(remaining=0,'Seeding','Leeching') AS Type, COUNT(x.uid) 
+        $DB->query("SELECT IF(remaining=0,'Seeding','Leeching') AS Type, COUNT(x.uid)
                       FROM xbt_files_users AS x
-                      JOIN torrents AS t ON t.ID=x.fid 
-                     WHERE x.uid='$UserID' AND x.active=1 
+                      JOIN torrents AS t ON t.ID=x.fid
+                     WHERE x.uid='$UserID' AND x.active=1
                   GROUP BY Type");
         $PeerCount = $DB->to_array(0, MYSQLI_NUM, false);
         $Seeding = isset($PeerCount['Seeding'][1]) ? $PeerCount['Seeding'][1] : 0;
@@ -528,8 +521,8 @@ function get_userid($Username) {
 
 /**
  * update a users site_options field with a new value
- * 
- * @param int $UserID 
+ *
+ * @param int $UserID
  * @param int $NewOptions options to overwrite in format array('OptionName' => $Value, 'OptionName' => $Value)
  */
 function update_site_options($UserID, $NewOptions) {
@@ -580,13 +573,13 @@ function get_permissions($PermissionID) {
     global $DB, $Cache;
     $Permission = $Cache->get_value('perm_' . $PermissionID);
     if (empty($Permission)) {
-        $DB->query("SELECT p.Level AS Class, 
-                               p.Values as Permissions, 
-                               p.MaxSigLength,
-                               p.MaxAvatarWidth,
-                               p.MaxAvatarHeight,
-                                p.DisplayStaff
-                               FROM permissions AS p WHERE ID='$PermissionID'");
+        $DB->query("SELECT p.Level AS Class,
+            p.Values as Permissions,
+            p.MaxSigLength,
+            p.MaxAvatarWidth,
+            p.MaxAvatarHeight,
+            p.DisplayStaff
+            FROM permissions AS p WHERE ID='$PermissionID'");
         if ($DB->record_count()>0){
             $Permission = $DB->next_record(MYSQLI_ASSOC, array('Permissions'));
             $Permission['Permissions'] = unserialize($Permission['Permissions']);
@@ -602,18 +595,18 @@ function get_permissions_for_user($UserID, $CustomPermissions = false, $UserPerm
 	global $DB, $Cache;
 
 	$UserInfo = user_info($UserID);
-	
-	if ($CustomPermissions === false) { 
+
+	if ($CustomPermissions === false) {
             // if this value is in the cache get it from there
-            $HeavyInfo = $Cache->get_value('user_info_heavy_' . $UserID); 
+            $HeavyInfo = $Cache->get_value('user_info_heavy_' . $UserID);
             if($HeavyInfo!==false && isset($HeavyInfo['CustomPermissions']) ) {
-                $CustomPermissions = $HeavyInfo['CustomPermissions']; 
+                $CustomPermissions = $HeavyInfo['CustomPermissions'];
             } elseif ($UserID>0) { // if not just grab it
-                $DB->query("SELECT um.CustomPermissions FROM users_main AS um WHERE um.ID = '$UserID'"); 
+                $DB->query("SELECT um.CustomPermissions FROM users_main AS um WHERE um.ID = '$UserID'");
                 list($CustomPermissions) = $DB->next_record(MYSQLI_NUM, false);
             }
 	}
-	
+
 	if (!empty($CustomPermissions) && !is_array($CustomPermissions)) {
 		$CustomPermissions = unserialize($CustomPermissions);
 	}
@@ -623,16 +616,7 @@ function get_permissions_for_user($UserID, $CustomPermissions = false, $UserPerm
       } else {
             $Permissions = $UserPermission;
       }
-      
-      /* 
- 
 
-	$MaxCollages = $Permissions['Permissions']['MaxCollages'] + $CustomPerms['MaxCollages'];
-	
-	//Combine the permissions
-	return array_merge($Permissions['Permissions'], $CustomPerms, array('MaxCollages' => $MaxCollages));
-       */
-      
 	if($UserInfo['GroupPermissionID'] > 0) {
 		$GroupPerms = get_permissions($UserInfo['GroupPermissionID']);
 	} else {
@@ -646,10 +630,10 @@ function get_permissions_for_user($UserID, $CustomPermissions = false, $UserPerm
 	}
 
 	$MaxCollages = $Permissions['Permissions']['MaxCollages'] + $GroupPerms['Permissions']['MaxCollages'] + $CustomPerms['MaxCollages'];
-	
+
 	//Combine the permissions
 	return array_merge($Permissions['Permissions'], $GroupPerms['Permissions'], $CustomPerms, array('MaxCollages' => $MaxCollages));
-      
+
 }
 
 // Get whether this user can use adv tags (pass optional params to reduce lookups)
@@ -658,14 +642,12 @@ function get_permissions_advtags($UserID, $CustomPermissions = false, $UserPermi
       return isset($PermissionsValues['site_advanced_tags']) &&  $PermissionsValues['site_advanced_tags'];
 }
 
-
-
 function get_user_badges($UserID, $LimitRows = true) {     //, $Limit = 0){
     global $DB, $Cache;
     $UserID = (int)$UserID;
     if ($LimitRows) {
         $extra = "_limit";
-        $Limit = "LIMIT 12"; 
+        $Limit = "LIMIT 12";
     }
     $UserBadges = $Cache->get_value('user_badges_'.$UserID.$extra);
     if (!is_array($UserBadges)) {
@@ -710,17 +692,16 @@ function get_user_shop_badges_ids($UserID){
     $UserBadges = $Cache->get_value('user_badges_ids_'.$UserID);
     if (!is_array($UserBadges)) {
         $DB->query("SELECT BadgeID
-                      FROM users_badges AS ub
-                 LEFT JOIN badges AS b ON b.ID = ub.BadgeID
-                     WHERE b.Type='Shop' AND UserID = $UserID");
+                    FROM users_badges AS ub
+                    LEFT JOIN badges AS b ON b.ID = ub.BadgeID
+                    WHERE b.Type='Shop' AND UserID = $UserID");
         $UserBadges = $DB->collect('BadgeID');
         $Cache->cache_value('user_badges_ids_'.$UserID, $UserBadges);
     }
     return $UserBadges;
 }
 
-
-function print_badges_array($UserBadges, $UserLinkID = false){ 
+function print_badges_array($UserBadges, $UserLinkID = false){
     $LastRow='';
     $html='';
     foreach ($UserBadges as $Badge) {
@@ -738,8 +719,6 @@ function print_badges_array($UserBadges, $UserLinkID = false){
     echo $html;
 }
 
-//----------------------------
-
 function get_latest_forum_topics($PermissionID, $ExcludeGames = true) {
     global $Classes, $DB, $Cache, $ExcludeForums;
     if ($ExcludeGames && is_array($ExcludeForums)) { // check array from config exists
@@ -751,38 +730,27 @@ function get_latest_forum_topics($PermissionID, $ExcludeGames = true) {
     $LatestTopics = $Cache->get_value('latest_topics_'.$cachekey);
     if ($LatestTopics === false) {
         $Level = $Classes[$PermissionID]['Level'];
-        /*
-        $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime FROM forums_posts AS fp
-                    INNER JOIN forums_topics AS ft ON ft.ID=fp.TopicID
-                    INNER JOIN forums AS f ON f.ID=ft.ForumID
-                    INNER JOIN users_main AS um ON um.ID=fp.AuthorID
-                    WHERE f.MinClassRead<='$Level' $ANDWHERE
-                    ORDER BY AddedTime DESC
-                    LIMIT 5"); 
-        */
-        
-        $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime 
-                      FROM forums_topics AS ft 
+
+        $DB->query("SELECT ft.ID AS ThreadID, fp.ID AS PostID, ft.Title, um.Username, fp.AddedTime
+                      FROM forums_topics AS ft
                       JOIN forums AS f ON f.ID=ft.ForumID
-                      JOIN ( SELECT TopicID, Max(ID) as LastPostID FROM forums_posts GROUP BY TopicID ) AS x ON x.TopicID=ft.ID 
+                      JOIN ( SELECT TopicID, Max(ID) as LastPostID FROM forums_posts GROUP BY TopicID ) AS x ON x.TopicID=ft.ID
                       JOIN forums_posts AS fp ON fp.ID=x.LastPostID
                       JOIN users_main AS um ON um.ID=fp.AuthorID
                      WHERE f.MinClassRead<='$Level' $ANDWHERE
                   GROUP BY ThreadID
                   ORDER BY AddedTime DESC
                      LIMIT 6");
-                         
-        
+
         $LatestTopics = $DB->to_array();
         $Cache->cache_value('latest_topics_'.$cachekey, $LatestTopics);
     }
     return $LatestTopics;
 }
 
- 
 function print_latest_forum_topics() {
     global $LoggedUser;
-    if (empty($LoggedUser['DisableLatestTopics'])) {    
+    if (empty($LoggedUser['DisableLatestTopics'])) {
         $LatestTopics = get_latest_forum_topics($LoggedUser['PermissionID'], !$LoggedUser['ShowGames'] );
 
         echo '<div class="head latest_topics">Latest forum topics</div>';
@@ -802,10 +770,10 @@ function print_latest_forum_topics() {
   for fast email blacklist checking
   ----------------------------------- */
 function get_emailblacklist_regex() {
-    global $DB, $Cache; 
+    global $DB, $Cache;
     $pattern = $Cache->get_value('emailblacklist_regex');
     if($pattern===false){
-        $DB->query("SELECT Email FROM email_blacklist");  
+        $DB->query("SELECT Email FROM email_blacklist");
         if($DB->record_count()>0) {
             $pattern = '@';
             $div = '';
@@ -826,10 +794,10 @@ function get_emailblacklist_regex() {
   for fast whitelist checking
   ----------------------------------- */
 function get_whitelist_regex() {
-    global $DB, $Cache; 
+    global $DB, $Cache;
     $pattern = $Cache->get_value('imagehost_regex');
     if($pattern===false){
-        $DB->query("SELECT Imagehost FROM imagehost_whitelist");  
+        $DB->query("SELECT Imagehost FROM imagehost_whitelist");
         if($DB->record_count()>0) {
             $pattern = '@';
             $div = '';
@@ -845,56 +813,50 @@ function get_whitelist_regex() {
     }
     return $pattern;
 }
-    
 
-/** 
+
+/**
  * Validates the passed imageurl with the passed parameters, and against an image validating regex:
  * '/^(https?):\/\/([a-z0-9\-\_]+\.)+([a-z]{1,5}[^\.])(\/[^<>]+)*$/i'
- * 
+ *
  * @param string $Imageurl The url to validate
  * @param int $MinLength The min string length
  * @param int $MaxLength The max string length
- * @param string $WhitelistRegex a regex containing valid imagehosts 
+ * @param string $WhitelistRegex a regex containing valid imagehosts
  * @return mixed Returns TRUE if it validates and a user readable error message if it fails
  */
 function validate_imageurl($Imageurl, $MinLength, $MaxLength, $WhitelistRegex) {
-         
+
        $ErrorMessage = "$Imageurl is not a valid url.";
-       
+
        if(strlen($Imageurl)>$MaxLength) {
-           return "$ErrorMessage (must be < $MaxLength characters)";  
+           return "$ErrorMessage (must be < $MaxLength characters)";
        }
        elseif(strlen($Imageurl)<$MinLength) {
-           return "$ErrorMessage (must be > $MinLength characters)";  
+           return "$ErrorMessage (must be > $MinLength characters)";
        }
-       elseif(!preg_match('/^(https?):\/\/([a-z0-9\-\_]+\.)+([a-z]{1,5}[^\.])(\/[^<>]+)*$/i', $Imageurl)) {  
-           return $ErrorMessage;  
+       elseif(!preg_match('/^(https?):\/\/([a-z0-9\-\_]+\.)+([a-z]{1,5}[^\.])(\/[^<>]+)*$/i', $Imageurl)) {
+           return $ErrorMessage;
        }
-       elseif(!preg_match($WhitelistRegex, $Imageurl)) { 
-           return "$Imageurl is not on an approved imagehost."; 
+       elseif(!preg_match($WhitelistRegex, $Imageurl)) {
+           return "$Imageurl is not on an approved imagehost.";
        }
-       else { // hooray it validated 
+       else { // hooray it validated
            return TRUE;
        }
 }
-
-
 
 function validate_email($email) {
-          
-       if(preg_match(get_emailblacklist_regex(), $email)) { 
-           return "$email is on a blacklisted email host."; 
+
+       if(preg_match(get_emailblacklist_regex(), $email)) {
+           return "$email is on a blacklisted email host.";
        }
-       else { // hooray it validated 
+       else { // hooray it validated
            return TRUE;
        }
 }
 
-
-
-
-
-// for getting an article to display on some other page 
+// for getting an article to display on some other page
 function get_article($TopicID){
     global $DB;
     $TopicID = db_string($TopicID);
@@ -903,46 +865,40 @@ function get_article($TopicID){
     return $Body;
 }
 
-
 function flood_check($Table = 'forums_posts'){
     global $DB, $LoggedUser;
     if (check_perms('site_ignore_floodcheck')) return true;
     if ( !in_array($Table, array('forums_posts','requests_comments','torrents_comments','collages_comments','sm_results'))) error(0);
     if ($Table=='collages_comments' || $Table=='sm_results'){
-        $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'".USER_FLOOD_POST_TIME."')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM $Table 
-                  WHERE UserID = $LoggedUser[ID] 
+        $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'".USER_FLOOD_POST_TIME."')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM $Table
+                  WHERE UserID = $LoggedUser[ID]
                     AND UNIX_TIMESTAMP( Time)>= ( UNIX_TIMESTAMP(  UTC_TIMESTAMP())-'".USER_FLOOD_POST_TIME."')");
     } else {
-        $DB->query( "SELECT ( (UNIX_TIMESTAMP( AddedTime)+'".USER_FLOOD_POST_TIME."')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM $Table 
-                  WHERE AuthorID = $LoggedUser[ID] 
+        $DB->query( "SELECT ( (UNIX_TIMESTAMP( AddedTime)+'".USER_FLOOD_POST_TIME."')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM $Table
+                  WHERE AuthorID = $LoggedUser[ID]
                     AND UNIX_TIMESTAMP( AddedTime)>= ( UNIX_TIMESTAMP(  UTC_TIMESTAMP())-'".USER_FLOOD_POST_TIME."')");
     }
     if ($DB->record_count()==0) return true;
     else {
         list($Secs) = $DB->next_record();
-        error("<h3>Flood Control</h3>You must wait <strong>$Secs</strong> seconds before posting again."); 
+        error("<h3>Flood Control</h3>You must wait <strong>$Secs</strong> seconds before posting again.");
     }
 }
-
 
 function flood_check_slots(){  // gives ajax error
     global $DB, $LoggedUser;
     if (check_perms('site_ignore_floodcheck')) return true;
-    
-    $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'5')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM sm_results 
-                  WHERE UserID = $LoggedUser[ID] 
+
+    $DB->query( "SELECT ( (UNIX_TIMESTAMP( Time)+'5')-UNIX_TIMESTAMP(  UTC_TIMESTAMP()) )  FROM sm_results
+                  WHERE UserID = $LoggedUser[ID]
                     AND UNIX_TIMESTAMP( Time)>= ( UNIX_TIMESTAMP(  UTC_TIMESTAMP())-'5')");
-    
+
     if ($DB->record_count()==0) return true;
     else {
         list($Secs) = $DB->next_record();
         return (int)$Secs;
     }
 }
-
-
-
-
 
 // This function is slow. Don't call it unless somebody's logging in.
 function site_ban_ip($IP) {
@@ -1041,7 +997,7 @@ function lookup_ip($IP) {
     //TODO: use the $Cache
     global $Cache;
     if (!$IP) return false;
-    
+
     $LookUp = $Cache->get_value('gethost_'.$IP);
     if ($LookUp===false) {
         $Output = explode(' ', shell_exec('host -W 1 ' . escapeshellarg($IP)));
@@ -1057,20 +1013,6 @@ function lookup_ip($IP) {
         }
     }
     return $LookUp;
-    
-    /*  non cached version
-    $Output = explode(' ', shell_exec('host -W 1 ' . escapeshellarg($IP)));
-    if (count($Output) == 1 && empty($Output[0])) {
-        //No output at all implies the command failed
-        return '';
-    }
-
-    if (count($Output) != 5) {
-        return false;
-    } else {
-        return $Output[4];
-    }
-     */
 }
 
 
@@ -1093,24 +1035,11 @@ function display_ip($IP, $cc = '?', $gethost = false, $baniplink=false) {
     }
     $Line .= ' [<a href="user.php?action=search&amp;ip_history=on&amp;ip=' . display_str($IP) . '&amp;matchtype=fuzzy" title="Search IP History">S</a>]';
     $Line .= ' [<a href="user.php?action=search&amp;tracker_ip=' . display_str($IP) . '&amp;matchtype=fuzzy" title="Search Tracker IP\'s">S</a>]';
-    if ($baniplink && check_perms('admin_manage_ipbans')){ 
+    if ($baniplink && check_perms('admin_manage_ipbans')){
         $Line .= ' [<a href="tools.php?action=ip_ban&uip='.display_str($IP).'" title="Ban this users current IP ('.display_str($IP).')">B</a>]';
     }
     return $Line;
 }
-/*
-function get_cc($IP) {
-    static $ID = 0;
-    ++$ID;
-    return '<span id="cc_' . $ID . '">Resolving CC...<script type="text/javascript">ajax.get(\'tools.php?action=get_cc&ip=' . $IP . '\',function(cc){$(\'#cc_' . $ID . '\').raw().innerHTML=cc;});</script></span>';
-}
-
-function display_ip($IP) {
-    $Line = display_str($IP) . ' (' . get_cc($IP) . ') ';
-    $Line .= '[<a href="user.php?action=search&amp;ip_history=on&amp;ip=' . display_str($IP) . '&amp;matchtype=strict" title="Search">S</a>]';
-
-    return $Line;
-}*/
 
 function logout() {
     global $SessionID, $LoggedUser, $DB, $Cache;
@@ -1118,8 +1047,6 @@ function logout() {
     setcookie('keeplogged', '', time() - 60 * 60 * 24 * 365, '/', '', false);
     setcookie('session', '', time() - 60 * 60 * 24 * 365, '/', '', false);
     if ($SessionID) {
-
-
         $DB->query("DELETE FROM users_sessions WHERE UserID='$LoggedUser[ID]' AND SessionID='" . db_string($SessionID) . "'");
 
         $Cache->begin_transaction('users_sessions_' . $LoggedUser['ID']);
@@ -1159,7 +1086,6 @@ function authorize($Ajax = false) {
 // $JSIncludes is a comma separated list of js files to be inclides on
 // the page, ONLY PUT THE RELATIVE LOCATION WITHOUT .js
 // ex: 'somefile,somdire/somefile'
-
 function show_header($PageTitle='', $JSIncludes='') {
     global $Document, $Cache, $DB, $LoggedUser, $Mobile, $Classes, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
 
@@ -1195,7 +1121,7 @@ function show_footer($Options=array()) {
 }
 
 function cut_string($Str, $Length, $Hard=0, $ShowDots=1) {
-    //if (strlen($Str) > $Length) { // converted all to mb_str functions 
+    //if (strlen($Str) > $Length) { // converted all to mb_str functions
     if (mb_strlen($Str, "UTF-8") > $Length) {
         if ($Hard == 0) {
             // Not hard, cut at closest word
@@ -1224,15 +1150,14 @@ function cut_string($Str, $Length, $Hard=0, $ShowDots=1) {
  * @param $hlterm string The string to highlight; the actual html used is: '<span atyle="color: $color">$hlterm</span>'
  *
  * @param $text string, which result's page we want if no page is specified
- * 
+ *
  * @param $color string Optional, which color to use to highlight the term (can be any valid css color)
  * If this parameter is not specified, defaults to red
  *
  * @return string The text with 'term' highlighted
  */
 function highlight_text_color($hlterm, $text, $color = 'red'){
-    
-    return str_replace($hlterm, "<span style=\"color: $color;\">$hlterm</span>", $text); 
+    return str_replace($hlterm, "<span style=\"color: $color;\">$hlterm</span>", $text);
 }
 
 /**
@@ -1241,15 +1166,15 @@ function highlight_text_color($hlterm, $text, $color = 'red'){
  * @param $hlterm string The string to highlight; the actual html used is: '<span class="$css">$hlterm</span>'
  *
  * @param $text string, which result's page we want if no page is specified
- * 
- * @param $css string Optional, which css class to use to highlight the term 
+ *
+ * @param $css string Optional, which css class to use to highlight the term
  * If this parameter is not specified, defaults to search_highlight
  *
  * @return string The text with 'term' highlighted
  */
 function highlight_text_css($hlterm, $text, $css = 'search_highlight'){
-    
-    return str_replace($hlterm, "<span class=\"$css\">$hlterm</span>", $text); 
+
+    return str_replace($hlterm, "<span class=\"$css\">$hlterm</span>", $text);
 }
 
 function get_ratio_color($Ratio) {
@@ -1495,7 +1420,7 @@ function get_size($Size, $Levels = 2) {
     $Units = array(' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB');
     $Size = (double) $Size;
     for ($Steps = 0; abs($Size) >= 1024; $Size /= 1024, $Steps++) {
-        
+
     }
     if (func_num_args() == 1 && $Steps >= 4) {
         $Levels++;
@@ -1653,21 +1578,19 @@ function check_tag_input($str){
     return preg_match('/[^a-z0-9.-]/', $str)==0;
 }
 
-
 function get_tag_synonym($Tag, $Sanitise = true){
         global $Cache, $DB;
 
         if ($Sanitise) $Tag = sanitize_tag($Tag);
 
-        // Lanz: yeah the caching was a bit too much here imo.
-        $DB->query("SELECT t.Name 
-                    FROM tag_synomyns AS ts JOIN tags as t ON t.ID = ts.TagID 
+        $DB->query("SELECT t.Name
+                    FROM tag_synomyns AS ts JOIN tags as t ON t.ID = ts.TagID
                     WHERE Synomyn LIKE '".db_string($Tag)."'");
         if ($DB->record_count() > 0) { // should only ever be one but...
-            list($TagName) = $DB->next_record();       
+            list($TagName) = $DB->next_record();
             return $TagName;
         } else {
-            return $Tag; 
+            return $Tag;
         }
 }
 
@@ -1675,7 +1598,7 @@ function get_tag_synonym($Tag, $Sanitise = true){
 /**
  * Return whether $Tag is a valid tag - more than 2** char long and not a stupid word
  * (** unless is 'hd','dp','bj','ts','sd','69','mf','3d','hj','bi')
- * 
+ *
  * @param string $Tag The prospective tag to be evaluated
  * @return Boolean representing whether the tag is valid format (not banned)
  */
@@ -1683,7 +1606,7 @@ function is_valid_tag($Tag){
     static $Good2charTags;
     $len = strlen($Tag);
     if ( $len < 2 || $len > 32) return false;
-    if ( $len == 2 ) {  
+    if ( $len == 2 ) {
         if(!$Good2charTags) $Good2charTags = array('hd','dp','bj','ts','sd','69','mf','3d','hj','bi','tv','dv','da', '4k');
         if ( !in_array($Tag, $Good2charTags) ) return false;
     }
@@ -1704,22 +1627,9 @@ function make_secret($Length = 32) {
     return str_shuffle($Secret);
 }
 
-//TODO: Read and add this one
-/*
-  function make_secret($Length = 32) {
-  $Secret = '';
-  $Chars='abcdefghijklmnopqrstuvwxyz0123456789';
-  $CharLen = strlen($Chars)-1;
-  for ($i = 0; $i < $Length; ++$i) {
-  $Secret .= $Chars[mt_rand(0, $CharLen)];
-  }
-  return $Secret;
-  }
- */
-
 // Password hashes, feel free to make your own algorithm here
 function make_hash($Str, $Secret) {
-    // Lanz: we will be using tbdevs way for passwords instead of gazelles
+    // We will be using tbdevs way for passwords instead of gazelles
     // we are also using the salt field from tbdev that contains a shorter
     // salt than what gazelle generates, but new accounts will use gazelles
     // generated salt.
@@ -1732,11 +1642,11 @@ function is_anon($IsAnon) {
     else return $IsAnon;
 }
 
-function anon_username_ifmatch($Username, $UsernameCheck, $IsAnon = false) { 
+function anon_username_ifmatch($Username, $UsernameCheck, $IsAnon = false) {
     return anon_username($Username, $IsAnon && $Username===$UsernameCheck);
 }
 
-function anon_username($Username, $IsAnon = false) { 
+function anon_username($Username, $IsAnon = false) {
     // if not anon then just return username
     if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return $Username;
     // if anon ...
@@ -1747,8 +1657,7 @@ function anon_username($Username, $IsAnon = false) {
     }
 }
 
-
-function torrent_username($UserID, $Username, $IsAnon = false) { 
+function torrent_username($UserID, $Username, $IsAnon = false) {
     // if not anon then just return username
     if (!$IsAnon && !check_perms('site_force_anon_uploaders')) return format_username($UserID, $Username);
     // if anon ...
@@ -1761,16 +1670,12 @@ function torrent_username($UserID, $Username, $IsAnon = false) {
     }
 }
 
-
-
-
 /*
   Returns a username string for display
   $Class and $Title can be omitted for an abbreviated version
   $IsDonor, $IsWarned and $IsEnabled can be omitted for a *very* abbreviated version
  */
-
-function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000-00-00 00:00:00', 
+function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000-00-00 00:00:00',
                             $Enabled = 1, $Class = false, $Title = false, $DrawInBox = false, $GroupPerm = false, $DropDown=false, $Colorname=false) {
     global $DB, $Cache, $LoggedUser, $Classes;
     if ($UserID == 0) {
@@ -1786,41 +1691,36 @@ function format_username($UserID, $Username, $IsDonor = false, $IsWarned = '0000
             $ddlist .= '<li><a href="staffpm.php?action=compose&amp;toid='.$UserID.'" title="Start a Staff Conversation with '.$Username.'">Staff Message</a></li>';
         }
         $ddlist .= '<li><a href="inbox.php?action=compose&amp;to='.$UserID.'" title="Send a Private Message to '.$Username.'">Send PM</a></li>';
-            
+
         $Friends = $Cache->get_value('user_friends_'.$LoggedUser['ID']);
         if ($Friends===false){
-                //$Results = $DB->get_query_id();
-                //$DB->set_query_id($Results);
                 $DB->query("SELECT FriendID, Type FROM friends WHERE UserID='$LoggedUser[ID]'");
                 $Friends = $DB->to_array('FriendID');
                 $Cache->cache_value('user_friends_'.$LoggedUser['ID'], $Friends);
         }
         $FType = isset($Friends[$UserID]) ? $Friends[$UserID]['Type'] : false;
-        if(!$FType || $FType != 'friends' ) { 
+        if(!$FType || $FType != 'friends' ) {
                 $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'" title="Add this user to your friends list">Add to friends</a></li>';
-        } elseif ($FType == 'friends'){ 
+        } elseif ($FType == 'friends'){
                 $ddlist .= '<li><a href="friends.php?action=Defriend&amp;friendid='.$UserID.'&amp;auth='.$LoggedUser['AuthKey'].'" title="Remove this user from your friends list">Remove friend</a></li>';
         }
         if(!$FType || $FType != 'blocked' ) {
                 $ddlist .= '<li><a href="friends.php?action=add&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'" title="Add this user to your blocked list (blocks from sending PMs to you)">Block User</a></li>';
-        } elseif ($FType == 'blocked'){ 
+        } elseif ($FType == 'blocked'){
                 $ddlist .= '<li><a href="friends.php?action=Unblock&amp;friendid='.$UserID.'&amp;type=blocked&amp;auth='.$LoggedUser['AuthKey'].'" title="Remove this user from your blocked list">Remove block</a></li>';
         }
-        // $ddlist .= '<li><a href="reports.php?action=report&amp;type=user&amp;id='.$UserID.'">Report User</a></li>';
-         
         $str = "<div id=\"user_dropdown\">$str<ul>$ddlist</ul></div>";
     }
     $str.=($IsDonor) ? '<a href="donate.php"><img src="' . STATIC_SERVER . 'common/symbols/donor.png" alt="Donor" title="Donor" /></a>' : '';
 
     $str.=($IsWarned != '0000-00-00 00:00:00' && $IsWarned !== false) ? '<img src="' . STATIC_SERVER . 'common/symbols/warned.png" alt="Warned" title="Warned" />' : '';
-    
+
     if ($Enabled != '1' || $Enabled != true){
         if ($Enabled == '0')
             $str.= '<img src="' . STATIC_SERVER . 'common/symbols/unconfirmed.png" alt="Unconfirmed" title="This user has not confirmed their membership" />' ;
-        else 
+        else
             $str.= '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' ;
     }
-    //$str.=(!$IsEnabled) ? '<img src="' . STATIC_SERVER . 'common/symbols/disabled.png" alt="Banned" title="Be good, and you won\'t end up like this user" />' : '';
 
     if($GroupPerm) $str.= make_groupperm_string($GroupPerm, TRUE) ;  // ' (' . make_groupperm_string($GroupPerm, TRUE) . ')' ;
     if($Class && !$Colorname) $str.= ' (' . make_class_string($Class, TRUE) . ')' ;
@@ -1848,8 +1748,6 @@ function make_class_string($ClassID, $Usespan = false) {
         return $Classes[$ClassID]['Name'];
     } else {
         return '<span alt="' . $ClassID . '" class="rank" style="color:#'. $Classes[$ClassID]['Color'] . '">' . $Classes[$ClassID]['Name'] . '</span>';
-    
-        //return '<span alt="' . $ClassID . '" class="rank ' . str_replace(" ", "", $Classes[$ClassID]['Name']) . '">' . $Classes[$ClassID]['Name'] . '</span>';
     }
 }
 
@@ -1887,7 +1785,7 @@ function delete_torrent($ID, $GroupID=0, $UserID = 0) {
 	if(!$GroupID) {
 		$DB->query("SELECT GroupID, UserID FROM torrents WHERE ID='$ID'");
 		list($GroupID, $UploaderID) = $DB->next_record();
-		
+
 	}
 	if(!$UserID) {
 		$DB->query("SELECT UserID FROM torrents WHERE ID='$ID'");
@@ -1902,13 +1800,13 @@ function delete_torrent($ID, $GroupID=0, $UserID = 0) {
 			}
 		}
 	}
-	
-	
+
+
 	$DB->query("SELECT info_hash FROM torrents WHERE ID = ".$ID);
 	list($InfoHash) = $DB->next_record(MYSQLI_BOTH, false);
 	$DB->query("DELETE FROM torrents WHERE ID = ".$ID);
 	update_tracker('delete_torrent', array('info_hash' => rawurlencode($InfoHash), 'id' => $ID));
-	
+
 	$Cache->decrement('stats_torrent_count');
 
 	$DB->query("SELECT COUNT(ID) FROM torrents WHERE GroupID='$GroupID' AND flags <> 1");
@@ -1951,13 +1849,10 @@ function delete_torrent($ID, $GroupID=0, $UserID = 0) {
 
 function delete_group($GroupID) {
 	global $DB, $Cache;
-
-	//$DB->query("DELETE FROM group_log WHERE GroupID = ".$GroupID);
-
 	$Cache->decrement('stats_group_count');
-	
-	
-	
+
+
+
 	// Collages
 	$DB->query("SELECT CollageID FROM collages_torrents WHERE GroupID='$GroupID'");
 	if($DB->record_count()>0) {
@@ -1970,7 +1865,7 @@ function delete_group($GroupID) {
 		}
 		$Cache->delete_value('torrent_collages_'.$GroupID);
 	}
-		
+
 	// Requests
 	$DB->query("SELECT ID FROM requests WHERE GroupID='$GroupID'");
 	$Requests = $DB->collect('ID');
@@ -1993,7 +1888,7 @@ function delete_group($GroupID) {
                 $DB->query("DELETE FROM tags WHERE ID=".$Tag['TagID']." AND TagType='other'");
             }
         }
-        
+
     $DB->query("DELETE FROM group_log WHERE GroupID='$GroupID'");
 	$DB->query("DELETE FROM torrents_group WHERE ID='$GroupID'");
 	$DB->query("DELETE FROM torrents_tags WHERE GroupID='$GroupID'");
@@ -2001,7 +1896,7 @@ function delete_group($GroupID) {
 	$DB->query("DELETE FROM torrents_comments WHERE GroupID='$GroupID'");
 	$DB->query("DELETE FROM bookmarks_torrents WHERE GroupID='$GroupID'");
 	$DB->query("REPLACE INTO sphinx_delta (ID,Time) VALUES ('$GroupID',UNIX_TIMESTAMP())"); // Tells Sphinx that the group is removed
-	
+
 	$Cache->delete_value('torrents_details_'.$GroupID);
 	$Cache->delete_value('torrent_group_'.$GroupID);
 }
@@ -2078,72 +1973,10 @@ function update_hash($GroupID) {
 		JOIN torrents_group AS g ON g.ID=t.GroupID
 		WHERE g.ID=$GroupID
 		GROUP BY g.ID");
-	
+
 	$Cache->delete_value('torrents_details_'.$GroupID);
 	$Cache->delete_value('torrent_group_'.$GroupID);
 }
-
-
-/*
-// this function sends a PM to the userid $ToID and from the userid $FromID, sets date to now
-// this function no longer uses db_string() so you will need to escape strings before using this function!
-// set userid to 0 for a PM from 'system'
-// if $ConvID is not set, it auto increments it, ie. starting a new conversation
-function send_pm($ToID, $FromID, $Subject, $Body, $ConvID='') {
-    global $DB, $Cache, $Time;
-    if ($ToID == 0) {
-        // Don't allow users to send messages to the system
-        return;
-    }
-    if (!is_array($ToID)) {
-        $ToID = array($ToID);
-    }
-    if ($ConvID == '') {
-        $DB->query("INSERT INTO pm_conversations(Subject) VALUES ('" . $Subject . "')");
-        $ConvID = $DB->inserted_id();
-        foreach($ToID as $TID) {
-                $DB->query("INSERT INTO pm_conversations_users
-                                        (UserID, ConvID, InInbox, InSentbox, SentDate, ReceivedDate, UnRead) VALUES
-                                        ('$TID', '$ConvID', '1','0','" . sqltime() . "', '" . sqltime() . "', '1')");
-        }
-        if ($FromID != 0) {
-            $DB->query("INSERT INTO pm_conversations_users
-                                (UserID, ConvID, InInbox, InSentbox, SentDate, ReceivedDate, UnRead) VALUES
-                                ('$FromID', '$ConvID', '0','1','" . sqltime() . "', '" . sqltime() . "', '0')");
-        }
-    } else {
-        $DB->query("UPDATE pm_conversations_users SET
-				InInbox='1',
-				UnRead='1',
-				ReceivedDate='" . sqltime() . "'
-				WHERE UserID IN (" . implode(',', $ToID) . ")
-				AND ConvID='$ConvID'");
-
-        $DB->query("UPDATE pm_conversations_users SET
-				InSentbox='1',
-				SentDate='" . sqltime() . "'
-				WHERE UserID='$FromID'
-				AND ConvID='$ConvID'");
-    }
-    $DB->query("INSERT INTO pm_messages
-			(SenderID, ConvID, SentDate, Body) VALUES
-			('$FromID', '$ConvID', '" . sqltime() . "', '" . $Body . "')");
-
-    // Clear the caches of the inbox and sentbox
-    //$DB->query("SELECT UnRead from pm_conversations_users WHERE ConvID='$ConvID' AND UserID='$ToID'");
-    foreach ($ToID as $ID) {
-        $DB->query("SELECT COUNT(ConvID) FROM pm_conversations_users WHERE UnRead = '1' and UserID='$ID' AND InInbox = '1'");
-        list($UnRead) = $DB->next_record();
-        $Cache->cache_value('inbox_new_' . $ID, $UnRead);
-    }
-
-    //if ($UnRead == 0) {
-    //	$Cache->increment('inbox_new_'.$ToID);
-    //}
-    return $ConvID;
-}
-*/
-
 
 //  OPTIMISED a bit more for mass sending (only put in an array of numbers if fromID==system (0)
 // this function sends a PM to the userid $ToID and from the userid $FromID, sets date to now
@@ -2152,41 +1985,36 @@ function send_pm($ToID, $FromID, $Subject, $Body, $ConvID='') {
 // if $ConvID is not set, it auto increments it, ie. starting a new conversation
 function send_pm($ToID, $FromID, $Subject, $Body, $ConvID='') {
     global $DB, $Cache ;
-  
+
     if (!is_array($ToID)) $ToID = array($ToID);
-     
-    // Clear the caches of the inbox and sentbox 
-    foreach ($ToID as $key=>$ID) { 
-        if (!is_number($ID)) return false; 
+
+    // Clear the caches of the inbox and sentbox
+    foreach ($ToID as $key=>$ID) {
+        if (!is_number($ID)) return false;
         // Don't allow users to send messages to the system
         if ($ID == 0) unset($ToID[$key]);
         if ($ID == $FromID) unset($ToID[$key]); // or themselves
     }
-    if (count($ToID)==0) return false; 
+    if (count($ToID)==0) return false;
     if (count($ToID)>1 && $FromID!==0) return false; // masspms not from the system with the same convID dont work
     $sqltime = sqltime();
-    
+
     if ($ConvID == '') { // new pm
-         
+
         $DB->query("INSERT INTO pm_conversations (Subject) VALUES ('" . $Subject . "')");
         $ConvID = $DB->inserted_id();
-        
-        /*$Values = "('".implode("', '$ConvID', '1','0', '$sqltime', '$sqltime', '1'), ('", $ToID)."', '$ConvID', '1','0', '$sqltime', '$sqltime', '1')";
-        if ($FromID != 0) {
-            $Values .= ", ('$FromID', '$ConvID', '0','1','$sqltime', '$sqltime', '0')";
-        } */
-         
+
         if ($FromID != 0) {
             $Values = "('$FromID', '$ConvID', '0','1','$sqltime', '$sqltime', '0'),";
         }
         $Values .= "('".implode("', '$ConvID', '1','0', '$sqltime', '$sqltime', '1'), ('", $ToID)."', '$ConvID', '1','0', '$sqltime', '$sqltime', '1')";
-        
+
         $DB->query("INSERT INTO pm_conversations_users
                                         (UserID, ConvID, InInbox, InSentbox, SentDate, ReceivedDate, UnRead) VALUES
                                         $Values");
-       
+
     } else { // responding to exisiting
-        
+
         $DB->query("UPDATE pm_conversations_users SET
 				InInbox='1',
 				UnRead='1',
@@ -2199,33 +2027,22 @@ function send_pm($ToID, $FromID, $Subject, $Body, $ConvID='') {
 				SentDate='$sqltime'
 				WHERE UserID='$FromID'
 				AND ConvID='$ConvID'");
-        
     }
-    
+
     $DB->query("INSERT INTO pm_messages
 			(SenderID, ConvID, SentDate, Body) VALUES
 			('$FromID', '$ConvID', '$sqltime', '" . $Body . "')");
 
-    // Clear the caches of the inbox and sentbox 
-    foreach ($ToID as $ID) { 
+    // Clear the caches of the inbox and sentbox
+    foreach ($ToID as $ID) {
         $Cache->delete_value('inbox_new_' . $ID);
     }
     if ($FromID != 0) $Cache->delete_value('inbox_new_' . $FromID);
     // DEBUG only:
     //write_log("Sent MassPM to ".count($ToID)." users. ConvID: $ConvID  Subject: $Subject");
- 
+
     return $ConvID;
 }
-
-
-
-
-
-
-
-
-
-
 
 //Create thread function, things should already be escaped when sent here.
 //Almost all the code is stolen straight from the forums and tailored for new posts only
@@ -2371,11 +2188,11 @@ function check_force_anon($UserID) {
 // In places where the output from this is merged with sphinx filters, it will be in a different order.
 function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 	global $DB, $Cache, $LoggedUser;
-	
+
 	$Found = array_flip($GroupIDs);
 	$NotFound = array_flip($GroupIDs);
 	$Key = $Torrents ? 'torrent_group_' : 'torrent_group_light_';
-	
+
 	foreach($GroupIDs as $GroupID) {
 		$Data = $Cache->get_value($Key.$GroupID);
 		if(!empty($Data) && (@$Data['ver'] >= 5)) {
@@ -2394,43 +2211,43 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
             }
 		}
 	}
-	
+
 	$IDs = implode(',',array_flip($NotFound));
-	
+
 	/*
 	Changing any of these attributes returned will cause very large, very dramatic site-wide chaos.
 	Do not change what is returned or the order thereof without updating:
-		torrents, collages, bookmarks, better, the front page, 
+		torrents, collages, bookmarks, better, the front page,
 	and anywhere else the get_groups function is used.
 	*/
-	
+
 	if(count($NotFound)>0) {
 		$DB->query("SELECT g.ID, g.Name, g.TagList FROM torrents_group AS g WHERE g.ID IN ($IDs)");
-	
+
 		while($Group = $DB->next_record(MYSQLI_ASSOC, true)) {
 			unset($NotFound[$Group['ID']]);
 			$Found[$Group['ID']] = $Group;
 			$Found[$Group['ID']]['Torrents'] = array();
 		}
-		
-		if ($Torrents) {          
-            
-            $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed, 
+
+		if ($Torrents) {
+
+            $DB->query("SELECT t.ID, t.UserID, um.Username, t.GroupID, FileCount, FreeTorrent, double_seed,
                                         Size, Leechers, Seeders, Snatched, t.Time, t.ID AS HasFile, r.ReportCount, t.Anonymous
-                          FROM torrents AS t 
+                          FROM torrents AS t
                           JOIN users_main AS um ON t.UserID=um.ID
-                     LEFT JOIN (SELECT TorrentID, count(*) as ReportCount FROM reportsv2 
+                     LEFT JOIN (SELECT TorrentID, count(*) as ReportCount FROM reportsv2
                                  WHERE Type != 'edited' AND Status != 'Resolved' GROUP BY TorrentID) AS r ON r.TorrentID=t.ID
-                         WHERE t.GroupID IN($IDs) 
+                         WHERE t.GroupID IN($IDs)
                       ORDER BY GroupID DESC, t.ID");
-            
+
 			while($Torrent = $DB->next_record(MYSQLI_ASSOC, true)) {
 				$Found[$Torrent['GroupID']]['Torrents'][$Torrent['ID']] = $Torrent;
-		
-                $CacheTime = $Torrent['Seeders']==0 ? 120 : 900; 
+
+                $CacheTime = $Torrent['Seeders']==0 ? 120 : 900;
                 $TorrentPeerInfo = array('Seeders'=>$Torrent['Seeders'],'Leechers'=>$Torrent['Leechers'],'Snatched'=>$Torrent['Snatched']);
-                $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime); 
-                
+                $Cache->cache_value('torrent_peers_'.$Torrent['ID'], $TorrentPeerInfo, $CacheTime);
+
 				$Cache->cache_value('torrent_group_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
 				$Cache->cache_value('torrent_group_light_'.$Torrent['GroupID'], array('ver'=>5, 'd'=>$Found[$Torrent['GroupID']]), 0);
 			}
@@ -2440,7 +2257,7 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 			}
 		}
 	}
-	
+
 	if($Return) { // If we're interested in the data, and not just caching it
 		$Matches = array('matches'=>$Found, 'notfound'=>array_flip($NotFound));
 
@@ -2448,50 +2265,46 @@ function get_groups($GroupIDs, $Return = true, $Torrents = true) {
 	}
 }
 
-
-
 function get_peers($TorrentID) {
     global $DB, $Cache, $LoggedUser;
-	
+
 	$TorrentPeerInfo = $Cache->get_value('torrent_peers_'.$TorrentID);
-	if ($TorrentPeerInfo===false) {  
+	if ($TorrentPeerInfo===false) {
             // testing with 'dye'
         $DB->query("SELECT Seeders, Leechers, Snatched FROM torrents WHERE ID ='$TorrentID'");
         $TorrentPeerInfo = $DB->next_record(MYSQLI_ASSOC) ;
-		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 900; 
-        $Cache->cache_value('torrent_peers_'.$TorrentID, $TorrentPeerInfo, $CacheTime); 
+		$CacheTime = $TorrentPeerInfo['Seeders']==0 ? 120 : 900;
+        $Cache->cache_value('torrent_peers_'.$TorrentID, $TorrentPeerInfo, $CacheTime);
     }
     return $TorrentPeerInfo;
 }
 
-
-
 function get_last_review($GroupID){
 	global $DB, $Cache;
 	$LastReview = $Cache->get_value('torrent_review_'.$GroupID);
-	if ($LastReview===false || $LastReview['ver']<2) {  
+	if ($LastReview===false || $LastReview['ver']<2) {
         $DB->query("SELECT tr.ID,
                            tr.Status,
-                           tr.Time, 
-                           tr.KillTime, 
+                           tr.Time,
+                           tr.KillTime,
                            IF(tr.ReasonID = 0, tr.Reason, rr.Description) AS StatusDescription,
                            tr.ConvID,
                            tr.UserID AS UserID,
-                           u.Username AS Username 
-                      FROM torrents_reviews AS tr 
+                           u.Username AS Username
+                      FROM torrents_reviews AS tr
                  LEFT JOIN review_reasons AS rr ON rr.ID = tr.ReasonID
 			     LEFT JOIN users_main AS u ON u.ID=tr.UserID
-                     WHERE tr.GroupID=$GroupID  
+                     WHERE tr.GroupID=$GroupID
                   ORDER BY tr.Time DESC
-                     LIMIT 1 " ); 
+                     LIMIT 1 " );
         $LastReviewRow = $DB->next_record(MYSQLI_ASSOC);
         if($LastReviewRow['Status']!='Pending'){ // if last review log is not from a user
             $LastReviewRow['StaffID']=$LastReviewRow['UserID'];
             $LastReviewRow['Staffname']=$LastReviewRow['Username'];
         } else {
-            $DB->query("SELECT tr.UserID AS StaffID, u.Username AS Staffname 
+            $DB->query("SELECT tr.UserID AS StaffID, u.Username AS Staffname
                           FROM torrents_reviews AS tr
-                     LEFT JOIN users_main AS u ON u.ID=tr.UserID 
+                     LEFT JOIN users_main AS u ON u.ID=tr.UserID
                      WHERE tr.GroupID=$GroupID AND tr.Status!='Pending'
                   ORDER BY tr.Time DESC
                      LIMIT 1 ");
@@ -2500,20 +2313,18 @@ function get_last_review($GroupID){
             $LastReviewRow['Staffname']=$LastStaffReview['Staffname'];
         }
         $LastReview = array('ver'=>2, 'd'=>$LastReviewRow) ;
-        $Cache->cache_value('torrent_review_'.$GroupID, $LastReview, 0); 
+        $Cache->cache_value('torrent_review_'.$GroupID, $LastReview, 0);
     }
     return $LastReview['d'];
 }
 
-
-
 // moved this here from requests/functions.php as get_requests() is dependent
 function get_request_tags($RequestID) {
 	global $DB;
-	$DB->query("SELECT rt.TagID, 
-					t.Name 
-				FROM requests_tags AS rt 
-					JOIN tags AS t ON rt.TagID=t.ID 
+	$DB->query("SELECT rt.TagID,
+					t.Name
+				FROM requests_tags AS rt
+					JOIN tags AS t ON rt.TagID=t.ID
 				WHERE rt.RequestID = ".$RequestID."
 				ORDER BY rt.TagID ASC");
 	$Tags = $DB->to_array();
@@ -2524,7 +2335,6 @@ function get_request_tags($RequestID) {
 	}
 	return $Results;
 }
-
 
 //Function to get data from an array of $RequestIDs.
 //In places where the output from this is merged with sphinx filters, it will be in a different order.
@@ -2555,8 +2365,8 @@ function get_requests($RequestIDs, $Return = true) {
 					u.Username,
 					r.TimeAdded,
 					r.LastVote,
-					r.CategoryID, 
-					r.Title, 
+					r.CategoryID,
+					r.Title,
 					r.Image,
 					r.Description,
 					r.FillerID,
@@ -2589,7 +2399,7 @@ function update_sphinx_requests($RequestID) {
     global $DB, $Cache;
 
 	$DB->query("REPLACE INTO sphinx_requests_delta (
-				ID, UserID, TimeAdded, LastVote, CategoryID, 
+				ID, UserID, TimeAdded, LastVote, CategoryID,
                                 Title, FillerID, TorrentID,
 				TimeFilled, Visible, Votes, Bounty)
 			SELECT
@@ -2628,12 +2438,7 @@ function get_tags($TagNames) {
     return($TagIDs);
 }
 
-
-
-
-
 function get_overlay_html($GroupName, $Username, $Image, $Seeders, $Leechers, $Size, $Snatched) {
-    
     $OverImage = $Image != '' ? $Image : '/static/common/noartwork/noimage.png';
 
     # Temporary solution for image load on fapping - TODO proper permanent solution, this is ugly
@@ -2646,22 +2451,10 @@ function get_overlay_html($GroupName, $Username, $Image, $Seeders, $Leechers, $S
 
     $OverName = mb_strlen($GroupName) <= 60 ? $GroupName : mb_substr($GroupName, 0, 56) . '...';
     $SL = ($Seeders == 0 ? "<span class=r00>" . number_format($Seeders) . "</span>" : number_format($Seeders)) . " / " . number_format($Leechers);
-    //$Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $Username<br /><br /><strong>Size:</strong> " . get_size($Size) . "<br /><br /><strong>Snatched:</strong> " . number_format($Snatched) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
-    /*
-    $Overlay = '<table class=overlay><tr><td class="overlay" colspan="3"><strong>'.$OverName.'</strong></td></tr>
-                <tr><td class="leftOverlay" rowspan="5"><img style="max-width: 150px;" src="' . $OverImage . '" /></td>
-                    <td class=rightOverlay><strong>Uploader:</strong></td><td>'.$Username.'</td></tr>
-                <tr><td class=rightOverlay><strong>Size:</strong></td><td>' . get_size($Size) . '</td></tr>
-                <tr><td class=rightOverlay><strong>Snatched:</strong></td><td>' . number_format($Snatched) . '</td></tr>
-                <tr><td class=rightOverlay><strong>S/L:</strong></td><td>' . $SL . "</td></tr></table>";  */
-    
     $Overlay = "<table class=overlay><tr><td class=overlay colspan=2><strong>" . $OverName . "</strong></td><tr><td class=leftOverlay><img style='max-width: 150px;' src=" . $OverImage . "></td><td class=rightOverlay><strong>Uploader:</strong> $Username<br /><br /><strong>Size:</strong> " . get_size($Size) . "<br /><br /><strong>Snatched:</strong> " . number_format($Snatched) . "<br /><br /><strong>Seeders/Leechers:</strong> " . $SL . "</td></tr></table>";
-   
+
     return $Overlay;
 }
-
-
-
 
 function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID,
     global $DB, $Cache, $LoggedUser, $TorrentUserStatus, $Sitewide_Freeleech_On, $Sitewide_Freeleech;
@@ -2679,7 +2472,7 @@ function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID
         if ($Data['double_seed'] == '1') {
             $SeedTooltip = "Unlimited Doubleseed";
         }
-        
+
         $UserID = $LoggedUser['ID'];
         $TokenTorrents = $Cache->get_value('users_tokens_' .$UserID );
         if ($TokenTorrents===false) {
@@ -2687,56 +2480,53 @@ function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID
             $TokenTorrents = $DB->to_array('TorrentID');
             $Cache->cache_value('users_tokens_' . $UserID, $TokenTorrents);
         }
-        
+
         if (!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['FreeLeech'] > sqltime()) {
             $FreeTooltip = "Personal Freeleech for ".time_diff($TokenTorrents[$TorrentID]['FreeLeech'], 2,false,false,0);
-        } 
-        
+        }
+
         if (!empty($TokenTorrents[$TorrentID]) && $TokenTorrents[$TorrentID]['DoubleSeed'] > sqltime()) {
             $SeedTooltip = "Personal Doubleseed for ".time_diff($TokenTorrents[$TorrentID]['DoubleSeed'], 2,false,false,0);
         }
-        
+
         $Icons = '';
         if ($IsBookmarked)
             $Icons .= '<img src="static/styles/'.$LoggedUser['StyleName'].'/images/star16.png" alt="bookmarked" title="You have this torrent bookmarked" />';
-            //$Icons .= '<span title="You have this torrent bookmarked" class="icon icon_bookmarked"></span>';
-        if ($SeedTooltip) 
-            $Icons .= '&nbsp;<img src="static/common/symbols/doubleseed.gif" alt="DoubleSeed" title="'.$SeedTooltip.'" />';          
-        if ($FreeTooltip) 
+        if ($SeedTooltip)
+            $Icons .= '&nbsp;<img src="static/common/symbols/doubleseed.gif" alt="DoubleSeed" title="'.$SeedTooltip.'" />';
+        if ($FreeTooltip)
             $Icons .= '&nbsp;<img src="static/common/symbols/freedownload.gif" alt="Freeleech" title="'.$FreeTooltip.'" />';
-        
-     
-         
+
+
+
         $SnatchedTorrents = $Cache->get_value('users_torrents_snatched_' .$UserID );
         if ($SnatchedTorrents===false) {
             $DB->query("SELECT DISTINCT x.fid as TorrentID
-                          FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid 
+                          FROM xbt_snatched AS x JOIN torrents AS t ON t.ID=x.fid
                          WHERE x.uid='$UserID' ");
-                        
+
             $SnatchedTorrents = $DB->to_array('TorrentID');
             $Cache->cache_value('users_torrents_snatched_' . $UserID, $SnatchedTorrents, 21600);
         }
-        
+
         $GrabbedTorrents = $Cache->get_value('users_torrents_grabbed_' .$UserID );
         if ($GrabbedTorrents===false) {
 
-            $DB->query("SELECT DISTINCT ud.TorrentID 
-                                  FROM users_downloads AS ud JOIN torrents AS t ON t.ID=ud.TorrentID 
+            $DB->query("SELECT DISTINCT ud.TorrentID
+                                  FROM users_downloads AS ud JOIN torrents AS t ON t.ID=ud.TorrentID
                                  WHERE ud.UserID='$UserID' ");
-                
+
             $GrabbedTorrents = $DB->to_array('TorrentID');
             $Cache->cache_value('users_torrents_grabbed_' . $UserID, $GrabbedTorrents);
         }
 
-        
-        
         //icon_disk_grabbed icon_disk_snatched
         if ( !$Review || !$Review['Status'] ||  $Review['Status'] == 'Okay' || check_perms('torrents_download_override')) {
-            
+
             if ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Currently Seeding Torrent">';
                 $Icons .= '<span class="icon icon_disk_seed"></span>';
-                $Icons .= '</a>';               
+                $Icons .= '</a>';
             } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'"  title="Currently Leeching Torrent">';
                 $Icons .= '<span class="icon icon_disk_leech"></span>';
@@ -2744,33 +2534,33 @@ function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID
             } elseif (isset($SnatchedTorrents[$TorrentID])) {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Previously Snatched Torrent">';
                 $Icons .= '<span class="icon icon_disk_snatched"></span>';
-                $Icons .= '</a>';               
+                $Icons .= '</a>';
             } elseif (isset($GrabbedTorrents[$TorrentID] )) {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'"  title="Previously Grabbed Torrent File">';
                 $Icons .= '<span class="icon icon_disk_grabbed"></span>';
                 $Icons .= '</a>';
-                
-            } elseif (empty($TorrentUserStatus[$TorrentID])) { 
+
+            } elseif (empty($TorrentUserStatus[$TorrentID])) {
                 $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Download Torrent">';
                 $Icons .= '<span class="icon icon_disk_none"></span>';
                 $Icons .= '</a>';
             }
-        } else { 
-            
+        } else {
+
             if ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
-                $Icons .= '<span class="icon icon_disk_seed" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';                 
+                $Icons .= '<span class="icon icon_disk_seed" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
             } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
                 $Icons .= '<span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
             } elseif (isset($SnatchedTorrents[$TorrentID])) {
-                $Icons .= '<span class="icon icon_disk_snatched" title="Previously Snatched Torrent"></span>';           
+                $Icons .= '<span class="icon icon_disk_snatched" title="Previously Snatched Torrent"></span>';
             } elseif (isset($GrabbedTorrents[$TorrentID] )) {
-                $Icons .= '<span class="icon icon_disk_grabbed" title="Previously Grabbed Torrent File"></span>'; 
-                
+                $Icons .= '<span class="icon icon_disk_grabbed" title="Previously Grabbed Torrent File"></span>';
+
             } //elseif (empty($TorrentUserStatus[$TorrentID])) {
-            
+
             //}
         }
-        
+
         if ($Review) {
             if(check_perms('torrents_review')) {
                 $Icons .= get_status_icon_staff($Review['Status'], $Review['Staffname'], $Review['StatusDescription']);
@@ -2778,21 +2568,15 @@ function torrent_icons($Data, $TorrentID, $Review, $IsBookmarked) {  //  $UserID
                 $Icons .= get_status_icon($Review['Status']) ;
             }
         }
-        
-        /*
-        if ($Data['ReportCount'] > 0) {
-            $Title = "This torrent has ".$Data['ReportCount']." active ".($Data['ReportCount'] > 1 ?'reports' : 'report');
-            $AddExtra .= ' /<span class="reported" title="'.$Title.'"> Reported</span>';
-        } */
-        
+
         return '<span style="float:right">'.$Icons.'</span>';
- 
+
 }
 
 function get_status_icon_staff($Status, $Staffname, $Reason){
-    if ($Status == 'Warned' || $Status == 'Pending') 
+    if ($Status == 'Warned' || $Status == 'Pending')
         return "<span title=\"$Status: [$Reason] by $Staffname\" class=\"icon icon_warning\"></span>";
-    elseif ($Status == 'Okay') 
+    elseif ($Status == 'Okay')
         return '<span title="This torrent has been checked by staff ('.$Staffname.') and is okay" class="icon icon_okay"></span>';
     else return '';
 }
@@ -2803,38 +2587,6 @@ function get_status_icon($Status){
     elseif ($Status == 'Okay') return '<span title="This torrent has been checked by staff and is okay" class="icon icon_okay"></span>';
     else return '';
 }
-
-
-/*
-function disk_icon($TorrentID, $MFDStatus){
-    global $LoggedUser, $TorrentUserStatus;
-    
-        if (check_perms('torrents_download_override')  || !$MFDStatus ||  $MFDStatus == 'Okay' ) {
-            
-            if (empty($TorrentUserStatus[$TorrentID])) { 
-                $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Download">';
-                $Icons .= '<span class="icon icon_disk_none"></span>';
-                $Icons .= '</a>';
-            } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
-                $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'" title="Currently Seeding Torrent">';
-                $Icons .= '<span class="icon icon_disk_seed"></span>';
-                $Icons .= '</a>';               
-            } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
-                $Icons .= '<a href="torrents.php?action=download&amp;id='.$TorrentID.'&amp;authkey='.$LoggedUser['AuthKey'].'&amp;torrent_pass='.$LoggedUser['torrent_pass'].'"  title="Currently Leeching Torrent">';
-                $Icons .= '<span class="icon icon_disk_leech"></span>';
-                $Icons .= '</a>';
-            }
-        } else { 
-            if (empty($TorrentUserStatus[$TorrentID])) {
-            
-            } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') {
-                $Icons .= '<span class="icon icon_disk_seed" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';                 
-            } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') {
-                $Icons .= '<span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> ';
-            }
-        }
-        return $Icons;
-} */
 
 function get_num_comments($GroupID){
     global $DB, $Cache;
@@ -2850,45 +2602,6 @@ function get_num_comments($GroupID){
     }
     return $Results;
 }
-
-/*
-function print_torrent_status($TorrentID, $MFDStatus) {
-    global $TorrentUserStatus, $LoggedUser;
-    
-        if (check_perms('torrents_download_override')  || !$MFDStatus ||  $MFDStatus == 'Okay' ) {
-            
-?>
-                <span>
-                    <? if (empty($TorrentUserStatus[$TorrentID])) { ?>
-                        <a href="torrents.php?action=download&amp;id=<?= $TorrentID ?>&amp;authkey=<?= $LoggedUser['AuthKey'] ?>&amp;torrent_pass=<?= $LoggedUser['torrent_pass'] ?>" title="Download">
-                            <span class="icon icon_disk_none"></span>
-                        </a>
-                    <? } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') { ?>
-                        <a href="torrents.php?action=download&amp;id=<?= $TorrentID ?>&amp;authkey=<?= $LoggedUser['AuthKey'] ?>&amp;torrent_pass=<?= $LoggedUser['torrent_pass'] ?>" title="Currently Seeding Torrent">
-                            <span class="icon icon_disk_seed"></span>
-                        </a>                    
-                    <? } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') { ?>
-                        <a href="torrents.php?action=download&amp;id=<?= $TorrentID ?>&amp;authkey=<?= $LoggedUser['AuthKey'] ?>&amp;torrent_pass=<?= $LoggedUser['torrent_pass'] ?>" title="Currently Leeching Torrent">
-                            <span class="icon icon_disk_leech"></span>
-                        </a>                    
-
-                    <? } ?>
-                </span>
-<?
-        } else { 
-?>
-                <span>
-                    <? if (empty($TorrentUserStatus[$TorrentID])) { ?>
-                              
-                    <? } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'S') { ?>
-                            <span class="icon icon_disk_seed" title="Warning: You are seeding a torrent that is marked for deletion"></span>                  
-                    <? } elseif ($TorrentUserStatus[$TorrentID]['PeerStatus'] == 'L') { ?>
-                            <span class="icon icon_disk_leech" title="Warning: You are seeding a torrent that is marked for deletion"></span> 
-                    <? } ?>
-                </span>
-<?
-        }
-} */
 
 // Echo data sent in a form, typically a text area
 function form($Index, $Return = false) {
@@ -2943,12 +2656,6 @@ function disable_users($UserIDs, $AdminComment, $BanReason = 1) {
 		WHERE m.ID IN(" . implode(',', $UserIDs) . ") ");
     $Cache->decrement('stats_user_count', $DB->affected_rows() / 2); # Two tables are affected, meaning affected_rows() is actually twice the number of disabled users.
     foreach ($UserIDs as $UserID) {
-        /*
-          $Cache->cache_value('enabled_'.$UserID, 2, 2592000);
-          $Cache->begin_transaction('user_info_'.$UserID);
-          $Cache->update_row(false, array('Enabled' => 2));
-          $Cache->commit_transaction(0);
-         */
         $Cache->delete_value('enabled_' . $UserID);
         $Cache->delete_value('user_info_' . $UserID);
         $Cache->delete_value('user_info_heavy_' . $UserID);
@@ -3044,12 +2751,6 @@ function update_tracker($Action, $Updates, $ToIRC = false) {
     return ($Return == "success");
 }
 
-/*
-  function ends_with($Haystack, $Needle) {
-  return strrpos($Haystack, $Needle) === strlen($Haystack)-strlen($Needle);
-  }
- */
-
 /** This ends_with is slightly slower when the string is found, but a lot faster when it isn't.
  */
 function ends_with($Haystack, $Needle) {
@@ -3062,7 +2763,7 @@ function starts_with($Haystack, $Needle) {
 
 // amazingly fmod() does not return remanider when var2<var1... this one does
 function modulos($var1, $var2) {
-  $tmp = $var1/$var2; 
+  $tmp = $var1/$var2;
   return (float) ( $var1 - ( ( (int) ($tmp) ) * $var2 ) );
 }
 
@@ -3114,8 +2815,8 @@ function freeleech_torrents($TorrentIDs, $FreeNeutral = 1, $FromShop = false) { 
         update_tracker('update_torrent', array('info_hash' => rawurlencode($InfoHash), 'freetorrent' => $FreeNeutral));
         $Cache->delete_value('torrent_download_' . $TorrentID);
         if($FromShop){
-            write_log($LoggedUser['Username'] . " bought universal freeleech for torrent " . $TorrentID);   
-            write_group_log($GroupID, $TorrentID, $LoggedUser['ID'], "bought universal freeleech.", 0);  
+            write_log($LoggedUser['Username'] . " bought universal freeleech for torrent " . $TorrentID);
+            write_group_log($GroupID, $TorrentID, $LoggedUser['ID'], "bought universal freeleech.", 0);
         } else {
             write_log($LoggedUser['Username'] . " marked torrent " . $TorrentID . " as freeleech.");    // type " . $FreeLeechType . "!");
             write_group_log($GroupID, $TorrentID, $LoggedUser['ID'], "marked as freeleech.", 0);    //  type " . $FreeLeechType . "!", 0);
@@ -3157,12 +2858,10 @@ if (!preg_match('/^[a-z0-9]+$/i', $Document)) {
     error(404);
 }
 
-
-
 require(SERVER_ROOT . '/sections/' . $Document . '/index.php');
 $Debug->set_flag('completed module execution');
 
-/* Required in the absence of session_start() for providing that pages will change 
+/* Required in the absence of session_start() for providing that pages will change
   upon hit rather than being browser cache'd for changing content. */
 header('Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0');
 header('Pragma: no-cache');
@@ -3171,7 +2870,6 @@ header('Pragma: no-cache');
 ob_end_flush();
 
 $Debug->set_flag('set headers and send to user');
-
 
 //Attribute profiling
 $Debug->profile();

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!check_perms('admin_email_blacklist')) { error(403); }
 
 authorize();
@@ -24,7 +24,7 @@ if($_POST['submit'] == 'Delete'){ //Delete
 			Time='".sqltime()."'
 			WHERE ID='$P[id]'");
 	} else { //Create
-		$DB->query("INSERT INTO email_blacklist 
+		$DB->query("INSERT INTO email_blacklist
 			(Email, Comment, UserID, Time) VALUES
 			('$P[email]','$P[comment]','$LoggedUser[ID]','".sqltime()."')");
 	}
@@ -34,4 +34,3 @@ $Cache->delete_value('emailblacklist_regex');
 
 // Go back
 header('Location: tools.php?action=email_blacklist');
-?>

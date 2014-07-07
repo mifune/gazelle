@@ -1,4 +1,4 @@
-<?
+<?php
 /************************************************************************
 ||------------|| User email history page ||---------------------------||
 
@@ -9,7 +9,6 @@ It also requires $_GET['userid'] in order to get the data for the correct
 user.
 
 ************************************************************************/
-
 
 $UserID = $_GET['userid'];
 if (!is_number($UserID)) { error(404); }
@@ -46,7 +45,7 @@ if ($UsersOnly == 1) {
 	                        WHERE h.UserID='$UserID' AND h2.UserID>0"/*AND Time<>'0000-00-00 00:00:00'*/."
 				ORDER BY Time DESC");
 } else {
-	$DB->query("SELECT 
+	$DB->query("SELECT
 					u.Email,
 					'".sqltime()."' AS Time,
 					u.IP,
@@ -54,8 +53,8 @@ if ($UsersOnly == 1) {
 				FROM users_main AS u
 				LEFT JOIN geoip_country AS c ON INET_ATON(u.IP) BETWEEN c.StartIP AND c.EndIP
 				WHERE u.ID='$UserID'
-				UNION SELECT 
-					h.Email, 
+				UNION SELECT
+					h.Email,
 					h.Time,
 					h.IP,
 					c.Code
@@ -72,14 +71,14 @@ $History = $DB->to_array();
 		<td>Email</td>
 		<td>Set</td>
 		<td>IP [<a href="userhistory.php?action=ips&amp;userid=<?=$UserID ?>">H</a>]</td>
-<? if ($UsersOnly == 1) {
+<?php  if ($UsersOnly == 1) {
 ?>
 	<td>User</td>
-<?
+<?php
 }
 ?>
 	</tr>
-<?
+<?php
 foreach($History as $Key => $Values){
 	if (isset($History[$Key+1])) {
 		$Values['Time'] = $History[$Key+1]['Time'];
@@ -91,7 +90,7 @@ foreach($History as $Key => $Values){
 		<td><?=display_str($Values['Email'])?></td>
 		<td><?=time_diff($Values['Time'])?></td>
 		<td><?=display_str($Values['IP'])?> (<?=display_str($Values['Code'])?>) [<a href="user.php?action=search&amp;ip_history=on&amp;ip=<?=display_str($Values['IP'])?>" title="Search">S</a>]</td>
-<?
+<?php
 	if ($UsersOnly == 1) {
 		$ueQuery = $DB->query("SELECT ue.UserID, Username, ue.Time, ue.IP FROM users_history_emails AS ue, users_main WHERE ue.Email = '".db_string($Values['Email'])."' AND UserID != ".$UserID." AND ID = UserID");
 		while (list($UserID2, $Username, $Time, $IP) = $DB->next_record()) { ?>
@@ -100,17 +99,18 @@ foreach($History as $Key => $Values){
 		<td />
 		<td><?=time_diff($Time)?></td>
 		<td><?=display_str($IP)?></td>
-<? $UserURL = "http://".NONSSL_SITE_URL."/user.php?id=$UserID2";
+<?php  $UserURL = "http://".NONSSL_SITE_URL."/user.php?id=$UserID2";
 			$DB->query("SELECT Enabled FROM users_main WHERE ID = ".$UserID2);
 			list($Enabled)=$DB->next_record();
 			$DB->set_query_id($ueQuery);
 ?>
 		<td><a href="<?=display_str($UserURL)?>"><?=format_username($UserID2, $Username, 0, 0, $Enabled, "")?></a></td>
-	</tr>	
-<?
+	</tr>
+<?php
 		}
 	}
 ?>
-<? } ?>
+<?php  } ?>
 </table>
-<? show_footer(); ?>
+<?php
+show_footer();
