@@ -11,6 +11,7 @@ Things to expect in $_GET:
 //---------- Things to sort out before it can start printing/generating content
 
 include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 $Text = new TEXT;
 
 // Check for lame SQL injection attempts
@@ -80,7 +81,7 @@ foreach($Thread as $Post){
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
 				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID, $UserTitle, true, $GroupPermissionID, true)?> <?=time_diff($AddedTime)?>
 <? if (!$ThreadInfo['IsLocked']){ ?>				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','c<?=$CollageID?>','<?=$Username?>');">[Quote]</a><? }
-if (($AuthorID == $LoggedUser['ID'] && time_ago($AddedTime)<USER_EDIT_POST_TIME) || check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>');">[Edit]</a><? }
+if (can_edit_comment($AuthorID, null, $AddedTime, $AddedTime)){ ?>				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>');">[Edit]</a><? }
 if (check_perms('site_moderate_forums')){ ?>				- <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
 			</span>
 			<span id="bar<?=$PostID?>" style="float:right;">

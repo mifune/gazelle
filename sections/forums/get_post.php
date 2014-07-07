@@ -31,14 +31,15 @@ if(!check_forumperm($ForumID)) {
 	error(0);
 }
 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+$Body = $Text->clean_bbcode($Body, get_permissions_advtags($LoggedUser['ID']));
+
 // This gets sent to the browser, which echoes it wherever 
 
 if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
     echo trim($Body); 
 } else {
-    include(SERVER_ROOT.'/classes/class_text.php');
-    $Text = new TEXT;
-
       $Text->display_bbcode_assistant("editbox$PostID", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); 
 
     ?>					

@@ -356,12 +356,13 @@ if(!empty($_REQUEST['action'])) {
 			$DB->query("SELECT Body FROM torrents_comments WHERE ID='$PostID'");
 			list($Body) = $DB->next_record(MYSQLI_NUM);
 		
+                  include(SERVER_ROOT.'/classes/class_text.php');
+                  $Text = new TEXT;
+                  $Body = $Text->clean_bbcode($Body, get_permissions_advtags($LoggedUser['ID']));
+
                   if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
                   	echo trim($Body); 
                   } else {
-                      include(SERVER_ROOT.'/classes/class_text.php');
-                      $Text = new TEXT;
-
                       $Text->display_bbcode_assistant("editbox$PostID", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); 
 
 ?>	 <textarea id="editbox<?=$PostID?>" class="long" onkeyup="resize('editbox<?=$PostID?>');" name="body" rows="10"><?=display_str($Body)?></textarea>
@@ -374,6 +375,7 @@ if(!empty($_REQUEST['action'])) {
 			authorize();
 
 			include(SERVER_ROOT.'/classes/class_text.php'); // Text formatting class
+			include(SERVER_ROOT.'/classes/class_comment.php'); // Comment editing class
 			$Text = new TEXT;
 		
 			// Quick SQL injection check
@@ -385,25 +387,20 @@ if(!empty($_REQUEST['action'])) {
 				tc.AuthorID,
 				tc.GroupID,
 				tc.AddedTime,
-				tc.EditedTime
+				tc.EditedTime,
+				tc.EditedUserID
 				FROM torrents_comments AS tc
 				WHERE tc.ID='".db_string($_POST['post'])."'");
 			if ($DB->record_count()==0) { error(404); }
-			list($OldBody, $AuthorID,$GroupID,$AddedTime,$EditedTime)=$DB->next_record();
+			list($OldBody, $AuthorID,$GroupID,$AddedTime,$EditedTime,$EditedUserID)=$DB->next_record();
 			
 			$DB->query("SELECT ceil(COUNT(ID) / ".TORRENT_COMMENTS_PER_PAGE.") AS Page FROM torrents_comments WHERE GroupID = $GroupID AND ID <= $_POST[post]");
 			list($Page) = $DB->next_record();
 			
 			//if ($DB->record_count()==0) { error(404); }
 			//if ($LoggedUser['ID']!=$AuthorID && !check_perms('site_moderate_forums')) { error(404); }
-            if (!check_perms('site_moderate_forums')){ 
-                if ($LoggedUser['ID'] != $AuthorID){
-                    error(403,true);
-                } else if (!check_perms ('site_edit_own_posts') 
-                        && time_ago($AddedTime)>(USER_EDIT_POST_TIME+600)  && time_ago($EditedTime)>(USER_EDIT_POST_TIME+300) ) { // give them an extra 15 mins in the backend because we are nice
-                    error("Sorry - you only have ". date('i\m s\s', USER_EDIT_POST_TIME). "  to edit your comment before it is automatically locked." ,true);
-                } 
-            }
+
+            validate_edit_comment($AuthorID, $EditedUserID, $AddedTime, $EditedTime);
 		
 			// Perform the update
 			$DB->query("UPDATE torrents_comments SET

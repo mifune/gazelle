@@ -28,8 +28,11 @@ $DB->query("SELECT
 		AND u.UserID=".$LoggedUser['ID']);
 list($Body) = $DB->next_record(MYSQLI_NUM);
 
-// This gets sent to the browser, which echoes it wherever 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+$Body = $Text->clean_bbcode($Body, get_permissions_advtags($LoggedUser['ID']));
 
+// This gets sent to the browser, which echoes it wherever 
 echo trim($Body);
 
 ?>

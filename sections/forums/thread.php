@@ -12,6 +12,7 @@ Things to expect in $_GET:
 //---------- Things to sort out before it can start printing/generating content
 
 include(SERVER_ROOT.'/classes/class_text.php');
+include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
 
 // Check for lame SQL injection attempts
@@ -434,7 +435,7 @@ foreach($Thread as $Key => $Post){
 <? if(!$ThreadInfo['IsLocked'] || check_perms('site_moderate_forums')){ ?> 
 				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','f<?=$ThreadID?>','<?=$Username?>');">[Quote]</a> 
 <? }
-if (((!$ThreadInfo['IsLocked'] && check_forumperm($ForumID, 'Write')) && ($AuthorID == $LoggedUser['ID'] && (check_perms ('site_edit_own_posts') || time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME)) || check_perms('site_moderate_forums'))) { ?>
+if (((!$ThreadInfo['IsLocked'] && check_forumperm($ForumID, 'Write')) && can_edit_comment($AuthorID, $EditedUserID, $AddedTime, $EditedTime)) || check_perms('site_moderate_forums')) { ?>
 				- <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a> 
 <? }
 if($ForumID != TRASH_FORUM_ID && check_perms('site_moderate_forums') && $ThreadInfo['Posts'] > 1) { ?> 

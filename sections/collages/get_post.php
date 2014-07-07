@@ -23,13 +23,13 @@ $DB->query("SELECT Body FROM collages_comments WHERE ID='$PostID'");
 list($Body) = $DB->next_record(MYSQLI_NUM);
 
 // This gets sent to the browser, which echoes it wherever 
+include(SERVER_ROOT.'/classes/class_text.php');
+$Text = new TEXT;
+$Body = $Text->clean_bbcode($Body, get_permissions_advtags($LoggedUser['ID']));
 
 if (isset($_REQUEST['body']) && $_REQUEST['body']==1){
     echo trim($Body); 
 } else {
-    include(SERVER_ROOT.'/classes/class_text.php');
-    $Text = new TEXT;
-
       $Text->display_bbcode_assistant("editbox$PostID", get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])); 
 
     ?>					

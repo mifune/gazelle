@@ -6,6 +6,7 @@
 
 include(SERVER_ROOT.'/sections/bookmarks/functions.php'); // has_bookmarked()
 include(SERVER_ROOT.'/classes/class_text.php');
+include(SERVER_ROOT.'/classes/class_comment.php');
 $Text = new TEXT;
 
 if(empty($_GET['id']) || !is_number($_GET['id'])) { 
@@ -354,8 +355,7 @@ foreach($Thread as $Key => $Post){
 			<span style="float:left;"><a href='#post<?=$PostID?>'>#<?=$PostID?></a>
 				<?=format_username($AuthorID, $Username, $Donor, $Warned, $Enabled, $PermissionID,$UserTitle,true,$GroupPermissionID,true)?> <?=time_diff($AddedTime)?> 
 				- <a href="#quickpost" onclick="Quote('<?=$PostID?>','r<?=$RequestID?>','<?=$Username?>');">[Quote]</a>
-<?if ( ($AuthorID == $LoggedUser['ID'] && ( time_ago($AddedTime)<USER_EDIT_POST_TIME || time_ago($EditedTime)<USER_EDIT_POST_TIME ) )
-                                                                                            || check_perms('site_moderate_forums') ) { ?>				
+<?if (can_edit_comment($AuthorID, $EditedUserID, $AddedTime, $EditedTime)) { ?>
                         - <a href="#post<?=$PostID?>" onclick="Edit_Form('<?=$PostID?>','<?=$Key?>');">[Edit]</a><? }
 if (check_perms('site_admin_forums')){ ?>
                         - <a href="#post<?=$PostID?>" onclick="Delete('<?=$PostID?>');">[Delete]</a> <? } ?>
