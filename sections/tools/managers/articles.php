@@ -1,22 +1,22 @@
-<?
+<?php
 enforce_login();
-if(!check_perms('admin_manage_articles')){ error(403); }
+if (!check_perms('admin_manage_articles')) { error(403); }
 
 include(SERVER_ROOT.'/classes/class_text.php');
 $Text = new TEXT;
 
 $StaffClass = 0;
-if ($LoggedUser['Class']>=STAFF_LEVEL){ // only interested in staff classes
+if ($LoggedUser['Class']>=STAFF_LEVEL) { // only interested in staff classes
                     // should there be a way for FLS to see these... perm setting maybe?
     $StaffClass = $LoggedUser['Class'];
 } elseif ($LoggedUser['SupportFor']) {
     $StaffClass = STAFF_LEVEL;
 }
 
-switch($_REQUEST['action']) {
-	case 'takeeditarticle':
-		if(!check_perms('admin_manage_articles')){ error(403); }
-		if(is_number($_POST['articleid'])){
+switch ($_REQUEST['action']) {
+    case 'takeeditarticle':
+        if (!check_perms('admin_manage_articles')) { error(403); }
+        if (is_number($_POST['articleid'])) {
                 authorize();
                 $TopicID = strtolower($_POST['topicid']);
                 if(!$TopicID) error("You must enter a topicid for this article");
@@ -26,29 +26,29 @@ switch($_REQUEST['action']) {
                 if ($Count > 0) {
                     error('The topic ID must be unique for the article');
                 }
-                $DB->query("UPDATE articles SET Category='".(int)$_POST['category']."', 
-                                                    SubCat='".(int)$_POST['subcat']."', 
-                                                   TopicID='".db_string($TopicID)."', 
-                                                     Title='".db_string($_POST['title'])."', 
-                                               Description='".db_string($_POST['description'])."', 
-                                                      Body='".db_string($_POST['body'])."',  
-                                                  MinClass='".db_string($_POST['level'])."', 
-                                                      Time='".sqltime()."' 
+                $DB->query("UPDATE articles SET Category='".(int) $_POST['category']."',
+                                                    SubCat='".(int) $_POST['subcat']."',
+                                                   TopicID='".db_string($TopicID)."',
+                                                     Title='".db_string($_POST['title'])."',
+                                               Description='".db_string($_POST['description'])."',
+                                                      Body='".db_string($_POST['body'])."',
+                                                  MinClass='".db_string($_POST['level'])."',
+                                                      Time='".sqltime()."'
                                             WHERE ID='".db_string($_POST['articleid'])."'");
 
                 $Cache->delete_value("article_$TopicID");
                 $Cache->delete_value("articles_$_POST[category]");
-                $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);
-		}
-		header('Location: tools.php?action=articles');
-		break;
-	case 'editarticle':
+                $Cache->delete_value("articles_sub_".(int) $_POST['category']."_".(int) $_POST['subcat']);
+        }
+        header('Location: tools.php?action=articles');
+        break;
+    case 'editarticle':
             $ArticleID = db_string($_REQUEST['id']);
 
                 $DB->query("SELECT ID, Category, SubCat, TopicID, Title, Description, Body, MinClass FROM articles WHERE ID='$ArticleID'");
                 list($ArticleID, $Category, $SubCat, $TopicID, $Title, $Description, $Body, $MinClass) = $DB->next_record();
-                
-                if($MinClass>0){ // check permissions
+
+                if ($MinClass>0) { // check permissions
                     if ( $StaffClass < $MinClass ) error(403);
                 }
                 break;
@@ -58,7 +58,7 @@ show_header('Manage articles','bbcode');
 
 ?>
 <div class="thin">
-    <h2><?= ($_GET['action'] == 'articles')? 'Create a new article' : 'Edit an article';?></h2> 
+    <h2><?= ($_GET['action'] == 'articles')? 'Create a new article' : 'Edit an article';?></h2>
     <div id="quickreplypreview">
         <div id="contentpreview" style="text-align:left;"></div>
     </div>
@@ -66,41 +66,41 @@ show_header('Manage articles','bbcode');
         <div class="head"><?=($_GET['action'] == 'articles'?"New Article":"Edit Article: $Title")?></div>
         <div class="box pad">
             <div id="quickreplytext">
-			<input type="hidden" name="action" value="<?= ($_GET['action'] == 'articles')? 'takearticle' : 'takeeditarticle';?>" />
-			<input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
-<? if($_GET['action'] == 'editarticle'){?> 
-			<input type="hidden" name="articleid" value="<?=$ArticleID; ?>" />
-<? }?> 
+            <input type="hidden" name="action" value="<?= ($_GET['action'] == 'articles')? 'takearticle' : 'takeeditarticle';?>" />
+            <input type="hidden" name="auth" value="<?=$LoggedUser['AuthKey']?>" />
+<?php  if ($_GET['action'] == 'editarticle') {?>
+            <input type="hidden" name="articleid" value="<?=$ArticleID; ?>" />
+<?php  }?>
                   <div style="display:inline-block;margin-right:20px;vertical-align: top;">
                         <h3>Topic ID</h3>
-                        <input type="text" name="topicid" <? if(!empty($TopicID)) { echo 'value="'.display_str($TopicID).'"'; } ?> />
+                        <input type="text" name="topicid" <?php  if (!empty($TopicID)) { echo 'value="'.display_str($TopicID).'"'; } ?> />
                   </div>
                   <div style="display:inline-block;margin-right:20px;vertical-align: top;">
                             <h3>Permission Level</h3>
                             <select name="level">
-                                <option value="0"<?if($MinClass<500)echo ' selected="selected"';?>>All Users</option>
-<?                          if ($StaffClass >= 500) {  ?>
-                                <option value="500"<?if($MinClass==500)echo ' selected="selected"';?>>Staff & FLS</option>
-<?                          }
+                                <option value="0"<?php if($MinClass<500)echo ' selected="selected"';?>>All Users</option>
+<?php                           if ($StaffClass >= 500) {  ?>
+                                <option value="500"<?php if($MinClass==500)echo ' selected="selected"';?>>Staff & FLS</option>
+<?php                           }
                             if ($StaffClass >= 600) {  ?>
-                                <option value="600"<?if($MinClass==600)echo ' selected="selected"';?>>Admins</option>
-<?                          }  ?>
+                                <option value="600"<?php if($MinClass==600)echo ' selected="selected"';?>>Admins</option>
+<?php                           }  ?>
                             </select>
                   </div>
                   <div style="display:inline-block;margin-right:20px;vertical-align: top;">
                         <h3>Category</h3>
                         <select name="category">
-<? foreach($ArticleCats as $Key => $Value) { ?> 
+<?php  foreach ($ArticleCats as $Key => $Value) { ?>
                             <option value="<?=display_str($Key)?>"<?=($Category == $Key) ? 'selected="selected"' : '';?>><?=$Value?></option>
-<? } ?>
+<?php  } ?>
                         </select>
                   </div>
                   <div style="display:inline-block;margin-right:20px;vertical-align: top;">
                         <h3>Sub-Category</h3>
                         <select name="subcat">
-<? foreach($ArticleSubCats as $Key => $Value) { ?> 
+<?php  foreach ($ArticleSubCats as $Key => $Value) { ?>
                             <option value="<?=display_str($Key)?>"<?=($SubCat == $Key) ? 'selected="selected"' : '';?>><?=$Value?></option>
-<? } ?>
+<?php  } ?>
                         </select>
                   </div>
                   <div style="display:inline-block;">
@@ -110,63 +110,63 @@ show_header('Manage articles','bbcode');
                       </ul>
                   </div>
                   <h3>Title</h3>
-                  <input type="text" name="title" class="long" <? if(!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> />
+                  <input type="text" name="title" class="long" <?php  if (!empty($Title)) { echo 'value="'.display_str($Title).'"'; } ?> />
                   <h3>Description</h3>
-                  <input type="text" name="description" class="long" <? if(!empty($Description)) { echo 'value="'.display_str($Description).'"'; } ?> />
-			<br />
-			<h3>Body</h3>
+                  <input type="text" name="description" class="long" <?php  if (!empty($Description)) { echo 'value="'.display_str($Description).'"'; } ?> />
+            <br />
+            <h3>Body</h3>
                   &nbsp; special article tags allowed: &nbsp; [whitelist] &nbsp; [clientlist] &nbsp; [ratiolist] &nbsp; [dnulist]
-                  <? $Text->display_bbcode_assistant('textbody', get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])) ?>
-                  <textarea id="textbody" name="body" class="long" rows="15"><? if(!empty($Body)) { echo display_str($Body); } ?></textarea> 
+                  <?php  $Text->display_bbcode_assistant('textbody', get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions'])) ?>
+                  <textarea id="textbody" name="body" class="long" rows="15"><?php  if (!empty($Body)) { echo display_str($Body); } ?></textarea>
             </div>
             <br />
            <div class="center">
-			<input id="post_preview" type="button" value="Preview" onclick="if(this.preview){Edit_Article();}else{Preview_Article();}" />
+            <input id="post_preview" type="button" value="Preview" onclick="if (this.preview) {Edit_Article();} else {Preview_Article();}" />
                   <input type="submit" value="<?= ($_GET['action'] == 'articles')? 'Create new article' : 'Save changes';?>" />
-            </div> 
+            </div>
         </div>
     </form>
     <br /><br />
     <h2>Other articles</h2>
-        
-<?
+
+<?php
     $OldCategory = -1;
     $LastSubCat = -1;
     $OpenTable=false;
     $DB->query("SELECT ID, Category, SubCat, TopicID, Title, Body, Time, Description, MinClass
-                  FROM articles 
+                  FROM articles
               ORDER BY Category, SubCat, Title");// LIMIT 20
-    while(list($ArticleID,$Category,$SubCat,$TopicID, $Title,$Body,$ArticleTime,$Description,$MinClass)=$DB->next_record()) {
-       
+    while (list($ArticleID,$Category,$SubCat,$TopicID, $Title,$Body,$ArticleTime,$Description,$MinClass)=$DB->next_record()) {
+
         if($MinClass>$StaffClass) continue;
         $Row = ($Row == 'a') ? 'b' : 'a';
-  
-        if($LastSubCat != $SubCat) {  
+
+        if ($LastSubCat != $SubCat) {
                 $Row = 'b';
                 $LastSubCat = $SubCat;
 
-                if($OpenTable){  ?>
+                if ($OpenTable) {  ?>
             </table><br/>
-<?              }
-         
-            if($OldCategory != $Category ) { ?>
-                <br/> 
+<?php               }
+
+            if ($OldCategory != $Category) { ?>
+                <br/>
                 <h3 id="general"><?=$ArticleCats[$Category]?></h3>
-<?
-                $OldCategory = $Category; 
+<?php
+                $OldCategory = $Category;
             }  ?>
-            
+
         <div class="head"><?=($SubCat==1?"Other $ArticleCats[$Category] articles":$ArticleSubCats[$SubCat])?></div>
         <table width="100%" class="topic_list">
             <tr class="colhead">
                     <td style="width:300px;">Title</td>
                     <td>Additional Info</td>
             </tr>
-<? 
+<?php
             $OpenTable=true;
         }
-?> 
-            <tr class="row<?=$Row?>"> 
+?>
+            <tr class="row<?=$Row?>">
                 <td class="nobr topic_link">
                     <span style="float:left">
                         <a href="articles.php?topic=<?=$TopicID?>" target="_blank" title="goto article"><?=display_str($Title)?></a>
@@ -176,14 +176,14 @@ show_header('Manage articles','bbcode');
                 <td class="nobr">
                     <span style="float:left"><?=display_str($Description)?></span>
                     <span style="float:right">
-                        <? if($MinClass)echo "[{$ClassLevels[$MinClass][Name]}+] "; ?>
+                        <?php  if($MinClass)echo "[{$ClassLevels[$MinClass][Name]}+] "; ?>
                         <a href="tools.php?action=editarticle&amp;id=<?=$ArticleID?>">[Edit]</a>
                         <a href="tools.php?action=deletearticle&amp;id=<?=$ArticleID?>&amp;auth=<?=$LoggedUser['AuthKey']?>" onClick="return confirm('Are you sure you want to delete this article?');">[Delete]</a>
                     </span>
                 </td>
             </tr>
-<?  } ?>
+<?php   } ?>
         </table>
-            
 </div>
-<? show_footer();?>
+<?php
+show_footer();

@@ -1,15 +1,13 @@
-<?
-
-
+<?php
 show_header();
 ?>
 <div class="thin">
-    
+
     <table>
-<?
+<?php
     $DB->query("SELECT cc, country FROM countries");
 
-    while(list($cc,$country)=$DB->next_record()){
+    while (list($cc,$country)=$DB->next_record()) {
 ?>
         <tr>
             <td>
@@ -20,12 +18,10 @@ show_header();
                 <img style="margin-bottom:-2px;" src="static/common/flags/iso16/<?=strtolower($cc)?>.png" alt="(<?=$cc?>)" />
             </td>
         </tr>
-<?
+<?php
     }
 ?>
     </table>
 </div>
-<?
+<?php
 show_footer();
-?>
-

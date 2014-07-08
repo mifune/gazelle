@@ -1,4 +1,4 @@
-<?
+<?php
 /*
   User collage subscription page
  */
@@ -16,24 +16,24 @@ $ShowAll = !empty($_GET['showall']);
 if (!$ShowAll) {
     $sql = "SELECT c.ID,
                c.Name,
-			   c.NumTorrents,
-			   s.LastVisit
-		FROM collages AS c
-		JOIN users_collage_subs AS s ON s.CollageID = c.ID
-		JOIN collages_torrents AS ct ON ct.CollageID = c.ID
-		WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
-		  AND ct.AddedOn > s.LastVisit
-		GROUP BY c.ID";
+               c.NumTorrents,
+               s.LastVisit
+        FROM collages AS c
+        JOIN users_collage_subs AS s ON s.CollageID = c.ID
+        JOIN collages_torrents AS ct ON ct.CollageID = c.ID
+        WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
+          AND ct.AddedOn > s.LastVisit
+        GROUP BY c.ID";
 } else {
     $sql = "SELECT c.ID,
                c.Name,
-			   c.NumTorrents,
-			   s.LastVisit
-		FROM collages AS c
-		JOIN users_collage_subs AS s ON s.CollageID = c.ID
-		LEFT JOIN collages_torrents AS ct ON ct.CollageID = c.ID
-		WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
-		GROUP BY c.ID";
+               c.NumTorrents,
+               s.LastVisit
+        FROM collages AS c
+        JOIN users_collage_subs AS s ON s.CollageID = c.ID
+        LEFT JOIN collages_torrents AS ct ON ct.CollageID = c.ID
+        WHERE s.UserID = " . $LoggedUser['ID'] . " AND c.Deleted='0'
+        GROUP BY c.ID";
 }
 
 $DB->query($sql);
@@ -44,28 +44,28 @@ $CollageSubs = $DB->to_array();
     <h2>Subscribed collages<?= ($ShowAll ? '' : ' with new additions') ?></h2>
 
     <div class="linkbox">
-        <?
+        <?php
         if ($ShowAll) {
             ?>
             <br /><br />
             [<a href="userhistory.php?action=subscribed_collages&showall=0">Only display collages with new additions</a>]&nbsp;&nbsp;&nbsp;
-            <?
+            <?php
         } else {
             ?>
             <br /><br />
             [<a href="userhistory.php?action=subscribed_collages&showall=1">Show all subscribed collages</a>]&nbsp;&nbsp;&nbsp;
-            <?
+            <?php
         }
         ?>
         [<a href="userhistory.php?action=catchup_collages&auth=<?= $LoggedUser['AuthKey'] ?>">Catch up</a>]&nbsp;&nbsp;&nbsp;
     </div>
-    <?
+    <?php
     if (!$NumResults) {
         ?>
         <div class="center">
             No subscribed collages<?= ($ShowAll ? '' : ' with new additions') ?>
         </div>
-        <?
+        <?php
     } else {
         $HideGroup = '';
         $ActionTitle = "Hide";
@@ -77,13 +77,13 @@ $CollageSubs = $DB->to_array();
 
             list($CollageID, $CollageName, $CollageSize, $LastVisit) = $Collage;
             $RS = $DB->query("SELECT ct.GroupID,
-								tg.Image,
-								tg.NewCategoryID
-		            FROM collages_torrents AS ct
-					JOIN torrents_group AS tg ON ct.GroupID = tg.ID
-					WHERE ct.CollageID = $CollageID
-					  AND ct.AddedOn > '$LastVisit'
-					ORDER BY ct.AddedOn");
+                                tg.Image,
+                                tg.NewCategoryID
+                    FROM collages_torrents AS ct
+                    JOIN torrents_group AS tg ON ct.GroupID = tg.ID
+                    WHERE ct.CollageID = $CollageID
+                      AND ct.AddedOn > '$LastVisit'
+                    ORDER BY ct.AddedOn");
             $NewTorrentCount = $DB->record_count();
             //$NewTorrents = $DB->to_array();
 
@@ -108,7 +108,7 @@ $CollageSubs = $DB->to_array();
 
                 $TorrentTags = array();
                 $numtags=0;
-                foreach($TagList as $Tag) {
+                foreach ($TagList as $Tag) {
                     if ($numtags++>=$LoggedUser['MaxTags'])  break;
                     if (!isset($Tags[$Tag])) {
                         $Tags[$Tag] = array('name' => $Tag, 'count' => 1);
@@ -147,7 +147,7 @@ $CollageSubs = $DB->to_array();
                             | <a href="reportsv2.php?action=report&amp;id=<?= $TorrentID ?>" title="Report">RP</a>]
                         </span>
                         <strong><?= $DisplayName ?></strong>
-                        <? if ($LoggedUser['HideTagsInLists'] !== 1) {                 
+                        <?php  if ($LoggedUser['HideTagsInLists'] !== 1) {
                                 echo $TorrentTags;
                            } ?>
                     </td>
@@ -156,12 +156,11 @@ $CollageSubs = $DB->to_array();
                     <td<?= ($Torrent['Seeders'] == 0) ? ' class="r00"' : '' ?>><?= number_format($Torrent['Seeders']) ?></td>
                     <td><?= number_format($Torrent['Leechers']) ?></td>
                 </tr>
-            <?
+            <?php
             $TorrentTable.=ob_get_clean();
         }
         ?>
             <!-- I hate that proton is making me do it like this -->
-            <!--<div class="head colhead_dark" style="margin-top: 8px">-->
             <table style="margin-top: 8px">
                 <tr class="colhead_dark">
                     <td>
@@ -178,9 +177,9 @@ $CollageSubs = $DB->to_array();
             <table class="torrent_table <?= $ShowAll ? 'hidden' : '' ?>" id="discog_table_<?= $CollageID ?>">
                 <tr class="colhead">
                     <td><!-- expand/collapse --></td>
-        <? if (!$LoggedUser['HideCollage']) { ?>
+        <?php  if (!$LoggedUser['HideCollage']) { ?>
                         <td style="padding: 0"><!-- image --></td>
-                <? } ?>
+                <?php  } ?>
                     <td width="70%"><strong>Torrents</strong></td>
                     <td>Size</td>
                     <td class="sign"><img src="static/styles/<?= $LoggedUser['StyleName'] ?>/images/snatched.png" alt="Snatches" title="Snatches" /></td>
@@ -189,10 +188,9 @@ $CollageSubs = $DB->to_array();
                 </tr>
         <?= $TorrentTable ?>
             </table>
-    <? } // foreach() ?>
-    <? } // else -- if(empty($NumResults)) 
+    <?php  } // foreach() ?>
+    <?php  }
 ?>
 </div>
-<?
+<?php
 show_footer();
-?>

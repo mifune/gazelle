@@ -1,4 +1,4 @@
-<?
+<?php
 if (!check_perms('admin_whitelist')) {
     error(403);
 }
@@ -16,12 +16,12 @@ $DB->query('SELECT id, vstring, peer_id FROM xbt_client_blacklist ORDER BY peer_
             <td width="40%">Peer ID</td>
             <td width="40%">Client</td>
             <td width="20%">Submit</td>
-        </tr> 
-        <tr class="rowa">	 
-        <form action="" method="post"> 
+        </tr>
+        <tr class="rowa">
+        <form action="" method="post">
             <td>
                 <input type="hidden" name="action" value="client_blacklist_alter" />
-                <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" /> 
+                <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" />
                 <input class="long" type="text" size="10" name="peer_id" />
             </td>
             <td>
@@ -39,10 +39,10 @@ $DB->query('SELECT id, vstring, peer_id FROM xbt_client_blacklist ORDER BY peer_
             <td>Add clients</td>
         </tr>
         <tr class="colhead" class="multiadd">
-            <td>PeerID &nbsp; Client</td> 
-        </tr> 
-        <tr class="rowa" class="multiadd">	 
-        <form action="" method="post"> 
+            <td>PeerID &nbsp; Client</td>
+        </tr>
+        <tr class="rowa" class="multiadd">
+        <form action="" method="post">
             <td>
                 <input type="hidden" name="action" value="client_blacklist_alter" />
                 <input type="hidden" name="auth" value="<?= $LoggedUser['AuthKey'] ?>" />
@@ -62,8 +62,8 @@ $DB->query('SELECT id, vstring, peer_id FROM xbt_client_blacklist ORDER BY peer_
             <td width="40%">Peer ID</td>
             <td width="40%">Client</td>
             <td width="20%">Submit</td>
-        </tr> 
-        <?
+        </tr>
+        <?php
         $Row = 'b';
         while (list($ID, $Client, $Peer_ID) = $DB->next_record()) {
             $Row = ($Row === 'a' ? 'b' : 'a');
@@ -85,7 +85,8 @@ $DB->query('SELECT id, vstring, peer_id FROM xbt_client_blacklist ORDER BY peer_
                 </td>
             </form>
             </tr>
-<? } ?>
+<?php  } ?>
     </table>
 </div>
-<? show_footer(); ?>
+<?php
+show_footer();

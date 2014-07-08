@@ -1,30 +1,28 @@
-<?
-
-
+<?php
 //TODO: restrict to viewing bellow class, username in h2
-if(isset($_GET['userid']) && check_perms('users_view_ips') && check_perms('users_logout')) {
-        if(!is_number($_GET['userid'])) { error(404); }
+if (isset($_GET['userid']) && check_perms('users_view_ips') && check_perms('users_logout')) {
+        if (!is_number($_GET['userid'])) { error(404); }
         $UserID = $_GET['userid'];
 } else {
         $UserID = $LoggedUser['ID'];
 }
 
-if(isset($_POST['all'])) {
+if (isset($_POST['all'])) {
         authorize();
 
         $DB->query("DELETE FROM users_sessions WHERE UserID='$UserID' AND SessionID<>'$SessionID'");
-		$Cache->delete_value('users_sessions_'.$UserID);
+        $Cache->delete_value('users_sessions_'.$UserID);
 }
 
 if (isset($_POST['session'])) {
         authorize();
 
         $DB->query("DELETE FROM users_sessions WHERE UserID='$UserID' AND SessionID='".db_string($_POST['session'])."'");
-		$Cache->delete_value('users_sessions_'.$UserID);
+        $Cache->delete_value('users_sessions_'.$UserID);
 }
 
 $UserSessions = $Cache->get_value('users_sessions_'.$UserID);
-if(!is_array($UserSessions)) {
+if (!is_array($UserSessions)) {
         $DB->query("SELECT
                 SessionID,
                 Browser,
@@ -62,9 +60,9 @@ show_header($Username.' &gt; Sessions');
                                         </form>
                                 </td>
                         </tr>
-<?
+<?php
         $Row = 'a';
-        foreach($UserSessions as $Session) {
+        foreach ($UserSessions as $Session) {
                 list($ThisSessionID,$Browser,$OperatingSystem,$IP,$LastUpdate) = array_values($Session);
                 $Row = ($Row == 'a') ? 'b' : 'a';
 ?>
@@ -82,11 +80,9 @@ show_header($Username.' &gt; Sessions');
                                         </form>
                                 </td>
                         </tr>
-<? } ?>
+<?php  } ?>
                 </table>
         </div>
 </div>
-<?
+<?php
 show_footer();
-
-?>

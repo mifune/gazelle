@@ -1,4 +1,4 @@
-<?
+<?php
 if (!check_perms('admin_donor_log')) error(403,true);
 
 include(SERVER_ROOT.'/sections/donate/functions.php');
@@ -11,5 +11,3 @@ $DB->query("UPDATE bitcoin_donations SET state='$state' WHERE public='$address'"
 $result = $DB->affected_rows();
 
 echo $result;
-
-?>

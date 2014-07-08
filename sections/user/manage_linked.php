@@ -1,5 +1,4 @@
-<?
-
+<?php
 authorize();
 include(SERVER_ROOT . '/sections/user/linkedfunctions.php');
 
@@ -15,17 +14,15 @@ switch ($_REQUEST['dupeaction']) {
         break;
 
     case 'link':
- 
         if ($_REQUEST['targetid']) {
-            $TargetID = $_REQUEST['targetid']; 
+            $TargetID = $_REQUEST['targetid'];
             link_users($UserID, $TargetID);
-        } 
+        }
         break;
 
     case 'update':
-
         if (isset($_REQUEST['submitlink'])) {
-            
+
             if ($_REQUEST['target']) {
                 $Target = $_REQUEST['target'];
                 $DB->query("SELECT ID FROM users_main WHERE Username LIKE '" . db_string($Target) . "'");
@@ -38,7 +35,7 @@ switch ($_REQUEST['dupeaction']) {
         }
 
         if (isset($_REQUEST['submitcomment'])) {
-            
+
             $DB->query("SELECT GroupID FROM users_dupes WHERE UserID = '$UserID'");
             list($GroupID) = $DB->next_record();
 
@@ -47,10 +44,8 @@ switch ($_REQUEST['dupeaction']) {
             }
         }
         break;
-
     default:
         error(403);
 }
 echo '\o/';
 header("Location: user.php?id=$UserID");
-?>

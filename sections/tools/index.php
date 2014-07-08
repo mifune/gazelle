@@ -1,5 +1,4 @@
-<?
-
+<?php
 /* * ***************************************************************
   Tools switch center
 
@@ -12,7 +11,7 @@
 
 if (isset($argv[1])) {
     if ($argv[1] == "cli_sandbox") {
-        include("misc/cli_sandbox.php");
+        include 'misc/cli_sandbox.php';
         die();
     }
 
@@ -60,13 +59,12 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/services/get_cc.php');
         break;
 
-
     //Managers
     case 'site_options':
         include(SERVER_ROOT . '/sections/tools/managers/site_options.php');
         break;
     case 'take_site_options':
-        if (!check_perms('admin_manage_site_options')) error(403); 
+        if (!check_perms('admin_manage_site_options')) error(403);
         $remove_freeleech = $_POST['remove_freeleech'];
         //$freeleech = $_POST['freeleech'];
         if ($remove_freeleech == 'on') {
@@ -92,45 +90,43 @@ switch ($_REQUEST['action']) {
 
         header('Location: tools.php?action=site_options');
         break;
-        
+
     case 'change_logging':
         if (!check_perms('admin_manage_site_options')) error(403);
-        
-        if($_POST['submit']=="Change logging status"){
-            
-            $logging_status = (int)$_POST['logging'];
+
+        if ($_POST['submit']=="Change logging status") {
+
+            $logging_status = (int) $_POST['logging'];
             if ($logging_status< 0 || $logging_status > 3) $logging_status =0;
 
             $DB->query("UPDATE site_options SET FullLogging='$logging_status'");
-            
-        } elseif($_POST['submit']=="Delete some"){
-            
+
+        } elseif ($_POST['submit']=="Delete some") {
+
             $WHERE = array();
             if ($_POST['id_under']) {
-                $under = (int)$_POST['under'];
+                $under = (int) $_POST['under'];
                 $WHERE[] = "id < '$under'";
             }
             if ($_POST['id_over']) {
-                $over = (int)$_POST['over'];
+                $over = (int) $_POST['over'];
                 $WHERE[] = "id > '$over'";
             }
-            if (count($WHERE)>0){
+            if (count($WHERE)>0) {
                 $DB->query("DELETE FROM full_log WHERE " . implode(' OR ', $WHERE));
             }
-            
-        } elseif($_POST['submit']=="Delete all"){
-            
+
+        } elseif ($_POST['submit']=="Delete all") {
+
             $DB->query("TRUNCATE TABLE full_log");
-        } 
-        
+        }
+
         header('Location: tools.php?action=page_log');
         break;
 
     case 'page_log':
         include(SERVER_ROOT . '/sections/tools/data/page_log.php');
         break;
-        
-        
 
     case 'languages':
         include(SERVER_ROOT . '/sections/tools/managers/languages_list.php');
@@ -139,16 +135,13 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/managers/languages_alter.php');
         break;
 
-
-    
-    
     case 'speed_watchlist':
         include(SERVER_ROOT . '/sections/tools/managers/speed_watchlist.php');
         break;
     case 'speed_excludelist':
         include(SERVER_ROOT . '/sections/tools/managers/speed_excludelist.php');
         break;
-    
+
     case 'speed_records':
         include(SERVER_ROOT . '/sections/tools/managers/speed_reports_list.php');
         break;
@@ -158,63 +151,61 @@ switch ($_REQUEST['action']) {
     case 'speed_zerocheats':
         include(SERVER_ROOT . '/sections/tools/managers/speed_zerocheats.php');
         break;
-    
-    
+
     case 'ban_zero_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
- 
+
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
-            
+
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
-            
+
             disable_users(array($_REQUEST['userid']), "Disabled for cheating (0 stat downloading) by $LoggedUser[Username]", 4);
-            
-        } 
-        
+
+        }
+
         header("Location: tools.php?action=speed_zerocheats");
-        
+
         break;
     case 'ban_pattern_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
- 
+
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
-            
+
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
-             
+
             disable_users(array($_REQUEST['userid']), "Disabled for cheating ($_REQUEST[pattern] matching records) by $LoggedUser[Username]", 4);
-            
-        } 
+
+        }
         if (isset($_REQUEST['returnto']) && $_REQUEST['returnto']=='cheats') $returnto = 'speed_cheats';
         else $returnto = 'speed_records';
         header("Location: tools.php?action=$returnto");
-        
+
         break;
     case 'ban_speed_cheat':
         if (!check_perms('admin_manage_cheats')) error(403);
 
-        
         if ($_REQUEST['banuser'] && is_number($_REQUEST['userid'])) {
-            
+
             $DB->query("SELECT UserID FROM users_not_cheats WHERE UserID='$_REQUEST[userid]' ");
             if ($DB->record_count()>0) error("This user is in the 'exclude user' list - you must remove them from the list if you want to ban them from this page");
-            
+
             $DB->query("SELECT MAX(upspeed) FROM xbt_peers_history WHERE uid='$_REQUEST[userid]' ");
             list($Maxspeed) = $DB->next_record();
             disable_users(array($_REQUEST['userid']), "Disabled for speeding (maxspeed=" . get_size($Maxspeed) . "/s) by $LoggedUser[Username]", 4);
-            
+
         } elseif ($_POST['banusers'] && is_number($_POST['banspeed']) && $_POST['banspeed'] > 0) {
 
-            $DB->query("SELECT GROUP_CONCAT(DISTINCT xbt.uid SEPARATOR '|') 
+            $DB->query("SELECT GROUP_CONCAT(DISTINCT xbt.uid SEPARATOR '|')
                           FROM xbt_peers_history AS xbt JOIN users_main AS um ON um.ID=xbt.uid
                        LEFT JOIN users_not_cheats AS nc ON nc.UserID=xbt.uid
                          WHERE um.Enabled='1' AND nc.UserID IS NULL AND xbt.upspeed >='$_POST[banspeed]' ");
-            
+
             list($UserIDs) = $DB->next_record();
-            if ($UserIDs ) {
+            if ($UserIDs) {
                 $UserIDs = explode('|', $UserIDs);
-                if( count($UserIDs)>0 ) {
+                if ( count($UserIDs)>0 ) {
                     //error(print_r($UserIDs, true));
                     disable_users($UserIDs, "Disabled for speeding (mass banned users with speed>" . get_size($_POST['banspeed']) . "/s) by $LoggedUser[Username]", 4);
                 }
@@ -305,10 +296,9 @@ switch ($_REQUEST['action']) {
         $DB->query("SELECT DeleteRecordsMins, KeepSpeed FROM site_options");
         list($DeleteRecordsMins, $KeepSpeed) = $DB->next_record();
 
-
         // as we are deleting way way more than keeping, and to avoid exceeding lockrow size in innoDB we do it another way:
         $DB->query("DROP TABLE IF EXISTS temp_copy"); // jsut in case!
-        $DB->query("CREATE TABLE `temp_copy` (  
+        $DB->query("CREATE TABLE `temp_copy` (
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `uid` int(11) NOT NULL,
           `downloaded` bigint(20) NOT NULL,
@@ -330,7 +320,7 @@ switch ($_REQUEST['action']) {
 
         // insert the records we want to keep into the temp table
         $DB->query("INSERT INTO temp_copy (uid, downloaded, remaining, uploaded, upspeed, downspeed, timespent, peer_id, ip, fid, mtime)
-                            SELECT x.uid, x.downloaded, x.remaining, x.uploaded, x.upspeed, x.downspeed, x.timespent, x.peer_id, x.ip, x.fid, x.mtime 
+                            SELECT x.uid, x.downloaded, x.remaining, x.uploaded, x.upspeed, x.downspeed, x.timespent, x.peer_id, x.ip, x.fid, x.mtime
                               FROM xbt_peers_history AS x
                          LEFT JOIN users_watch_list AS uw ON uw.UserID=x.uid
                          LEFT JOIN torrents_watch_list AS tw ON tw.TorrentID=x.fid
@@ -346,8 +336,6 @@ switch ($_REQUEST['action']) {
 
         header("Location: tools.php?action=speed_records&viewspeed=$_POST[viewspeed]");
         break;
-
-
 
     case 'forum':
         include(SERVER_ROOT . '/sections/tools/managers/forum_list.php');
@@ -392,7 +380,6 @@ switch ($_REQUEST['action']) {
     case 'iw_alter':
         include(SERVER_ROOT . '/sections/tools/managers/imagehost_alter.php');
         break;
-
 
     case 'shop_list':
         include(SERVER_ROOT . '/sections/tools/managers/shop_list.php');
@@ -491,17 +478,17 @@ switch ($_REQUEST['action']) {
         $TopicID = strtolower($_POST['topicid']);
         if(!$TopicID) error("You must enter a topicid for this article");
         if (!preg_match('/^[a-z0-9\-\_.()\@&]+$/', $TopicID)) error("Invalid characters in topicID ($TopicID); allowed: a-z 0-9 -_.()@&");
-        
+
         $DB->query("SELECT Count(*) as c FROM articles WHERE TopicID='" . db_string($TopicID) . "'");
         list($Count) = $DB->next_record();
         if ($Count > 0) {
             error('The topic ID must be unique for the article');
         }
-        $DB->query("INSERT INTO articles (Category, SubCat, TopicID, Title, Description, Body, Time, MinClass) 
+        $DB->query("INSERT INTO articles (Category, SubCat, TopicID, Title, Description, Body, Time, MinClass)
                     VALUES ('" . (int) $_POST['category'] . "', '" . (int) $_POST['subcat'] . "', '" . db_string($TopicID) . "', '" . db_string($_POST['title']) . "', '" . db_string($_POST['description']) . "', '" . db_string($_POST['body']) . "', '" . sqltime() . "','" . db_string($_POST['level']) . "')");
         $NewID = $DB->inserted_id();
         $Cache->delete_value("articles_$_POST[category]");
-        $Cache->delete_value("articles_sub_".(int)$_POST['category']."_".(int)$_POST['subcat']);
+        $Cache->delete_value("articles_sub_".(int) $_POST['category']."_".(int) $_POST['subcat']);
         //header("Location: tools.php?action=editarticle&amp;id=$NewID");
         header('Location: tools.php?action=articles');
         break;
@@ -529,31 +516,22 @@ switch ($_REQUEST['action']) {
     case 'ocelot':
         include(SERVER_ROOT . '/sections/tools/managers/ocelot.php');
         break;
-    
-    
-    
-
     case 'official_tags':
         include(SERVER_ROOT . '/sections/tools/managers/official_tags.php');
         break;
     case 'official_tags_alter':
         include(SERVER_ROOT . '/sections/tools/managers/official_tags_alter.php');
         break;
-
     case 'official_synonyms':
         include(SERVER_ROOT . '/sections/tools/managers/official_synonyms.php');
         break;
     case 'official_synonyms_alter':
         include(SERVER_ROOT . '/sections/tools/managers/official_synonyms_alter.php');
         break;
-
-
-
     case 'marked_for_deletion':
         include(SERVER_ROOT . '/sections/tools/managers/mfd_functions.php');
         include(SERVER_ROOT . '/sections/tools/managers/mfd_manager.php');
         break;
-
     case 'save_mfd_options':
         enforce_login();
         authorize();
@@ -566,7 +544,7 @@ switch ($_REQUEST['action']) {
 
             $Hours = (int) $_POST['hours'];
             $AutoDelete = (int) $_POST['autodelete'] == 1 ? 1 : 0;
-            $DB->query("UPDATE site_options 
+            $DB->query("UPDATE site_options
                                    SET ReviewHours='$Hours', AutoDelete='$AutoDelete'");
         }
         include(SERVER_ROOT . '/sections/tools/managers/mfd_functions.php');
@@ -577,7 +555,7 @@ switch ($_REQUEST['action']) {
         enforce_login();
         authorize();
 
-        include('managers/mfd_functions.php');
+        include 'managers/mfd_functions.php';
 
         if (!check_perms('torrents_review'))
             error(403);
@@ -600,8 +578,6 @@ switch ($_REQUEST['action']) {
         include(SERVER_ROOT . '/sections/tools/managers/mfd_manager.php');
         break;
 
-
-
     case 'permissions':
         if (!check_perms('admin_manage_permissions')) {
             error(403);
@@ -611,14 +587,8 @@ switch ($_REQUEST['action']) {
 
             $Values = array();
             if (is_numeric($_REQUEST['id'])) {
-                /* $JoinOn = ( $_POST['isclass'] == 1) ? 'PermissionID' : 'GroupPermissionID';
                 $DB->query("SELECT p.ID,p.Name,p.Level,p.Values,p.DisplayStaff,p.IsUserClass,
-                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color, COUNT(u.ID) 
-                                    FROM permissions AS p LEFT JOIN users_main AS u ON u.$JoinOn=p.ID WHERE p.ID='" . db_string($_REQUEST['id']) . "' GROUP BY p.ID");
-                list($ID, $Name, $Level, $Values, $DisplayStaff, $IsUserClass, $MaxSigLength, $MaxAvatarWidth, $MaxAvatarHeight, $Color, $UserCount) = $DB->next_record(MYSQLI_NUM, array(3));
-                */
-                $DB->query("SELECT p.ID,p.Name,p.Level,p.Values,p.DisplayStaff,p.IsUserClass,
-                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color 
+                                    p.MaxSigLength,p.MaxAvatarWidth,p.MaxAvatarHeight,p.Color
                                     FROM permissions AS p WHERE p.ID='" . db_string($_REQUEST['id']) . "' ");
                 list($ID, $Name, $Level, $Values, $DisplayStaff, $IsUserClass, $MaxSigLength, $MaxAvatarWidth, $MaxAvatarHeight, $Color) = $DB->next_record(MYSQLI_NUM, array(3));
 
@@ -627,13 +597,12 @@ switch ($_REQUEST['action']) {
                 }
                 $JoinOn = $IsUserClass == '1' ? 'PermissionID' : 'GroupPermissionID';
                 $DB->query("SELECT COUNT(ID) FROM users_main WHERE $JoinOn='" . db_string($_REQUEST['id']) . "' ");
-                list($UserCount) = $DB->next_record(MYSQLI_NUM); 
+                list($UserCount) = $DB->next_record(MYSQLI_NUM);
 
                 $Values = unserialize($Values);
             } else {
                 $IsUserClass = isset($_REQUEST['isclass']) && $_REQUEST['isclass'] == 1 ? '1' : '0';
             }
-
 
             if (!empty($_POST['submit'])) {
                 $Values = array();
@@ -670,11 +639,10 @@ switch ($_REQUEST['action']) {
                     $DisplayStaff = '0';
                     $Val->SetFields('color', true, 'string', 'You did not enter a valid hex color.', array('minlength' => 6, 'maxlength' => 6));
                     $Color = strtolower($_REQUEST['color']);
-                    
+
                 }
                 if (!$Err)
                     $Err = $Val->ValidateForm($_POST);
-
 
                 foreach ($_REQUEST as $Key => $Perms) {
                     if (substr($Key, 0, 5) == "perm_") {
@@ -686,8 +654,8 @@ switch ($_REQUEST['action']) {
 
                 if (!$Err) {
                     if (!is_numeric($_REQUEST['id'])) {
-                        $DB->query("INSERT INTO permissions 
-                                            (Level,Name,`Values`,DisplayStaff,IsUserClass,MaxSigLength,MaxAvatarWidth,MaxAvatarHeight,Color) 
+                        $DB->query("INSERT INTO permissions
+                                            (Level,Name,`Values`,DisplayStaff,IsUserClass,MaxSigLength,MaxAvatarWidth,MaxAvatarHeight,Color)
                                      VALUES ('" . db_string($Level) . "','" . db_string($Name) . "','" . db_string(serialize($Values)) . "','" . db_string($DisplayStaff) . "','" . db_string($IsUserClass) . "','" . db_string($MaxSigLength) . "','" . db_string($MaxAvatarWidth) . "','" . db_string($MaxAvatarHeight) . "','" . db_string($Color) . "')");
                     } else {
                         $DB->query("UPDATE permissions SET Level='" . db_string($Level) . "',Name='" . db_string($Name) . "',`Values`='" . db_string(serialize($Values)) . "',DisplayStaff='" . db_string($DisplayStaff) . "',MaxSigLength='" . db_string($MaxSigLength) . "',MaxAvatarWidth='" . db_string($MaxAvatarWidth) . "',MaxAvatarHeight='" . db_string($MaxAvatarHeight) . "',Color='" . db_string($Color) . "' WHERE ID='" . db_string($_REQUEST['id']) . "'");
@@ -700,7 +668,7 @@ switch ($_REQUEST['action']) {
                 }
             }
 
-            include('managers/permissions_alter.php');
+            include 'managers/permissions_alter.php';
         } else {
             if (!empty($_REQUEST['removeid']) && is_numeric($_REQUEST['removeid'])) {
 
@@ -734,61 +702,55 @@ switch ($_REQUEST['action']) {
     case 'btc_address_input':
         include(SERVER_ROOT . '/sections/tools/data/donation_addresses.php');
         break;
-    
+
    case 'enter_addresses':
         // admin submits new unused addresses
         include(SERVER_ROOT . '/sections/tools/data/take_btc_addresses.php');
         break;
-        
+
    case 'delete_addresses':
         authorize();
         if (!check_perms('admin_donor_addresses'))  error(403);
-        
-        $AddressIDs = $_POST['deleteids'];  
+
+        $AddressIDs = $_POST['deleteids'];
         if (!is_array($AddressIDs)) error("Nothing selected to delete");
 
         foreach ($AddressIDs as $addressID) {
-            if (!is_number($addressID))  error(0);  
+            if (!is_number($addressID))  error(0);
         }
         $AddressIDs = implode(',', $AddressIDs);
 
-        $DB->query("DELETE FROM bitcoin_addresses WHERE ID IN ($AddressIDs)"); 
-       
-        
+        $DB->query("DELETE FROM bitcoin_addresses WHERE ID IN ($AddressIDs)");
+
         header("Location: tools.php?action=btc_address_input");
         break;
-    
-    case 'new_drive': 
+
+    case 'new_drive':
         authorize();
-            
+
         if (!check_perms('admin_donor_drives'))  error(403);
 
         $name = db_string($_REQUEST['drivename']);
         $target_euros = (int) ($_REQUEST['target']);
         $desc = db_string($_REQUEST['body']);
-        
-        //$start_time = db_string($_REQUEST['startdate']);
-        //$thread_id = (int) ($_REQUEST['threadid']);  `start_time`, `threadid`, 
 
-        $DB->query("INSERT INTO donation_drives ( `name`, `target_euros`, `description`) 
+        $DB->query("INSERT INTO donation_drives ( `name`, `target_euros`, `description`)
                                 VALUES ( '$name', '$target_euros', '$desc');");
 
-        header("Location: tools.php?action=donation_drives"); 
+        header("Location: tools.php?action=donation_drives");
         break;
- 
 
     case 'edit_drive':
         include(SERVER_ROOT . '/sections/tools/data/edit_drive.php');
         break;
-        
+
     case 'donation_log':
         include(SERVER_ROOT . '/sections/tools/data/donation_log.php');
         break;
-    
+
     case 'donation_drives':
         include(SERVER_ROOT . '/sections/tools/data/donation_drives.php');
         break;
-
 
     case 'upscale_pool':
         include(SERVER_ROOT . '/sections/tools/data/upscale_pool.php');
@@ -829,7 +791,6 @@ switch ($_REQUEST['action']) {
     case 'data_viewer':
         include(SERVER_ROOT . '/sections/tools/data/data_viewer.php');
         break;
-
 
     case 'browser_support':
         include(SERVER_ROOT . '/sections/tools/data/browser_support.php');
@@ -921,4 +882,3 @@ switch ($_REQUEST['action']) {
     default:
         include(SERVER_ROOT . '/sections/tools/tools.php');
 }
-?>

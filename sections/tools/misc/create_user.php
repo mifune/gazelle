@@ -1,19 +1,14 @@
-<?
+<?php
 //TODO: rewrite this, make it cleaner, make it work right, add it common stuff
 if (!check_perms('admin_create_users')) {
     error(403);
 }
 
-
 if (!empty($_POST['submit'])) {
-    
     $Val->SetFields('username', true, 'regex', 'You did not enter a valid username.', array('regex' => '/^[a-z0-9_?]{1,20}$/iD'));
     $Val->SetFields('email', true, 'email', 'You did not enter a valid email address.');
     $Val->SetFields('password', true, 'string', 'You did not enter a valid password (6 - 40 characters).', array('minlength' => 6, 'maxlength' => 40));
     $Val->SetFields('confirm_password', true, 'compare', 'Your passwords do not match.', array('comparefield' => 'password'));
-
-    //$Val->SetFields('Username',true,'regex','You did not enter a valid username.',array('regex'=>'/^[A-Za-z0-9_\-\.]{1,20}$/i'));
-    //$Val->SetFields('Password','1','string','You entered an invalid password.',array('maxlength'=>'40','minlength'=>'6'));
 
     $Err = $Val->ValidateForm($_POST);
     if ($Err) error($Err);
@@ -31,7 +26,7 @@ if (!empty($_POST['submit'])) {
     $torrent_pass = make_secret();
 
     //Create the account
-    $DB->query("INSERT INTO users_main (Username,Email,PassHash,Secret,torrent_pass,Enabled,PermissionID,Uploaded) 
+    $DB->query("INSERT INTO users_main (Username,Email,PassHash,Secret,torrent_pass,Enabled,PermissionID,Uploaded)
             VALUES ('" . db_string($Username) . "','" . db_string($Email) . "','" . db_string(make_hash($Password, $Secret)) . "','" . db_string($Secret) . "','" . db_string($torrent_pass) . "','1','" . APPRENTICE . "', '524288000')");
 
     //Increment site user count
@@ -40,7 +35,6 @@ if (!empty($_POST['submit'])) {
     //Grab the userid
     $UserID = $DB->inserted_id();
 
-    ////update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
     //Default stylesheet
     $DB->query("SELECT ID FROM stylesheets WHERE `Default`='1'");
     list($StyleID) = $DB->next_record();
@@ -49,24 +43,21 @@ if (!empty($_POST['submit'])) {
     $AuthKey = make_secret();
 
     //Give them a row in users_info
-    $DB->query("INSERT INTO users_info 
-		(UserID,StyleID,AuthKey,JoinDate,RunHour) VALUES 
-		('" . db_string($UserID) . "','" . db_string($StyleID) . "','" . db_string($AuthKey) . "', '" . sqltime() . "', FLOOR( RAND() * 24 ))");
+    $DB->query("INSERT INTO users_info
+        (UserID,StyleID,AuthKey,JoinDate,RunHour) VALUES
+        ('" . db_string($UserID) . "','" . db_string($StyleID) . "','" . db_string($AuthKey) . "', '" . sqltime() . "', FLOOR( RAND() * 24 ))");
 
-        
     $Body = get_article("intro_pm");
     if($Body) send_pm($UserID, 0, db_string("Welcome to ". SITE_NAME) , db_string($Body));
-    
+
     update_tracker('add_user', array('id' => $UserID, 'passkey' => $torrent_pass));
 
     //Redirect to users profile
     header("Location: user.php?id=" . $UserID);
-    
-    
 
 //Form wasn't sent -- Show form
 } else {
- 
+
     show_header('Create a User');
 
     ?>
@@ -99,8 +90,6 @@ if (!empty($_POST['submit'])) {
             </table>
         </form>
     </div>
-    <? 
+    <?php
     show_footer();
 }
-
-?>

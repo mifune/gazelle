@@ -1,24 +1,23 @@
-<?
-if(!check_perms('admin_donor_addresses')) { error(403); }
+<?php
+if (!check_perms('admin_donor_addresses')) { error(403); }
 
 include(SERVER_ROOT.'/sections/donate/functions.php');
 define('DONATIONS_PER_PAGE', 50);
-
 
 show_header('Bitcoin addresses');
 ?>
 <div class="thin">
     <h2>Bitcoin address pool</h2>
-    
-	<div class="linkbox"> 
-		<a href="tools.php?action=btc_address_input">[Unused address pool]</a>
-        <? if (check_perms('admin_donor_log')) { ?>
-		<a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
-		<a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
-		<a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
-        <? } ?>
-	</div>
-    
+
+    <div class="linkbox">
+        <a href="tools.php?action=btc_address_input">[Unused address pool]</a>
+        <?php if (check_perms('admin_donor_log')) { ?>
+        <a href="tools.php?action=donation_log&view=issued">[Issued addresses]</a>
+        <a href="tools.php?action=donation_log&view=submitted">[Submitted donations]</a>
+        <a href="tools.php?action=donation_log&view=cleared">[Cleared donations]</a>
+        <?php  } ?>
+    </div>
+
     <div class="head">Add more donation addresses</div>
     <div class="box pad">
         When a user goes to the donate page they can request an address to donate BTC to. Unused addresses are taken from this pool.<br/>
@@ -34,14 +33,14 @@ show_header('Bitcoin addresses');
             <input type="submit" value="Enter new addresses" />
         </form>
     </div>
-<?
-   
+<?php
+
     list($Page,$Limit) = page_limit(DONATIONS_PER_PAGE);
 
-    $DB->query("SELECT SQL_CALC_FOUND_ROWS ba.ID, ba.public , ba.userID, m.Username, m.PermissionID, m.Enabled, i.Donor, i.Warned  
+    $DB->query("SELECT SQL_CALC_FOUND_ROWS ba.ID, ba.public , ba.userID, m.Username, m.PermissionID, m.Enabled, i.Donor, i.Warned
                          FROM bitcoin_addresses  AS ba
                          LEFT JOIN users_main AS m ON m.ID=ba.UserID
-                         LEFT JOIN users_info AS i ON i.UserID=ba.UserID 
+                         LEFT JOIN users_info AS i ON i.UserID=ba.UserID
                          ORDER BY ba.ID ASC LIMIT $Limit ");
 
     $Addresses = $DB->to_array(false,MYSQLI_NUM);
@@ -50,7 +49,7 @@ show_header('Bitcoin addresses');
 
 ?>
     <div class="linkbox">
-    <?
+    <?php
         $Pages=get_pages($Page,$Results,DONATIONS_PER_PAGE,11) ;
         echo $Pages;
     ?>
@@ -58,7 +57,7 @@ show_header('Bitcoin addresses');
 
     <div class="head"><?=$Results?> Unused donation addresses</div>
     <div class="box pad">
-        
+
         <form id="addressform" action="tools.php" method="post" onsubmit="return anyChecks('addressform')">
             <div class="donate_details">
                 <input type="hidden" name="action" value="delete_addresses" />
@@ -71,10 +70,10 @@ show_header('Bitcoin addresses');
                         <td>user</td>
                         <td></td>
                     </tr>
-    <?
-        foreach($Addresses as $Address) {
+    <?php
+        foreach ($Addresses as $Address) {
             list($ID, $public, $UserID, $Username, $PermissionID, $Enabled, $Donor, $Warned) = $Address;
-    
+
                 $row = $row=='b'?'a':'b';
     ?>
                     <tr class="row<?=$row?>">
@@ -86,8 +85,8 @@ show_header('Bitcoin addresses');
                         <td><?=format_username($UserID, $Username, $Donor, $Warned, $Enabled, $PermissionID)?></td>
                         <td><?=( validate_btc_address($public)?'':'<span class="red">invalid format!</span>');?> </td>
                     </tr>
-        
-    <?	} ?>
+
+    <?php 	} ?>
                 </table>
             </div>
             <div>
@@ -95,14 +94,10 @@ show_header('Bitcoin addresses');
             </div>
         </form>
     </div>
-        
-  
+
     <div class="linkbox">
         <?=$Pages?>
     </div>
 </div>
-<? show_footer();  
-
-
-
-?>
+<?php
+show_footer();

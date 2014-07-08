@@ -1,32 +1,29 @@
-<?
+<?php
 
 if (!check_perms('site_stats_advanced')) error(403);
 
-
-
 include_once(SERVER_ROOT.'/classes/class_charts.php');
-$DB->query("SELECT tg.NewCategoryID, COUNT(t.ID) AS Torrents 
-              FROM torrents AS t JOIN torrents_group AS tg ON tg.ID=t.GroupID 
+$DB->query("SELECT tg.NewCategoryID, COUNT(t.ID) AS Torrents
+              FROM torrents AS t JOIN torrents_group AS tg ON tg.ID=t.GroupID
           GROUP BY tg.NewCategoryID ORDER BY Torrents DESC");
 $Groups = $DB->to_array();
 $Pie = new PIE_CHART(750,400,array('Other'=>0.2,'Percentage'=>1));
-foreach($Groups as $Group) {
-	list($NewCategoryID, $Torrents) = $Group;
-	//$CategoryName = $NewCategories[$NewCategoryID]['name'];
-	$Pie->add($NewCategories[$NewCategoryID]['name'],$Torrents);
+foreach ($Groups as $Group) {
+    list($NewCategoryID, $Torrents) = $Group;
+    //$CategoryName = $NewCategories[$NewCategoryID]['name'];
+    $Pie->add($NewCategories[$NewCategoryID]['name'],$Torrents);
 }
 $Pie->transparent();
 $Pie->color('FF33CC');
 $Pie->generate();
 $TorrentCategories = $Pie->url();
 
-
 //==========================================================
 
 if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
-    
+
     $start = date('Y-m-d H:i:s', strtotime( "$_POST[year1]-$_POST[month1]-$_POST[day1]" )  );
-    $end = date('Y-m-d H:i:s', strtotime( "$_POST[year2]-$_POST[month2]-$_POST[day2]" )  ); 
+    $end = date('Y-m-d H:i:s', strtotime( "$_POST[year2]-$_POST[month2]-$_POST[day2]" )  );
    // error("$start --> $end");
     if($start===false) error("Error in start time input");
     if($end===false) error("Error in end time input");
@@ -36,17 +33,16 @@ if (isset($_POST['view']) && check_perms('site_stats_advanced')) {
     }
     if (strtotime($end)>time()) $end = sqltime();
     if ($start>=$end) error("Start date ($start) cannot be after end date ($end)");
-         
-    $DB->query("SELECT DATE_FORMAT(Time, '%d %b %y') AS Label, Count(ID) As Torrents 
-                FROM torrents 
+
+    $DB->query("SELECT DATE_FORMAT(Time, '%d %b %y') AS Label, Count(ID) As Torrents
+                FROM torrents
                 WHERE Time BETWEEN '$start' AND '$end'
-                GROUP BY Label 
+                GROUP BY Label
                 ORDER BY Time DESC
                 LIMIT 365");
     $title = "$_POST[year1]-$_POST[month1]-$_POST[day1] to $_POST[year2]-$_POST[month2]-$_POST[day2]";
 
     $TorrentStats = array_reverse($DB->to_array());
-    
 }
 
 if (!$TorrentStats) {
@@ -55,70 +51,56 @@ if (!$TorrentStats) {
 }
 
 if ($TorrentStats === false) {
- /* DATE_FORMAT(Time, '%Y') as year ,  
-                DATE_FORMAT(Time, '%j') as day ,  */ 
-    $DB->query("SELECT DATE_FORMAT(Time, '%d %b %y') AS Label, Count(ID) As Torrents 
-                FROM torrents 
+    $DB->query("SELECT DATE_FORMAT(Time, '%d %b %y') AS Label, Count(ID) As Torrents
+                FROM torrents
                 WHERE Time < (NOW() - INTERVAL 1 DAY)
-                GROUP BY Label 
+                GROUP BY Label
                 ORDER BY Time DESC
                 LIMIT 365");
     $title = "last 365 days";
     $TorrentStats = $DB->to_array();
     $TorrentStats = array_reverse($TorrentStats);
-    //$TorrentStats[] = array('', 0);
-    //error(print_r($SiteStats,true));
-    $Cache->cache_value('torrents_byday',$TorrentStats, 3600*24 ); 
+    $Cache->cache_value('torrents_byday',$TorrentStats, 3600*24 );
 }
 
 $startrow=0;
 $endrow=0;
-//$maxnum=0;
 $maxrows = count($TorrentStats);
 
 if (count($TorrentStats)>0) {
- 
     $endrow= $maxrows;
     $cols = "cols: [{id: 'date', label: 'Date', type: 'string'},
                     {id: 'torrents', label: 'Torrents Daily', type: 'number'}] ";
-     
-    $rows = array();        
+
+    $rows = array();
     //reset($SiteStats);
-    foreach ($TorrentStats as $data)  {  
+    foreach ($TorrentStats as $data) {
         list($Label, $Torrents) = $data;
-        //if($Torrents>$maxnum) $maxnum = $Torrents;
         $rows[] = " {c:[{v: '$Label'}, {v: $Torrents}]} ";
     }
     $rows[] = " {c:[{v: '$Label'}, {v: 0}]} "; // stupid google charts
-    $data = " { $cols, rows: [" . implode(",", $rows) . "] }"; 
+    $data = " { $cols, rows: [" . implode(",", $rows) . "] }";
 }
 
 //=================================================================
-
 
 show_header('Torrent statistics','charts,jquery');
 ?>
 
 <div class="thin">
     <h2>Torrent stats</h2>
-	<div class="linkbox">
-		<a href="stats.php?action=users">[User graphs]</a>
-		<a href="stats.php?action=site">[Site stats]</a>
-		<strong><a href="stats.php?action=torrents">[Torrent stats]</a></strong>
-	</div>
-    <br/>
-<?  /*
-    <div class="head">Upload history</div>
-    <div class="box pad center">
-        <img src="http://chart.apis.google.com/chart?cht=lc&chs=880x160&chco=000D99,99000D,00990D&chg=0,-1,1,1&chxt=y,x&chxs=0,h&chxl=1:|<?=implode('|',$Labels)?>&chxr=0,0,<?=$Max?>&chd=t:<?=implode(',',$InFlow)?>|<?=implode(',',$OutFlow)?>|<?=implode(',',$NetFlow)?>&chls=2,4,0&chdl=Uploads|Deletions|Remaining&amp;chf=bg,s,FFFFFF00" />
+    <div class="linkbox">
+        <a href="stats.php?action=users">[User graphs]</a>
+        <a href="stats.php?action=site">[Site stats]</a>
+        <strong><a href="stats.php?action=torrents">[Torrent stats]</a></strong>
     </div>
-    <br/>   */
-?>
+    <br/>
+
     <div class="head">Uploads daily</div>
     <table class="">
         <tr><td class="box pad center">
-<?
-    if ($data) { ?> 
+<?php
+    if ($data) { ?>
         <h1>Uploads daily</h1>
         <span style="position:relative;left:0px;"><?=$title?></span>
         <div id="chart_div"></div>
@@ -135,30 +117,29 @@ show_header('Torrent statistics','charts,jquery');
         <script type="text/javascript">
             var startrow = <?=$startrow?>;
             var endrow = <?=$endrow?>;
-            // var maxnum = <?=$maxnum?>;
-            var chartdata = <?=$data?>; 
+            var chartdata = <?=$data?>;
             Load_Torrentstats();
         </script>
-        
-<?
-        if (check_perms('site_debug')) {  ?>      
+
+<?php
+        if (check_perms('site_debug')) {  ?>
             <span style="float:left">
                 <a href="#debuginfo" onclick="$('#databox').toggle(); this.innerHTML=(this.innerHTML=='DEBUG: (Hide chart data)'?'DEBUG: (View chart data)':'DEBUG: (Hide chart data)'); return false;">DEBUG: (View chart data)</a>
             </span>&nbsp;
-            
+
             <div id="databox" class="box pad hidden">
             <?=$data?>
             </div>
-<?      }  ?>
-<?
+<?php       }  ?>
+<?php
     } else { ?>
         <p>No torrent data found</p>
-<?  }  ?>
+<?php   }  ?>
         </td></tr>
-        
-<? 
+
+<?php
     if (check_perms('site_stats_advanced')) {
-        if (isset($_POST['year1'])){
+        if (isset($_POST['year1'])) {
             $start = array ($_POST['year1'],$_POST['month1'],$_POST['day1']);
             $end = array ($_POST['year2'],$_POST['month2'],$_POST['day2']);
         } else {
@@ -168,7 +149,7 @@ show_header('Torrent statistics','charts,jquery');
             $end =  date('Y-m-d');
             $end = explode('-', $end);
         }
-?>      
+?>
         <tr><td class="colhead">view options</td></tr>
         <tr><td class="box pad center">
             <form method="post" action="">
@@ -181,10 +162,10 @@ show_header('Torrent statistics','charts,jquery');
                 <input type="text" style="width:50px" title="year" name="year2"  value="<?=$end[0]?>" />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <input type="submit" name="view" value="View history" />
-            </form> 
+            </form>
         </td></tr>
-<?  }  ?>
-        
+<?php   }  ?>
+
     </table>
     <br/><br/>
     <div class="head">Torrents by category</div>
@@ -193,5 +174,5 @@ show_header('Torrent statistics','charts,jquery');
         <img src="<?=$TorrentCategories?>" />
     </div>
 </div>
-<?
+<?php
 show_footer();

@@ -1,6 +1,6 @@
-<?
+<?php
 show_header('Disabled');
-if(empty($_POST['submit']) || empty($_POST['username'])) {
+if (empty($_POST['submit']) || empty($_POST['username'])) {
     ?>
     <p class="warning">
     Your account has been disabled.<br />
@@ -18,30 +18,25 @@ if(empty($_POST['submit']) || empty($_POST['username'])) {
           <input type="text" name="username" width="20" />
           <input type="submit" name="submit" value="Join WebIRC" />
     </form>
-    <?
+    <?php
 } else {
-	$nick = $_POST['username'];
-	$nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
-	if(strlen($nick) == 0) {
-		$nick = "EmpGuest?";
-	} //else {
-		//if(is_numeric(substr($nick, 0, 1))) {
-		//	$nick = "_" . $nick;
-		//}
-	//}
+    $nick = $_POST['username'];
+    $nick = preg_replace('/[^a-zA-Z0-9\[\]\\`\^\{\}\|_]/', '', $nick);
+    if (strlen($nick) == 0) {
+        $nick = "EmpGuest?";
+    }
       $nick = "disabled_$nick";
-      
+
     ?>
     <div class="thin">
           <h3 id="general">Disabled IRC</h3>
         <div class="">
               <div class="head">IRC</div>
-              <div class="box pad center"> 
-                        <iframe src="http://webchat.digitalwizardry.org/?nick=<?=$nick?>&channels=empornium-help" width="98%" height="600"></iframe> 
+              <div class="box pad center">
+                        <iframe src="http://webchat.digitalwizardry.org/?nick=<?=$nick?>&channels=empornium-help" width="98%" height="600"></iframe>
               </div>
         </div>
     </div>
-    <?
+    <?php
 }
 show_footer();
-?>

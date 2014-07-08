@@ -1,4 +1,4 @@
-<?
+<?php
 if (!isset($_GET['torrentid']) || !is_number($_GET['torrentid'])) {
     error(404);
 }
@@ -15,15 +15,13 @@ if (!empty($_GET['page']) && is_number($_GET['page'])) {
     $Limit = 100;
 }
 
-
-
 $DB->query("SELECT SQL_CALC_FOUND_ROWS
-		ud.UserID,
-		ud.Time
-		FROM users_downloads AS ud
-		WHERE ud.TorrentID='$TorrentID'
-		ORDER BY ud.Time DESC
-		LIMIT $Limit");
+        ud.UserID,
+        ud.Time
+        FROM users_downloads AS ud
+        WHERE ud.TorrentID='$TorrentID'
+        ORDER BY ud.Time DESC
+        LIMIT $Limit");
 $UserIDs = $DB->collect('UserID');
 $Results = $DB->to_array('UserID', MYSQLI_ASSOC);
 
@@ -40,17 +38,17 @@ if (count($UserIDs) > 0) {
 }
 ?>
 
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_downloads', $_GET['torrentid'], $NumResults, $Page) ?></div>
-<? } ?>
+<?php  } ?>
 <table>
-    <?
+    <?php
     if ($NumResults == 0) {
-        ?> 
+        ?>
         <tr class="smallhead">
             <td colspan="4">There have been no downloads of this torrent</td>
-        </tr> 
-        <?
+        </tr>
+        <?php
     } else {
         ?>
         <tr class="smallhead">
@@ -64,7 +62,7 @@ if (count($UserIDs) > 0) {
             <td>Time</td>
         </tr>
         <tr>
-            <?
+            <?php
             $i = 0;
 
             foreach ($Results as $ID => $Data) {
@@ -80,23 +78,23 @@ if (count($UserIDs) > 0) {
                     }
                 }
                 if ($i % 2 == 0 && $i > 0) {
-                    ?> 
+                    ?>
                 </tr>
-                <tr>	
-                    <?
+                <tr>
+                    <?php
                 }
-                ?> 
+                ?>
                 <td><?= $User ?></td>
                 <td><?= time_diff($Timestamp) ?></td>
-                <?
+                <?php
                 $i++;
             }
             ?>
         </tr>
-        <?
+        <?php
     }
     ?>
 </table>
-<? if ($NumResults > 100) { ?>
+<?php  if ($NumResults > 100) { ?>
     <div class="linkbox"><?= js_pages('show_downloads', $_GET['torrentid'], $NumResults, $Page) ?></div>
-<? } ?>
+<?php  }

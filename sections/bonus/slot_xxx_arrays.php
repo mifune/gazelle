@@ -1,4 +1,4 @@
-<?
+<?php
 /*  from spreadsheet:
 
      Reel1	Reel2	Reel3	Reel4
@@ -47,7 +47,7 @@
 
  */
 
-        //Payout and Reels for slot machine  
+        //Payout and Reels for slot machine
 $Payout = array();
 $Payout['A'] = array(6, 12);
 $Payout['B'] = array(10, 25);
@@ -62,9 +62,9 @@ $Reel[1] = array('C', 'X', 'A', 'A', 'X', 'D', 'D', 'X', 'B', 'B', 'X', 'E', 'B'
 $Reel[2] = array('B', 'X', 'F', 'C', 'B', 'C', 'E', 'C', 'X', 'B', 'B', 'D', 'X', 'A', 'A', 'X', 'A', 'A', 'E', 'D');
 $Reel[3] = array('D', 'X', 'B', 'D', 'B', 'X', 'E', 'X', 'A', 'B', 'X', 'C', 'A', 'X', 'A', 'B', 'A', 'F', 'X', 'C');
 
-
-// draw payout 
-function print_payout_table($BetAmount) {
+// draw payout
+function print_payout_table($BetAmount)
+{
     global $Payout;
     ?>
     <div>
@@ -76,14 +76,14 @@ function print_payout_table($BetAmount) {
         <img src="<?= STATIC_SERVER ?>common/casino/iconA.png" />
         <img src="<?= STATIC_SERVER ?>common/casino/iconA.png" />
     </div>
-    <? foreach ($Payout as $Pic => $P) { ?>
+    <?php foreach ($Payout as $Pic => $P) { ?>
         <div>
             <span class="payout"><?= number_format($BetAmount * $P[0]) ?></span>
             <img src="<?= STATIC_SERVER ?>common/casino/icon<?= $Pic ?>.png" />
             <img src="<?= STATIC_SERVER ?>common/casino/icon<?= $Pic ?>.png" />
             <img src="<?= STATIC_SERVER ?>common/casino/icon<?= $Pic ?>.png" />
         </div>
-    <? }
+    <?php }
     foreach ($Payout as $Pic => $P) { ?>
         <div>
             <span class="payout"><?= number_format($BetAmount * $P[1]) ?></span>
@@ -92,8 +92,6 @@ function print_payout_table($BetAmount) {
             <img src="<?= STATIC_SERVER ?>common/casino/icon<?= $Pic ?>.png" />
             <img src="<?= STATIC_SERVER ?>common/casino/icon<?= $Pic ?>.png" />
         </div>
-    <?
+    <?php
     }
 }
-
-?>

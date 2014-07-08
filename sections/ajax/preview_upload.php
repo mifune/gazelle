@@ -1,5 +1,4 @@
-<?
-
+<?php
 /* AJAX Previews, simple stuff. */
 
 include(SERVER_ROOT . '/classes/class_text.php'); // Text formatting class
@@ -25,12 +24,6 @@ $Response = array();
 
 $Response[0] = $Err;
 
-
-//if ($Err){
-// echo '<div class="messagebar alert">'.$Err.'</div>';
-//}
-
-
 $Content = $_REQUEST['desc']; // Don't use URL decode.
 $Content .= "[br][br]$_REQUEST[templatefooter]";
 $Imageurl = $_REQUEST['image']; // Don't use URL decode.
@@ -46,10 +39,6 @@ if (!empty($Imageurl)) {
     $Imageurl = "<div style=\"text-align: center;\"><strong class=\"important_text\">No Cover Image</strong></div>";
 }
 
-
-
-
-
 $Response[1] = '<br/>
           <div class="cover_image">
                 <div class="head">Cover Image</div>
@@ -57,11 +46,7 @@ $Response[1] = '<br/>
           </div>
           <div class="head">Description</div>
           <div class="box pad">
-               ' . $Text->full_format($Content, get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions']), true) . '                              
+               ' . $Text->full_format($Content, get_permissions_advtags($LoggedUser['ID'], $LoggedUser['CustomPermissions']), true) . '
           </div><br/>';
 
-
-
 echo json_encode($Response);
-?>
-

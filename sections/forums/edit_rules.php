@@ -1,21 +1,19 @@
-<?
+<?php
 enforce_login();
 if (!check_perms('site_moderate_forums')) {
     error(403);
 }
-
 
 $ForumID = $_GET['forumid'];
 if (!is_number($ForumID)) {
     error(404);
 }
 
-
 if (!empty($_POST['add']) || (!empty($_POST['del']))) {
     if (!empty($_POST['add'])) {
         if (is_number($_POST['new_thread'])) {
 
-            $ThreadID = (int)$_POST['new_thread'];
+            $ThreadID = (int) $_POST['new_thread'];
             $DB->query("SELECT ID FROM forums_topics WHERE ID = $ThreadID" );
             if ($DB->record_count()==0) $ResultMessage ="No thread with id=$ThreadID!";
             else $DB->query("INSERT INTO forums_specific_rules (ForumID, ThreadID) VALUES ( $ForumID, $ThreadID)");
@@ -29,19 +27,18 @@ if (!empty($_POST['add']) || (!empty($_POST['del']))) {
     $Cache->delete_value('forums_list');
 }
 
-
 $DB->query("SELECT ThreadID , Title
-              FROM forums_specific_rules AS fs LEFT JOIN forums_topics AS ft ON ft.ID=fs.ThreadID 
+              FROM forums_specific_rules AS fs LEFT JOIN forums_topics AS ft ON ft.ID=fs.ThreadID
              WHERE fs.ForumID = $ForumID" );
-//$ThreadIDs = $DB->collect('ThreadID');
+
 $ThreadIDs = $DB->to_array();
 
 show_header();
 ?>
 <div class="thin">
-    <? if ($ResultMessage) { ?>
-			<div id="messagebar" class="messagebar alert"><?=$ResultMessage?></div>
-    <? } ?>
+    <?php if ($ResultMessage) { ?>
+            <div id="messagebar" class="messagebar alert"><?=$ResultMessage?></div>
+    <?php } ?>
     <div class="head">
         <a href="forums.php">Forums</a>
         &gt;
@@ -66,7 +63,7 @@ show_header();
                 <input type="submit" name="add" value="Add thread" />
             </td>
         </form>
-        <? foreach ($ThreadIDs as $ThreadID) { ?>
+        <?php foreach ($ThreadIDs as $ThreadID) { ?>
             <tr>
                 <td><?= $ThreadID[0] ?></td>
                 <td><?= $ThreadID[1] ?></td>
@@ -77,9 +74,8 @@ show_header();
                     </form>
                 </td>
             </tr>
-        <? } ?>
+        <?php } ?>
     </table>
 </div>
-<?
+<?php
 show_footer();
-?>

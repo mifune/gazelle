@@ -1,2 +1,2 @@
-<? header('Location: articles.php?topic=clients');
-
+<?php
+header('Location: articles.php?topic=clients');
