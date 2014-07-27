@@ -25,15 +25,14 @@ if (empty($_POST['submit']) || empty($_POST['username'])) {
     if (strlen($nick) == 0) {
         $nick = "EmpGuest?";
     }
-      $nick = "disabled_$nick";
-
     ?>
+
     <div class="thin">
           <h3 id="general">Disabled IRC</h3>
         <div class="">
               <div class="head">IRC</div>
               <div class="box pad center">
-                        <iframe src="http://webchat.digitalwizardry.org/?nick=<?=$nick?>&channels=empornium-help" width="98%" height="600"></iframe>
+                        <iframe src="https://webchat.digitalirc.org/?nick=disabled_<?=$nick?>&channels=empornium-help&prompt=0" width="98%" height="600"></iframe>
               </div>
         </div>
     </div>
